@@ -5,7 +5,7 @@ import { CHAMPS, TEAM_NAMES, TEAM_COLORS, FFA_COLORS } from './champs.js';
 import { MAPS } from './maps.js';
 import * as net from './net.js';
 import { prepareMap, loadBeast } from './stages.js';
-import { loadSfx, play } from './sfx.js';
+import { loadSfx, play, setVolume } from './sfx.js';
 
 const $ = id => document.getElementById(id);
 const esc = s => String(s).replace(/[&<>"']/g, c => `&#${c.charCodeAt(0)};`);
@@ -217,6 +217,11 @@ $('view').addEventListener('mousedown', e => mouse.add(e.button));
 addEventListener('mouseup', e => mouse.delete(e.button));
 addEventListener('contextmenu', e => { if (game) e.preventDefault(); });
 $('resumeBtn').onclick = () => $('escMenu').classList.add('hidden');
+// volume sliders (menu + Esc menu) share one saved setting
+const vols = document.querySelectorAll('.vol');
+const applyVol = v => { setVolume(v / 100); store.set('volume', v); vols.forEach(el => { el.value = v; }); };
+vols.forEach(el => { el.oninput = () => applyVol(+el.value); el.onchange = () => play('hit', 0.8); });
+applyVol(+store.get('volume', 70));
 $('quitBtn').onclick = () => leave();
 
 const k = (...codes) => codes.some(c => keys.has(c));
@@ -224,12 +229,12 @@ function readInput() {
   let x = (k('KeyD', 'ArrowRight') ? 1 : 0) - (k('KeyA', 'ArrowLeft') ? 1 : 0);
   let z = (k('KeyS', 'ArrowDown') ? 1 : 0) - (k('KeyW', 'ArrowUp') ? 1 : 0);
   let b = (k('Space') ? BTN.JUMP : 0) | (k('KeyJ') || mouse.has(0) ? BTN.PUNCH : 0) | (k('KeyK') || mouse.has(2) ? BTN.GRAB : 0)
-    | (k('KeyQ') ? BTN.A1 : 0) | (k('KeyE') ? BTN.A2 : 0);
+    | (k('KeyQ') ? BTN.A1 : 0) | (k('KeyE') ? BTN.A2 : 0) | (k('KeyH') ? BTN.BUTT : 0) | (k('KeyC', 'ControlLeft') ? BTN.LAY : 0);
   const pad = [...(navigator.getGamepads?.() ?? [])].find(Boolean);
   if (pad) {
     const [ax, az] = pad.axes, on = i => pad.buttons[i]?.pressed;
     if (Math.hypot(ax, az) > 0.2) { x = ax; z = az; }
-    b |= (on(0) ? BTN.JUMP : 0) | (on(2) ? BTN.PUNCH : 0) | (on(5) || on(7) ? BTN.GRAB : 0) | (on(4) || on(3) ? BTN.A1 : 0) | (on(6) || on(1) ? BTN.A2 : 0);
+    b |= (on(0) ? BTN.JUMP : 0) | (on(2) ? BTN.PUNCH : 0) | (on(5) || on(7) ? BTN.GRAB : 0) | (on(4) ? BTN.A1 : 0) | (on(6) ? BTN.A2 : 0) | (on(1) ? BTN.BUTT : 0) | (on(3) ? BTN.LAY : 0);
   }
   const side = view.camSide; // controls are camera-relative: up on the stick is away from the camera
   return { x: Math.round(x * side * 100) / 100, z: Math.round(z * side * 100) / 100, b };

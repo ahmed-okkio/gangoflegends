@@ -119,13 +119,24 @@ def hec_tail():  # hips frame: a spectral flame streaming back
     tube(SPIRIT(), [(0, 0.05, -0.17), (0, 0.06, -0.34), (0, -0.04, -0.52), (0, -0.16, -0.68), (0, -0.22, -0.85)], [0.07, 0.1, 0.085, 0.05, 0.003])
     for s in (1, -1): tube(SPIRIT(), [(s * 0.03, 0.06, -0.3), (s * 0.1, 0.08, -0.46), (s * 0.15, 0.02, -0.6)], [0.045, 0.03, 0.002])  # wisps
 
+def hec_hoof(top, bottom, r):  # a chunky plated horse hoof down the part's -y, flaring to a flat sole; spirit glow round the cuff
+    h = top - bottom
+    cyl(ARMOR(), r * 0.85, h * 0.22, (0, top - h * 0.11, 0.01))  # cuff
+    ring(SPIRIT(), r * 0.88, r * 0.15, (0, top - h * 0.22, 0.01))
+    cyl(ARMOR2(), r, h * 0.62, (0, bottom + h * 0.41, 0.02), r2=r * 0.86)  # hoof wall, wide end down
+    cyl(ARMOR(), r * 1.08, h * 0.14, (0, bottom + h * 0.07, 0.025))  # sole
+    box(ARMOR(), (r * 0.4, h * 0.6, r * 0.4), (0, bottom + h * 0.42, 0.02 + r * 0.9), r * 0.15)  # front ridge
+
 PROPS = {
     "blitzcrank_core": blitz_core, "blitzcrank_gauntletL": lambda: blitz_gauntlet(1), "blitzcrank_gauntletR": lambda: blitz_gauntlet(-1),
     "hecarim_blade": hec_blade, "hecarim_tail": hec_tail,
+    "hecarim_hoofHand": lambda: hec_hoof(-0.24, -0.44, 0.1),  # forearm frame: hand at y -.337
+    "hecarim_hoofFoot": lambda: hec_hoof(0.03, -0.15, 0.115),  # leg frame: foot bottom at y ~-.136
 }
 # where each prop sits on the preview mannequin: part pivot in the beast's rest pose with arms hanging (beast.js)
 PIVOT = {"core": (0, 0.6347, -0.0101), "blade": (0, 1.0693, 0.0247), "tail": (0, 0.4223, 0.0002),
-         "gauntletL": (0.2015, 0.6711, -0.0433), "gauntletR": (-0.2015, 0.6711, -0.0433)}
+         "gauntletL": (0.2015, 0.6711, -0.0433), "gauntletR": (-0.2015, 0.6711, -0.0433),
+         "hoofHand": (0.2015, 0.6711, -0.0433), "hoofFoot": (0.239, 0.1201, 0.0057)}
 
 def mannequin(dx):
     grey = mat("beast", (0.62, 0.6, 0.58), 0.6)

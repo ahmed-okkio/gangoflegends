@@ -3,6 +3,9 @@ import { xhr } from './stages.js';
 
 const ctx = typeof AudioContext !== 'undefined' ? new AudioContext() : null;
 const base = './gbcache/audio/';
+const VOLUME = 0.3; // GB clips are mastered hot: the slider's 100% is this
+let volume = 1;
+export const setVolume = v => { volume = v; };
 let index = {};
 const buffers = {}; // file -> Promise<AudioBuffer>
 
@@ -19,7 +22,7 @@ export function play(group, vol = 1, rate = 0.92 + Math.random() * 0.16) {
   buffers[file] ??= xhr(base + file, 'arraybuffer').then(b => ctx.decodeAudioData(b));
   buffers[file].then(buf => {
     const src = ctx.createBufferSource(), g = ctx.createGain();
-    src.buffer = buf; src.playbackRate.value = rate; g.gain.value = vol;
+    src.buffer = buf; src.playbackRate.value = rate; g.gain.value = vol * VOLUME * volume;
     src.connect(g).connect(ctx.destination);
     src.start();
   }, () => {});

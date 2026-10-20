@@ -7,7 +7,7 @@ import { PARTS, ANCHOR, HAND, HIP_HEIGHT, CHEST, HEAD, ARM, THIGH, FORE, LEG, HI
 
 export const initPhysics = () => RAPIER.init();
 export const DT = 1 / 60;
-export const BTN = { JUMP: 1, PUNCH: 2, GRAB: 4, A1: 8, A2: 16 };
+export const BTN = { JUMP: 1, PUNCH: 2, GRAB: 4, A1: 8, A2: 16, BUTT: 32, LAY: 64 };
 export const STAND = HIP_HEIGHT + PARTS[CHEST].p[1] - PARTS[HIPS].p[1]; // chest pivot height above the floor when standing
 
 // --- tiny vector / quaternion helpers (Rapier hands out plain {x,y,z(,w)} objects) ---
@@ -38,7 +38,7 @@ const turnToward = (a, b, max) => a + Math.max(-max, Math.min(max, wrap(b - a)))
 const TORSO = CHEST;
 const CORE = [HIPS, WAIST, CHEST, HEAD, THIGH, THIGH + 1, LEG, LEG + 1]; // moved as one by the locomotion; arms hang off it
 const HOLD = 20; // m/s^2 lift on the core (= gravity), so the hover spring only has to hold up the hanging arms
-const UPPER = [HEAD, ARM, ARM + 1, FORE, FORE + 1]; // hang off the chest
+const UPPER = [HEAD]; // turns rigidly with the chest; the arms don't, so they lag and swing out when the beast spins
 const isLeg = i => (i >= THIGH && i < THIGH + 2) || (i >= LEG && i < LEG + 2);
 const Q = a => ({ x: a[0], y: a[1], z: a[2], w: a[3] });
 const ROT_X = qaxis(Z, Math.PI / 2), ROT_Z = qaxis(X, Math.PI / 2); // capsules are y-up in Rapier
@@ -106,6 +106,7 @@ export function createSim({ mapId, players, practice = false, roundsToWin = 3 })
     Object.assign(p, {
       alive: true, yaw, daze: 0, sinceHit: 9, ko: 0, cd: [0, 0], punch: null, punchCd: 0, nextArm: 0, grabs: [null, null],
       stun: 0, spin: 0, spinHit: null, charge: 0, empower: 0, jumpT: 0, phase: 0, grounded: false, prevB: p.input.b,
+      butt: null, buttCd: 0, lying: false, climb: 0,
     });
   }
 
@@ -183,10 +184,12 @@ export function createSim({ mapId, players, practice = false, roundsToWin = 3 })
     }
   }
   // spin the body part so its "down" axis points along dir, at the given strength (0 = limp, 1 = snap)
-  function aimPart(b, dir, k, strength, carry = []) {
+  // Like Gang Beasts' joint drives, the target spin is relative to the parent body: a limb rides along with its parent
+  // but keeps its own momentum, so arms dangle and fling out instead of being held in place in the world.
+  function aimPart(b, dir, k, strength, carry = [], parent = null) {
     const c = qrot(b.rotation(), DOWN), d = norm(dir);
     const ax = cross(c, d), s = len(ax);
-    const target = s < 1e-4 ? V() : mul(ax, Math.atan2(s, dot(c, d)) * k / s);
+    const target = add(parent ? parent.angvel() : V(), s < 1e-4 ? V() : mul(ax, Math.atan2(s, dot(c, d)) * k / s));
     turn(b, mul(sub(target, b.angvel()), strength), carry);
   }
   // rotate a body towards a target orientation, about its joint pivot (the body origin) rather than its centre of mass,
@@ -217,15 +220,18 @@ export function createSim({ mapId, players, practice = false, roundsToWin = 3 })
     p.prevB = inp.b;
 
     if (p.ko > 0 && (p.ko -= DT) <= 0) wake(p);
-    const ctrl = p.ko > 0 ? 0 : 1;
+    // lying down (hold): go limp like a KO, legs touch the floor; let go to get back up
+    const lying = p.ko <= 0 && !!(inp.b & BTN.LAY);
+    if (lying !== p.lying) { p.lying = lying; setLegGroups(p, lying ? bodyGroups(p) : legGroups(p)); }
+    const ctrl = p.ko > 0 ? 0 : lying ? 0.08 : 1;
     const move = ctrl && (p.stun -= DT) <= 0 ? 1 : 0; // staggered: can't steer, jump or cast
     if ((p.sinceHit += DT) > 1.2) p.daze = Math.max(0, p.daze - 15 * DT);
     p.cd = p.cd.map(c => Math.max(0, c - DT));
-    p.punchCd -= DT; p.empower -= DT; p.jumpT -= DT;
+    p.punchCd -= DT; p.empower -= DT; p.jumpT -= DT; p.buttCd -= DT;
 
     const tp = T.translation(), tv = T.linvel(), Hb = p.bodies[HIPS];
     const ray = world.castRay(new RAPIER.Ray(tp, DOWN), STAND + 0.3, true, undefined, worldAndOthers(p));
-    p.grounded = !!ray && ctrl > 0;
+    p.grounded = !!ray && ctrl > 0 && !lying;
 
     let mx = inp.x, mz = inp.z;
     const m = Math.hypot(mx, mz);
@@ -244,19 +250,37 @@ export function createSim({ mapId, players, practice = false, roundsToWin = 3 })
     let speed = 3.6;
     if (p.charge > 0) { p.charge -= DT; speed = 8.5; mx = f.x; mz = f.z; }
     if (p.spin > 0) speed *= 0.6;
+    if (lying) speed = 1.2; // crawl
     const k = (p.grounded ? 0.2 : 0.04) * move;
     const dv = V((mx * speed - tv.x) * k, 0, (mz * speed - tv.z) * k);
     if (p.grounded && p.jumpT <= 0) dv.y = ((STAND - ray.timeOfImpact) * 12 - tv.y) * 0.35 + HOLD * DT;
     if (p.grounded && move && pressed & BTN.JUMP) { dv.y = 6.5 - tv.y; p.jumpT = 0.3; }
+    // climbing: hanging off a ledge by the hands, jump hauls the chest up past the hands, then they let go and
+    // the body rolls forward over the edge
+    const ledge = p.grabs.reduce((y, g, i) => g?.target.isFixed() ? Math.max(y, handPos(p, i).y) : y, -Infinity);
+    if (move && !p.grounded && ledge > -Infinity && pressed & BTN.JUMP && p.climb <= 0) { p.climb = 1.2; p.over = false; }
+    if (p.climb > 0) {
+      p.climb -= DT;
+      if (!p.over && ledge > -Infinity && tp.y < ledge + 0.6) {
+        // haul up, held just behind the hands so the chest neither swings out nor jams under the lip
+        const held = p.grabs.map((g, i) => g && handPos(p, i)).filter(Boolean), hx = held.reduce((a, h) => a + h.x, 0) / held.length, hz = held.reduce((a, h) => a + h.z, 0) / held.length;
+        dv.y = (5 - tv.y) * 0.5 + HOLD * DT;
+        dv.x = ((hx - f.x * 0.3 - tp.x) * 4 - tv.x) * 0.3; dv.z = ((hz - f.z * 0.3 - tp.z) * 4 - tv.z) * 0.3; // stay just out from the wall
+      } else {
+        if (!p.over) { p.over = true; p.climb = Math.min(p.climb, 0.4); releaseGrabs(p); }
+        dv.y = (1.5 - tv.y) * 0.3 + HOLD * DT;
+        dv.x = (f.x * 3 - tv.x) * 0.4; dv.z = (f.z * 3 - tv.z) * 0.4;
+      }
+    }
     if (p.grounded || move) for (const i of CORE) addVel(p.bodies[i], dv);
 
     // posture: hips, waist, chest and head stay upright and face the stick direction
-    const lean = p.charge > 0 ? 0.35 : 0, yq = qyaw(p.yaw), up = (p.grounded ? 0.3 : 0.15) * ctrl;
+    const lean = p.charge > 0 ? 0.35 : p.butt ? 0.9 * Math.sin(Math.min(1, p.butt.t / 0.25) * Math.PI) : 0, yq = qyaw(p.yaw), up = (p.grounded ? 0.3 : 0.15) * ctrl;
     leak = V();
     orient(Hb, yq, 10, up);
     orient(p.bodies[WAIST], qmul(yq, qaxis(X, lean * 0.5)), 10, up, [T, ...UPPER.map(i => p.bodies[i])]);
     orient(T, qmul(yq, qaxis(X, lean)), 20, up, UPPER.map(i => p.bodies[i]));
-    orient(H, yq, 20, up);
+    orient(H, qmul(yq, qaxis(X, lean * 0.6)), 20, up);
 
     const hspeed = Math.hypot(tv.x, tv.z), gait = Math.min(1, hspeed / 2);
     p.phase += hspeed * DT * 4.5;
@@ -269,33 +293,56 @@ export function createSim({ mapId, players, practice = false, roundsToWin = 3 })
       addVel(p.bodies[FORE + arm], add(mul(f, 7), V(0, 1, 0)));
       addVel(T, mul(f, 1));
     }
-    if (p.punch && (p.punch.t += DT) > 0.3) p.punch = null;
+    if (p.punch && (p.punch.t += DT) > 0.3 && !(inp.b & BTN.PUNCH)) p.punch = null; // hold punch to keep the arm out
+    // headbutt: the whole upper body snaps forward and the head leads
+    if (move && pressed & BTN.BUTT && p.buttCd <= 0 && p.spin <= 0) {
+      p.butt = { t: 0, hit: new Set() }; p.buttCd = 0.7;
+      addVel(H, add(mul(f, 4), V(0, 0.5, 0))); addVel(T, mul(f, 1.5));
+      fx('swing', H.translation());
+    }
+    if (p.butt && (p.butt.t += DT) > 0.3) p.butt = null;
 
     for (let i = 0; i < 2; i++) {
       const s = i === 0 ? 1 : -1, swing = Math.sin(p.phase + i * Math.PI);
       // arms: [upper arm dir, forearm dir, strength]. Idle hangs loose with a slight bend, like the originals.
       // `fs` scales the forearm: it lags the upper arm so swings whip instead of moving as one stick
-      let ua = add(add(DOWN, mul(f, 0.15 + swing * 0.4 * gait)), mul(side, s * 0.25)), fa = add(DOWN, mul(f, 0.5 + swing * 0.3 * gait)), str = 0.25, fs = 1;
+      let ua = add(add(DOWN, mul(f, 0.15 + swing * 0.4 * gait)), mul(side, s * 0.25)), fa = add(DOWN, mul(f, 0.5 + swing * 0.3 * gait)), str = 0.1, fs = 1;
       if (grabbing) { ua = fa = add(add(f, V(0, 0.35, 0)), mul(side, s * 0.1)); str = 0.8; }
       if (p.charge > 0) { ua = fa = add(f, V(0, -0.3, 0)); str = 0.6; }
       if (p.punch?.arm === i) { ua = fa = add(add(f, V(0, 0.1, 0)), mul(side, -s * 0.1)); str = 0.6; fs = 0.4; }
       if (p.spin > 0) { ua = fa = add(mul(side, s), mul(f, 0.1)); str = 0.5; fs = 0.4; }
-      aimPart(p.bodies[ARM + i], ua, 14, str * ctrl, [p.bodies[FORE + i]]);
-      aimPart(p.bodies[FORE + i], fa, 14, str * fs * ctrl);
+      if (grabbing && !p.grounded) { ua = fa = add(mul(f, 0.5), V(0, 1, 0)); str = 0.8; } // reach up for ledges
+      if (p.climb > 0) { ua = fa = add(mul(f, 0.3), DOWN); str = 0.8; } // push down on the ledge
+      aimPart(p.bodies[ARM + i], ua, 14, str * ctrl, [p.bodies[FORE + i]], T);
+      aimPart(p.bodies[FORE + i], fa, 14, str * fs * ctrl, [], p.bodies[ARM + i]);
       // legs: thighs swing, shins fold back on the up-swing
-      aimPart(p.bodies[THIGH + i], add(DOWN, mul(f, swing * 0.7 * gait)), 14, 0.5 * ctrl, [p.bodies[LEG + i]]);
-      aimPart(p.bodies[LEG + i], add(DOWN, mul(f, (swing * 0.7 - Math.max(0, Math.cos(p.phase + i * Math.PI)) * 0.9) * gait)), 14, 0.5 * ctrl);
+      aimPart(p.bodies[THIGH + i], add(DOWN, mul(f, swing * 0.7 * gait)), 14, 0.5 * ctrl, [p.bodies[LEG + i]], Hb);
+      aimPart(p.bodies[LEG + i], add(DOWN, mul(f, (swing * 0.7 - Math.max(0, Math.cos(p.phase + i * Math.PI)) * 0.9) * gait)), 14, 0.5 * ctrl, [], p.bodies[THIGH + i]);
     }
     const back = mul(leak, -1 / p.bodies.reduce((m, b) => m + b.mass(), 0));
     for (const b of p.bodies) addVel(b, back);
 
+    // headbutt hits: the skull, a little ahead of the head pivot
+    if (p.butt && p.butt.t > 0.03 && p.butt.t < 0.22) {
+      for (const { vic, part } of playersNear(p, add(H.translation(), qrot(H.rotation(), V(0, 0.17, 0.08))), 0.24)) {
+        if (p.butt.hit.has(vic)) continue;
+        p.butt.hit.add(vic);
+        hit(vic, part, add(mul(f, 4), V(0, 1.5, 0)), 30);
+      }
+    }
+
     // punch hits
-    if (p.punch && p.punch.t > 0.04 && p.punch.t < 0.24) {
-      for (const { vic, part } of playersNear(p, handPos(p, p.punch.arm), 0.2)) {
+    // punch hits land as hard as the fist is moving, so a spinning or running punch carries the body's momentum
+    if (p.punch && p.punch.t > 0.04) {
+      const arm = p.bodies[FORE + p.punch.arm], hp = handPos(p, p.punch.arm);
+      const fv = add(arm.linvel(), cross(arm.angvel(), sub(hp, arm.worldCom())));
+      for (const { vic, part } of playersNear(p, hp, 0.2)) {
         if (p.punch.hit.has(vic)) continue;
+        const sp = len(sub(fv, vic.bodies[part].linvel()));
+        if (sp < 2.5) continue; // a resting fist just pushes
         p.punch.hit.add(vic);
         if (p.empower > 0) { p.empower = 0; hit(vic, part, add(mul(f, 2), V(0, 10, 0)), 45); }
-        else hit(vic, part, add(mul(f, 3.5), V(0, 1, 0)), 20);
+        else { const k = Math.min(sp, 12) / 6; hit(vic, part, add(mul(norm(add(norm(fv), f)), 3.5 * k), V(0, 1, 0)), 20 * k); }
       }
     }
     if (p.spin > 0) for (let i = 0; i < 2; i++) {
@@ -315,9 +362,10 @@ export function createSim({ mapId, players, practice = false, roundsToWin = 3 })
       }
     }
 
-    // grabs: each fist sticks to whatever it touches while grab is held
+    // grabs: each fist sticks to whatever it touches while grab is held (after a climb, only once grab is pressed again)
+    if (!grabbing && p.climb <= 0) p.over = false;
     for (let i = 0; i < 2; i++) {
-      if (!grabbing) { if (p.grabs[i]) { world.removeImpulseJoint(p.grabs[i].j, true); p.grabs[i] = null; } continue; }
+      if (!grabbing || p.over) { if (p.grabs[i]) { world.removeImpulseJoint(p.grabs[i].j, true); p.grabs[i] = null; } continue; }
       if (p.grabs[i]) continue;
       const arm = p.bodies[FORE + i], hp = handPos(p, i);
       const target = overlap(hp, 0.16, worldAndOthers(p))[0]?.parent();

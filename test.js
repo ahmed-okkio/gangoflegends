@@ -104,7 +104,29 @@ function lineUp(sim, gap = 1.1) {
   console.log('grab ok');
 }
 
-// 8. snapshot is small
+// 8. headbutt dazes, lying down drops you and you get back up, hanging off a ledge you can climb up
+{
+  const sim = near('blitz', 'hec');
+  run(sim, 90);
+  lineUp(sim, 0.75);
+  run(sim, 20, i => sim.setInput(0, { x: 0, z: 0, b: i < 3 ? BTN.BUTT : 0 }));
+  assert.ok(sim.players[1].daze > 0, 'headbutt dazes');
+  run(sim, 60, () => sim.setInput(0, { x: 0, z: 0, b: BTN.LAY }));
+  assert.ok(torso(sim, 0).y < 0.35, `lies down ${torso(sim, 0).y}`);
+  run(sim, 90, () => sim.setInput(0, { x: 0, z: 0, b: 0 }));
+  assert.ok(Math.abs(torso(sim, 0).y - STAND) < 0.15, 'gets back up');
+  // hang off the +z edge of the floor (top y 0, edge z 5) facing it, then climb
+  const p = sim.players[0], t0 = torso(sim, 0);
+  for (const b of p.bodies) { const t = b.translation(); b.setTranslation({ x: t.x - t0.x - 3, y: t.y - t0.y - 0.45, z: t.z - t0.z + 5.35 }, true); b.setLinvel({ x: 0, y: 0, z: 0 }, true); }
+  p.yaw = Math.PI;
+  run(sim, 40, () => sim.setInput(0, { x: 0, z: 0, b: BTN.GRAB }));
+  assert.ok(p.grabs.every(Boolean), 'hangs by both hands');
+  run(sim, 60, i => sim.setInput(0, { x: 0, z: 0, b: BTN.GRAB | (i === 2 ? BTN.JUMP : 0) }));
+  assert.ok(p.alive && torso(sim, 0).y > 0.3 && torso(sim, 0).z < 5, `climbs onto the ledge ${JSON.stringify(torso(sim, 0))}`);
+  console.log('headbutt + lie down + climb ok');
+}
+
+// 9. snapshot is small
 {
   const sim = createSim({ mapId: 'girders', players: Array.from({ length: 8 }, (_, i) => ({ id: i, name: 'P', champ: i % 2 ? 'hec' : 'blitz', team: i })) });
   run(sim, 120);

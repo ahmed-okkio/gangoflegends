@@ -8,7 +8,7 @@ import { OutputPass } from 'three/addons/postprocessing/OutputPass.js';
 import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
 import { MAPS } from './maps.js';
 import { CHAMPS, TEAM_COLORS, FFA_COLORS } from './champs.js';
-import { PARTS, ORDER, ANCHOR, HAND, CHEST, HEAD, FORE, HIPS, qmul, qinv, qrot } from './beast.js';
+import { PARTS, ORDER, ANCHOR, HAND, CHEST, HEAD, FORE, LEG, HIPS, qmul, qinv, qrot } from './beast.js';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { beastAsset, xhr } from './stages.js';
 import { playEvents } from './sfx.js';
@@ -17,7 +17,7 @@ import { playEvents } from './sfx.js';
 // part's frame, so it parents with no offset. [prop, part, tag]
 const PROPS = {
   blitz: [['core', CHEST], ['gauntletL', FORE, 'fist'], ['gauntletR', FORE + 1, 'fist']],
-  hec: [['blade', HEAD], ['tail', HIPS]],
+  hec: [['blade', HEAD], ['tail', HIPS], ['hoofHand', FORE], ['hoofHand', FORE + 1], ['hoofFoot', LEG], ['hoofFoot', LEG + 1]],
 };
 const PROP_FILE = { blitz: 'blitzcrank', hec: 'hecarim' };
 const propScenes = {}; // 'blitz/core' -> parsed glTF scene

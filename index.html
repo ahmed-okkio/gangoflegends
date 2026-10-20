@@ -84,6 +84,8 @@
   #keys { position: absolute; right: 18px; bottom: 18px; display: grid; gap: 4px; font-size: 12px; color: #c9d1e0; text-align: right; text-shadow: 0 1px 2px #000; }
   #escMenu { position: absolute; inset: 0; display: grid; place-items: center; background: rgba(5,10,20,.6); pointer-events: auto; }
   #escMenu .card { width: 320px; text-align: center; display: grid; gap: 12px; }
+  .volrow { display: flex; align-items: center; gap: 12px; margin-top: 14px; color: var(--gold); font: 16px var(--display); }
+  .volrow input { flex: 1; accent-color: var(--gold); padding: 0; border: 0; background: none; }
   #update { position: fixed; inset: 0; z-index: 1000; display: grid; place-items: center; background: rgba(5,10,20,.92); }
   #update .card { width: min(460px, 90vw); text-align: center; }
   #update .bar { height: 20px; margin: 16px 0 10px; border: 2px solid var(--gold); border-radius: 99px; background: var(--ink); overflow: hidden; }
@@ -120,8 +122,12 @@
       <span><kbd>J</kbd> / left click punch</span>
       <span><kbd>K</kbd> / right click hold to grab</span>
       <span><kbd>Q</kbd><kbd>E</kbd> abilities</span>
-      <span>Gamepad: A jump, X punch, RB grab, LB/LT abilities</span>
+      <span><kbd>H</kbd> headbutt</span>
+      <span><kbd>C</kbd> hold to lie down</span>
+      <span><kbd>K</kbd>+<kbd>Space</kbd> climb a ledge</span>
+      <span style="grid-column: 1 / -1">Gamepad: A jump, X punch, RB grab, B headbutt, Y lie down, LB/LT abilities</span>
     </div>
+    <label class="volrow">Volume <input class="vol" type="range" min="0" max="100"></label>
     <p class="legal">Gang of Legends was created under Riot Games' "Legal Jibber Jabber" policy using assets owned by Riot Games. Riot Games does not endorse or sponsor this project. Free fan game, not for sale.</p>
   </div>
 </div>
@@ -153,8 +159,8 @@
   <div id="banner" class="hidden"></div>
   <div id="out" class="hidden">You're out! Watch the rest of the round.</div>
   <div id="abil"></div>
-  <div id="keys"><span>Punch <kbd>J</kbd> · Grab <kbd>K</kbd> · Jump <kbd>Space</kbd></span><span>Esc menu</span></div>
-  <div id="escMenu" class="hidden"><div class="card"><button id="resumeBtn" class="btn">Resume</button><button id="quitBtn" class="btn gold">Leave match</button></div></div>
+  <div id="keys"><span>Punch <kbd>J</kbd> · Grab <kbd>K</kbd> · Headbutt <kbd>H</kbd> · Lie <kbd>C</kbd> · Jump <kbd>Space</kbd></span><span>Esc menu</span></div>
+  <div id="escMenu" class="hidden"><div class="card"><button id="resumeBtn" class="btn">Resume</button><label class="volrow">Volume <input class="vol" type="range" min="0" max="100"></label><button id="quitBtn" class="btn gold">Leave match</button></div></div>
 </div>
 
 <script type="importmap">{ "imports": {
