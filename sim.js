@@ -82,7 +82,7 @@ export function createSim({ mapId, players, practice = false, roundsToWin = 3, l
 
   const ps = players.map((pl, slot) => ({
     ...pl, slot, bit: 1 << (slot + 1), champ: CHAMPS[pl.champ] ? pl.champ : 'blitz',
-    alive: false, bodies: null, input: { x: 0, z: 0, b: 0 }, prevB: 0, respawn: 0, ack: 0,
+    alive: false, bodies: null, input: { x: 0, z: 0, b: 0 }, prevB: 0, respawn: 0, ack: 0, q: new Map(), next: null, newest: -1,
   }));
   const teamCount = new Set(ps.map(p => p.team)).size;
   const scores = Array(Math.max(...ps.map(p => p.team)) + 1).fill(0);
@@ -511,6 +511,14 @@ export function createSim({ mapId, players, practice = false, roundsToWin = 3, l
     }
   }
 
+  // play back the next queued client input (setInput); a missing one repeats the last, which is right nearly always
+  function feed(p) {
+    const inp = p.q.get(p.next);
+    if (inp) p.input = inp;
+    p.q.delete(p.next);
+    p.ack = p.next++;
+  }
+
   function stepHooks() {
     if (local >= 0) { hooks = []; return; } // hooks are drawn from the host's snapshots
     hooks = hooks.filter(h => {
@@ -579,7 +587,8 @@ export function createSim({ mapId, players, practice = false, roundsToWin = 3, l
     const dp = sub(hp, h.pos), dv = sub(hv, h.vel), d = len(dp);
     err = d;
     // far off (teleport, missed a big hit): jump there. Otherwise ease in, and take velocity jumps (knockback) whole.
-    const kp = d > 2 ? 1 : 0.25, kv = len(dv) > 2.5 || me.ko > 0 || me.hooked > 0 ? 1 : 0.2;
+    // knocked out or hooked I'm drawn from the host's state, so just stay on it; tiny errors are left alone (no shimmer)
+    const limp = me.ko > 0 || me.hooked > 0, kp = d > 2 || limp ? 1 : d < 0.03 ? 0 : 0.25, kv = len(dv) > 2.5 || limp ? 1 : len(dv) < 0.2 ? 0 : 0.2;
     const cp = mul(dp, kp), cv = mul(dv, kv);
     shift(cp, cv);
     for (const [t, v] of hist) if (t > ack) { v.pos = add(v.pos, cp); v.vel = add(v.vel, cv); } // they already include the old error
@@ -602,7 +611,7 @@ export function createSim({ mapId, players, practice = false, roundsToWin = 3, l
     for (const { r, body } of rollers) body.setNextKinematicRotation(rollerRot(r, mt));
     if (st === 'count' && (timer -= DT) <= 0) st = 'fight';
     const active = st !== 'count';
-    for (const p of ps) { p.ack++; if (p.alive) control(p, active); }
+    for (const p of ps) { if (p.next != null) feed(p); if (p.alive) control(p, active); }
     stepHooks();
     world.step();
 
@@ -625,7 +634,7 @@ export function createSim({ mapId, players, practice = false, roundsToWin = 3, l
 
   function snapshot() {
     return {
-      st, tm: Math.ceil(timer), t: r2(timer), rn: round, mt: r2(mt), sc: scores, win,
+      st, tm: Math.ceil(timer), t: r2(timer), rn: round, mt: r3(mt), sc: scores, win,
       p: ps.map(p => {
         if (!p.alive) return [p.slot, 0];
         const flags = (p.spin > 0) | (p.charge > 0) << 1 | (p.empower > 0) << 2 | (p.grabs.some(Boolean)) << 3 | (p.ko > 0) << 4 | (p.safe > 0) << 5 | (p.vault > 0 || p.hay > 0) << 6;
@@ -648,8 +657,19 @@ export function createSim({ mapId, players, practice = false, roundsToWin = 3, l
     get state() { return st; },
     get tick() { return tick; },
     get err() { return err; },
-    // n: the client's tick this input started on; the host counts on from it each step (control) and echoes it back
-    setInput(slot, inp) { const p = ps[slot]; if (p) { p.input = { x: +inp.x || 0, z: +inp.z || 0, b: inp.b | 0 }; if (inp.n != null) p.ack = (inp.n | 0) - 1; } },
+    // a local player's input ({ x, z, b }), or a client's: { n, i: [[x, z, b], ...] } for its ticks n - i.length + 1 .. n,
+    // queued and played back one per step in tick order (feed), so network jitter doesn't change which step an input
+    // lands on and the tick echoed back (ack) lines up exactly with the client's own history
+    setInput(slot, inp) {
+      const p = ps[slot];
+      if (!p) return;
+      if (!Array.isArray(inp.i)) { p.input = { x: +inp.x || 0, z: +inp.z || 0, b: inp.b | 0 }; return; }
+      const n = inp.n | 0;
+      inp.i.slice(-8).forEach(([x, z, b], k, all) => { const t = n - all.length + 1 + k; if (p.next == null || t >= p.next) p.q.set(t, { x: +x || 0, z: +z || 0, b: b | 0 }); });
+      p.newest = Math.max(p.newest, n);
+      // first input, or the buffer drifted too deep (lag builds up) or ran dry (stale inputs): line up 2 ticks behind
+      if (p.next == null || p.newest - p.next > 8 || p.next - p.newest > 6) { p.next = p.newest - 2; for (const t of p.q.keys()) if (t < p.next) p.q.delete(t); }
+    },
     drop(slot) { const p = ps[slot]; if (p) { p.left = true; removeRagdoll(p); } },
   };
 }

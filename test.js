@@ -213,16 +213,21 @@ function lineUp(sim, gap = 1.1) {
 {
   const players = [{ id: 'a', name: 'A', champ: 'blitz', team: 0 }, { id: 'b', name: 'B', champ: 'hec', team: 1 }];
   const host = createSim({ mapId: 'girders', players }), cli = createSim({ mapId: 'girders', players, local: 0 });
-  const lag = 12, wire = []; // ticks each way (200ms round trip)
+  // 200ms round trip with up to 100ms of jitter each way (messages stay in order, like the reliable channel)
+  let seed = 3, lastAt = { host: 0, cli: 0 };
+  const rnd = () => (seed = (seed * 16807) % 2147483647) / 2147483647;
+  const send = (to, m, i) => { const at = Math.max(lastAt[to], i + 12 + Math.floor(rnd() * 6)); lastAt[to] = at; wire.push({ ...m, to, at }); };
+  const wire = [], q = [];
   let maxErr = 0;
   for (let i = 0; i < 400; i++) {
-    const inp = { x: i > 200 ? 1 : 0, z: i % 120 < 60 ? -1 : 1, b: 0, n: cli.tick + 1 };
+    const inp = { x: i > 200 ? 1 : 0, z: i % 120 < 60 ? -1 : 1, b: 0 };
     cli.setInput(0, inp); cli.step();
-    wire.push({ at: i + lag, to: 'host', inp });
+    q.push([inp.x, inp.z, inp.b]); if (q.length > 4) q.shift();
+    if (cli.tick % 2 === 0) send('host', { inp: { n: cli.tick, i: [...q] } }, i);
     if (i === 300) for (const b of host.players[0].bodies) b.setLinvel({ x: 0, y: 3, z: 6 }, true); // a hit the client never saw
     for (const m of wire.filter(m => m.at === i)) m.to === 'host' ? host.setInput(0, m.inp) : cli.sync(m.s, m.s.p[0]);
     host.step();
-    if (i % 2) wire.push({ at: i + lag, to: 'cli', s: JSON.parse(JSON.stringify(host.snapshot())) });
+    if (i % 2) send('cli', { s: JSON.parse(JSON.stringify(host.snapshot())) }, i);
     if (i > 150 && i < 300) maxErr = Math.max(maxErr, cli.err);
   }
   const d = (a, b) => Math.hypot(a.x - b.x, a.z - b.z), hp = host.players[0].bodies[0].translation(), cp = cli.players[0].bodies[0].translation();

@@ -592,16 +592,19 @@ export function createRenderer(canvas) {
   }
 
   const qa = new THREE.Quaternion(), qb = new THREE.Quaternion(), tmp = new THREE.Vector3(), tmp2 = new THREE.Vector3();
-  // draw an interpolated state between snapshots a and b
-  function apply(a, b, alpha) {
+  // draw an interpolated state between snapshots a and b; `own` ({ slot, a, b, alpha }) draws one player from its own
+  // pair of states instead (a predicting client's own champ)
+  function apply(a, b, alpha, own) {
     if (!setup) return;
     const centre = new THREE.Vector3(), alive = [];
     b.p.forEach((pb, slot) => {
-      const av = avatars[slot], pa = a.p[slot];
+      let pa = a.p[slot], t = alpha;
+      if (own?.slot === slot) { pa = own.a; pb = own.b; t = own.alpha; }
+      const av = avatars[slot];
       av.group.visible = !!pb[1];
       if (!pb[1]) return;
       // snapshot: hips position + one rotation per part; rebuild the other positions down the joint chain
-      const lerp = pa?.[1] ? alpha : 1, src = pa?.[1] ? pa : pb;
+      const lerp = pa?.[1] ? t : 1, src = pa?.[1] ? pa : pb;
       for (let i = 0; i < PARTS.length; i++) {
         const o = 9 + i * 4;
         qa.set(src[o], src[o + 1], src[o + 2], src[o + 3]);

@@ -118,10 +118,16 @@ async function joinLobby(raw) {
     if (m.t === 'lobby') { lobby = m.lobby; game = null; renderLobby(); show('lobby'); }
     else if (m.t === 'start') startGame(m.setup);
     else if (m.t === 'snap' && game) {
-      game.snaps.push({ at: performance.now(), s: m.s });
+      game.snaps.push(m.s);
+      // host clock vs mine over the last 2s of snapshots: the quickest arrival sets the offset, and how late the rest
+      // came on average is the jitter the playback delay has to cover (a window, so a host whose sim runs a bit slow
+      // or a route that gets slower is followed within seconds)
+      const offs = game.offs; offs.push(m.s.mt - performance.now() / 1000); if (offs.length > 60) offs.shift();
+      game.off = Math.max(...offs);
+      game.jit = offs.reduce((sum, o) => sum + game.off - o, 0) / offs.length;
       game.local?.sync(m.s, m.s.p[game.mySlot]);
       const ev = m.ev?.filter(e => e[5] !== game.mySlot); // my own swings already played when I made them
-      if (ev?.length) setTimeout(() => view.fx(ev), 80); // match the interpolation delay
+      if (ev?.length) setTimeout(() => view.fx(ev), game.delay * 1000); // in step with the playback delay
     }
     else if (m.t === 'deny') leave(m.msg);
   });
@@ -177,7 +183,7 @@ $('startBtn').onclick = () => {
 async function startGame(setup) {
   await Promise.all([prepareMap(setup.map), loadBeast(), loadProps(), loadSfx()]);
   const myId = conn ? conn.myId : 'me';
-  game = { setup, mySlot: setup.players.findIndex(p => p.id === myId), snaps: [], cur: null, fightAt: 0, lastIn: '', sentAt: 0, pendingEv: [] };
+  game = { setup, mySlot: setup.players.findIndex(p => p.id === myId), snaps: [], cur: null, fightAt: 0, pendingEv: [], inq: [], offs: [], off: null, jit: 0, delay: 0.1 };
   if (setup.practice || isHost()) game.sim = createSim({ mapId: setup.map, players: setup.players, practice: !!setup.practice, roundsToWin: setup.rounds });
   else game.local = createSim({ mapId: setup.map, players: setup.players, local: game.mySlot }); // my champ, predicted (sim.js)
   view.setMatch(setup);
@@ -274,14 +280,16 @@ function frame(now) {
       game.sim.step();
       const ev = game.sim.takeEvents();
       if (ev.length) { view.fx(ev); game.pendingEv.push(...ev); }
+      game.prev = game.cur; game.cur = game.sim.snapshot();
       // ponytail: full JSON snapshots at 30Hz over PeerJS's reliable channel (~2KB each); move to an unreliable binary channel if 8-player games stutter
-      if (conn && ++tick % 2 === 0) conn.broadcast({ t: 'snap', s: game.sim.snapshot(), ev: game.pendingEv.splice(0) });
+      if (conn && ++tick % 2 === 0) conn.broadcast({ t: 'snap', s: game.cur, ev: game.pendingEv.splice(0) });
     }
-    game.cur = game.sim.snapshot();
-    view.apply(game.cur, game.cur, 1);
+    if (!game.cur) return;
+    view.apply(game.prev ?? game.cur, game.cur, acc / DT); // between the last two steps: smooth on screens faster than 60Hz
     if (game.sim.state === 'over') { game = null; pushLobby(); return; }
   } else {
-    // my champ moves right away on my own copy; inputs carry the tick they start on so the host can say which one it's at
+    // my champ moves right away on my own copy (sim.js sync). Inputs go out every other tick, each message carrying
+    // the last 4 ticks' inputs, so a late message costs nothing; the host plays them back tick by tick.
     const { local } = game;
     acc += dt;
     while (acc >= DT) {
@@ -290,18 +298,22 @@ function frame(now) {
       local.step();
       const ev = local.takeEvents();
       if (ev.length) view.fx(ev);
-      const key = `${inp.x},${inp.z},${inp.b}`;
-      if (key !== game.lastIn || now - game.sentAt > 100) { conn.send({ t: 'in', ...inp, n: local.tick }); game.lastIn = key; game.sentAt = now; }
+      game.mine = [game.mine?.[1], local.snapshot().p[game.mySlot]];
+      game.inq.push([inp.x, inp.z, inp.b]); if (game.inq.length > 4) game.inq.shift();
+      if (local.tick % 2 === 0) conn.send({ t: 'in', n: local.tick, i: game.inq });
     }
-    // everyone else is drawn ~80ms in the past, between the two snapshots around that moment
-    const at = now - 80, s = game.snaps;
-    while (s.length > 2 && s[1].at <= at) s.shift();
-    if (!s.length) return;
-    const a = s[0], b = s[1] ?? a, alpha = b === a ? 1 : Math.min(1, Math.max(0, (at - a.at) / (b.at - a.at)));
-    const mine = local.snapshot().p[game.mySlot], withMe = x => ({ ...x, p: x.p.map((e, i) => i === game.mySlot ? mine : e) });
-    view.apply(withMe(a.s), withMe(b.s), alpha);
-    b.s.p.forEach((e, i) => { const o = a.s.p[i]; local.place(i, ...(e[1] && o?.[1] ? [6, 7, 8].map(k => o[k] + (e[k] - o[k]) * alpha) : [0, -100, 0])); });
-    game.cur = withMe(b.s);
+    // everyone else plays back on the host's clock, far enough behind to ride out the jitter seen so far
+    const s = game.snaps;
+    if (!s.length || !game.mine) return;
+    game.delay += (Math.min(0.35, Math.max(0.06, 0.05 + 2.5 * game.jit)) - game.delay) * 0.02;
+    const at = now / 1000 + game.off - game.delay;
+    while (s.length > 2 && s[1].mt <= at) s.shift();
+    const a = s[0], b = s[1] ?? a, alpha = b === a ? 1 : Math.min(1, Math.max(0, (at - a.mt) / (b.mt - a.mt)));
+    // me: between my last two local steps, unless knocked out or hooked (then the host's ragdoll is the truth)
+    const me = local.players[game.mySlot], limp = !me.alive || me.ko > 0 || me.hooked > 0;
+    view.apply(a, b, alpha, limp ? null : { slot: game.mySlot, a: game.mine[0] ?? game.mine[1], b: game.mine[1], alpha: acc / DT });
+    b.p.forEach((e, i) => { const o = a.p[i]; local.place(i, ...(e[1] && o?.[1] ? [6, 7, 8].map(k => o[k] + (e[k] - o[k]) * alpha) : [0, -100, 0])); });
+    game.cur = { ...b, p: b.p.map((e, i) => i === game.mySlot && !limp ? game.mine[1] : e) };
   }
   updateHud(game.cur, now);
   view.render(dt);
