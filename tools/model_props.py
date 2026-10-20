@@ -1,4 +1,5 @@
-"""Model the champion props (Blitzcrank's gauntlets and chest core, Hecarim's head blade and tail) from scratch in Gang Beasts costume style: chunky bevelled blocks, domes and tubes in a few
+"""Model the champion props (Blitzcrank's gauntlets and chest core, Hecarim's head blade, tail and hooves, Vi's gauntlets
+and hair, Sett's fists and fur-collared jacket) from scratch in Gang Beasts costume style: chunky bevelled blocks, domes and tubes in a few
 solid toy colours. The League models are reference only (tools/import_lol.py fetches them for side-by-side renders).
 
 Run with Blender (headless): blender -b --python tools/model_props.py [-- --preview]
@@ -40,8 +41,8 @@ def box(m, size, at, bevel=0.03, tilt=None):
     if tilt: ob.rotation_euler = (math.radians(tilt[0]), math.radians(tilt[2]), math.radians(tilt[1])); bake(ob)
     bv = ob.modifiers.new("bevel", "BEVEL"); bv.width = bevel; bv.segments = 4; bv.limit_method = "NONE"
     return done(ob, m)
-def ball(m, r, at, squash=(1, 1, 1)):
-    bpy.ops.mesh.primitive_uv_sphere_add(radius=r, segments=40, ring_count=24, location=B(at)); ob = bpy.context.object
+def ball(m, r, at, squash=(1, 1, 1), seg=40):
+    bpy.ops.mesh.primitive_uv_sphere_add(radius=r, segments=seg, ring_count=seg * 3 // 5, location=B(at)); ob = bpy.context.object
     ob.scale = (squash[0], squash[2], squash[1]); bake(ob)
     return done(ob, m)
 def cyl(m, r, length, at, axis=(0, 1, 0), r2=None):
@@ -62,6 +63,14 @@ def tube(m, pts, radii, flat=1):  # a tapered tube through points: handles, horn
         bpy.ops.object.convert(target="MESH")
     ob.scale.x = flat; bake(ob)
     return done(ob, m)
+
+def shell(m, radii, at, cut):  # an ellipsoid with the faces where cut(x, y, z) (our space) removed: open jackets, hoods
+    ob = ball(m, 1, at, radii)
+    bm = bmesh.new(); bm.from_mesh(ob.data)
+    bmesh.ops.delete(bm, geom=[f for f in bm.faces if cut(f.calc_center_median().x, f.calc_center_median().z, -f.calc_center_median().y)], context="FACES")
+    bm.to_mesh(ob.data); bm.free()
+    sol = ob.modifiers.new("thick", "SOLIDIFY"); sol.thickness = 0.02; sol.offset = 1
+    return ob
 
 def finish(name):
     """Join what's been built into one prop and export it."""
@@ -127,16 +136,62 @@ def hec_hoof(top, bottom, r):  # a chunky plated horse hoof down the part's -y, 
     cyl(ARMOR(), r * 1.08, h * 0.14, (0, bottom + h * 0.07, 0.025))  # sole
     box(ARMOR(), (r * 0.4, h * 0.6, r * 0.4), (0, bottom + h * 0.42, 0.02 + r * 0.9), r * 0.15)  # front ridge
 
+# ---------------- Vi: Piltover enforcer, giant Hextech gauntlets ----------------
+VI_PINK = lambda: mat("vi_pink", (0.86, 0.3, 0.52), 0.35, 0.35)
+VI_HAIR = lambda: mat("vi_hair", (0.95, 0.38, 0.62), 0.55)
+HEX = lambda: mat("hextech", (0.3, 0.75, 1.0), 0.2, 0, glow=3)
+
+def vi_gauntlet(s):  # forearm frame, hand at y -.337; s = 1 left, -1 right (the Hextech core sits on the outside)
+    cyl(VI_PINK(), 0.085, 0.16, (0, -0.13, 0)); ring(GOLD(), 0.088, 0.018, (0, -0.06, 0)); ring(GOLD(), 0.092, 0.018, (0, -0.21, 0))
+    box(VI_PINK(), (0.32, 0.28, 0.3), (0, -0.37, 0.01), 0.06)  # the huge fist
+    for k in range(4):  # steel knuckle plates on the punching end
+        box(STEEL(), (0.07, 0.06, 0.25), (-0.11 + k * 0.073, -0.53, 0.01), 0.02)
+    box(IRON(), (0.08, 0.14, 0.09), (0, -0.37, 0.19), 0.03)  # thumb guard
+    cyl(GOLD(), 0.075, 0.04, (s * 0.165, -0.36, 0.01), (1, 0, 0)); cyl(HEX(), 0.05, 0.05, (s * 0.175, -0.36, 0.01), (1, 0, 0))  # Hextech core
+    for y in (-0.28, -0.44): box(HEX(), (0.02, 0.02, 0.18), (-s * 0.16, y, 0.01), 0.008)  # glowing vents on the inside
+    cyl(IRON(), 0.03, 0.18, (0, -0.2, -0.11))  # piston along the back
+
+def vi_hair():  # head frame (skull centre y .165, z .057, r .21): pink cap with a big side-swept fringe and a spiky crown
+    ball(VI_HAIR(), 0.235, (0, 0.27, 0.02), (1.0, 0.62, 1.0))
+    tube(VI_HAIR(), [(0.04, 0.4, 0.1), (-0.06, 0.38, 0.22), (-0.17, 0.3, 0.23), (-0.24, 0.19, 0.15)], [0.08, 0.07, 0.05, 0.015])
+    for x, z, lean in ((0.06, -0.08, -0.4), (-0.06, -0.1, -0.5), (0.0, -0.02, -0.25), (0.12, 0.0, -0.3)):
+        cyl(VI_HAIR(), 0.055, 0.14, (x, 0.43, z), (x, 1, lean), r2=0.004)
+
+# ---------------- Sett: the Boss, wrapped brass-knuckle fists and a fur-collared jacket ----------------
+WRAP = lambda: mat("wraps", (0.9, 0.84, 0.7), 0.7)
+BRASS = lambda: mat("brass", (0.85, 0.62, 0.22), 0.3, 0.6)
+COAT = lambda: mat("coat", (0.17, 0.04, 0.08), 0.6)
+FUR = lambda: mat("fur", (0.95, 0.92, 0.85), 0.9)
+
+def sett_fist():  # forearm frame: bandaged wrist and hand, brass knuckles across the punching end
+    for k, y in enumerate((-0.17, -0.21, -0.25, -0.29)): ring(WRAP(), 0.055, 0.022, (0, y, 0), (0, 1, 0.15 * (-1) ** k))
+    ball(WRAP(), 0.085, (0, -0.35, 0.02), (1.05, 1.1, 0.95))
+    box(BRASS(), (0.2, 0.05, 0.12), (0, -0.425, 0.02), 0.02)
+    for k in range(4): ring(BRASS(), 0.028, 0.012, (-0.072 + k * 0.048, -0.44, 0.02), (0, 0, 1))
+
+def sett_jacket():  # chest frame (capsule along x: r .193, half length .082, centre y .254 z -.013): open-front coat, fur collar
+    shell(COAT(), (0.3, 0.235, 0.218), (0, 0.255, -0.013), lambda x, y, z: z > 0.05 and abs(x) < 0.1 + (0.45 - y) * 0.15 or y < 0.06)
+    for k in range(18):  # collar: lumpy fur round the back of the neck...
+        a = math.pi * (0.1 + 0.8 * k / 17); ball(FUR(), 0.06, (math.cos(a) * 0.19, 0.44 + math.sin(a) * 0.03, -math.sin(a) * 0.1 + 0.02), seg=14)
+    for sx in (1, -1):  # ...and down both lapels
+        for k in range(6): ball(FUR(), 0.055 - k * 0.004, (sx * (0.13 + k * 0.004), 0.4 - k * 0.06, 0.15 + 0.01 * k), seg=14)
+
+def sett_sleeve():  # upper-arm frame: arm runs down -y from the shoulder
+    cyl(COAT(), 0.088, 0.26, (0, -0.12, 0)); ring(FUR(), 0.09, 0.03, (0, -0.25, 0))
+
 PROPS = {
     "blitzcrank_core": blitz_core, "blitzcrank_gauntletL": lambda: blitz_gauntlet(1), "blitzcrank_gauntletR": lambda: blitz_gauntlet(-1),
     "hecarim_blade": hec_blade, "hecarim_tail": hec_tail,
     "hecarim_hoofHand": lambda: hec_hoof(-0.24, -0.44, 0.1),  # forearm frame: hand at y -.337
     "hecarim_hoofFoot": lambda: hec_hoof(0.03, -0.15, 0.115),  # leg frame: foot bottom at y ~-.136
+    "vi_gauntletL": lambda: vi_gauntlet(1), "vi_gauntletR": lambda: vi_gauntlet(-1), "vi_hair": vi_hair,
+    "sett_fist": sett_fist, "sett_jacket": sett_jacket, "sett_sleeve": sett_sleeve,
 }
 # where each prop sits on the preview mannequin: part pivot in the beast's rest pose with arms hanging (beast.js)
 PIVOT = {"core": (0, 0.6347, -0.0101), "blade": (0, 1.0693, 0.0247), "tail": (0, 0.4223, 0.0002),
          "gauntletL": (0.2015, 0.6711, -0.0433), "gauntletR": (-0.2015, 0.6711, -0.0433),
-         "hoofHand": (0.2015, 0.6711, -0.0433), "hoofFoot": (0.239, 0.1201, 0.0057)}
+         "hoofHand": (0.2015, 0.6711, -0.0433), "hoofFoot": (0.239, 0.1201, 0.0057),
+         "hair": (0, 1.0693, 0.0247), "jacket": (0, 0.6347, -0.0101), "sleeve": (0.2015, 0.9447, -0.0425), "fist": (0.2015, 0.6711, -0.0433)}
 
 def mannequin(dx):
     grey = mat("beast", (0.62, 0.6, 0.58), 0.6)
@@ -161,13 +216,13 @@ if preview:
     sc.world = bpy.data.worlds.new("w"); sc.world.color = (0.32, 0.34, 0.38)
     sc.render.engine = "BLENDER_WORKBENCH"; sc.display.shading.light = "STUDIO"; sc.display.shading.color_type = "MATERIAL"
     sc.display.shading.show_cavity = True; sc.display.shading.show_shadows = True
-    sc.render.resolution_x, sc.render.resolution_y = 1400, 900
-    for champ, dx in (("blitzcrank", -0.55), ("hecarim", 0.55)):
+    sc.render.resolution_x, sc.render.resolution_y = 1800, 900
+    for champ, dx in (("blitzcrank", -1.65), ("hecarim", -0.55), ("vi", 0.55), ("sett", 1.65)):
         mannequin(dx)
         for name, ob in built.items():
             if name.startswith(champ): ob.location = B(Vector(PIVOT[name.split("_")[1]]) + Vector((dx, 0, 0)))
     cam = bpy.data.objects.new("cam", bpy.data.cameras.new("cam")); sc.collection.objects.link(cam); sc.camera = cam
-    cam.data.type = "ORTHO"; cam.data.ortho_scale = 2.9
+    cam.data.type = "ORTHO"; cam.data.ortho_scale = 4.6
     for view, d in (("front", (0.0, 0.25, 1)), ("three_quarter", (0.8, 0.35, 0.9)), ("back", (-0.5, 0.3, -1))):
         target = B((0, 0.75, 0)); cam.location = target + B(Vector(d).normalized() * 6)
         cam.rotation_euler = (target - cam.location).to_track_quat("-Z", "Y").to_euler()

@@ -8,7 +8,7 @@ import { OutputPass } from 'three/addons/postprocessing/OutputPass.js';
 import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
 import { MAPS } from './maps.js';
 import { CHAMPS, TEAM_COLORS, FFA_COLORS } from './champs.js';
-import { PARTS, ORDER, ANCHOR, HAND, CHEST, HEAD, FORE, LEG, HIPS, qmul, qinv, qrot } from './beast.js';
+import { PARTS, ORDER, ANCHOR, HAND, CHEST, HEAD, ARM, FORE, LEG, HIPS, qmul, qinv, qrot } from './beast.js';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { beastAsset, xhr } from './stages.js';
 import { playEvents } from './sfx.js';
@@ -18,8 +18,10 @@ import { playEvents } from './sfx.js';
 const PROPS = {
   blitz: [['core', CHEST], ['gauntletL', FORE, 'fist'], ['gauntletR', FORE + 1, 'fist']],
   hec: [['blade', HEAD], ['tail', HIPS], ['hoofHand', FORE], ['hoofHand', FORE + 1], ['hoofFoot', LEG], ['hoofFoot', LEG + 1]],
+  vi: [['hair', HEAD], ['gauntletL', FORE, 'fist'], ['gauntletR', FORE + 1, 'fist']],
+  sett: [['jacket', CHEST], ['sleeve', ARM], ['sleeve', ARM + 1], ['fist', FORE, 'fist'], ['fist', FORE + 1, 'fist']],
 };
-const PROP_FILE = { blitz: 'blitzcrank', hec: 'hecarim' };
+const PROP_FILE = { blitz: 'blitzcrank', hec: 'hecarim', vi: 'vi', sett: 'sett' };
 const propScenes = {}; // 'blitz/core' -> parsed glTF scene
 export async function loadProps() {
   if (Object.keys(propScenes).length) return;
@@ -573,7 +575,7 @@ export function createRenderer(canvas) {
     // Rampage swirl
     const swirl = new THREE.Mesh(new THREE.TorusGeometry(0.75, 0.05, 6, 40).rotateX(Math.PI / 2), new THREE.MeshBasicMaterial({ color: c.eyes, transparent: true, opacity: 0.6, blending: THREE.AdditiveBlending, depthWrite: false }));
     group.add(swirl);
-    return { group, parts, tag, stars, fists, swirl, champId, torsoMat: body, glowBase: body.emissive.clone(), eyes: c.eyes, q: PARTS.map(() => [0, 0, 0, 1]), pos: PARTS.map(() => [0, 0, 0]) };
+    return { group, parts, tag, stars, fists, swirl, champId, glow: c.glow ?? '#ff8a00', torsoMat: body, glowBase: body.emissive.clone(), eyes: c.eyes, q: PARTS.map(() => [0, 0, 0, 1]), pos: PARTS.map(() => [0, 0, 0]) };
   }
 
   const qa = new THREE.Quaternion(), qb = new THREE.Quaternion(), tmp = new THREE.Vector3(), tmp2 = new THREE.Vector3();
@@ -607,14 +609,22 @@ export function createRenderer(canvas) {
       av.stars.children.forEach((s, i) => { s.visible = i < dizzy; });
       av.stars.position.copy(head).y += 0.45;
       av.stars.rotation.y = time * 6;
-      for (const f of av.fists) f.traverse(m => { if (m.material?.emissive) { m.material.emissive.set(flags & 4 ? '#ff8a00' : '#000'); m.material.emissiveIntensity = flags & 4 ? 2.2 + Math.sin(time * 18) : 1; } });
-      if (flags & 4 && av.fists.length && Math.random() < 0.5) emit(av.fists[Math.floor(Math.random() * 2)].getWorldPosition(tmp2), { color: '#ff9a2e', n: 1, speed: 0.6, size: 0.18, life: 0.35, grav: 3, up: 1 });
+      // empowered punch (4) or winding up an ability (64): fists glow in the champ's colour; otherwise their own glow comes back
+      const lit = flags & 68;
+      for (const f of av.fists) f.traverse(m => {
+        const mt = m.material;
+        if (!mt?.emissive) return;
+        mt.userData.e0 ??= [mt.emissive.clone(), mt.emissiveIntensity];
+        if (lit) { mt.emissive.set(av.glow); mt.emissiveIntensity = 2.2 + Math.sin(time * 18); } else { mt.emissive.copy(mt.userData.e0[0]); mt.emissiveIntensity = mt.userData.e0[1]; }
+      });
+      if (lit && av.fists.length && Math.random() < 0.5) emit(av.fists[Math.floor(Math.random() * 2)].getWorldPosition(tmp2), { color: av.glow, n: 1, speed: 0.6, size: 0.18, life: 0.35, grav: 3, up: 1 });
       av.torsoMat.emissive.copy(av.glowBase);
       if (flags & 2) {
         av.torsoMat.emissive.set('#2fffd0').multiplyScalar(0.35 + 0.25 * Math.sin(time * 20));
         emit(tmp.copy(torso).add(tmp2.set(rand(-0.3, 0.3), rand(-0.6, 0.2), rand(-0.3, 0.3))), { color: av.eyes, n: 2, speed: 0.3, size: 0.45, life: 0.45, grav: 0.5 });
       }
       av.swirl.visible = !!(flags & 1);
+      av.group.visible = !(flags & 32) || Math.sin(time * 28) > -0.6; // flicker while stun-immune after a KO
       if (flags & 1) { av.swirl.position.copy(torso); av.swirl.rotation.y = time * 25; av.swirl.material.opacity = 0.4 + Math.random() * 0.3; }
       centre.add(torso);
       alive.push(torso);

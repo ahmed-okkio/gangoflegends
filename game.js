@@ -63,10 +63,18 @@ function champCards(el, onPick) {
 champCards($('champs'));
 
 const menuError = msg => { $('menuErr').textContent = msg || ''; };
+// network debugging for players who can't connect: run the test, then paste the log to whoever is helping
+$('netTestBtn').onclick = async () => { menuError('Testing network…'); menuError(await net.selfTest()); };
+$('netLogBtn').onclick = async () => {
+  const text = [`Gang of Legends ${VERSION}`, new Date().toString(), navigator.userAgent, ...net.netLog].join('\n');
+  try { await navigator.clipboard.writeText(text); menuError(`Copied ${net.netLog.length} log lines. Paste them to whoever is helping you.`); }
+  catch { const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([text])); a.download = 'gangoflegends-network-log.txt'; a.click(); menuError('Saved the log as a file.'); }
+};
 
 $('practiceBtn').onclick = () => startPractice($('practiceMap').value);
 function startPractice(map) {
-  const dummies = [1, 2, 3].map(i => ({ id: `dummy${i}`, name: 'Dummy', champ: i % 2 ? 'hec' : 'blitz', team: i }));
+  const roster = Object.keys(CHAMPS).filter(c => c !== me.champ); // one dummy of each other champ
+  const dummies = roster.slice(0, 7).map((champ, i) => ({ id: `dummy${i}`, name: 'Dummy', champ, team: i + 1 }));
   startGame({ map, teams: 0, rounds: 3, practice: true, players: [{ id: 'me', name: me.name, champ: me.champ, team: 0 }, ...dummies] });
 }
 

@@ -3,3 +3,5 @@ gbcache/
 lolcache/
 release/
 dist/
+worker/secrets.json
+worker/.wrangler/

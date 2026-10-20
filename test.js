@@ -44,6 +44,11 @@ function lineUp(sim, gap = 1.1) {
   for (; k < 10 && sim.players[1].ko <= 0; k++) { lineUp(sim); run(sim, 22, i => sim.setInput(0, { x: 0, z: 0, b: i < 3 ? BTN.PUNCH : 0 })); }
   console.log('punches to KO', k, 'daze', sim.players[1].daze.toFixed(0));
   assert.ok(sim.players[1].ko > 0, 'punches knock out');
+  // KO length is fixed and getting up gives a safe window: punching through it doesn't chain another KO
+  let kos = 0, wasKo = true;
+  for (let i = 0; i < 12; i++) { lineUp(sim); run(sim, 22, j => { sim.setInput(0, { x: 0, z: 0, b: j < 3 ? BTN.PUNCH : 0 }); const ko = sim.players[1].ko > 0; if (ko && !wasKo) kos++; wasKo = ko; }); }
+  assert.ok(sim.players[1].ko <= 0 || kos > 0, 'KO does not last forever under punches');
+  assert.ok(kos <= 1, `no chain KO right after waking (${kos})`);
 }
 
 // 3. Blitz hook pulls from range
@@ -126,7 +131,45 @@ function lineUp(sim, gap = 1.1) {
   console.log('headbutt + lie down + climb ok');
 }
 
-// 9. snapshot is small
+// 9. Vi: Vault Breaker dash hits, Relentless Force punches through to the champ behind
+{
+  const sim = createSim({ mapId: 'grind', practice: true, players: [
+    { id: 'a', name: 'A', champ: 'vi', team: 0 }, { id: 'b', name: 'B', champ: 'hec', team: 1 }, { id: 'c', name: 'C', champ: 'blitz', team: 2 }] });
+  run(sim, 90);
+  lineUp(sim, 2.2);
+  run(sim, 60, i => sim.setInput(0, { x: 0, z: 0, b: i < 30 ? BTN.A1 : 0 }));
+  assert.ok(sim.players[1].daze > 0, 'vault breaker hits');
+  const sim2 = createSim({ mapId: 'grind', practice: true, players: [
+    { id: 'a', name: 'A', champ: 'vi', team: 0 }, { id: 'b', name: 'B', champ: 'hec', team: 1 }, { id: 'c', name: 'C', champ: 'blitz', team: 2 }] });
+  run(sim2, 90);
+  lineUp(sim2, 0.95);
+  const c = sim2.players[2], bt = torso(sim2, 1), ct = c.bodies[0].translation();
+  for (const b of c.bodies) { const t = b.translation(); b.setTranslation({ x: t.x - ct.x + bt.x + 0.9, y: t.y, z: t.z - ct.z + bt.z }, true); }
+  run(sim2, 30, i => sim2.setInput(0, { x: 0, z: 0, b: (i === 0 ? BTN.A2 : 0) | (i > 2 && i < 6 ? BTN.PUNCH : 0) }));
+  assert.ok(sim2.players[1].daze > 0 && c.daze > 0, `relentless force hits through (${sim2.players[1].daze}, ${c.daze})`);
+  console.log('vi ok');
+}
+
+// 10. Sett: Haymaker cone, Facebreaker from both sides stuns
+{
+  const sim = createSim({ mapId: 'grind', practice: true, players: [
+    { id: 'a', name: 'A', champ: 'sett', team: 0 }, { id: 'b', name: 'B', champ: 'hec', team: 1 }, { id: 'c', name: 'C', champ: 'blitz', team: 2 }] });
+  run(sim, 90);
+  lineUp(sim, 1.4);
+  run(sim, 50, i => sim.setInput(0, { x: 0, z: 0, b: i === 0 ? BTN.A1 : 0 }));
+  assert.ok(sim.players[1].daze >= 40, `haymaker hits hard (${sim.players[1].daze})`);
+  // C goes behind Sett, B in front: Facebreaker catches both and stuns
+  lineUp(sim, 1.2);
+  const c = sim.players[2], at = torso(sim, 0), ct = c.bodies[0].translation();
+  for (const b of c.bodies) { const t = b.translation(); b.setTranslation({ x: t.x - ct.x + at.x - 1.2, y: t.y, z: t.z - ct.z + at.z }, true); b.setLinvel({ x: 0, y: 0, z: 0 }, true); }
+  run(sim, 200, () => sim.setInput(0, { x: 0, z: 0, b: 0 })); // cooldowns
+  sim.players[0].cd = [0, 0]; sim.players[1].safe = sim.players[2].safe = 0;
+  sim.setInput(0, { x: 0, z: 0, b: BTN.A2 }); sim.step();
+  assert.ok(sim.players[1].stun > 1 && c.stun > 1, 'facebreaker from both sides stuns');
+  console.log('sett ok');
+}
+
+// 11. snapshot is small
 {
   const sim = createSim({ mapId: 'girders', players: Array.from({ length: 8 }, (_, i) => ({ id: i, name: 'P', champ: i % 2 ? 'hec' : 'blitz', team: i })) });
   run(sim, 120);

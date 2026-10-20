@@ -1,6 +1,6 @@
 {
   "name": "gang-of-legends",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "description": "Gang Beasts-style ragdoll brawler with League of Legends champions. Free fan game.",
   "main": "main.cjs",
   "scripts": {
@@ -21,7 +21,8 @@
   },
   "devDependencies": {
     "electron": "^33.4.11",
-    "electron-builder": "^26.15.3"
+    "electron-builder": "^26.15.3",
+    "wrangler": "^4.151.3"
   },
   "productName": "Gang of Legends",
   "repository": "github:ahmed-okkio/gangoflegends",
@@ -39,7 +40,8 @@
       "!release/**",
       "!release.cjs",
       "!DESIGN.md",
-      "!assets/props/preview_*.png"
+      "!assets/props/preview_*.png",
+      "!worker/**"
     ],
     "win": {
       "target": "nsis"

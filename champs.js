@@ -14,6 +14,20 @@ export const CHAMPS = {
       { id: 'charge', key: 'E', name: 'Devastating Charge', cd: 8, desc: 'Gallop at high speed and bowl over the first champ you reach.' },
     ],
   },
+  vi: {
+    name: 'Vi', title: 'The Piltover Enforcer', body: '#5b6b8c', limb: '#45526d', eyes: '#7fd3ff', glow: '#ff5fae',
+    abilities: [
+      { id: 'vault', key: 'Q', name: 'Vault Breaker', cd: 6, desc: 'Hold to wind up, let go to dash and punch the first champ you hit. Longer windup, bigger hit.' },
+      { id: 'relentless', key: 'E', name: 'Relentless Force', cd: 4, desc: 'Your next punch smashes through its target into everyone behind it.' },
+    ],
+  },
+  sett: {
+    name: 'Sett', title: 'The Boss', body: '#c97a52', limb: '#9a5a3a', eyes: '#ffd166', glow: '#ffb000',
+    abilities: [
+      { id: 'haymaker', key: 'Q', name: 'Haymaker', cd: 8, desc: 'Wind up (taking half daze), then a huge cone punch. Hardest down the middle.' },
+      { id: 'facebreaker', key: 'E', name: 'Facebreaker', cd: 7, desc: 'Yank everyone close into you. Catch champs on both sides to stun them.' },
+    ],
+  },
 };
 
 export const TEAM_COLORS = ['#ff4d5e', '#3d8bff', '#2ecc71', '#ffc93c'];
