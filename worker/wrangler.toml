@@ -1,3 +1,11 @@
 name = "gangoflegends-turn"
 main = "turn.js"
 compatibility_date = "2026-10-01"
+
+[[durable_objects.bindings]]
+name = "ROOM"
+class_name = "Room"
+
+[[migrations]]
+tag = "v1"
+new_sqlite_classes = ["Room"] # SQLite-backed Durable Objects are on the free plan

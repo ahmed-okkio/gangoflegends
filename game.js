@@ -65,6 +65,9 @@ champCards($('champs'));
 const menuError = msg => { $('menuErr').textContent = msg || ''; };
 // network debugging for players who can't connect: run the test, then paste the log to whoever is helping
 $('netTestBtn').onclick = async () => { menuError('Testing network…'); menuError(await net.selfTest()); };
+$('relayIn').checked = store.get('relay', '0') === '1';
+net.useRelay($('relayIn').checked);
+$('relayIn').onchange = e => { net.useRelay(e.target.checked); store.set('relay', e.target.checked ? '1' : '0'); };
 $('netLogBtn').onclick = async () => {
   const text = [`Gang of Legends ${VERSION}`, new Date().toString(), navigator.userAgent, ...net.netLog].join('\n');
   try { await navigator.clipboard.writeText(text); menuError(`Copied ${net.netLog.length} log lines. Paste them to whoever is helping you.`); }

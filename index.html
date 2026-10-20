@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <title>Gang of Legends</title>
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-inline' 'wasm-unsafe-eval'; img-src 'self' data: blob:; connect-src 'self' data: https://0.peerjs.com wss://0.peerjs.com https://gangoflegends-turn.ahmed-okkio.workers.dev">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-inline' 'wasm-unsafe-eval'; img-src 'self' data: blob:; connect-src 'self' data: https://0.peerjs.com wss://0.peerjs.com https://gangoflegends-turn.ahmed-okkio.workers.dev wss://gangoflegends-turn.ahmed-okkio.workers.dev">
 <style>
   @font-face { font-family: 'Lilita One'; src: url('node_modules/@fontsource/lilita-one/files/lilita-one-latin-400-normal.woff2') format('woff2'); }
   @font-face { font-family: 'Nunito'; font-weight: 700; src: url('node_modules/@fontsource/nunito/files/nunito-latin-700-normal.woff2') format('woff2'); }
@@ -84,7 +84,8 @@
   #keys { position: absolute; right: 18px; bottom: 18px; display: grid; gap: 4px; font-size: 12px; color: #c9d1e0; text-align: right; text-shadow: 0 1px 2px #000; }
   #escMenu { position: absolute; inset: 0; display: grid; place-items: center; background: rgba(5,10,20,.6); pointer-events: auto; }
   #escMenu .card { width: 320px; text-align: center; display: grid; gap: 12px; }
-  .netrow { margin-top: 8px; }
+  .netrow { margin-top: 8px; align-items: center; }
+  .relay { display: flex; gap: 6px; align-items: center; color: #c9d1e0; font-size: 13px; }
   .btn.small { padding: 6px 12px; font-size: 14px; }
   .volrow { display: flex; align-items: center; gap: 12px; margin-top: 14px; color: var(--gold); font: 16px var(--display); }
   .volrow input { flex: 1; accent-color: var(--gold); padding: 0; border: 0; background: none; }
@@ -117,7 +118,7 @@
       <button id="practiceBtn" class="btn">Practice</button>
     </div>
     <div id="menuErr" class="err"></div>
-    <div class="row netrow"><button id="netTestBtn" class="btn small">Network test</button><button id="netLogBtn" class="btn small">Copy network log</button></div>
+    <div class="row netrow"><button id="netTestBtn" class="btn small">Network test</button><button id="netLogBtn" class="btn small">Copy network log</button><label class="relay"><input id="relayIn" type="checkbox"> Use relay (if you can't connect, e.g. from China)</label></div>
     <h2>Controls</h2>
     <div class="controls">
       <span><kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd> move</span>
