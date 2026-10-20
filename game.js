@@ -244,13 +244,15 @@ const k = (...codes) => codes.some(c => keys.has(c));
 function readInput() {
   let x = (k('KeyD', 'ArrowRight') ? 1 : 0) - (k('KeyA', 'ArrowLeft') ? 1 : 0);
   let z = (k('KeyS', 'ArrowDown') ? 1 : 0) - (k('KeyW', 'ArrowUp') ? 1 : 0);
-  let b = (k('Space') ? BTN.JUMP : 0) | (k('KeyJ') || mouse.has(0) ? BTN.PUNCH : 0) | (k('KeyK') || mouse.has(2) ? BTN.GRAB : 0)
-    | (k('KeyQ') ? BTN.A1 : 0) | (k('KeyE') ? BTN.A2 : 0) | (k('KeyF', 'KeyH') || mouse.has(1) ? BTN.BUTT : 0) | (k('KeyC', 'ControlLeft') ? BTN.LAY : 0);
+  // Gang Beasts layout: each mouse button is a hand (tap punches with it, hold reaches out and grabs)
+  let b = (k('Space') ? BTN.JUMP : 0) | (k('KeyJ') || mouse.has(0) ? BTN.LEFT : 0) | (k('KeyK') || mouse.has(2) ? BTN.RIGHT : 0)
+    | (k('KeyX') ? BTN.A1 : 0) | (k('KeyC') ? BTN.A2 : 0) | (k('KeyF', 'KeyH') || mouse.has(1) ? BTN.BUTT : 0) | (k('ControlLeft') ? BTN.LAY : 0);
   const pad = [...(navigator.getGamepads?.() ?? [])].find(Boolean);
   if (pad) {
     const [ax, az] = pad.axes, on = i => pad.buttons[i]?.pressed;
     if (Math.hypot(ax, az) > 0.2) { x = ax; z = az; }
-    b |= (on(0) ? BTN.JUMP : 0) | (on(2) ? BTN.PUNCH : 0) | (on(5) || on(7) ? BTN.GRAB : 0) | (on(4) ? BTN.A1 : 0) | (on(6) ? BTN.A2 : 0) | (on(1) ? BTN.BUTT : 0) | (on(3) ? BTN.LAY : 0);
+    // triggers / bumpers are the hands, like Gang Beasts on a pad
+    b |= (on(0) ? BTN.JUMP : 0) | (on(4) || on(6) ? BTN.LEFT : 0) | (on(5) || on(7) ? BTN.RIGHT : 0) | (on(2) ? BTN.A1 : 0) | (on(3) ? BTN.A2 : 0) | (on(11) ? BTN.BUTT : 0) | (on(1) ? BTN.LAY : 0);
   }
   const side = view.camSide; // controls are camera-relative: up on the stick is away from the camera
   return { x: Math.round(x * side * 100) / 100, z: Math.round(z * side * 100) / 100, b };

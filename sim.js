@@ -7,7 +7,9 @@ import { PARTS, ANCHOR, HAND, HIP_HEIGHT, CHEST, HEAD, ARM, THIGH, FORE, LEG, HI
 
 export const initPhysics = () => RAPIER.init();
 export const DT = 1 / 60;
-export const BTN = { JUMP: 1, PUNCH: 2, GRAB: 4, A1: 8, A2: 16, BUTT: 32, LAY: 64 };
+// LEFT / RIGHT: one button per hand, like Gang Beasts: tap to punch with that hand, hold to reach out and grab with it
+export const BTN = { JUMP: 1, LEFT: 2, RIGHT: 4, A1: 8, A2: 16, BUTT: 32, LAY: 64 };
+const HANDS = [BTN.LEFT, BTN.RIGHT]; // arm 0 is the beast's left
 export const STAND = HIP_HEIGHT + PARTS[CHEST].p[1] - PARTS[HIPS].p[1]; // chest pivot height above the floor when standing
 
 // --- tiny vector / quaternion helpers (Rapier hands out plain {x,y,z(,w)} objects) ---
@@ -41,6 +43,9 @@ const HOLD = 20; // m/s^2 lift on the core (= gravity), so the hover spring only
 const SAFE = 2.5; // seconds of daze/stagger immunity after getting up from a knockout
 const CHARGE = 3, RAMP = 1.5; // Hecarim E: lasts 3s, speeds up evenly from walking to full gallop over the first 1.5s
 const FB_R = 2.4; // Sett E reach
+const SPIN = 0.3; // Hecarim Q: seconds for its one turn
+const TWIST = 0.7; // how firmly arms hold their roll (aimPart)
+const TAP = 0.2; // a hand let go within this many seconds punches; held longer, it grabs
 const GRIT_FILL = 70; // Sett Q: % of the Grit bar charged per second held
 const UPPER = [HEAD]; // turns rigidly with the chest; the arms don't, so they lag and swing out when the beast spins
 const isLeg = i => (i >= THIGH && i < THIGH + 2) || (i >= LEG && i < LEG + 2);
@@ -115,7 +120,7 @@ export function createSim({ mapId, players, practice = false, roundsToWin = 3, l
       if (part.hinge) j.setLimits(...part.hinge);
     });
     Object.assign(p, {
-      alive: true, yaw, daze: 0, sinceHit: 9, ko: 0, cd: [0, 0], punch: null, punchCd: 0, nextArm: 0, grabs: [null, null],
+      alive: true, yaw, daze: 0, sinceHit: 9, ko: 0, cd: [0, 0], punch: null, punchCd: 0, grabs: [null, null], held: [0, 0],
       stun: 0, spin: 0, spinHit: null, charge: 0, empower: 0, jumpT: 0, phase: 0, grounded: false, prevB: p.input.b,
       butt: null, buttCd: 0, lying: false, climb: 0, safe: 0, hooked: 0, spinA: 0, chargeT: 0,
       emp: null, dash: null, vault: 0, vaultBtn: 0, hay: 0, hayK: 0, hayBtn: 0, fb: 0, grit: 0,
@@ -193,24 +198,39 @@ export function createSim({ mapId, players, practice = false, roundsToWin = 3, l
   // spin a body about its joint pivot (the body origin) by dw; `carry` bodies turn rigidly with it.
   // The pivot swing adds linear momentum; it's tallied in `leak` and taken back off the whole beast after posing,
   // otherwise the limbs aiming forward every step push the beast along (the idle slide).
+  // track = false leaves it out of `leak`: a limb pinned by a grab can't actually swing, so taking that momentum back
+  // off the beast would just shove it around (grabbing a wall pushed the beast into the floor)
   let leak = V();
-  function turn(b, dw, carry) {
+  function turn(b, dw, carry, track = true) {
     const pivot = b.translation();
     for (const c of [b, ...carry]) {
       c.setAngvel(add(c.angvel(), dw), true);
       const dv = cross(dw, sub(c.worldCom(), pivot));
       addVel(c, dv);
-      leak = add(leak, mul(dv, c.mass()));
+      if (track) leak = add(leak, mul(dv, c.mass()));
     }
   }
-  // spin the body part so its "down" axis points along dir, at the given strength (0 = limp, 1 = snap)
+  // each limb's rest orientation relative to its parent (beast.js)
+  const REST = PARTS.map(pt => pt.parent < 0 ? null : qmul(qconj(Q(PARTS[pt.parent].q)), Q(pt.q)));
+  const arc = (a, b) => { // shortest rotation taking unit vector a onto b
+    const c = cross(a, b), w = 1 + dot(a, b);
+    if (w < 1e-4) return { ...norm(Math.abs(a.x) < 0.9 ? cross(a, X) : cross(a, Z)), w: 0 };
+    const n = Math.hypot(c.x, c.y, c.z, w);
+    return { x: c.x / n, y: c.y / n, z: c.z / n, w: w / n };
+  };
+  // spin body part i so its "down" axis points along dir, at the given strength (0 = limp, 1 = snap). Its twist about
+  // that axis is held where it sits at rest relative to its parent, at least as firmly as `twist` even when the swing is
+  // loose (arms: left free they roll and wring the skinned shoulders; legs stay loose, holding them spoils climbing).
   // Like Gang Beasts' joint drives, the target spin is relative to the parent body: a limb rides along with its parent
   // but keeps its own momentum, so arms dangle and fling out instead of being held in place in the world.
-  function aimPart(b, dir, k, strength, carry = [], parent = null) {
-    const c = qrot(b.rotation(), DOWN), d = norm(dir);
-    const ax = cross(c, d), s = len(ax);
-    const target = add(parent ? parent.angvel() : V(), s < 1e-4 ? V() : mul(ax, Math.atan2(s, dot(c, d)) * k / s));
-    turn(b, mul(sub(target, b.angvel()), strength), carry);
+  function aimPart(p, i, dir, k, strength, carry = [], track = true, twist = 0) {
+    const b = p.bodies[i], par = p.bodies[PARTS[i].parent], base = qmul(par.rotation(), REST[i]);
+    let e = qmul(qmul(arc(qrot(base, DOWN), norm(dir)), base), qconj(b.rotation()));
+    if (e.w < 0) e = { x: -e.x, y: -e.y, z: -e.z, w: -e.w };
+    const s = Math.hypot(e.x, e.y, e.z);
+    const dw = sub(add(par.angvel(), s < 1e-5 ? V() : mul(V(e.x, e.y, e.z), 2 * Math.atan2(s, e.w) * k / s)), b.angvel());
+    const axis = qrot(b.rotation(), DOWN), roll = mul(axis, dot(dw, axis));
+    turn(b, add(mul(sub(dw, roll), strength), mul(roll, Math.max(strength, twist))), carry, track);
   }
   // rotate a body towards a target orientation, about its joint pivot (the body origin) rather than its centre of mass,
   // so the joint doesn't eat the correction. `carry` bodies turn rigidly with it, so heavy arms and head ride along.
@@ -241,7 +261,7 @@ export function createSim({ mapId, players, practice = false, roundsToWin = 3, l
     const f = facing(p), t = p.bodies[TORSO].translation(), btn = i ? BTN.A2 : BTN.A1;
     if (ab.id === 'hook') hooks.push({ o: p, pos: add(add(t, mul(f, 0.7)), V(0, 0.2, 0)), dir: f, t: 0, vic: null, pull: 0 });
     else if (ab.id === 'fist') { p.empower = 4; p.emp = 'launch'; }
-    else if (ab.id === 'rampage') { p.spin = 0.6; p.spinHit = new Set(); }
+    else if (ab.id === 'rampage') { p.spin = SPIN; p.spinHit = new Set(); }
     else if (ab.id === 'charge') { p.charge = CHARGE; p.chargeT = 0; }
     else if (ab.id === 'vault') { p.vault = DT; p.vaultBtn = btn; } // charges while held, see control()
     else if (ab.id === 'relentless') { p.empower = 4; p.emp = 'through'; }
@@ -273,7 +293,7 @@ export function createSim({ mapId, players, practice = false, roundsToWin = 3, l
       const d = sub(o.bodies[TORSO].translation(), t), dist = Math.hypot(d.x, d.z), along = (d.x * f.x + d.z * f.z);
       if (dist > 2.4 || Math.abs(d.y) > 1.2 || along < dist * Math.cos(0.6)) continue;
       const centre = Math.abs(d.x * f.z - d.z * f.x) < 0.35;
-      hit(o, TORSO, add(mul(f, centre ? 5 + 9 * k : 4 + 6 * k), V(0, 1.5 + 2 * k, 0)), centre ? 25 + 75 * k : 15 + 45 * k);
+      hit(o, TORSO, mul(add(mul(f, centre ? 5 + 9 * k : 4 + 6 * k), V(0, 1.5 + 2 * k, 0)), 1.5), (centre ? 25 + 75 * k : 15 + 45 * k) * 1.5);
     }
   }
 
@@ -303,7 +323,7 @@ export function createSim({ mapId, players, practice = false, roundsToWin = 3, l
     const m = Math.hypot(mx, mz);
     if (m > 1) { mx /= m; mz /= m; }
     // Rampage spins the body (spinA) on top of the travel direction, so it works while walking or charging
-    if (p.spin > 0) { p.spin -= DT; p.spinA += 20 * DT; } else p.spinA = 0;
+    if (p.spin > 0) { p.spin -= DT; p.spinA += (2 * Math.PI / SPIN) * DT; } else p.spinA = 0; // one full turn
     if (move) {
       if (p.charge > 0) { if (m > 0.2) p.yaw = turnToward(p.yaw, Math.atan2(mx, mz), 3 * DT); }
       else if (m > 0.2) p.yaw = Math.atan2(mx, mz);
@@ -357,22 +377,32 @@ export function createSim({ mapId, players, practice = false, roundsToWin = 3, l
     const lean = p.charge > 0 || p.dash ? 0.35 : p.butt ? 0.9 * Math.sin(Math.min(1, p.butt.t / 0.25) * Math.PI) : 0, yq = qyaw(p.yaw + p.spinA), up = (p.grounded ? 0.3 : 0.15) * ctrl;
     leak = V();
     orient(Hb, yq, 10, up);
-    orient(p.bodies[WAIST], qmul(yq, qaxis(X, lean * 0.5)), 10, up, [T, ...UPPER.map(i => p.bodies[i])]);
-    orient(T, qmul(yq, qaxis(X, lean)), 20, up, UPPER.map(i => p.bodies[i]));
+    // punching turns the shoulders into it: wound back, then the punching side drives forward (that's the reach)
+    const cock = p.held.findIndex(h => h > 0 && h < TAP && p.grounded);
+    const tw = p.punch ? (p.punch.arm ? 0.7 : -0.7) : cock >= 0 ? (cock ? -0.3 : 0.3) : 0;
+    orient(p.bodies[WAIST], qmul(qyaw(p.yaw + p.spinA + tw * 0.4), qaxis(X, lean * 0.5)), 10, up, [T, ...UPPER.map(i => p.bodies[i])]);
+    orient(T, qmul(qyaw(p.yaw + p.spinA + tw), qaxis(X, lean)), 20, up, UPPER.map(i => p.bodies[i]));
     orient(H, qmul(yq, qaxis(X, lean * 0.6)), 20, up);
 
     const hspeed = Math.hypot(tv.x, tv.z), gait = Math.min(1, hspeed / 2);
     p.phase += hspeed * DT * 4.5;
-    const grabbing = ctrl && inp.b & BTN.GRAB;
-    if (move && pressed & BTN.PUNCH && p.punchCd <= 0 && p.spin <= 0) {
-      const arm = p.nextArm; p.nextArm ^= 1;
-      p.punch = { arm, t: 0, hit: new Set() };
-      p.punchCd = 0.32;
-      fx('swing', handPos(p, arm), 0, p.slot);
-      addVel(p.bodies[FORE + arm], add(mul(f, 7), V(0, 1, 0)));
-      addVel(T, mul(f, 1));
+    // hands, Gang Beasts style: pressing one cocks that arm back; let go quickly (a tap) and it throws the punch,
+    // keep holding and it reaches out and grabs instead
+    const grabbing = [false, false];
+    for (const arm of [0, 1]) {
+      if (ctrl && inp.b & HANDS[arm]) p.held[arm] += DT;
+      else if (p.held[arm] > 0) {
+        if (p.held[arm] < TAP && !p.grabs[arm] && move && p.punchCd <= 0 && p.spin <= 0) {
+          p.punch = { arm, t: 0, hit: new Set() }; // already drawn back while the button was down
+          p.punchCd = 0.25;
+          fx('swing', handPos(p, arm), 0, p.slot);
+          addVel(T, mul(f, 1.5)); // lunge into it
+        }
+        p.held[arm] = 0;
+      }
+      grabbing[arm] = p.held[arm] >= TAP || (p.held[arm] > 0 && !p.grounded); // in the air, grab at once: ledges go by fast
     }
-    if (p.punch && (p.punch.t += DT) > 0.3 && !(inp.b & BTN.PUNCH)) p.punch = null; // hold punch to keep the arm out
+    if (p.punch && (p.punch.t += DT) > 0.25) p.punch = null;
     // headbutt: the whole upper body snaps forward and the head leads
     if (move && pressed & BTN.BUTT && p.buttCd <= 0 && p.spin <= 0) {
       p.butt = { t: 0, hit: new Set() }; p.buttCd = 0.7;
@@ -387,7 +417,7 @@ export function createSim({ mapId, players, practice = false, roundsToWin = 3, l
       // `fs` scales the forearm: it lags the upper arm so swings whip instead of moving as one stick
       // poses follow the body facing (bf), which only differs from the travel direction mid-Rampage
       let ua = add(add(DOWN, mul(bf, 0.15 + swing * 0.4 * gait)), mul(side, s * 0.25)), fa = add(DOWN, mul(bf, 0.5 + swing * 0.3 * gait)), str = 0.1, fs = 1;
-      if (grabbing) { ua = fa = add(add(bf, V(0, 0.35, 0)), mul(side, s * 0.1)); str = 0.8; }
+      if (grabbing[i]) { ua = fa = add(add(bf, V(0, 0.35, 0)), mul(side, s * 0.1)); str = 0.8; }
       if (p.charge > 0) { ua = fa = add(bf, V(0, -0.3, 0)); str = 0.6; }
       if (p.vault > 0) { ua = fa = add(mul(bf, -0.6), DOWN); str = 0.5; } // fists drawn back
       if (p.dash) { ua = fa = add(bf, V(0, 0.1, 0)); str = 0.8; } // both fists leading
@@ -395,15 +425,21 @@ export function createSim({ mapId, players, practice = false, roundsToWin = 3, l
       if (p.hay > 0 && i === 0) { ua = fa = add(bf, V(0, 0.2, 0)); str = 0.5; } // guard hand out front
       // Facebreaker: arms fling wide, then slam together in front
       if (p.fb > 0) { ua = fa = p.fb > 0.18 ? add(mul(side, s), mul(bf, -0.3)) : add(mul(side, s * 0.15), bf); str = 0.9; }
-      if (p.punch?.arm === i) { ua = fa = add(add(bf, V(0, 0.1, 0)), mul(side, -s * 0.1)); str = 0.6; fs = 0.4; }
+      // punch: the fist sweeps round from the side to the front (a short hook) out of the cocked pose below
+      if (p.punch?.arm === i) {
+        const u = Math.min(1, p.punch.t / 0.1);
+        ua = add(add(mul(side, s * 0.9 * (1 - u)), mul(bf, 0.3 + 0.7 * u)), V(0, 0.15, 0)); fa = add(bf, V(0, 0.1, 0)); str = 0.9; fs = 0.8;
+      }
       if (p.spin > 0) { ua = fa = add(mul(side, s), mul(bf, 0.1)); str = 0.5; fs = 0.4; }
-      if (grabbing && !p.grounded) { ua = fa = add(mul(bf, 0.5), V(0, 1, 0)); str = 0.8; } // reach up for ledges
+      if (p.held[i] > 0 && !grabbing[i] && p.punch?.arm !== i) { ua = add(add(mul(bf, -0.5), mul(side, s * 0.7)), V(0, -0.3, 0)); fa = add(bf, V(0, 0.3, 0)); str = 0.6; fs = 0.7; } // cocked: elbow back and out
+      if (grabbing[i] && !p.grounded) { ua = fa = add(mul(bf, 0.5), V(0, 1, 0)); str = 0.8; } // reach up for ledges
       if (p.climb > 0) { ua = fa = add(mul(bf, 0.3), DOWN); str = 0.8; } // push down on the ledge
-      aimPart(p.bodies[ARM + i], ua, 14, str * ctrl, [p.bodies[FORE + i]], T);
-      aimPart(p.bodies[FORE + i], fa, 14, str * fs * ctrl, [], p.bodies[ARM + i]);
+      const free = !p.grabs[i]?.target.isFixed() || !p.grounded; // hanging or climbing, arm momentum is what lifts the beast
+      aimPart(p, ARM + i, ua, 14, str * ctrl, [p.bodies[FORE + i]], free, TWIST);
+      aimPart(p, FORE + i, fa, 14, str * fs * ctrl, [], free, TWIST);
       // legs: thighs swing, shins fold back on the up-swing
-      aimPart(p.bodies[THIGH + i], add(DOWN, mul(bf, swing * 0.7 * gait)), 14, 0.5 * ctrl, [p.bodies[LEG + i]], Hb);
-      aimPart(p.bodies[LEG + i], add(DOWN, mul(bf, (swing * 0.7 - Math.max(0, Math.cos(p.phase + i * Math.PI)) * 0.9) * gait)), 14, 0.5 * ctrl, [], p.bodies[THIGH + i]);
+      aimPart(p, THIGH + i, add(DOWN, mul(bf, swing * 0.7 * gait)), 14, 0.5 * ctrl, [p.bodies[LEG + i]]);
+      aimPart(p, LEG + i, add(DOWN, mul(bf, (swing * 0.7 - Math.max(0, Math.cos(p.phase + i * Math.PI)) * 0.9) * gait)), 14, 0.5 * ctrl);
     }
     const back = mul(leak, -1 / p.bodies.reduce((m, b) => m + b.mass(), 0));
     for (const b of p.bodies) addVel(b, back);
@@ -419,7 +455,7 @@ export function createSim({ mapId, players, practice = false, roundsToWin = 3, l
 
     // punch hits
     // punch hits land as hard as the fist is moving, so a spinning or running punch carries the body's momentum
-    if (p.punch && p.punch.t > 0.04) {
+    if (p.punch && p.punch.t > 0.01) {
       const arm = p.bodies[FORE + p.punch.arm], hp = handPos(p, p.punch.arm);
       const fv = add(arm.linvel(), cross(arm.angvel(), sub(hp, arm.worldCom())));
       for (const { vic, part } of playersNear(p, hp, 0.2)) {
@@ -429,7 +465,7 @@ export function createSim({ mapId, players, practice = false, roundsToWin = 3, l
         p.punch.hit.add(vic);
         if (p.empower > 0 && p.emp === 'through') { p.empower = 0; relentless(p, vic, part, f); }
         else if (p.empower > 0) { p.empower = 0; hit(vic, part, add(mul(f, 2), V(0, 10, 0)), 45); }
-        else { const k = Math.min(sp, 12) / 6; hit(vic, part, add(mul(norm(add(norm(fv), f)), 3.5 * k), V(0, 1, 0)), 20 * k); }
+        else { const k = Math.min(sp, 12) / 6; hit(vic, part, add(mul(norm(add(norm(fv), f)), 2.2 * k), V(0, 0.6, 0)), 20 * k); }
       }
     }
     if (p.spin > 0) for (let i = 0; i < 2; i++) {
@@ -459,10 +495,10 @@ export function createSim({ mapId, players, practice = false, roundsToWin = 3, l
       }
     }
 
-    // grabs: each fist sticks to whatever it touches while grab is held (after a climb, only once grab is pressed again)
-    if (!grabbing && p.climb <= 0) p.over = false;
+    // grabs: each fist sticks to whatever it touches while its hand is held (after a climb, only once grabbing again)
+    if (!grabbing[0] && !grabbing[1] && p.climb <= 0) p.over = false;
     for (let i = 0; i < 2; i++) {
-      if (!grabbing || p.over) { if (p.grabs[i]) { world.removeImpulseJoint(p.grabs[i].j, true); p.grabs[i] = null; } continue; }
+      if (!grabbing[i] || p.over) { if (p.grabs[i]) { world.removeImpulseJoint(p.grabs[i].j, true); p.grabs[i] = null; } continue; }
       if (p.grabs[i]) continue;
       const arm = p.bodies[FORE + i], hp = handPos(p, i);
       const target = overlap(hp, 0.16, worldAndOthers(p))[0]?.parent();

@@ -3,29 +3,29 @@ export const CHAMPS = {
   blitz: {
     name: 'Blitzcrank', title: 'The Great Steam Golem', body: '#d9a43a', limb: '#a8802c', eyes: '#7fe8ff',
     abilities: [
-      { id: 'hook', key: 'Q', name: 'Rocket Grab', cd: 6, desc: 'Fire your fist and drag the first champ it hits to you.' },
-      { id: 'fist', key: 'E', name: 'Power Fist', cd: 5, desc: 'Your next punch launches its target into the air.' },
+      { id: 'hook', key: 'X', name: 'Rocket Grab', cd: 6, desc: 'Fire your fist and drag the first champ it hits to you.' },
+      { id: 'fist', key: 'C', name: 'Power Fist', cd: 5, desc: 'Your next punch launches its target into the air.' },
     ],
   },
   hec: {
     name: 'Hecarim', title: 'The Shadow of War', body: '#2f6274', limb: '#1d3f4c', eyes: '#5ff7d2',
     abilities: [
-      { id: 'rampage', key: 'Q', name: 'Rampage', cd: 4, desc: 'Spin with both fists out, smacking everyone around you. Works on the move and mid-charge.' },
-      { id: 'charge', key: 'E', name: 'Devastating Charge', cd: 8, desc: 'Gallop, building up speed, and bowl over the first champ you reach. Faster hits harder. Press again to stop.' },
+      { id: 'rampage', key: 'X', name: 'Rampage', cd: 4, desc: 'Spin with both fists out, smacking everyone around you. Works on the move and mid-charge.' },
+      { id: 'charge', key: 'C', name: 'Devastating Charge', cd: 8, desc: 'Gallop, building up speed, and bowl over the first champ you reach. Faster hits harder. Press again to stop.' },
     ],
   },
   vi: {
     name: 'Vi', title: 'The Piltover Enforcer', body: '#5b6b8c', limb: '#45526d', eyes: '#7fd3ff', glow: '#ff5fae',
     abilities: [
-      { id: 'vault', key: 'Q', name: 'Vault Breaker', cd: 6, desc: 'Hold to wind up, let go to dash and punch the first champ you hit. Longer windup, bigger hit.' },
-      { id: 'relentless', key: 'E', name: 'Relentless Force', cd: 4, desc: 'Your next punch smashes through its target into everyone behind it.' },
+      { id: 'vault', key: 'X', name: 'Vault Breaker', cd: 6, desc: 'Hold to wind up, let go to dash and punch the first champ you hit. Longer windup, bigger hit.' },
+      { id: 'relentless', key: 'C', name: 'Relentless Force', cd: 4, desc: 'Your next punch smashes through its target into everyone behind it.' },
     ],
   },
   sett: {
     name: 'Sett', title: 'The Boss', body: '#c97a52', limb: '#9a5a3a', eyes: '#ffd166', glow: '#ffb000',
     abilities: [
-      { id: 'haymaker', key: 'Q', name: 'Haymaker', cd: 8, desc: 'Getting hit fills your Grit. Hold to plant and charge it in (taking half daze), let go for a cone punch as strong as the Grit spent.' },
-      { id: 'facebreaker', key: 'E', name: 'Facebreaker', cd: 7, desc: 'Yank everyone close into you and stun them. Catch champs on both sides for a long stun.' },
+      { id: 'haymaker', key: 'X', name: 'Haymaker', cd: 8, desc: 'Getting hit fills your Grit. Hold to plant and charge it in (taking half daze), let go for a cone punch as strong as the Grit spent.' },
+      { id: 'facebreaker', key: 'C', name: 'Facebreaker', cd: 7, desc: 'Yank everyone close into you and stun them. Catch champs on both sides for a long stun.' },
     ],
   },
 };

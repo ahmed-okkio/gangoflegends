@@ -42,12 +42,12 @@ function lineUp(sim, gap = 1.1) {
   run(sim, 90);
   lineUp(sim);
   let k = 0;
-  for (; k < 10 && sim.players[1].ko <= 0; k++) { lineUp(sim); run(sim, 22, i => sim.setInput(0, { x: 0, z: 0, b: i < 3 ? BTN.PUNCH : 0 })); }
+  for (; k < 10 && sim.players[1].ko <= 0; k++) { lineUp(sim); run(sim, 22, i => sim.setInput(0, { x: 0, z: 0, b: i < 3 ? BTN.LEFT : 0 })); }
   console.log('punches to KO', k, 'daze', sim.players[1].daze.toFixed(0));
   assert.ok(sim.players[1].ko > 0, 'punches knock out');
   // KO length is fixed and getting up gives a safe window: punching through it doesn't chain another KO
   let kos = 0, wasKo = true;
-  for (let i = 0; i < 12; i++) { lineUp(sim); run(sim, 22, j => { sim.setInput(0, { x: 0, z: 0, b: j < 3 ? BTN.PUNCH : 0 }); const ko = sim.players[1].ko > 0; if (ko && !wasKo) kos++; wasKo = ko; }); }
+  for (let i = 0; i < 12; i++) { lineUp(sim); run(sim, 22, j => { sim.setInput(0, { x: 0, z: 0, b: j < 3 ? BTN.LEFT : 0 }); const ko = sim.players[1].ko > 0; if (ko && !wasKo) kos++; wasKo = ko; }); }
   assert.ok(sim.players[1].ko <= 0 || kos > 0, 'KO does not last forever under punches');
   assert.ok(kos <= 1, `no chain KO right after waking (${kos})`);
 }
@@ -94,7 +94,7 @@ function lineUp(sim, gap = 1.1) {
   run(sim, 90);
   lineUp(sim);
   let peak = 0;
-  run(sim, 60, i => { sim.setInput(0, { x: 0, z: 0, b: i < 2 ? BTN.A2 : i > 5 && i < 9 ? BTN.PUNCH : 0 }); peak = Math.max(peak, torso(sim, 1).y); });
+  run(sim, 60, i => { sim.setInput(0, { x: 0, z: 0, b: i < 2 ? BTN.A2 : i > 5 && i < 9 ? BTN.LEFT : 0 }); peak = Math.max(peak, torso(sim, 1).y); });
   console.log('fist peak', peak.toFixed(2));
   assert.ok(peak > STAND + 1, 'power fist launches');
 }
@@ -116,10 +116,17 @@ function lineUp(sim, gap = 1.1) {
   const sim = near('blitz', 'hec');
   run(sim, 90);
   lineUp(sim, 0.95);
-  run(sim, 30, () => sim.setInput(0, { x: 0, z: 0, b: BTN.GRAB }));
+  run(sim, 30, () => sim.setInput(0, { x: 0, z: 0, b: (BTN.LEFT | BTN.RIGHT) }));
   assert.ok(sim.players[0].grabs.some(Boolean), 'grabbed');
   run(sim, 5, () => sim.setInput(0, { x: 0, z: 0, b: 0 }));
   assert.ok(!sim.players[0].grabs.some(Boolean), 'released');
+  // grabbing the side wall while standing holds on without dragging the beast down
+  const p = sim.players[0], t0 = torso(sim, 0);
+  for (const b of p.bodies) { const t = b.translation(); b.setTranslation({ x: t.x - t0.x - 6.45, y: t.y, z: t.z - t0.z }, true); b.setLinvel({ x: 0, y: 0, z: 0 }, true); }
+  run(sim, 60, () => sim.setInput(0, { x: -1, z: 0, b: 0 }));
+  run(sim, 120, () => sim.setInput(0, { x: 0, z: 0, b: BTN.LEFT | BTN.RIGHT }));
+  assert.ok(p.grabs.some(g => g?.target.isFixed()), 'grabs the wall');
+  assert.ok(Math.abs(torso(sim, 0).y - STAND) < 0.12, `stays standing while holding the wall (${torso(sim, 0).y})`);
   console.log('grab ok');
 }
 
@@ -139,9 +146,9 @@ function lineUp(sim, gap = 1.1) {
   const p = sim.players[0], t0 = torso(sim, 0);
   for (const b of p.bodies) { const t = b.translation(); b.setTranslation({ x: t.x - t0.x - 3, y: t.y - t0.y - 0.45, z: t.z - t0.z + 5.35 }, true); b.setLinvel({ x: 0, y: 0, z: 0 }, true); }
   p.yaw = Math.PI;
-  run(sim, 40, () => sim.setInput(0, { x: 0, z: 0, b: BTN.GRAB }));
+  run(sim, 40, () => sim.setInput(0, { x: 0, z: 0, b: (BTN.LEFT | BTN.RIGHT) }));
   assert.ok(p.grabs.every(Boolean), 'hangs by both hands');
-  run(sim, 60, i => sim.setInput(0, { x: 0, z: 0, b: BTN.GRAB | (i === 2 ? BTN.JUMP : 0) }));
+  run(sim, 60, i => sim.setInput(0, { x: 0, z: 0, b: (BTN.LEFT | BTN.RIGHT) | (i === 2 ? BTN.JUMP : 0) }));
   assert.ok(p.alive && torso(sim, 0).y > 0.3 && torso(sim, 0).z < 5, `climbs onto the ledge ${JSON.stringify(torso(sim, 0))}`);
   console.log('headbutt + lie down + climb ok');
 }
@@ -160,7 +167,7 @@ function lineUp(sim, gap = 1.1) {
   lineUp(sim2, 0.95);
   const c = sim2.players[2], bt = torso(sim2, 1), ct = c.bodies[0].translation();
   for (const b of c.bodies) { const t = b.translation(); b.setTranslation({ x: t.x - ct.x + bt.x + 0.9, y: t.y, z: t.z - ct.z + bt.z }, true); }
-  run(sim2, 30, i => sim2.setInput(0, { x: 0, z: 0, b: (i === 0 ? BTN.A2 : 0) | (i > 2 && i < 6 ? BTN.PUNCH : 0) }));
+  run(sim2, 30, i => sim2.setInput(0, { x: 0, z: 0, b: (i === 0 ? BTN.A2 : 0) | (i > 2 && i < 6 ? BTN.LEFT : 0) }));
   assert.ok(sim2.players[1].daze > 0 && c.daze > 0, `relentless force hits through (${sim2.players[1].daze}, ${c.daze})`);
   console.log('vi ok');
 }
@@ -197,7 +204,7 @@ function lineUp(sim, gap = 1.1) {
   lineUp(sim, 4);
   sim.players[1].yaw = -Math.PI / 2;
   let punched = false;
-  run(sim, 30, i => { sim.setInput(0, { x: 0, z: 0, b: i < 2 ? BTN.A1 : 0 }); sim.setInput(1, { x: 0, z: 0, b: i % 4 < 2 ? BTN.PUNCH : 0 }); if (sim.players[1].hooked > 0 && sim.players[1].punch) punched = true; });
+  run(sim, 30, i => { sim.setInput(0, { x: 0, z: 0, b: i < 2 ? BTN.A1 : 0 }); sim.setInput(1, { x: 0, z: 0, b: i % 4 < 2 ? BTN.LEFT : 0 }); if (sim.players[1].hooked > 0 && sim.players[1].punch) punched = true; });
   assert.ok(!punched, 'no punching while hooked');
   console.log('hook lock ok');
 }
