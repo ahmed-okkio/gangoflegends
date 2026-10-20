@@ -1,0 +1,73 @@
+{
+  "name": "gang-of-legends",
+  "version": "1.0.0",
+  "description": "Gang Beasts-style ragdoll brawler with League of Legends champions. Free fan game.",
+  "main": "main.cjs",
+  "scripts": {
+    "start": "electron .",
+    "dev": "electron . --dev",
+    "test": "node test.js",
+    "dist": "electron-builder --win",
+    "release": "electron-builder --win && node release.cjs"
+  },
+  "type": "module",
+  "dependencies": {
+    "@dimforge/rapier3d-compat": "^0.21.0",
+    "@fontsource/lilita-one": "^5.3.0",
+    "@fontsource/nunito": "^5.3.0",
+    "electron-updater": "^6.8.9",
+    "peerjs": "^1.5.5",
+    "three": "^0.170.0"
+  },
+  "devDependencies": {
+    "electron": "^33.4.11",
+    "electron-builder": "^26.15.3"
+  },
+  "productName": "Gang of Legends",
+  "repository": "github:ahmed-okkio/gangoflegends",
+  "build": {
+    "appId": "com.ahmedokkio.gangoflegends",
+    "productName": "GangOfLegends",
+    "directories": {
+      "output": "release"
+    },
+    "files": [
+      "**/*",
+      "!test.js",
+      "!tools/**",
+      "!lolcache/**",
+      "!release/**",
+      "!release.cjs",
+      "!DESIGN.md",
+      "!assets/props/preview_*.png"
+    ],
+    "win": {
+      "target": "nsis"
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "artifactName": "GangOfLegends-Setup-${version}.${ext}"
+    },
+    "publish": {
+      "provider": "github",
+      "owner": "ahmed-okkio",
+      "repo": "gangoflegends",
+      "releaseType": "release"
+    },
+    "asar": false,
+    "extraResources": [
+      {
+        "from": "node_modules/three/examples/jsm",
+        "to": "app/node_modules/three/examples/jsm",
+        "filter": [
+          "environments/**",
+          "loaders/**",
+          "postprocessing/**",
+          "shaders/**",
+          "utils/**"
+        ]
+      }
+    ]
+  }
+}

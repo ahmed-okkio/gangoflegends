@@ -1,0 +1,168 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>Gang of Legends</title>
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-inline' 'wasm-unsafe-eval'; img-src 'self' data: blob:; connect-src 'self' data: https://0.peerjs.com wss://0.peerjs.com">
+<style>
+  @font-face { font-family: 'Lilita One'; src: url('node_modules/@fontsource/lilita-one/files/lilita-one-latin-400-normal.woff2') format('woff2'); }
+  @font-face { font-family: 'Nunito'; font-weight: 700; src: url('node_modules/@fontsource/nunito/files/nunito-latin-700-normal.woff2') format('woff2'); }
+  @font-face { font-family: 'Nunito'; font-weight: 900; src: url('node_modules/@fontsource/nunito/files/nunito-latin-900-normal.woff2') format('woff2'); }
+  :root {
+    --ink: #0b1426; --ink-2: #1b2a44; --paper: #f0e6d2; --gold: #c8aa6e; --gold-2: #f0d48a; --teal: #0ac8b9; --muted: #7d8aa3; --bad: #ff5468;
+    --display: 'Lilita One', 'Segoe UI Black', sans-serif; --body: 'Nunito', 'Segoe UI', sans-serif;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; height: 100%; overflow: hidden; background: var(--ink); color: var(--paper); font: 700 15px var(--body); user-select: none; }
+  canvas { display: block; position: fixed; inset: 0; }
+  .hidden { display: none !important; }
+  button, select, input { font: inherit; color: inherit; }
+  kbd { display: inline-grid; place-items: center; min-width: 24px; height: 24px; padding: 0 5px; border-radius: 6px; background: var(--ink); color: var(--gold-2); border: 2px solid var(--gold); font: 14px var(--display); }
+
+  .screen { position: fixed; inset: 0; display: grid; place-items: center; overflow: auto; padding: 24px;
+    background: radial-gradient(ellipse at 50% -10%, #23406a 0%, transparent 60%), radial-gradient(ellipse at 100% 110%, #0d3b44 0%, transparent 55%), var(--ink); }
+  .card { width: min(880px, 100%); background: linear-gradient(#13213a, #0e192d); border: 2px solid var(--gold); border-radius: 18px; padding: 26px 28px; box-shadow: 0 0 0 6px rgba(200,170,110,.12), 0 30px 80px rgba(0,0,0,.5); }
+  h1 { margin: 0; font: 64px/0.95 var(--display); font-weight: 400; color: var(--gold-2); letter-spacing: 1px; text-shadow: 0 4px 0 #6b5428; }
+  h1 + p { margin: 6px 0 22px; color: var(--muted); }
+  h2 { margin: 18px 0 8px; font: 18px var(--display); font-weight: 400; color: var(--gold); letter-spacing: .5px; text-transform: uppercase; }
+  .row { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+  .grow { flex: 1; }
+  input, select { background: var(--ink); border: 2px solid var(--ink-2); border-radius: 10px; padding: 10px 12px; outline: none; }
+  input:focus, select:focus { border-color: var(--teal); }
+  select:disabled { opacity: .7; }
+  .btn { border: 0; border-radius: 12px; padding: 12px 20px; cursor: pointer; font: 20px var(--display); background: var(--ink-2); color: var(--paper); box-shadow: 0 4px 0 #050a14; transition: transform .06s; }
+  .btn:hover { filter: brightness(1.15); } .btn:active { transform: translateY(3px); box-shadow: 0 1px 0 #050a14; }
+  .btn.gold { background: linear-gradient(var(--gold-2), var(--gold)); color: var(--ink); box-shadow: 0 4px 0 #6b5428; }
+  .btn.teal { background: var(--teal); color: var(--ink); box-shadow: 0 4px 0 #066d65; }
+  #codeIn { width: 130px; text-transform: uppercase; letter-spacing: 3px; font: 20px var(--display); text-align: center; }
+  .err { min-height: 22px; margin-top: 12px; color: var(--bad); }
+
+  .champs { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 12px; }
+  .champ { position: relative; text-align: left; cursor: pointer; padding: 14px 14px 12px 82px; border-radius: 14px; border: 2px solid var(--ink-2); background: var(--ink); display: flex; flex-direction: column; gap: 3px; }
+  .champ:hover { border-color: var(--muted); }
+  .champ.on { border-color: var(--gold); box-shadow: 0 0 0 3px rgba(200,170,110,.25); }
+  .champ > b { font: 22px var(--display); font-weight: 400; color: var(--gold-2); }
+  .champ > small { color: var(--muted); margin-bottom: 6px; }
+  .bean { position: absolute; left: 16px; top: 16px; width: 50px; height: 70px; border-radius: 26px; background: radial-gradient(circle at 35% 30%, color-mix(in srgb, var(--c), #fff 30%), var(--c) 60%); }
+  .bean::after { content: ''; position: absolute; left: 14px; top: 18px; width: 22px; height: 7px; border-radius: 4px; background: var(--e); box-shadow: 0 0 10px var(--e); }
+  .ab { display: flex; gap: 8px; align-items: flex-start; font-size: 13px; color: #c9d1e0; line-height: 1.3; }
+  .ab b { display: block; color: var(--paper); font-weight: 900; }
+
+  .controls { display: grid; grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); gap: 6px 14px; color: #c9d1e0; font-size: 13px; }
+  .controls span { display: flex; gap: 6px; align-items: center; }
+  .legal { margin-top: 18px; font-size: 11px; color: var(--muted); font-weight: 700; }
+
+  #lobbyCode { cursor: pointer; font: 54px var(--display); letter-spacing: 8px; color: var(--teal); }
+  #lobbyPlayers { list-style: none; padding: 0; margin: 0; display: grid; gap: 6px; }
+  #lobbyPlayers li { display: flex; align-items: center; gap: 8px; padding: 9px 12px; border-radius: 10px; background: var(--ink); border-left: 5px solid var(--pc); }
+  #lobbyPlayers li.empty { border-left-color: var(--ink-2); color: var(--muted); }
+  #lobbyPlayers .dot { width: 12px; height: 12px; border-radius: 50%; background: var(--pc); }
+  #lobbyPlayers em { font-style: normal; font-size: 11px; color: var(--ink); background: var(--gold); padding: 1px 6px; border-radius: 5px; }
+  #lobbyPlayers .pick { margin-left: auto; color: var(--gold-2); }
+  #lobbyPlayers .team { color: var(--pc); min-width: 44px; text-align: right; }
+  .cols { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+  @media (max-width: 760px) { .cols { grid-template-columns: 1fr; } }
+  .settings { display: grid; grid-template-columns: auto 1fr; gap: 8px 12px; align-items: center; }
+  #mapBlurb { color: var(--muted); font-size: 13px; margin: 8px 0 0; }
+
+  #hud { position: fixed; inset: 0; pointer-events: none; }
+  #hud button { pointer-events: auto; }
+  #scores { position: absolute; top: 14px; left: 0; right: 0; display: flex; justify-content: center; flex-wrap: wrap; gap: 8px; }
+  .chip { padding: 6px 12px; border-radius: 999px; background: rgba(11,20,38,.85); border: 2px solid var(--pc, var(--gold)); font-size: 14px; }
+  .chip b { font: 18px var(--display); font-weight: 400; color: var(--pc, var(--gold-2)); margin-left: 4px; }
+  .chip.out { opacity: .45; }
+  #banner { position: absolute; top: 26%; left: 0; right: 0; text-align: center; font: 84px var(--display); color: var(--gold-2); text-shadow: 0 5px 0 #6b5428, 0 10px 40px rgba(0,0,0,.6); animation: pop .25s ease-out; }
+  #banner small { display: block; font-size: 26px; color: var(--paper); text-shadow: 0 2px 0 #000; }
+  @keyframes pop { from { transform: scale(.7); opacity: 0; } }
+  #out { position: absolute; bottom: 110px; left: 0; right: 0; text-align: center; font: 26px var(--display); color: var(--bad); text-shadow: 0 2px 0 #000; }
+  #abil { position: absolute; left: 18px; bottom: 18px; display: flex; gap: 10px; }
+  .slot { position: relative; overflow: hidden; width: 118px; height: 74px; border-radius: 12px; background: rgba(11,20,38,.9); border: 2px solid var(--gold); padding: 8px 10px; display: flex; flex-direction: column; gap: 6px; }
+  .slot b { font-size: 13px; line-height: 1.1; }
+  .slot i { position: absolute; left: 0; right: 0; bottom: 0; height: 0; background: rgba(0,0,0,.6); }
+  .slot .cd { position: absolute; right: 10px; top: 6px; font: 26px var(--display); color: var(--paper); }
+  .slot.cooling { border-color: var(--ink-2); }
+  #keys { position: absolute; right: 18px; bottom: 18px; display: grid; gap: 4px; font-size: 12px; color: #c9d1e0; text-align: right; text-shadow: 0 1px 2px #000; }
+  #escMenu { position: absolute; inset: 0; display: grid; place-items: center; background: rgba(5,10,20,.6); pointer-events: auto; }
+  #escMenu .card { width: 320px; text-align: center; display: grid; gap: 12px; }
+  #update { position: fixed; inset: 0; z-index: 1000; display: grid; place-items: center; background: rgba(5,10,20,.92); }
+  #update .card { width: min(460px, 90vw); text-align: center; }
+  #update .bar { height: 20px; margin: 16px 0 10px; border: 2px solid var(--gold); border-radius: 99px; background: var(--ink); overflow: hidden; }
+  #updFill { height: 100%; width: 0; background: linear-gradient(var(--gold-2), var(--gold)); transition: width .2s; }
+</style>
+</head>
+<body>
+<div id="update" class="hidden"><div class="card"><h2 id="updTitle">Checking for updates…</h2><div class="bar"><div id="updFill"></div></div><div id="updTxt">One moment</div></div></div>
+<canvas id="view"></canvas>
+
+<div id="menu" class="screen">
+  <div class="card">
+    <h1>Gang of Legends</h1>
+    <p>Wobbly ragdoll brawls with League champions. Throw everyone else off the map.</p>
+    <div class="row">
+      <input id="nameIn" class="grow" maxlength="14" placeholder="Summoner name">
+    </div>
+    <h2>Champion</h2>
+    <div id="champs" class="champs"></div>
+    <h2>Play</h2>
+    <div class="row">
+      <button id="hostBtn" class="btn gold">Host game</button>
+      <input id="codeIn" maxlength="5" placeholder="CODE">
+      <button id="joinBtn" class="btn teal">Join</button>
+      <span class="grow"></span>
+      <select id="practiceMap"></select>
+      <button id="practiceBtn" class="btn">Practice</button>
+    </div>
+    <div id="menuErr" class="err"></div>
+    <h2>Controls</h2>
+    <div class="controls">
+      <span><kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd> move</span>
+      <span><kbd>Space</kbd> jump</span>
+      <span><kbd>J</kbd> / left click punch</span>
+      <span><kbd>K</kbd> / right click hold to grab</span>
+      <span><kbd>Q</kbd><kbd>E</kbd> abilities</span>
+      <span>Gamepad: A jump, X punch, RB grab, LB/LT abilities</span>
+    </div>
+    <p class="legal">Gang of Legends was created under Riot Games' "Legal Jibber Jabber" policy using assets owned by Riot Games. Riot Games does not endorse or sponsor this project. Free fan game, not for sale.</p>
+  </div>
+</div>
+
+<div id="lobby" class="screen hidden">
+  <div class="card">
+    <div class="row"><div class="grow"><h2 style="margin:0">Lobby code (click to copy)</h2><div id="lobbyCode"></div></div>
+      <button id="leaveBtn" class="btn">Leave</button><button id="startBtn" class="btn gold">Start match</button></div>
+    <p id="lobbyNote" style="color:var(--muted);margin:4px 0 0"></p>
+    <div class="cols">
+      <div><h2>Players</h2><ul id="lobbyPlayers"></ul></div>
+      <div>
+        <h2>Match</h2>
+        <div class="settings">
+          <span>Map</span><select id="setMap"></select>
+          <span>Teams</span><select id="setTeams"><option value="0">Free for all</option><option value="2">2 teams</option><option value="3">3 teams</option><option value="4">4 teams</option></select>
+          <span>Rounds to win</span><select id="setRounds"><option>2</option><option>3</option><option>5</option></select>
+        </div>
+        <p id="mapBlurb"></p>
+      </div>
+    </div>
+    <h2>Your champion</h2>
+    <div id="lobbyChamps" class="champs"></div>
+  </div>
+</div>
+
+<div id="hud" class="hidden">
+  <div id="scores"></div>
+  <div id="banner" class="hidden"></div>
+  <div id="out" class="hidden">You're out! Watch the rest of the round.</div>
+  <div id="abil"></div>
+  <div id="keys"><span>Punch <kbd>J</kbd> · Grab <kbd>K</kbd> · Jump <kbd>Space</kbd></span><span>Esc menu</span></div>
+  <div id="escMenu" class="hidden"><div class="card"><button id="resumeBtn" class="btn">Resume</button><button id="quitBtn" class="btn gold">Leave match</button></div></div>
+</div>
+
+<script type="importmap">{ "imports": {
+  "three": "./node_modules/three/build/three.module.js",
+  "three/addons/": "./node_modules/three/examples/jsm/",
+  "@dimforge/rapier3d-compat": "./node_modules/@dimforge/rapier3d-compat/dist/rapier.mjs"
+} }</script>
+<script src="node_modules/peerjs/dist/peerjs.min.js"></script>
+<script type="module" src="game.js"></script>
+</body>
+</html>
