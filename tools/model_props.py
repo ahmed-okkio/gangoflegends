@@ -64,8 +64,8 @@ def tube(m, pts, radii, flat=1):  # a tapered tube through points: handles, horn
     ob.scale.x = flat; bake(ob)
     return done(ob, m)
 
-def shell(m, radii, at, cut):  # an ellipsoid with the faces where cut(x, y, z) (our space) removed: open jackets, hoods
-    ob = ball(m, 1, at, radii)
+def shell(m, radii, at, cut, seg=40):  # an ellipsoid with the faces where cut(x, y, z) (our space) removed: open jackets, hoods
+    ob = ball(m, 1, at, radii, seg=seg)
     bm = bmesh.new(); bm.from_mesh(ob.data)
     bmesh.ops.delete(bm, geom=[f for f in bm.faces if cut(f.calc_center_median().x, f.calc_center_median().z, -f.calc_center_median().y)], context="FACES")
     bm.to_mesh(ob.data); bm.free()
@@ -162,6 +162,7 @@ WRAP = lambda: mat("wraps", (0.9, 0.84, 0.7), 0.7)
 BRASS = lambda: mat("brass", (0.85, 0.62, 0.22), 0.3, 0.6)
 COAT = lambda: mat("coat", (0.17, 0.04, 0.08), 0.6)
 FUR = lambda: mat("fur", (0.95, 0.92, 0.85), 0.9)
+GOLD = lambda: mat("gold", (0.95, 0.7, 0.25), 0.3, 0.7)
 
 def sett_fist():  # forearm frame: bandaged wrist and hand, brass knuckles across the punching end
     for k, y in enumerate((-0.17, -0.21, -0.25, -0.29)): ring(WRAP(), 0.055, 0.022, (0, y, 0), (0, 1, 0.15 * (-1) ** k))
@@ -169,15 +170,21 @@ def sett_fist():  # forearm frame: bandaged wrist and hand, brass knuckles acros
     box(BRASS(), (0.2, 0.05, 0.12), (0, -0.425, 0.02), 0.02)
     for k in range(4): ring(BRASS(), 0.028, 0.012, (-0.072 + k * 0.048, -0.44, 0.02), (0, 0, 1))
 
-def sett_jacket():  # chest frame (capsule along x: r .193, half length .082, centre y .254 z -.013): open-front coat, fur collar
-    shell(COAT(), (0.3, 0.235, 0.218), (0, 0.255, -0.013), lambda x, y, z: z > 0.05 and abs(x) < 0.1 + (0.45 - y) * 0.15 or y < 0.06)
-    for k in range(18):  # collar: lumpy fur round the back of the neck...
-        a = math.pi * (0.1 + 0.8 * k / 17); ball(FUR(), 0.06, (math.cos(a) * 0.19, 0.44 + math.sin(a) * 0.03, -math.sin(a) * 0.1 + 0.02), seg=14)
-    for sx in (1, -1):  # ...and down both lapels
-        for k in range(6): ball(FUR(), 0.055 - k * 0.004, (sx * (0.13 + k * 0.004), 0.4 - k * 0.06, 0.15 + 0.01 * k), seg=14)
+JC, JR = (0, 0.255, -0.013), (0.3, 0.235, 0.218)  # vest ellipsoid around the chest capsule
+def on_vest(x, y, out=1.0):  # the point on the vest's front at (x, y), pushed out by `out`
+    k = max(0.0, 1 - (x / JR[0]) ** 2 - ((y - JC[1]) / JR[1]) ** 2)
+    return (x * out, JC[1] + (y - JC[1]) * out, JC[2] + JR[2] * math.sqrt(k) * out)
+OPEN = lambda y: 0.035 + (y - 0.08) * 0.28  # half-width of the open front at height y: a deep V, chest on show
 
-def sett_sleeve():  # upper-arm frame: arm runs down -y from the shoulder
-    cyl(COAT(), 0.088, 0.26, (0, -0.12, 0)); ring(FUR(), 0.09, 0.03, (0, -0.25, 0))
+def sett_jacket():  # chest frame (capsule along x: r .193, half length .082, centre y .254 z -.013): open sleeveless vest, fur collar
+    shell(COAT(), JR, JC, lambda x, y, z: (z + JC[2] > 0 and abs(x) < OPEN(y + JC[1])) or y + JC[1] < 0.08, seg=72)  # cut() gets shell-centred coords
+    for sx in (1, -1):  # gold piping down both edges of the opening
+        ys = [0.09 + k * 0.05 for k in range(7)]
+        tube(GOLD(), [on_vest(sx * (OPEN(y) + 0.008), y, 1.06) for y in ys], [0.016] * len(ys))
+        box(GOLD(), (0.035, 0.035, 0.02), on_vest(sx * (OPEN(0.2) + 0.03), 0.2, 1.08), 0.01)  # a button
+    # fur collar: one fat roll from lapel to lapel round the back of the neck
+    pts = [on_vest(-0.15, 0.3, 1.1), on_vest(-0.16, 0.4, 1.12)] +           [(math.sin(a) * 0.17, 0.46, -math.cos(a) * 0.1) for a in (-1.1, -0.5, 0, 0.5, 1.1)] + [on_vest(0.16, 0.4, 1.12), on_vest(0.15, 0.3, 1.1)]
+    tube(FUR(), pts, [0.035, 0.06, 0.07, 0.075, 0.075, 0.075, 0.07, 0.06, 0.035])
 
 PROPS = {
     "blitzcrank_core": blitz_core, "blitzcrank_gauntletL": lambda: blitz_gauntlet(1), "blitzcrank_gauntletR": lambda: blitz_gauntlet(-1),
@@ -185,7 +192,7 @@ PROPS = {
     "hecarim_hoofHand": lambda: hec_hoof(-0.24, -0.44, 0.1),  # forearm frame: hand at y -.337
     "hecarim_hoofFoot": lambda: hec_hoof(0.03, -0.15, 0.115),  # leg frame: foot bottom at y ~-.136
     "vi_gauntletL": lambda: vi_gauntlet(1), "vi_gauntletR": lambda: vi_gauntlet(-1), "vi_hair": vi_hair,
-    "sett_fist": sett_fist, "sett_jacket": sett_jacket, "sett_sleeve": sett_sleeve,
+    "sett_fist": sett_fist, "sett_jacket": sett_jacket,
 }
 # where each prop sits on the preview mannequin: part pivot in the beast's rest pose with arms hanging (beast.js)
 PIVOT = {"core": (0, 0.6347, -0.0101), "blade": (0, 1.0693, 0.0247), "tail": (0, 0.4223, 0.0002),

@@ -37,6 +37,7 @@ let game = null;  // { setup, mySlot, sim?, snaps, cur, fightAt }
 function show(screen) {
   for (const s of ['menu', 'lobby', 'hud']) $(s).classList.toggle('hidden', s !== screen);
   $('escMenu').classList.add('hidden');
+  document.body.classList.toggle('playing', screen === 'hud'); // hides the cursor unless the Esc menu is up
 }
 
 // ---------- menu ----------
@@ -118,7 +119,9 @@ async function joinLobby(raw) {
     else if (m.t === 'start') startGame(m.setup);
     else if (m.t === 'snap' && game) {
       game.snaps.push({ at: performance.now(), s: m.s });
-      if (m.ev?.length) setTimeout(() => view.fx(m.ev), 80); // match the interpolation delay
+      game.local?.sync(m.s, m.s.p[game.mySlot]);
+      const ev = m.ev?.filter(e => e[5] !== game.mySlot); // my own swings already played when I made them
+      if (ev?.length) setTimeout(() => view.fx(ev), 80); // match the interpolation delay
     }
     else if (m.t === 'deny') leave(m.msg);
   });
@@ -176,6 +179,7 @@ async function startGame(setup) {
   const myId = conn ? conn.myId : 'me';
   game = { setup, mySlot: setup.players.findIndex(p => p.id === myId), snaps: [], cur: null, fightAt: 0, lastIn: '', sentAt: 0, pendingEv: [] };
   if (setup.practice || isHost()) game.sim = createSim({ mapId: setup.map, players: setup.players, practice: !!setup.practice, roundsToWin: setup.rounds });
+  else game.local = createSim({ mapId: setup.map, players: setup.players, local: game.mySlot }); // my champ, predicted (sim.js)
   view.setMatch(setup);
   const mine = CHAMPS[setup.players[game.mySlot]?.champ ?? 'blitz'];
   $('abil').innerHTML = mine.abilities.map(a => `<div class="slot"><kbd>${a.key}</kbd><b>${a.name}</b><i></i><span class="cd"></span></div>`).join('');
@@ -217,6 +221,7 @@ const keys = new Set(), mouse = new Set();
 addEventListener('keydown', e => {
   if (e.target.tagName === 'INPUT') return;
   keys.add(e.code);
+  if (game && $('escMenu').classList.contains('hidden')) e.preventDefault(); // Space would click a focused button, Ctrl+key would act
   if (e.code === 'Escape' && game) {
     if (game.setup.practice) { game = null; show('menu'); }
     else $('escMenu').classList.toggle('hidden');
@@ -224,7 +229,7 @@ addEventListener('keydown', e => {
 });
 addEventListener('keyup', e => keys.delete(e.code));
 addEventListener('blur', () => { keys.clear(); mouse.clear(); });
-$('view').addEventListener('mousedown', e => mouse.add(e.button));
+$('view').addEventListener('mousedown', e => { mouse.add(e.button); if (e.button === 1) e.preventDefault(); }); // middle click: no autoscroll
 addEventListener('mouseup', e => mouse.delete(e.button));
 addEventListener('contextmenu', e => { if (game) e.preventDefault(); });
 $('resumeBtn').onclick = () => $('escMenu').classList.add('hidden');
@@ -240,7 +245,7 @@ function readInput() {
   let x = (k('KeyD', 'ArrowRight') ? 1 : 0) - (k('KeyA', 'ArrowLeft') ? 1 : 0);
   let z = (k('KeyS', 'ArrowDown') ? 1 : 0) - (k('KeyW', 'ArrowUp') ? 1 : 0);
   let b = (k('Space') ? BTN.JUMP : 0) | (k('KeyJ') || mouse.has(0) ? BTN.PUNCH : 0) | (k('KeyK') || mouse.has(2) ? BTN.GRAB : 0)
-    | (k('KeyQ') ? BTN.A1 : 0) | (k('KeyE') ? BTN.A2 : 0) | (k('KeyH') ? BTN.BUTT : 0) | (k('KeyC', 'ControlLeft') ? BTN.LAY : 0);
+    | (k('KeyQ') ? BTN.A1 : 0) | (k('KeyE') ? BTN.A2 : 0) | (k('KeyF', 'KeyH') || mouse.has(1) ? BTN.BUTT : 0) | (k('KeyC', 'ControlLeft') ? BTN.LAY : 0);
   const pad = [...(navigator.getGamepads?.() ?? [])].find(Boolean);
   if (pad) {
     const [ax, az] = pad.axes, on = i => pad.buttons[i]?.pressed;
@@ -274,15 +279,27 @@ function frame(now) {
     view.apply(game.cur, game.cur, 1);
     if (game.sim.state === 'over') { game = null; pushLobby(); return; }
   } else {
-    const key = `${inp.x},${inp.z},${inp.b}`;
-    if (key !== game.lastIn || now - game.sentAt > 100) { conn.send({ t: 'in', ...inp }); game.lastIn = key; game.sentAt = now; }
-    // draw ~80ms in the past, between the two snapshots around that moment
+    // my champ moves right away on my own copy; inputs carry the tick they start on so the host can say which one it's at
+    const { local } = game;
+    acc += dt;
+    while (acc >= DT) {
+      acc -= DT;
+      local.setInput(game.mySlot, inp);
+      local.step();
+      const ev = local.takeEvents();
+      if (ev.length) view.fx(ev);
+      const key = `${inp.x},${inp.z},${inp.b}`;
+      if (key !== game.lastIn || now - game.sentAt > 100) { conn.send({ t: 'in', ...inp, n: local.tick }); game.lastIn = key; game.sentAt = now; }
+    }
+    // everyone else is drawn ~80ms in the past, between the two snapshots around that moment
     const at = now - 80, s = game.snaps;
     while (s.length > 2 && s[1].at <= at) s.shift();
     if (!s.length) return;
-    const a = s[0], b = s[1] ?? a;
-    view.apply(a.s, b.s, b === a ? 1 : Math.min(1, Math.max(0, (at - a.at) / (b.at - a.at))));
-    game.cur = b.s;
+    const a = s[0], b = s[1] ?? a, alpha = b === a ? 1 : Math.min(1, Math.max(0, (at - a.at) / (b.at - a.at)));
+    const mine = local.snapshot().p[game.mySlot], withMe = x => ({ ...x, p: x.p.map((e, i) => i === game.mySlot ? mine : e) });
+    view.apply(withMe(a.s), withMe(b.s), alpha);
+    b.s.p.forEach((e, i) => { const o = a.s.p[i]; local.place(i, ...(e[1] && o?.[1] ? [6, 7, 8].map(k => o[k] + (e[k] - o[k]) * alpha) : [0, -100, 0])); });
+    game.cur = withMe(b.s);
   }
   updateHud(game.cur, now);
   view.render(dt);
@@ -293,4 +310,4 @@ show('menu');
 // dev shortcuts: #practice-<map> starts straight into practice (used by the smoke test)
 const dev = location.hash.match(/^#practice-(\w+)/);
 if (dev && MAPS[dev[1]]) startPractice(dev[1]);
-if (dev) Object.defineProperty(window, "game", { get: () => game }); // smoke-test probes
+if (dev) { Object.defineProperty(window, "game", { get: () => game }); window.view = view; } // smoke-test probes

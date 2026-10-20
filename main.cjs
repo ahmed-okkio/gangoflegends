@@ -1,4 +1,4 @@
-const { app, BrowserWindow } = require('electron');
+const { app, BrowserWindow, Menu } = require('electron');
 const path = require('path');
 const fs = require('fs');
 
@@ -8,6 +8,8 @@ const dev = process.argv.includes('--dev'); // npm run dev: straight into Girder
 if (smoke) app.setPath('userData', path.join(app.getPath('temp'), `gangoflegends-test-${process.pid}`));
 
 app.whenReady().then(() => {
+  // no app menu: its shortcuts (Ctrl+W closes, Ctrl+R reloads) fire while holding Ctrl to lie down and pressing a move key
+  if (!dev) Menu.setApplicationMenu(null);
   const win = new BrowserWindow({
     width: 1400, height: 860, backgroundColor: '#0b1426', autoHideMenuBar: true, show: !smoke,
     title: 'Gang of Legends', webPreferences: { backgroundThrottling: false, offscreen: !!smoke },

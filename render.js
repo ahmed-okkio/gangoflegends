@@ -19,7 +19,7 @@ const PROPS = {
   blitz: [['core', CHEST], ['gauntletL', FORE, 'fist'], ['gauntletR', FORE + 1, 'fist']],
   hec: [['blade', HEAD], ['tail', HIPS], ['hoofHand', FORE], ['hoofHand', FORE + 1], ['hoofFoot', LEG], ['hoofFoot', LEG + 1]],
   vi: [['hair', HEAD], ['gauntletL', FORE, 'fist'], ['gauntletR', FORE + 1, 'fist']],
-  sett: [['jacket', CHEST], ['sleeve', ARM], ['sleeve', ARM + 1], ['fist', FORE, 'fist'], ['fist', FORE + 1, 'fist']],
+  sett: [['jacket', CHEST], ['fist', FORE, 'fist'], ['fist', FORE + 1, 'fist']],
 };
 const PROP_FILE = { blitz: 'blitzcrank', hec: 'hecarim', vi: 'vi', sett: 'sett' };
 const propScenes = {}; // 'blitz/core' -> parsed glTF scene
@@ -179,15 +179,17 @@ export function createRenderer(canvas) {
     }
   }
   const rings = [];
-  function ring(pos, color, size) {
+  // a ring that bursts outward facing the camera, or (inward) lies on the floor and closes in on its centre
+  function ring(pos, color, size, inward = false, max = 0.3) {
     let r = rings.find(q => q.life <= 0);
     if (!r) {
-      r = { m: new THREE.Mesh(new THREE.RingGeometry(0.7, 1, 32), new THREE.MeshBasicMaterial({ transparent: true, blending: THREE.AdditiveBlending, depthWrite: false, side: THREE.DoubleSide })) };
+      r = { m: new THREE.Mesh(new THREE.RingGeometry(0.7, 1, 48), new THREE.MeshBasicMaterial({ transparent: true, blending: THREE.AdditiveBlending, depthWrite: false, side: THREE.DoubleSide })) };
       scene.add(r.m); rings.push(r);
     }
-    r.m.position.copy(pos); r.m.quaternion.copy(camera.quaternion);
+    r.m.position.copy(pos);
+    if (inward) r.m.rotation.set(-Math.PI / 2, 0, 0); else r.m.quaternion.copy(camera.quaternion);
     r.m.material.color.set(color);
-    Object.assign(r, { life: 0.3, size });
+    Object.assign(r, { life: max, max, size, inward });
     r.m.visible = true;
   }
   function stepRings(dt) {
@@ -195,9 +197,9 @@ export function createRenderer(canvas) {
       if (r.life <= 0) continue;
       r.life -= dt;
       r.m.visible = r.life > 0;
-      const k = 1 - r.life / 0.3;
-      r.m.scale.setScalar(r.size * (0.2 + k));
-      r.m.material.opacity = 1 - k;
+      const k = 1 - r.life / r.max;
+      r.m.scale.setScalar(r.size * (r.inward ? 1 - 0.85 * k * k : 0.2 + k));
+      r.m.material.opacity = r.inward ? 1 - k * 0.6 : 1 - k;
     }
   }
 
@@ -213,6 +215,11 @@ export function createRenderer(canvas) {
       } else if (kind === 'ko') {
         emit(v, { color: '#ffd84a', n: 14, speed: 3, size: 0.25, life: 0.8, grav: -2, up: 1 });
         ring(v, '#ffd84a', 1.2);
+      } else if (kind === 'fb') { // Sett's Facebreaker: its reach, snapping shut
+        v.y -= 0.6;
+        ring(v, '#ffb000', 2.4, true, 0.35);
+        ring(v, '#ffffff', 2.4, true, 0.2);
+        shake = Math.max(shake, 0.12);
       } else if (kind === 'out') {
         emit(v, { color: '#ffffff', n: 30, speed: 6, size: 0.5, life: 0.9, grav: 2, additive: false, opacity: 0.8 });
         emit(v, { color: '#ff7a3d', n: 16, speed: 8, size: 0.35, life: 0.5, grav: 0 });
@@ -575,7 +582,13 @@ export function createRenderer(canvas) {
     // Rampage swirl
     const swirl = new THREE.Mesh(new THREE.TorusGeometry(0.75, 0.05, 6, 40).rotateX(Math.PI / 2), new THREE.MeshBasicMaterial({ color: c.eyes, transparent: true, opacity: 0.6, blending: THREE.AdditiveBlending, depthWrite: false }));
     group.add(swirl);
-    return { group, parts, tag, stars, fists, swirl, champId, glow: c.glow ?? '#ff8a00', torsoMat: body, glowBase: body.emissive.clone(), eyes: c.eyes, q: PARTS.map(() => [0, 0, 0, 1]), pos: PARTS.map(() => [0, 0, 0]) };
+    // Sett's Grit bar over his head: dark back, orange fill, bright part = what the Haymaker being charged will spend
+    let grit = null;
+    if (champId === 'sett') {
+      const bar = (c, o, z) => { const s = new THREE.Sprite(new THREE.SpriteMaterial({ color: c, depthTest: false, opacity: o, transparent: true })); s.center.set(0, 0.5); s.renderOrder = 10 + z; group.add(s); return s; };
+      grit = { back: bar('#0b1426', 0.75, 0), fill: bar('#ff8a00', 1, 1), use: bar('#fff3b0', 1, 2) };
+    }
+    return { group, parts, tag, stars, fists, swirl, grit, champId, glow: c.glow ?? '#ff8a00', torsoMat: body, glowBase: body.emissive.clone(), eyes: c.eyes, q: PARTS.map(() => [0, 0, 0, 1]), pos: PARTS.map(() => [0, 0, 0]) };
   }
 
   const qa = new THREE.Quaternion(), qb = new THREE.Quaternion(), tmp = new THREE.Vector3(), tmp2 = new THREE.Vector3();
@@ -604,6 +617,13 @@ export function createRenderer(canvas) {
       }
       const flags = pb[3], head = av.parts[HEAD].position, torso = av.parts[CHEST].position;
       av.tag.position.copy(head).y += 0.65;
+      if (av.grit) {
+        const x = 9 + PARTS.length * 4, w = 0.9, h = 0.1, { back, fill, use } = av.grit;
+        for (const [s, k] of [[back, 1], [fill, (pb[x] ?? 0) / 100], [use, (pb[x + 1] ?? 0) / 100]]) {
+          s.position.copy(head); s.position.x -= cam.side * w / 2; s.position.y += 0.9; // left end, as seen from the camera; just above the name
+          s.scale.set(Math.max(0.001, w * k), h, 1);
+        }
+      }
       const dizzy = flags & 16 ? 3 : pb[2] >= 60 ? 2 : 0;
       av.stars.visible = dizzy > 0;
       av.stars.children.forEach((s, i) => { s.visible = i < dizzy; });
@@ -685,5 +705,5 @@ export function createRenderer(canvas) {
     composer.render(dt);
   }
 
-  return { setMatch, apply, fx, render, get camSide() { return cam.side; } };
+  return { setMatch, apply, fx, render, avatars: () => avatars, get camSide() { return cam.side; } };
 }

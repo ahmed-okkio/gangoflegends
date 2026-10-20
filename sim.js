@@ -39,6 +39,9 @@ const TORSO = CHEST;
 const CORE = [HIPS, WAIST, CHEST, HEAD, THIGH, THIGH + 1, LEG, LEG + 1]; // moved as one by the locomotion; arms hang off it
 const HOLD = 20; // m/s^2 lift on the core (= gravity), so the hover spring only has to hold up the hanging arms
 const SAFE = 2.5; // seconds of daze/stagger immunity after getting up from a knockout
+const CHARGE = 3, RAMP = 1.5; // Hecarim E: lasts 3s, speeds up evenly from walking to full gallop over the first 1.5s
+const FB_R = 2.4; // Sett E reach
+const GRIT_FILL = 70; // Sett Q: % of the Grit bar charged per second held
 const UPPER = [HEAD]; // turns rigidly with the chest; the arms don't, so they lag and swing out when the beast spins
 const isLeg = i => (i >= THIGH && i < THIGH + 2) || (i >= LEG && i < LEG + 2);
 const Q = a => ({ x: a[0], y: a[1], z: a[2], w: a[3] });
@@ -52,7 +55,10 @@ const legGroups = p => (p.bit << 16) | (0xffff & ~p.bit & ~1);
 const worldAndOthers = p => (1 << 16) | (0xffff & ~p.bit); // ground rays, grabs
 const othersOnly = p => (1 << 16) | (0x1fe & ~p.bit);      // hit checks
 
-export function createSim({ mapId, players, practice = false, roundsToWin = 3 }) {
+// local >= 0: a client's prediction copy. Only that player's ragdoll is simulated (straight from local input, so moving and
+// swinging feel instant); everyone else is a kinematic stand-in placed from the host's snapshots, and sync() pulls the
+// ragdoll toward the host's authoritative state as it arrives. Hits, KOs and rounds stay the host's call.
+export function createSim({ mapId, players, practice = false, roundsToWin = 3, local = -1 }) {
   const map = MAPS[mapId];
   const world = new RAPIER.World(V(0, -20, 0)); // Gang Beasts' gravity
   world.timestep = DT;
@@ -71,16 +77,20 @@ export function createSim({ mapId, players, practice = false, roundsToWin = 3 })
 
   const ps = players.map((pl, slot) => ({
     ...pl, slot, bit: 1 << (slot + 1), champ: CHAMPS[pl.champ] ? pl.champ : 'blitz',
-    alive: false, bodies: null, input: { x: 0, z: 0, b: 0 }, prevB: 0, respawn: 0,
+    alive: false, bodies: null, input: { x: 0, z: 0, b: 0 }, prevB: 0, respawn: 0, ack: 0,
   }));
   const teamCount = new Set(ps.map(p => p.team)).size;
   const scores = Array(Math.max(...ps.map(p => p.team)) + 1).fill(0);
   const events = []; // [kind, x, y, z, big] for the renderer's particles, drained by takeEvents()
-  const fx = (kind, t, big = 0) => events.push([kind, r2(t.x), r2(t.y), r2(t.z), big]);
+  // [kind, x, y, z, big, slot]: slot = who caused it, so a predicting client can skip the host's copy of its own swings
+  const fx = (kind, t, big = 0, slot = -1) => events.push([kind, r2(t.x), r2(t.y), r2(t.z), big, slot]);
   let hooks = [], st = practice ? 'fight' : 'count', timer = 2.5, round = 1, mt = 0, win = -1;
+  // spawn points are dealt out at random every round
+  const shuffle = a => { for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; };
+  let order = shuffle(map.spawns.map((_, i) => i));
 
-  function spawn(p) {
-    const [sx, sy, sz] = map.spawns[p.slot % map.spawns.length];
+  function spawn(p, at = order[p.slot % order.length]) {
+    const [sx, sy, sz] = map.spawns[at];
     const yaw = Math.atan2(-sx, -sz); // face the middle
     const q = qyaw(yaw), base = V(sx, sy + 0.05, sz);
     p.bodies = PARTS.map((part, i) => {
@@ -107,8 +117,8 @@ export function createSim({ mapId, players, practice = false, roundsToWin = 3 })
     Object.assign(p, {
       alive: true, yaw, daze: 0, sinceHit: 9, ko: 0, cd: [0, 0], punch: null, punchCd: 0, nextArm: 0, grabs: [null, null],
       stun: 0, spin: 0, spinHit: null, charge: 0, empower: 0, jumpT: 0, phase: 0, grounded: false, prevB: p.input.b,
-      butt: null, buttCd: 0, lying: false, climb: 0, safe: 0,
-      emp: null, dash: null, vault: 0, vaultBtn: 0, hay: 0, fb: 0,
+      butt: null, buttCd: 0, lying: false, climb: 0, safe: 0, hooked: 0, spinA: 0, chargeT: 0,
+      emp: null, dash: null, vault: 0, vaultBtn: 0, hay: 0, hayK: 0, hayBtn: 0, fb: 0, grit: 0,
     });
   }
 
@@ -141,17 +151,19 @@ export function createSim({ mapId, players, practice = false, roundsToWin = 3 })
     const seen = new Map();
     for (const c of overlap(pos, r, othersOnly(p))) {
       const o = owner.get(c.handle);
-      if (o?.p.alive && !seen.has(o.p)) seen.set(o.p, { vic: o.p, part: o.part });
+      if ((o?.p.alive || o?.proxy) && !seen.has(o.p)) seen.set(o.p, { vic: o.p, part: o.part });
     }
     return [...seen.values()];
   }
 
   function hit(vic, part, dv, daze) {
+    if (local >= 0) return; // a prediction copy only learns about hits from the host
     for (const b of vic.bodies) addVel(b, dv);
     addVel(vic.bodies[HEAD], mul(dv, 0.3)); // snap the head back a little
     vic.sinceHit = 0;
     fx('hit', vic.bodies[part].translation(), daze >= 40 ? 1 : 0);
     if (dv.y > 2) vic.jumpT = Math.max(vic.jumpT, 0.3); // don't let the hover spring swallow a launch
+    if (vic.champ === 'sett') vic.grit = Math.min(100, vic.grit + daze * 0.8); // Sett's Grit: getting hit fills it
     // knocked out, or just back up from it: still gets knocked around, but no stagger or daze, so no chain stuns
     if (vic.ko > 0 || vic.safe > 0) return;
     vic.stun = Math.max(vic.stun, 0.15 + len(dv) * 0.04); // let the knockback play out before control returns
@@ -161,9 +173,14 @@ export function createSim({ mapId, players, practice = false, roundsToWin = 3 })
 
   function knockOut(p) {
     fx('ko', p.bodies[HEAD].translation());
-    p.ko = 3.2; p.daze = 0; p.spin = 0; p.charge = 0; p.punch = null; p.vault = 0; p.hay = 0;
-    releaseGrabs(p);
+    p.ko = 3.2; p.daze = 0;
+    cancel(p);
     setLegGroups(p, bodyGroups(p));
+  }
+  // drop whatever the player was doing: knocked out, or caught by a hook
+  function cancel(p) {
+    p.spin = 0; p.charge = 0; p.punch = null; p.butt = null; p.dash = null; p.vault = 0; p.hay = 0;
+    releaseGrabs(p);
   }
   const wake = p => setLegGroups(p, legGroups(p));
   function setLegGroups(p, g) {
@@ -218,41 +235,45 @@ export function createSim({ mapId, players, practice = false, roundsToWin = 3 })
 
   function useAbility(p, i) {
     const ab = CHAMPS[p.champ].abilities[i];
+    if (ab.id === 'charge' && p.charge > 0) { p.charge = 0; return; } // recast ends the charge early
     if (p.cd[i] > 0) return;
     p.cd[i] = ab.cd;
-    const f = facing(p), t = p.bodies[TORSO].translation();
+    const f = facing(p), t = p.bodies[TORSO].translation(), btn = i ? BTN.A2 : BTN.A1;
     if (ab.id === 'hook') hooks.push({ o: p, pos: add(add(t, mul(f, 0.7)), V(0, 0.2, 0)), dir: f, t: 0, vic: null, pull: 0 });
     else if (ab.id === 'fist') { p.empower = 4; p.emp = 'launch'; }
     else if (ab.id === 'rampage') { p.spin = 0.6; p.spinHit = new Set(); }
-    else if (ab.id === 'charge') p.charge = 2.2;
-    else if (ab.id === 'vault') { p.vault = DT; p.vaultBtn = i ? BTN.A2 : BTN.A1; } // charges while held, see control()
+    else if (ab.id === 'charge') { p.charge = CHARGE; p.chargeT = 0; }
+    else if (ab.id === 'vault') { p.vault = DT; p.vaultBtn = btn; } // charges while held, see control()
     else if (ab.id === 'relentless') { p.empower = 4; p.emp = 'through'; }
-    else if (ab.id === 'haymaker') p.hay = 0.6;
+    else if (ab.id === 'haymaker') { p.hay = DT; p.hayK = 0; p.hayBtn = btn; } // charges while held, see control()
     else if (ab.id === 'facebreaker') facebreaker(p, f, t);
   }
 
-  // Sett E: yank everyone close on both sides into him; caught from both sides at once means a stun
+  // Sett E: yank everyone close on both sides into him and stun them; caught from both sides at once stuns for longer
   function facebreaker(p, f, t) {
-    p.fb = 0.3;
+    p.fb = 0.35;
+    fx('fb', t, 0, p.slot);
+    if (local >= 0) return;
     const near = ps.filter(o => o !== p && o.alive).map(o => ({ o, d: sub(o.bodies[TORSO].translation(), t) }))
-      .filter(({ d }) => Math.hypot(d.x, d.z) < 2.4 && Math.abs(d.y) < 1.2);
+      .filter(({ d }) => Math.hypot(d.x, d.z) < FB_R && Math.abs(d.y) < 1.2);
     const both = near.some(({ d }) => dot(d, f) >= 0) && near.some(({ d }) => dot(d, f) < 0);
     for (const { o, d } of near) {
       hit(o, TORSO, add(mul(norm(V(-d.x, 0, -d.z)), 7), V(0, 1.2, 0)), both ? 35 : 15);
-      if (both && o.ko <= 0 && o.safe <= 0) o.stun = Math.max(o.stun, 1.2);
+      if (o.ko <= 0 && o.safe <= 0) o.stun = Math.max(o.stun, both ? 1.5 : 0.6);
     }
   }
-  // Sett W: a big cone punch; the middle of the cone hits hardest
-  function haymaker(p, f, t) {
+  // Sett Q: a big cone punch, as strong as the Grit charged into it (k 0..1); the middle of the cone hits hardest
+  function haymaker(p, f, t, k) {
     p.punch = { arm: 1, t: 0, hit: new Set(ps) }; // the arm swings for show; the cone does the hitting
     addVel(p.bodies[FORE + 1], add(mul(f, 9), V(0, 1, 0)));
-    fx('hit', add(t, mul(f, 1.2)), 1);
+    fx('hit', add(t, mul(f, 1.2)), 1, p.slot);
+    if (local >= 0) return;
     for (const o of ps) {
       if (o === p || !o.alive) continue;
       const d = sub(o.bodies[TORSO].translation(), t), dist = Math.hypot(d.x, d.z), along = (d.x * f.x + d.z * f.z);
       if (dist > 2.4 || Math.abs(d.y) > 1.2 || along < dist * Math.cos(0.6)) continue;
       const centre = Math.abs(d.x * f.z - d.z * f.x) < 0.35;
-      hit(o, TORSO, add(mul(f, centre ? 9 : 6.5), V(0, 2, 0)), centre ? 50 : 35);
+      hit(o, TORSO, add(mul(f, centre ? 5 + 9 * k : 4 + 6 * k), V(0, 1.5 + 2 * k, 0)), centre ? 25 + 75 * k : 15 + 45 * k);
     }
   }
 
@@ -263,13 +284,14 @@ export function createSim({ mapId, players, practice = false, roundsToWin = 3 })
     p.prevB = inp.b;
 
     if (p.ko > 0 && (p.ko -= DT) <= 0) { wake(p); p.safe = SAFE; }
-    p.safe -= DT;
+    p.safe -= DT; p.hooked -= DT;
     // lying down (hold): go limp like a KO, legs touch the floor; let go to get back up
     const lying = p.ko <= 0 && !!(inp.b & BTN.LAY);
     if (lying !== p.lying) { p.lying = lying; setLegGroups(p, lying ? bodyGroups(p) : legGroups(p)); }
-    const ctrl = p.ko > 0 ? 0 : lying ? 0.08 : 1;
+    const ctrl = p.ko > 0 || p.hooked > 0 ? 0 : lying ? 0.08 : 1; // hooked: limp, dragged along helpless
     const move = ctrl && (p.stun -= DT) <= 0 ? 1 : 0; // staggered: can't steer, jump or cast
     if ((p.sinceHit += DT) > 1.2) p.daze = Math.max(0, p.daze - 15 * DT);
+    if (p.sinceHit > 3) p.grit = Math.max(0, p.grit - 12 * DT); // Grit drains out of combat
     p.cd = p.cd.map(c => Math.max(0, c - DT));
     p.punchCd -= DT; p.empower -= DT; p.jumpT -= DT; p.buttCd -= DT;
 
@@ -280,28 +302,33 @@ export function createSim({ mapId, players, practice = false, roundsToWin = 3 })
     let mx = inp.x, mz = inp.z;
     const m = Math.hypot(mx, mz);
     if (m > 1) { mx /= m; mz /= m; }
+    // Rampage spins the body (spinA) on top of the travel direction, so it works while walking or charging
+    if (p.spin > 0) { p.spin -= DT; p.spinA += 20 * DT; } else p.spinA = 0;
     if (move) {
-      if (p.spin > 0) { p.spin -= DT; p.yaw += 20 * DT; }
-      else if (p.charge > 0) { if (m > 0.2) p.yaw = turnToward(p.yaw, Math.atan2(mx, mz), 3 * DT); }
+      if (p.charge > 0) { if (m > 0.2) p.yaw = turnToward(p.yaw, Math.atan2(mx, mz), 3 * DT); }
       else if (m > 0.2) p.yaw = Math.atan2(mx, mz);
       if (pressed & BTN.A1) useAbility(p, 0);
       if (pressed & BTN.A2) useAbility(p, 1);
     }
-    const f = facing(p), side = V(f.z, 0, -f.x); // side = local +x (the beast's left)
+    const f = facing(p); // travel direction
+    const bf = V(Math.sin(p.yaw + p.spinA), 0, Math.cos(p.yaw + p.spinA)), side = V(bf.z, 0, -bf.x); // body facing; side = the beast's left
 
     // locomotion: steer the chest's velocity and hover it at standing height (Gang Beasts lifts the upper body too);
     // the same nudge goes to the whole core so the hips and legs hang underneath without stretching the joints
     let speed = 3.6;
-    if (p.charge > 0) { p.charge -= DT; speed = 8.5; mx = f.x; mz = f.z; }
+    if (p.charge > 0) { p.charge -= DT; p.chargeT += DT; speed = 3.6 + 5.4 * Math.min(1, p.chargeT / RAMP); mx = f.x; mz = f.z; }
     // Vi Q: hold to wind up (slowed), let go (or max out) to dash; a longer windup dashes further and hits harder
     if (p.vault > 0) {
       if (move && inp.b & p.vaultBtn && p.vault < 1.25) { p.vault += DT; speed *= 0.35; }
       else { p.dash = { t: 0.2 + p.vault * 0.3, power: p.vault / 1.25 }; p.vault = 0; }
     }
     if (p.dash) { speed = 11; mx = f.x; mz = f.z; if ((p.dash.t -= DT) <= 0) p.dash = null; }
-    if (p.hay > 0) { speed *= 0.3; if ((p.hay -= DT) <= 0 && move) haymaker(p, f, tp); }
+    // Sett Q: hold to plant and pour Grit into the punch (up to what the bar holds), let go to throw it
+    if (p.hay > 0) {
+      if (move && inp.b & p.hayBtn && p.hay < 3) { p.hay += DT; p.hayK = Math.min(p.grit, p.hayK + GRIT_FILL * DT); speed = 0; }
+      else { if (move) { haymaker(p, f, tp, Math.max(0.15, p.hayK / 100)); p.grit = Math.max(0, p.grit - p.hayK); } p.hay = 0; p.hayK = 0; }
+    }
     p.fb -= DT;
-    if (p.spin > 0) speed *= 0.6;
     if (lying) speed = 1.2; // crawl
     const k = (p.grounded ? 0.2 : 0.04) * move;
     const dv = V((mx * speed - tv.x) * k, 0, (mz * speed - tv.z) * k);
@@ -327,7 +354,7 @@ export function createSim({ mapId, players, practice = false, roundsToWin = 3 })
     if (p.grounded || move) for (const i of CORE) addVel(p.bodies[i], dv);
 
     // posture: hips, waist, chest and head stay upright and face the stick direction
-    const lean = p.charge > 0 || p.dash ? 0.35 : p.butt ? 0.9 * Math.sin(Math.min(1, p.butt.t / 0.25) * Math.PI) : 0, yq = qyaw(p.yaw), up = (p.grounded ? 0.3 : 0.15) * ctrl;
+    const lean = p.charge > 0 || p.dash ? 0.35 : p.butt ? 0.9 * Math.sin(Math.min(1, p.butt.t / 0.25) * Math.PI) : 0, yq = qyaw(p.yaw + p.spinA), up = (p.grounded ? 0.3 : 0.15) * ctrl;
     leak = V();
     orient(Hb, yq, 10, up);
     orient(p.bodies[WAIST], qmul(yq, qaxis(X, lean * 0.5)), 10, up, [T, ...UPPER.map(i => p.bodies[i])]);
@@ -341,7 +368,7 @@ export function createSim({ mapId, players, practice = false, roundsToWin = 3 })
       const arm = p.nextArm; p.nextArm ^= 1;
       p.punch = { arm, t: 0, hit: new Set() };
       p.punchCd = 0.32;
-      fx('swing', handPos(p, arm));
+      fx('swing', handPos(p, arm), 0, p.slot);
       addVel(p.bodies[FORE + arm], add(mul(f, 7), V(0, 1, 0)));
       addVel(T, mul(f, 1));
     }
@@ -350,7 +377,7 @@ export function createSim({ mapId, players, practice = false, roundsToWin = 3 })
     if (move && pressed & BTN.BUTT && p.buttCd <= 0 && p.spin <= 0) {
       p.butt = { t: 0, hit: new Set() }; p.buttCd = 0.7;
       addVel(H, add(mul(f, 4), V(0, 0.5, 0))); addVel(T, mul(f, 1.5));
-      fx('swing', H.translation());
+      fx('swing', H.translation(), 0, p.slot);
     }
     if (p.butt && (p.butt.t += DT) > 0.3) p.butt = null;
 
@@ -358,22 +385,25 @@ export function createSim({ mapId, players, practice = false, roundsToWin = 3 })
       const s = i === 0 ? 1 : -1, swing = Math.sin(p.phase + i * Math.PI);
       // arms: [upper arm dir, forearm dir, strength]. Idle hangs loose with a slight bend, like the originals.
       // `fs` scales the forearm: it lags the upper arm so swings whip instead of moving as one stick
-      let ua = add(add(DOWN, mul(f, 0.15 + swing * 0.4 * gait)), mul(side, s * 0.25)), fa = add(DOWN, mul(f, 0.5 + swing * 0.3 * gait)), str = 0.1, fs = 1;
-      if (grabbing) { ua = fa = add(add(f, V(0, 0.35, 0)), mul(side, s * 0.1)); str = 0.8; }
-      if (p.charge > 0) { ua = fa = add(f, V(0, -0.3, 0)); str = 0.6; }
-      if (p.vault > 0) { ua = fa = add(mul(f, -0.6), DOWN); str = 0.5; } // fists drawn back
-      if (p.dash) { ua = fa = add(f, V(0, 0.1, 0)); str = 0.8; } // both fists leading
-      if (p.hay > 0 && i === 1) { ua = add(mul(f, -0.8), V(0, 0.4, 0)); fa = add(f, V(0, 0.6, 0)); str = 0.6; } // cocked back
-      if (p.fb > 0) { ua = fa = add(mul(side, s), mul(f, 0.3)); str = 0.8; } // arms flung wide to grab
-      if (p.punch?.arm === i) { ua = fa = add(add(f, V(0, 0.1, 0)), mul(side, -s * 0.1)); str = 0.6; fs = 0.4; }
-      if (p.spin > 0) { ua = fa = add(mul(side, s), mul(f, 0.1)); str = 0.5; fs = 0.4; }
-      if (grabbing && !p.grounded) { ua = fa = add(mul(f, 0.5), V(0, 1, 0)); str = 0.8; } // reach up for ledges
-      if (p.climb > 0) { ua = fa = add(mul(f, 0.3), DOWN); str = 0.8; } // push down on the ledge
+      // poses follow the body facing (bf), which only differs from the travel direction mid-Rampage
+      let ua = add(add(DOWN, mul(bf, 0.15 + swing * 0.4 * gait)), mul(side, s * 0.25)), fa = add(DOWN, mul(bf, 0.5 + swing * 0.3 * gait)), str = 0.1, fs = 1;
+      if (grabbing) { ua = fa = add(add(bf, V(0, 0.35, 0)), mul(side, s * 0.1)); str = 0.8; }
+      if (p.charge > 0) { ua = fa = add(bf, V(0, -0.3, 0)); str = 0.6; }
+      if (p.vault > 0) { ua = fa = add(mul(bf, -0.6), DOWN); str = 0.5; } // fists drawn back
+      if (p.dash) { ua = fa = add(bf, V(0, 0.1, 0)); str = 0.8; } // both fists leading
+      if (p.hay > 0 && i === 1) { ua = add(mul(bf, -0.8), V(0, 0.4, 0)); fa = add(bf, V(0, 0.6, 0)); str = 0.6; } // cocked back
+      if (p.hay > 0 && i === 0) { ua = fa = add(bf, V(0, 0.2, 0)); str = 0.5; } // guard hand out front
+      // Facebreaker: arms fling wide, then slam together in front
+      if (p.fb > 0) { ua = fa = p.fb > 0.18 ? add(mul(side, s), mul(bf, -0.3)) : add(mul(side, s * 0.15), bf); str = 0.9; }
+      if (p.punch?.arm === i) { ua = fa = add(add(bf, V(0, 0.1, 0)), mul(side, -s * 0.1)); str = 0.6; fs = 0.4; }
+      if (p.spin > 0) { ua = fa = add(mul(side, s), mul(bf, 0.1)); str = 0.5; fs = 0.4; }
+      if (grabbing && !p.grounded) { ua = fa = add(mul(bf, 0.5), V(0, 1, 0)); str = 0.8; } // reach up for ledges
+      if (p.climb > 0) { ua = fa = add(mul(bf, 0.3), DOWN); str = 0.8; } // push down on the ledge
       aimPart(p.bodies[ARM + i], ua, 14, str * ctrl, [p.bodies[FORE + i]], T);
       aimPart(p.bodies[FORE + i], fa, 14, str * fs * ctrl, [], p.bodies[ARM + i]);
       // legs: thighs swing, shins fold back on the up-swing
-      aimPart(p.bodies[THIGH + i], add(DOWN, mul(f, swing * 0.7 * gait)), 14, 0.5 * ctrl, [p.bodies[LEG + i]], Hb);
-      aimPart(p.bodies[LEG + i], add(DOWN, mul(f, (swing * 0.7 - Math.max(0, Math.cos(p.phase + i * Math.PI)) * 0.9) * gait)), 14, 0.5 * ctrl, [], p.bodies[THIGH + i]);
+      aimPart(p.bodies[THIGH + i], add(DOWN, mul(bf, swing * 0.7 * gait)), 14, 0.5 * ctrl, [p.bodies[LEG + i]], Hb);
+      aimPart(p.bodies[LEG + i], add(DOWN, mul(bf, (swing * 0.7 - Math.max(0, Math.cos(p.phase + i * Math.PI)) * 0.9) * gait)), 14, 0.5 * ctrl, [], p.bodies[THIGH + i]);
     }
     const back = mul(leak, -1 / p.bodies.reduce((m, b) => m + b.mass(), 0));
     for (const b of p.bodies) addVel(b, back);
@@ -421,9 +451,10 @@ export function createSim({ mapId, players, practice = false, roundsToWin = 3 })
     }
     if (p.charge > 0) {
       const [first] = playersNear(p, add(tp, mul(f, 0.45)), 0.6);
-      if (first) {
+      if (first) { // hits as hard as the gallop has built up
+        const r = Math.min(1, p.chargeT / RAMP);
         p.charge = 0;
-        hit(first.vic, first.part, add(mul(f, 11), V(0, 4, 0)), 45);
+        hit(first.vic, first.part, add(mul(f, 5 + 6 * r), V(0, 1.5 + 2.5 * r, 0)), 20 + 25 * r);
         addVel(T, mul(f, -2));
       }
     }
@@ -440,20 +471,22 @@ export function createSim({ mapId, players, practice = false, roundsToWin = 3 })
       const j = world.createImpulseJoint(RAPIER.JointData.spherical(V(...HAND[i]), local), arm, target, true);
       j.setContactsEnabled(false);
       p.grabs[i] = { j, target };
-      fx('grab', hp);
+      fx('grab', hp, 0, p.slot);
     }
   }
 
   function stepHooks() {
+    if (local >= 0) { hooks = []; return; } // hooks are drawn from the host's snapshots
     hooks = hooks.filter(h => {
       h.t += DT;
       if (!h.vic) {
         h.pos = add(h.pos, mul(h.dir, 28 * DT));
         const [first] = playersNear(h.o, h.pos, 0.4);
-        if (first) { h.vic = first.vic; hit(first.vic, first.part, V(), 25); }
+        if (first) { h.vic = first.vic; hit(first.vic, first.part, V(), 25); cancel(h.vic); }
         return h.vic || h.t < 0.42;
       }
       h.pull += DT;
+      h.vic.hooked = 0.1; // limp for as long as the pull lasts
       const vp = h.vic.bodies[TORSO].translation(), to = sub(h.o.bodies[TORSO].translation(), vp), d = len(to);
       h.pos = vp;
       if (d < 1.4 || h.pull > 0.7) return false;
@@ -467,22 +500,79 @@ export function createSim({ mapId, players, practice = false, roundsToWin = 3 })
 
   function resetRound() {
     for (const p of ps) removeRagdoll(p);
+    order = shuffle(order);
     for (const p of ps) if (!p.left) spawn(p);
     hooks = []; win = -1; st = 'count'; timer = 2.5;
   }
 
+  // ---------- client prediction (local >= 0) ----------
+  const me = ps[local], hist = new Map(); // local tick -> my hips { pos, vel } after that step
+  let tick = 0, err = 0; // err: last correction size (m), for tests
+  if (me) for (const q of ps) if (q !== me) {
+    // everyone else: a kinematic bean the size of a standing beast, so I bump into them and can grab them
+    const body = world.createRigidBody(RAPIER.RigidBodyDesc.kinematicPositionBased().setTranslation(0, -100, 0));
+    const col = world.createCollider(RAPIER.ColliderDesc.capsule(0.4, 0.35).setTranslation(0, 0.35, 0).setCollisionGroups(bodyGroups(q)), body);
+    owner.set(col.handle, { p: q, part: TORSO, proxy: true });
+    q.bodies = PARTS.map(() => body);
+  }
+  const hips = () => me.bodies[HIPS];
+  const shift = (dp, dv) => { for (const b of me.bodies) { b.setTranslation(add(b.translation(), dp), true); addVel(b, dv); } };
+  // e: my entry in a host snapshot (see snapshot()). The host's state is my state `ack` local ticks ago, so the
+  // error is measured against my history at that tick and the difference is folded into the present.
+  function sync(s, e) {
+    st = s.st;
+    if (!e[1]) { if (me.alive) removeRagdoll(me); return; }
+    const x = 9 + PARTS.length * 4, hp = V(e[6], e[7], e[8]), hv = V(e[x + 2], e[x + 3], e[x + 4]), ack = e[x + 5];
+    // countdown: my inputs land on the host a round trip (tick - ack) after this snapshot's clock, so start moving that much early
+    if (st === 'count') { timer = s.t - (tick - ack) * DT; if (timer <= 0) st = 'fight'; }
+    if (!me.alive) { // (re)spawned on the host: start from the spawn point it used
+      const near = map.spawns.map(([sx, , sz], i) => [Math.hypot(sx - hp.x, sz - hp.z), i]).sort((a, b) => a[0] - b[0])[0][1];
+      spawn(me, near); hist.clear();
+    }
+    // status is the host's call
+    me.daze = e[2]; me.grit = e[x];
+    me.cd = me.cd.map((c, i) => Math.max(c, e[4 + i] / 10 - 0.2));
+    me.stun = Math.max(me.stun, e[x + 6]);
+    if (e[x + 7]) me.hooked = 0.1;
+    if (e[3] & 16 && me.ko <= 0) { me.daze = 0; cancel(me); setLegGroups(me, bodyGroups(me)); }
+    else if (!(e[3] & 16) && me.ko > 0) { me.ko = 0; wake(me); }
+    if (e[3] & 16) me.ko = e[x + 8];
+    me.safe = e[3] & 32 ? Math.max(me.safe, 0.1) : 0;
+    const h = hist.get(ack);
+    if (!h) return;
+    const dp = sub(hp, h.pos), dv = sub(hv, h.vel), d = len(dp);
+    err = d;
+    // far off (teleport, missed a big hit): jump there. Otherwise ease in, and take velocity jumps (knockback) whole.
+    const kp = d > 2 ? 1 : 0.25, kv = len(dv) > 2.5 || me.ko > 0 || me.hooked > 0 ? 1 : 0.2;
+    const cp = mul(dp, kp), cv = mul(dv, kv);
+    shift(cp, cv);
+    for (const [t, v] of hist) if (t > ack) { v.pos = add(v.pos, cp); v.vel = add(v.vel, cv); } // they already include the old error
+  }
+  function stepLocal() {
+    mt += DT; tick++;
+    for (const { r, body } of rollers) body.setNextKinematicRotation(rollerRot(r, mt));
+    if (st === 'count' && (timer -= DT) <= 0) st = 'fight';
+    if (me.alive) control(me, st !== 'count');
+    world.step();
+    if (me.alive) hist.set(tick, { pos: hips().translation(), vel: hips().linvel() });
+    hist.delete(tick - 240);
+  }
+  // others' stand-ins go where the screen shows them (hips position from the interpolated snapshot)
+  function place(slot, x, y, z) { const q = ps[slot]; if (q !== me) q.bodies[0].setNextKinematicTranslation(V(x, y, z)); }
+
   function step() {
+    if (me) return stepLocal();
     mt += DT;
     for (const { r, body } of rollers) body.setNextKinematicRotation(rollerRot(r, mt));
     if (st === 'count' && (timer -= DT) <= 0) st = 'fight';
     const active = st !== 'count';
-    for (const p of ps) if (p.alive) control(p, active);
+    for (const p of ps) { p.ack++; if (p.alive) control(p, active); }
     stepHooks();
     world.step();
 
     for (const p of ps) {
       if (p.alive && inKill(p.bodies[TORSO].translation())) { fx('out', p.bodies[TORSO].translation()); removeRagdoll(p); p.respawn = 1.5; }
-      if (practice && !p.alive && !p.left && (p.respawn -= DT) <= 0) spawn(p);
+      if (practice && !p.alive && !p.left && (p.respawn -= DT) <= 0) spawn(p, Math.floor(Math.random() * map.spawns.length));
     }
     if (practice) return;
     if (st === 'fight' && teamCount > 1) {
@@ -499,7 +589,7 @@ export function createSim({ mapId, players, practice = false, roundsToWin = 3 })
 
   function snapshot() {
     return {
-      st, tm: Math.ceil(timer), rn: round, mt: r2(mt), sc: scores, win,
+      st, tm: Math.ceil(timer), t: r2(timer), rn: round, mt: r2(mt), sc: scores, win,
       p: ps.map(p => {
         if (!p.alive) return [p.slot, 0];
         const flags = (p.spin > 0) | (p.charge > 0) << 1 | (p.empower > 0) << 2 | (p.grabs.some(Boolean)) << 3 | (p.ko > 0) << 4 | (p.safe > 0) << 5 | (p.vault > 0 || p.hay > 0) << 6;
@@ -507,17 +597,23 @@ export function createSim({ mapId, players, practice = false, roundsToWin = 3 })
         const t = p.bodies[HIPS].translation();
         const out = [p.slot, 1, Math.round(p.daze), flags, Math.ceil(p.cd[0] * 10), Math.ceil(p.cd[1] * 10), r2(t.x), r2(t.y), r2(t.z)];
         for (const b of p.bodies) { const q = b.rotation(); out.push(r3(q.x), r3(q.y), r3(q.z), r3(q.w)); }
+        // then: Grit, Haymaker charge, and what a predicting client needs to line itself up (sync())
+        const v = p.bodies[HIPS].linvel();
+        out.push(Math.round(p.grit), Math.round(p.hayK), r2(v.x), r2(v.y), r2(v.z), p.ack, r2(Math.max(0, p.stun)), p.hooked > 0 ? 1 : 0, r2(Math.max(0, p.ko)));
         return out;
       }),
       h: hooks.map(h => [h.o.slot, r2(h.pos.x), r2(h.pos.y), r2(h.pos.z)]),
     };
   }
 
-  for (const p of ps) spawn(p);
+  if (!me) for (const p of ps) spawn(p);
   return {
-    world, players: ps, step, snapshot, takeEvents: () => events.splice(0),
+    world, players: ps, step, snapshot, sync, place, takeEvents: () => events.splice(0),
     get state() { return st; },
-    setInput(slot, inp) { const p = ps[slot]; if (p) p.input = { x: +inp.x || 0, z: +inp.z || 0, b: inp.b | 0 }; },
+    get tick() { return tick; },
+    get err() { return err; },
+    // n: the client's tick this input started on; the host counts on from it each step (control) and echoes it back
+    setInput(slot, inp) { const p = ps[slot]; if (p) { p.input = { x: +inp.x || 0, z: +inp.z || 0, b: inp.b | 0 }; if (inp.n != null) p.ack = (inp.n | 0) - 1; } },
     drop(slot) { const p = ps[slot]; if (p) { p.left = true; removeRagdoll(p); } },
   };
 }

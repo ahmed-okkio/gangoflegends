@@ -10,8 +10,8 @@ export const CHAMPS = {
   hec: {
     name: 'Hecarim', title: 'The Shadow of War', body: '#2f6274', limb: '#1d3f4c', eyes: '#5ff7d2',
     abilities: [
-      { id: 'rampage', key: 'Q', name: 'Rampage', cd: 4, desc: 'Spin with both fists out, smacking everyone around you.' },
-      { id: 'charge', key: 'E', name: 'Devastating Charge', cd: 8, desc: 'Gallop at high speed and bowl over the first champ you reach.' },
+      { id: 'rampage', key: 'Q', name: 'Rampage', cd: 4, desc: 'Spin with both fists out, smacking everyone around you. Works on the move and mid-charge.' },
+      { id: 'charge', key: 'E', name: 'Devastating Charge', cd: 8, desc: 'Gallop, building up speed, and bowl over the first champ you reach. Faster hits harder. Press again to stop.' },
     ],
   },
   vi: {
@@ -24,8 +24,8 @@ export const CHAMPS = {
   sett: {
     name: 'Sett', title: 'The Boss', body: '#c97a52', limb: '#9a5a3a', eyes: '#ffd166', glow: '#ffb000',
     abilities: [
-      { id: 'haymaker', key: 'Q', name: 'Haymaker', cd: 8, desc: 'Wind up (taking half daze), then a huge cone punch. Hardest down the middle.' },
-      { id: 'facebreaker', key: 'E', name: 'Facebreaker', cd: 7, desc: 'Yank everyone close into you. Catch champs on both sides to stun them.' },
+      { id: 'haymaker', key: 'Q', name: 'Haymaker', cd: 8, desc: 'Getting hit fills your Grit. Hold to plant and charge it in (taking half daze), let go for a cone punch as strong as the Grit spent.' },
+      { id: 'facebreaker', key: 'E', name: 'Facebreaker', cd: 7, desc: 'Yank everyone close into you and stun them. Catch champs on both sides for a long stun.' },
     ],
   },
 };
