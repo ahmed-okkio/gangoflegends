@@ -543,6 +543,35 @@ function duo(mapId, players, slot, ow, extra = {}) {
   assert.ok(leapGap < 2.2 && hostGap < 2, 'the recast leaps on my copy before the host says it caught, and on the host');
 }
 
+// 12g. lag compensation: a client whose screen showed a walking target 0.25s late hooks where it saw it, and catches it;
+// the same throw from a client with nothing to make up for misses (the target has walked on)
+{
+  const tryHook = late => {
+    const sim = near('blitz', 'hec');
+    run(sim, 90);
+    for (const [slot, x, z] of [[0, -4, 3.5], [1, 1, 1.6]]) {
+      const p = sim.players[slot], t0 = p.bodies[0].translation();
+      for (const b of p.bodies) { const t = b.translation(); b.setTranslation({ x: t.x + x - t0.x, y: t.y, z: t.z + z - t0.z }, true); b.setLinvel({ x: 0, y: 0, z: 0 }, true); }
+    }
+    const A = sim.players[0], B = sim.players[1], path = [];
+    let n = 0, caught = false;
+    for (let i = 0; i < 70; i++) {
+      // on that client's screen B is 15 steps back, and walks on while the hook flies (~10 steps): it aims at B 5 steps ago
+      const seenB = path.at(-5), a = seenB && Math.atan2(seenB.x - torso(sim, 0).x, seenB.z - torso(sim, 0).z);
+      const b = i === 30 ? BTN.A1 : 0, v = late ? sim.snapshot().mt - 15 / 60 : null;
+      sim.setInput(0, { n: ++n, i: [[0, 0, b, i >= 30 ? a : null, null, v]] });
+      sim.setInput(1, { x: 0, z: 1, b: 0 });
+      sim.step();
+      path.push(torso(sim, 1));
+      if (B.hooked > 0) caught = true;
+    }
+    return caught;
+  };
+  const withComp = tryHook(true), without = tryHook(false);
+  console.log('hook on a walking target seen 0.25s late:', withComp ? 'caught' : 'missed', '| no lag to make up:', without ? 'caught' : 'missed');
+  assert.ok(withComp && !without, 'abilities land where the caster saw the target');
+}
+
 // 13. snapshot is small
 {
   const sim = createSim({ mapId: 'girders', players: Array.from({ length: 8 }, (_, i) => ({ id: i, name: 'P', champ: i % 2 ? 'hec' : 'blitz', team: i })) });

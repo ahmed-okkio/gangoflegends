@@ -194,6 +194,17 @@ export function createSim({ mapId, players, practice = false, roundsToWin = 3, l
     }
     return [...seen.values()];
   }
+  // lag compensation: a client's abilities go off against everyone where that client saw them. Its playback of the others
+  // (game.js) was p.view steps behind the host when it pressed (each input says what it was showing), capped at 0.25s: from
+  // further back than that, whoever dodged on their own screen was robbed. trail: everyone's torso over the last VIEW steps
+  const VIEW = 15;
+  let trail = [];
+  const seen = (p, q) => (p.view && trail.at(-1 - Math.min(p.view, trail.length - 1))?.[q.slot]) || q.bodies[TORSO].translation();
+  // playersNear as p saw them: the ball moved along by however far each one has gone since, tested against them now
+  function playersNearSeen(p, pos, r) {
+    if (!p.view) return playersNear(p, pos, r);
+    return ps.flatMap(q => q === p || !q.alive ? [] : playersNear(p, add(pos, sub(q.bodies[TORSO].translation(), seen(p, q))), r).filter(o => o.vic === q));
+  }
   // Gang Beasts' punch targeting: the nearest beast of another team within reach and in front of me (a 120° cone)
   function punchTarget(p, f) {
     const tp = p.bodies[TORSO].translation();
@@ -353,7 +364,7 @@ export function createSim({ mapId, players, practice = false, roundsToWin = 3, l
     p.fb = 0.35;
     fx('fb', t, 0, p.slot);
     if (local >= 0) return;
-    const near = ps.filter(o => o !== p && o.alive).map(o => ({ o, d: sub(o.bodies[TORSO].translation(), t) }))
+    const near = ps.filter(o => o !== p && o.alive).map(o => ({ o, d: sub(seen(p, o), t) }))
       .filter(({ d }) => Math.hypot(d.x, d.z) < FB_R && Math.abs(d.y) < 1.2);
     const both = near.some(({ d }) => dot(d, f) >= 0) && near.some(({ d }) => dot(d, f) < 0);
     for (const { o, d } of near) {
@@ -378,7 +389,7 @@ export function createSim({ mapId, players, practice = false, roundsToWin = 3, l
     if (local >= 0) return;
     for (const o of ps) {
       if (o === p || !o.alive) continue;
-      const d = sub(o.bodies[TORSO].translation(), t), along = d.x * f.x + d.z * f.z;
+      const d = sub(seen(p, o), t), along = d.x * f.x + d.z * f.z;
       if (Math.abs(along) > 3.2 || Math.abs(d.x * f.z - d.z * f.x) > 0.8 || Math.abs(d.y) > 1.2) continue;
       hit(o, TORSO, add(mul(f, -7), V(0, along > 0 ? 10 : 5, 0)), 20); // the ones in front have to clear him
       if (o.ko <= 0 && o.safe <= 0) o.stun = Math.max(o.stun, 0.5);
@@ -400,7 +411,7 @@ export function createSim({ mapId, players, practice = false, roundsToWin = 3, l
   function fling(p, t) {
     p.fling = 0.3;
     // a prediction copy picks from the stand-ins (placed at their hips) to show the throw at once
-    const [o] = ps.filter(o => o !== p && live(o)).map(o => ({ o, d: sub(o.bodies[TORSO].translation(), t) }))
+    const [o] = ps.filter(o => o !== p && live(o)).map(o => ({ o, d: sub(seen(p, o), t) }))
       .filter(({ d }) => Math.hypot(d.x, d.z) < 1.6 && Math.abs(d.y) < 1).sort((a, b) => len(a.d) - len(b.d));
     if (!o) return;
     const n = Math.hypot(o.d.x, o.d.z) || 1;
@@ -416,7 +427,7 @@ export function createSim({ mapId, players, practice = false, roundsToWin = 3, l
     if (local >= 0) return;
     for (const o of ps) {
       if (o === p || !o.alive) continue;
-      const d = sub(o.bodies[TORSO].translation(), t);
+      const d = sub(seen(p, o), t);
       if (Math.hypot(d.x, d.z) > PULV_R || Math.abs(d.y) > 1.2) continue;
       hit(o, TORSO, add(mul(norm(V(d.x, 0, d.z)), 1.5), V(0, 9, 0)), 20);
       if (o.ko <= 0 && o.safe <= 0) o.stun = Math.max(o.stun, 1);
@@ -435,7 +446,7 @@ export function createSim({ mapId, players, practice = false, roundsToWin = 3, l
     const back = base / Math.tan(cone), apex = sub(t, mul(f, back));
     for (const o of ps) {
       if (o === p || !o.alive) continue;
-      const d = sub(o.bodies[TORSO].translation(), apex), dist = Math.hypot(d.x, d.z), along = (d.x * f.x + d.z * f.z);
+      const d = sub(seen(p, o), apex), dist = Math.hypot(d.x, d.z), along = (d.x * f.x + d.z * f.z);
       if (dist < back || dist > back + range || Math.abs(d.y) > 1.2 || along < dist * Math.cos(cone)) continue;
       const centre = Math.abs(d.x * f.z - d.z * f.x) < core;
       hit(o, TORSO, mul(add(mul(f, centre ? 5 + 9 * k : 4 + 6 * k), V(0, 1.5 + 2 * k, 0)), 1.125), (centre ? 25 + 75 * k : 15 + 45 * k) * 1.125);
@@ -727,6 +738,7 @@ export function createSim({ mapId, players, practice = false, roundsToWin = 3, l
       p.next = Math.min(...p.q.keys()); // a gap that's never coming (every message repeats the last 6 ticks): carry on from what did arrive
     }
     p.input = p.q.get(p.next); p.q.delete(p.next); p.ack = p.next++;
+    p.view = p.input.v == null ? 0 : Math.max(0, Math.min(VIEW, Math.round((mt - p.input.v) / DT))); // see seen()
     let ready = 0; while (p.q.has(p.next + ready)) ready++; // the unbroken run waiting (newest - ack overstates it when they come out of order)
     p.slack = Math.min(p.slack, ready);
     if (++p.win >= 120) {
@@ -742,7 +754,7 @@ export function createSim({ mapId, players, practice = false, roundsToWin = 3, l
       h.t += DT; by = h.o.slot;
       if (!h.vic) {
         h.pos = add(h.pos, mul(h.dir, 28 * DT));
-        const [first] = playersNear(h.o, h.pos, 0.4);
+        const [first] = playersNearSeen(h.o, h.pos, 0.4);
         if (first) {
           h.vic = first.vic; hit(first.vic, first.part, V(), 25);
           if (local < 0) cancel(h.vic);
@@ -786,7 +798,7 @@ export function createSim({ mapId, players, practice = false, roundsToWin = 3, l
     for (const p of ps) removeRagdoll(p);
     order = shuffle(order);
     for (const p of ps) if (!p.left) spawn(p);
-    hooks = []; win = -1; st = 'count'; timer = 2.5;
+    hooks = []; trail = []; win = -1; st = 'count'; timer = 2.5;
   }
 
   // ---------- client prediction (local >= 0) ----------
@@ -910,6 +922,8 @@ export function createSim({ mapId, players, practice = false, roundsToWin = 3, l
       && !p.grabs.some(g => g?.vic) && !ps.some(q => q.grabs?.some(g => g?.vic === p))).map(p => p.bodies.map(b => [b, b.translation(), b.rotation(), b.linvel(), b.angvel()]));
     world.step();
     for (const bs of paused) for (const [b, t, r, v, w] of bs) { b.setTranslation(t, true); b.setRotation(r, true); b.setLinvel(v, true); b.setAngvel(w, true); }
+    trail.push(ps.map(p => p.alive ? p.bodies[TORSO].translation() : null));
+    if (trail.length > VIEW + 1) trail.shift();
 
     for (const p of ps) {
       if (p.alive && inKill(p.bodies[TORSO].translation())) { fx('out', p.bodies[TORSO].translation(), 0, -1, p.slot); removeRagdoll(p); p.respawn = 1.5; }
@@ -967,7 +981,8 @@ export function createSim({ mapId, players, practice = false, roundsToWin = 3, l
       const yaw = a => typeof a === 'number' && Number.isFinite(a) ? a : null, dist = d => yaw(d) == null ? null : Math.max(0, Math.min(30, d));
       if (!Array.isArray(inp.i)) { p.input = { x: +inp.x || 0, z: +inp.z || 0, b: inp.b | 0, a: yaw(inp.a), d: dist(inp.d) }; return; }
       const n = inp.n | 0;
-      inp.i.slice(-8).forEach(([x, z, b, a, d], k, all) => { const t = n - all.length + 1 + k; if (p.next == null || t >= p.next) p.q.set(t, { x: +x || 0, z: +z || 0, b: b | 0, a: yaw(a), d: dist(d) }); });
+      // v: the host time the client's screen showed everyone else at (lag compensation, seen()); any finite number, capped there
+      inp.i.slice(-8).forEach(([x, z, b, a, d, v], k, all) => { const t = n - all.length + 1 + k; if (p.next == null || t >= p.next) p.q.set(t, { x: +x || 0, z: +z || 0, b: b | 0, a: yaw(a), d: dist(d), v: yaw(v) }); });
       p.newest = Math.max(p.newest, n);
       // first input, or way behind after a lag spike (feed() only trims a tick every 2s): line up 2 ticks behind
       if (p.next == null || p.newest - p.next > 30) { p.next = p.newest - 2; for (const t of p.q.keys()) if (t < p.next) p.q.delete(t); }

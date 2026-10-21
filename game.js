@@ -583,7 +583,8 @@ function frame(now) {
       if (ev.length) { view.fx(ev); for (const e of ev) if (e[5] === game.mySlot) game.played.push([...e, now]); }
       const mine = local.snapshot();
       game.mine = [game.mine?.[1], mine.p[game.mySlot]]; game.myHooks = mine.h;
-      game.inq.push([inp.x, inp.z, inp.b, inp.a, inp.d]); if (game.inq.length > 6) game.inq.shift(); // each tick goes out 3-6 times
+      // and what my screen shows the others at (the playback clock): the host tests my abilities against that (sim.js seen())
+      game.inq.push([inp.x, inp.z, inp.b, inp.a, inp.d, game.at == null ? null : Math.round(game.at * 1000) / 1000]); if (game.inq.length > 6) game.inq.shift(); // each tick goes out 3-6 times
       // every tick on a steady link (my inputs reach the host up to a tick sooner, and it can keep fewer waiting); every
       // other tick on a bursty one (TCP: every packet is one more chance of a stall: its stalls keep the lateness up), and
       // for the first 10s, till that's known: loading the match throws it off for a few seconds (measured: on TCP, starting
