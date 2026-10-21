@@ -69,7 +69,7 @@ const othersOnly = p => (1 << 16) | (0x1fe & ~p.bit);      // hit checks
 // local >= 0: a client's prediction copy. Only that player's ragdoll is simulated (straight from local input, so moving and
 // swinging feel instant); everyone else is a kinematic stand-in placed from the host's snapshots, and sync() pulls the
 // ragdoll toward the host's authoritative state as it arrives. Hits, KOs and rounds stay the host's call.
-export function createSim({ mapId, players, practice = false, roundsToWin = 3, local = -1 }) {
+export function createSim({ mapId, players, practice = false, roundsToWin = 3, local = -1, gb = false }) {
   const map = MAPS[mapId];
   const world = new RAPIER.World(V(0, -20, 0)); // Gang Beasts' gravity
   world.timestep = DT;
@@ -845,10 +845,12 @@ export function createSim({ mapId, players, practice = false, roundsToWin = 3, l
     if (e[3] & 16) me.ko = e[x + 7];
     me.safe = e[3] & 32 ? Math.max(me.safe, 0.1) : 0;
     me.tied = !!(e[3] & 128); // holding / held by a champ: two ragdolls tied together only the host can simulate
+    // GB mode (gb, game.js GB_MODE): my copy only walks; whatever moves me otherwise (abilities, headbutt, holding on) is the host's
+    me.hostOwned = gb && !!(e[3] & (1 | 2 | 8 | 64 | 512));
     // knocked out, hooked or tied to another champ: I'm drawn from the host's state (game.js) and can't predict it, so
     // the ragdoll is just kept on it, ready to predict from there once I'm free. (Correcting the prediction instead
     // overshot every snapshot and grew: holding each other and jumping flung me metres up and down.)
-    if (me.ko > 0 || me.hooked > 0 || me.tied) {
+    if (me.ko > 0 || me.hooked > 0 || me.tied || me.hostOwned) {
       err = len(sub(hp, hips().translation()));
       shift(sub(hp, hips().translation()), sub(hv, hips().linvel()));
       hist.clear(); smooth = V();
@@ -949,7 +951,8 @@ export function createSim({ mapId, players, practice = false, roundsToWin = 3, l
         if (!p.alive) return [p.slot, 0];
         const flags = (p.spin > 0) | (p.charge > 0) << 1 | (p.empower > 0) << 2 | (p.grabs.some(Boolean)) << 3 | (p.ko > 0) << 4 | (p.safe > 0) << 5 | (p.vault > 0 || p.hay > 0) << 6
           | (p.grabs.some(g => g?.vic) || ps.some(q => q.grabs?.some(g => g?.vic === p))) << 7 // holding or held by a champ
-          | (p.dizzy > 0) << 8; // stunned on their feet (stars)
+          | (p.dizzy > 0) << 8 // stunned on their feet (stars)
+          | (!!p.dash || !!p.leap || !!p.butt || p.fb > 0 || p.pulv > 0 || p.flay > 0 || p.fling > 0 || !!p.lifted) << 9; // GB mode: a move only the host plays
         // hips position + every part's rotation; clients rebuild the other positions from the joint anchors (beast.js fk)
         const t = p === me ? add(p.bodies[HIPS].translation(), smooth) : p.bodies[HIPS].translation();
         const out = [p.slot, 1, Math.round(p.daze), flags, Math.ceil(p.cd[0] * 10), Math.ceil(p.cd[1] * 10), r2(t.x), r2(t.y), r2(t.z)];

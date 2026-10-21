@@ -5,9 +5,13 @@ import { CHAMPS, TEAM_NAMES, TEAM_COLORS, FFA_COLORS } from './champs.js';
 import { MAPS } from './maps.js';
 import * as net from './net.js';
 import { prepareMap, loadBeast } from './stages.js';
-import { PARTS, HIPS } from './beast.js';
+import { PARTS, HIPS, ARM, FORE } from './beast.js';
 import { packSnap, unpackSnap } from './wire.js';
 import { loadSfx, play, ui, setVolume } from './sfx.js';
+// Gang Beasts' split: a client predicts only walking (move, jump, run, lie down); punches, grabs, abilities and their
+// effects are the host's, drawn a round trip late like everyone else's. false revives full prediction (own punches,
+// hits, hooks, dashes, glue shown at once), still kept working and tested in sim.js / test.js
+const GB_MODE = true;
 
 const $ = id => document.getElementById(id);
 const esc = s => String(s).replace(/[&<>"']/g, c => `&#${c.charCodeAt(0)};`);
@@ -321,7 +325,7 @@ async function startGame(setup) {
   $('ping').textContent = '';
   if (setup.practice || isHost()) game.sim = createSim({ mapId: setup.map, players: setup.players, practice: !!setup.practice, roundsToWin: setup.rounds });
   // my champ, predicted (sim.js). Practice behind a simulated connection has both: game.sim is the host
-  if (!game.sim || setup.lag) game.local = createSim({ mapId: setup.map, players: setup.players, local: game.mySlot });
+  if (!game.sim || setup.lag) game.local = createSim({ mapId: setup.map, players: setup.players, local: game.mySlot, gb: GB_MODE });
   game.fake = setup.lag && { acc: 0, t: 0, n: 0, ev: [] };
   attract = null;
   view.setMatch(setup);
@@ -577,7 +581,7 @@ function frame(now) {
     acc += dt;
     while (acc >= DT) {
       acc -= DT;
-      local.setInput(game.mySlot, inp);
+      local.setInput(game.mySlot, GB_MODE ? { ...inp, b: inp.b & (BTN.JUMP | BTN.RUN | BTN.LAY) } : inp); // GB mode: my copy only walks
       local.step();
       const ev = local.takeEvents();
       if (ev.length) { view.fx(ev); for (const e of ev) if (e[5] === game.mySlot) game.played.push([...e, now]); }
@@ -608,13 +612,23 @@ function frame(now) {
     const a = s[0], b = s[1] ?? a, alpha = b === a ? 1 : Math.min(1, Math.max(0, (at - a.mt) / (b.mt - a.mt)));
     // me: between my last two local steps, unless knocked out, hooked or grabbing / grabbed by someone (then the host's
     // ragdoll is the truth, and drawn on the same clock as whoever I'm tied to)
-    const me = local.players[game.mySlot], limp = !me.alive || me.ko > 0 || me.hooked > 0 || me.tied;
+    const me = local.players[game.mySlot], limp = !me.alive || me.ko > 0 || me.hooked > 0 || me.tied || me.hostOwned;
     const shift = carryOn(a, b, alpha, s[s.length - 1], at, dt), own = limp ? null : { slot: game.mySlot, a: game.mine[0] ?? game.mine[1], b: game.mine[1], alpha: acc / DT };
     if (!limp) shift[game.mySlot] = null;
+    // GB mode: my arms (punching, cocking, grabbing) as the host has them, on the same clock as everyone else
+    if (GB_MODE && own && a.p[game.mySlot]?.[1] && b.p[game.mySlot]?.[1]) {
+      const ha = a.p[game.mySlot], hb = b.p[game.mySlot], qs = [ARM, ARM + 1, FORE, FORE + 1].map(i => {
+        const o = 9 + i * 4, sg = [0, 1, 2, 3].reduce((d, k) => d + ha[o + k] * hb[o + k], 0) < 0 ? -1 : 1;
+        const q = [0, 1, 2, 3].map(k => ha[o + k] + (sg * hb[o + k] - ha[o + k]) * alpha), n = Math.hypot(...q) || 1;
+        return [o, q.map(c => c / n)];
+      });
+      const put = e => { const out = [...e]; for (const [o, q] of qs) out.splice(o, 4, ...q); return out; };
+      own.a = put(own.a); own.b = put(own.b);
+    }
     slideOver(limp, own, a, b, alpha, shift, dt);
     // my own hook and glue: drawn from my copy (cast at once) until the host's catch / puddle shows up on screen
     const og = local.ownGlue.filter(g => !b.g?.some(h => h[5] === g.team && Math.hypot(h[0] - g.x, h[2] - g.z) < 1));
-    const hostHook = h => h[0] !== game.mySlot || h[5], caught = b.h.some(h => h[0] === game.mySlot && h[5]);
+    const hostHook = h => GB_MODE || h[0] !== game.mySlot || h[5], caught = b.h.some(h => h[0] === game.mySlot && h[5]);
     const drawn = { ...b, h: [...b.h.filter(hostHook), ...caught ? [] : game.myHooks ?? []], g: [...b.g ?? [], ...og.map(g => [g.x, g.y, g.z, g.t, g.r, g.team])] };
     view.apply({ ...a, h: a.h.filter(hostHook) }, drawn, alpha, own, shift);
     game.drawnHips = b.p[game.mySlot]?.[1] ? [...view.avatars()[game.mySlot].pos[HIPS]] : null;

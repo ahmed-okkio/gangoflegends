@@ -25,10 +25,10 @@ function lineUp(sim, gap = 1.1) {
 // a host and a client predicting `slot`, `ow` ticks apart each way. step(inp, hostSide) runs one tick of both; the client's
 // inputs go up every tick (the last 6), snapshots and the host's events come down every other tick
 function duo(mapId, players, slot, ow, extra = {}) {
-  const host = createSim({ mapId, players, ...extra }), cli = createSim({ mapId, players, local: slot });
+  const { gb, ...opts } = extra, host = createSim({ mapId, players, ...opts }), cli = createSim({ mapId, players, local: slot, gb });
   const wire = [], q = [], d = { host, cli, i: 0, snaps: [], events: [] };
   d.step = (inp, hostSide) => {
-    cli.setInput(slot, inp); cli.step();
+    cli.setInput(slot, gb ? { ...inp, b: inp.b & (BTN.JUMP | BTN.RUN | BTN.LAY) } : inp); cli.step(); // as game.js GB_MODE
     q.push([inp.x, inp.z, inp.b, inp.a, inp.d]); if (q.length > 6) q.shift();
     wire.push({ to: 'host', at: d.i + ow, inp: { n: cli.tick, i: [...q] } });
     for (const m of wire.filter(m => m.at === d.i)) {
@@ -570,6 +570,19 @@ function duo(mapId, players, slot, ow, extra = {}) {
   const withComp = tryHook(true), without = tryHook(false);
   console.log('hook on a walking target seen 0.25s late:', withComp ? 'caught' : 'missed', '| no lag to make up:', without ? 'caught' : 'missed');
   assert.ok(withComp && !without, 'abilities land where the caster saw the target');
+}
+
+// 12h. GB mode: a client's copy only walks; the host's charge carries my body (drawn from the host), then hands it back
+{
+  const d = duo('grind', [{ id: 'a', name: 'A', champ: 'hec', team: 0 }, { id: 'b', name: 'B', champ: 'blitz', team: 1 }], 0, 12, { practice: true, gb: true });
+  let owned = 0, charged = 0, hostCharged = 0;
+  for (let i = 0; i < 500; i++) {
+    d.step({ x: 0, z: 0, b: i === 100 ? BTN.A2 : 0 }); // Devastating Charge
+    owned += !!d.cli.players[0].hostOwned; charged += d.cli.players[0].charge > 0; hostCharged += d.host.players[0].charge > 0;
+  }
+  console.log('GB mode: host-owned for', owned, 'ticks');
+  assert.ok(hostCharged && !charged, 'the host charged, my copy never did');
+  assert.ok(owned > 20 && !d.cli.players[0].hostOwned, 'my body was the host\'s while it charged, mine again after');
 }
 
 // 13. snapshot is small
