@@ -177,6 +177,7 @@ export function createSim({ mapId, players, practice = false, roundsToWin = 3, l
   const under = p => local >= 0 ? (1 << 16) | 1 : worldAndOthers(p);
   const handPos = (p, i) => { const b = p.bodies[FORE + i]; return add(b.translation(), qrot(b.rotation(), V(...HAND[i]))); };
   const facing = p => V(Math.sin(p.yaw), 0, Math.cos(p.yaw));
+  const live = q => q.alive || q.seen; // seen: a prediction copy's stand-in for someone the host has in play (sync())
 
   // colliders overlapping a ball. Collected first: touching the world inside Rapier's query callback panics.
   function overlap(pos, r, groups) {
@@ -364,8 +365,8 @@ export function createSim({ mapId, players, practice = false, roundsToWin = 3, l
   function leap(p) {
     const q = ps[p.tether], t = p.bodies[TORSO].translation();
     p.tether = null;
-    if (local < 0) hooks = hooks.filter(h => h.o !== p);
-    if (!q?.alive) return;
+    hooks = hooks.filter(h => h.o !== p);
+    if (!q || !live(q)) return;
     p.leap = { slot: q.slot, t: 0 }; // reeled in until he reaches them (control())
     fx('swing', t, 0, p.slot);
   }
@@ -399,7 +400,7 @@ export function createSim({ mapId, players, practice = false, roundsToWin = 3, l
   function fling(p, t) {
     p.fling = 0.3;
     // a prediction copy picks from the stand-ins (placed at their hips) to show the throw at once
-    const [o] = ps.filter(o => o !== p && (o.alive || local >= 0 && o.bodies)).map(o => ({ o, d: sub(o.bodies[TORSO].translation(), t) }))
+    const [o] = ps.filter(o => o !== p && live(o)).map(o => ({ o, d: sub(o.bodies[TORSO].translation(), t) }))
       .filter(({ d }) => Math.hypot(d.x, d.z) < 1.6 && Math.abs(d.y) < 1).sort((a, b) => len(a.d) - len(b.d));
     if (!o) return;
     const n = Math.hypot(o.d.x, o.d.z) || 1;
@@ -486,6 +487,8 @@ export function createSim({ mapId, players, practice = false, roundsToWin = 3, l
           continue;
         }
         if (pressed & btn && abs[i].id === 'sentence' && p.tether != null) { useAbility(p, i); continue; } // recast: no aiming
+        const flying = abs[i].id === 'sentence' && hooks.find(h => h.o === p && !h.vic);
+        if (pressed & btn && flying) { flying.leap = true; continue; } // recast before it caught (a ping's worth early): leap when it does
         if (pressed & btn && p.cd[i] <= 0) p.aimBtn |= btn;
         if (p.aimBtn & btn && !(inp.b & btn)) { p.aimBtn &= ~btn; if (aim != null) p.yaw = aim; useAbility(p, i); }
       }
@@ -505,7 +508,7 @@ export function createSim({ mapId, players, practice = false, roundsToWin = 3, l
       else { const w = Math.min(p.vault, 1.25); p.dash = { t: 0.2 + w * 0.3, power: w / 1.25 }; p.vault = 0; }
     }
     if (p.leap) { // Thresh's Death Sentence recast: reeled along the chain all the way to them
-      const q = ps[p.leap.slot], d = q?.alive && sub(q.bodies[TORSO].translation(), tp);
+      const q = ps[p.leap.slot], d = q && live(q) && sub(q.bodies[TORSO].translation(), tp);
       if (!d || len(d) < 1.2 || (p.leap.t += DT) > 1) p.leap = null;
       else { const v = add(mul(d, 14 / len(d)), V(0, 0.8, 0)); for (const b of p.bodies) b.setLinvel(v, true); p.jumpT = 0.1; }
     }
@@ -733,16 +736,23 @@ export function createSim({ mapId, players, practice = false, roundsToWin = 3, l
     }
   }
 
+  // a prediction copy flies my own hook too (drawn at once, game.js), against the stand-ins
   function stepHooks() {
-    if (local >= 0) { hooks = []; return; } // hooks are drawn from the host's snapshots
     hooks = hooks.filter(h => {
       h.t += DT; by = h.o.slot;
       if (!h.vic) {
         h.pos = add(h.pos, mul(h.dir, 28 * DT));
         const [first] = playersNear(h.o, h.pos, 0.4);
-        if (first) { h.vic = first.vic; hit(first.vic, first.part, V(), 25); cancel(h.vic); }
+        if (first) {
+          h.vic = first.vic; hit(first.vic, first.part, V(), 25);
+          if (local < 0) cancel(h.vic);
+          if (h.leap) { h.o.tether = h.vic.slot; leap(h.o); return false; } // recast while it flew: straight to them
+        }
         return h.vic || h.t < 0.42;
       }
+      // what my copy's hook caught is the host's call: it just stays on the stand-in until the host's catch is on screen
+      // (game.js). ponytail: 0.6s, about the longest that takes; after a miss the host's sees it shown that long
+      if (local >= 0) { h.pos = add(h.vic.bodies[TORSO].translation(), V(0, 0.45, 0)); if (h.thresh) h.o.tether = h.vic.slot; return (h.pull += DT) < 0.6; }
       h.pull += DT;
       if (h.thresh) { // a short tug toward Thresh, then just the chain until it times out or he leaps
         if (!h.vic.alive || !h.o.alive || h.pull > 2) { h.o.tether = null; return false; }
@@ -800,8 +810,9 @@ export function createSim({ mapId, players, practice = false, roundsToWin = 3, l
   function sync(s, e) {
     st = s.st;
     glue = (s.g ?? []).map(([x, y, z, t, r, team]) => ({ x, y, z, t, r, team }));
-    me.tether = null;
+    me.tether = hooks.find(h => h.vic && h.thresh)?.vic.slot ?? null; // my copy's catch, until the host's own shows
     for (const h of s.h ?? []) if (h[0] === local && h[4] >= 0) me.tether = h[4];
+    for (const e of s.p) if (ps[e[0]] && ps[e[0]] !== me) ps[e[0]].seen = !!e[1];
     s.ch?.forEach((c, i) => { if (CHAMPS[c]) ps[i].champ = c; });
     if (!e[1]) { if (me.alive) removeRagdoll(me); return; }
     const x = SX, hp = V(e[6], e[7], e[8]), hv = V(e[x + 1], e[x + 2], e[x + 3]), ack = e[x + 4];
@@ -873,6 +884,7 @@ export function createSim({ mapId, players, practice = false, roundsToWin = 3, l
     ownGlue = st === 'count' ? [] : ownGlue.filter(g => (g.t -= DT) > 0);
     if (st === 'count' && (timer -= DT) <= 0) st = 'fight';
     if (me.alive) { control(me, st !== 'count'); belts(me); }
+    stepHooks();
     world.step();
     if (me.alive) hist.set(tick, { pos: hips().translation(), vel: hips().linvel() });
     smooth = mul(smooth, 0.88);
@@ -933,7 +945,7 @@ export function createSim({ mapId, players, practice = false, roundsToWin = 3, l
         out.push(Math.round(hayK(p) * 100), r2(v.x), r2(v.y), r2(v.z), p.ack, r2(Math.max(0, p.stun)), p.hooked > 0 ? 1 : 0, r2(Math.max(0, p.ko)), r2(p.yaw));
         return out;
       }),
-      h: hooks.map(h => [h.o.slot, r2(h.pos.x), r2(h.pos.y), r2(h.pos.z), h.thresh && h.vic ? h.vic.slot : -1]),
+      h: hooks.map(h => [h.o.slot, r2(h.pos.x), r2(h.pos.y), r2(h.pos.z), h.thresh && h.vic ? h.vic.slot : -1, h.vic ? 1 : 0]), // ..., caught
       g: glue.map(g => [r2(g.x), r2(g.y), r2(g.z), r2(g.t), g.r, g.team]),
       ch: ps.map(p => p.champ),
     };

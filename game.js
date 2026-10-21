@@ -581,7 +581,8 @@ function frame(now) {
       local.step();
       const ev = local.takeEvents();
       if (ev.length) { view.fx(ev); for (const e of ev) if (e[5] === game.mySlot) game.played.push([...e, now]); }
-      game.mine = [game.mine?.[1], local.snapshot().p[game.mySlot]];
+      const mine = local.snapshot();
+      game.mine = [game.mine?.[1], mine.p[game.mySlot]]; game.myHooks = mine.h;
       game.inq.push([inp.x, inp.z, inp.b, inp.a, inp.d]); if (game.inq.length > 6) game.inq.shift(); // each tick goes out 3-6 times
       // every tick on a steady link (my inputs reach the host up to a tick sooner, and it can keep fewer waiting); every
       // other tick on a bursty one (TCP: every packet is one more chance of a stall: its stalls keep the lateness up), and
@@ -609,10 +610,11 @@ function frame(now) {
     const me = local.players[game.mySlot], limp = !me.alive || me.ko > 0 || me.hooked > 0 || me.tied;
     const shift = carryOn(a, b, alpha, s[s.length - 1], at, dt);
     if (!limp) shift[game.mySlot] = null;
-    // my own glue puddles: drawn from my copy (cast at once) until the host's shows up on screen
+    // my own hook and glue: drawn from my copy (cast at once) until the host's catch / puddle shows up on screen
     const og = local.ownGlue.filter(g => !b.g?.some(h => h[5] === g.team && Math.hypot(h[0] - g.x, h[2] - g.z) < 1));
-    const drawn = og.length ? { ...b, g: [...b.g ?? [], ...og.map(g => [g.x, g.y, g.z, g.t, g.r, g.team])] } : b;
-    view.apply(a, drawn, alpha, limp ? null : { slot: game.mySlot, a: game.mine[0] ?? game.mine[1], b: game.mine[1], alpha: acc / DT }, shift);
+    const hostHook = h => h[0] !== game.mySlot || h[5], caught = b.h.some(h => h[0] === game.mySlot && h[5]);
+    const drawn = { ...b, h: [...b.h.filter(hostHook), ...caught ? [] : game.myHooks ?? []], g: [...b.g ?? [], ...og.map(g => [g.x, g.y, g.z, g.t, g.r, g.team])] };
+    view.apply({ ...a, h: a.h.filter(hostHook) }, drawn, alpha, limp ? null : { slot: game.mySlot, a: game.mine[0] ?? game.mine[1], b: game.mine[1], alpha: acc / DT }, shift);
     b.p.forEach((e, i) => { const o = a.p[i], d = shift[i]; local.place(i, ...(e[1] && o?.[1] ? [6, 7, 8].map((k, j) => o[k] + (e[k] - o[k]) * alpha + (d?.[j] ?? 0)) : [0, -100, 0])); });
     game.cur = { ...b, p: b.p.map((e, i) => i === game.mySlot && !limp ? game.mine[1] : e) };
   }

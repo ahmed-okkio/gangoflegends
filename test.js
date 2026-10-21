@@ -337,6 +337,14 @@ function duo(mapId, players, slot, ow, extra = {}) {
   run(sim, 30, () => sim.setInput(0, { x: 0, z: 0, b: 0 }));
   const gap2 = torso(sim, 1).x - torso(sim, 0).x;
   assert.ok(sim.players[0].tether == null && gap2 < gap1 - 1, `recast leaps to them (${gap2.toFixed(2)})`);
+  sim = near('thresh', 'blitz'); // recast while the hook's still flying (pressed a ping early): leaps the moment it catches
+  run(sim, 90);
+  lineUp(sim, 5);
+  tap(sim, BTN.A1, Math.PI / 2);
+  run(sim, 3, () => sim.setInput(0, { x: 0, z: 0, b: 0 }));
+  tap(sim, BTN.A1, Math.PI / 2);
+  run(sim, 40, () => sim.setInput(0, { x: 0, z: 0, b: 0 }));
+  assert.ok(torso(sim, 1).x - torso(sim, 0).x < 2, `an early recast still leaps (${(torso(sim, 1).x - torso(sim, 0).x).toFixed(2)})`);
   sim = near('thresh', 'blitz');
   run(sim, 90);
   lineUp(sim, 1.5);
@@ -509,6 +517,30 @@ function duo(mapId, players, slot, ow, extra = {}) {
   console.log('own hit shown at tick', mine[0]?.[7], 'host copy arrives', host?.[7]);
   assert.ok(mine.length && mine[0][5] === 0 && mine[0][6] === 1, 'my copy plays my hit on the stand-in');
   assert.ok(host && host[5] === 0 && host[6] === 1 && host[7] - mine[0][7] >= 20, 'the host saw it too, a round trip later');
+}
+
+// 12f. a client's own hook flies on its copy at once and catches the stand-in; a Thresh recast then leaps there before
+// the host's catch has come back (the host leaps too)
+{
+  const d = duo('grind', [{ id: 'a', name: 'A', champ: 'thresh', team: 0 }, { id: 'b', name: 'B', champ: 'hec', team: 1 }], 0, 12, { practice: true });
+  let flew = -1, caught = -1, hostCaught = -1;
+  const gaps = []; // my copy's distance to their stand-in (placed at x = 1)
+  for (let i = 0; i < 320; i++) {
+    if (i === 150) for (const [slot, x] of [[0, -4], [1, 1]]) {
+      const p = d.host.players[slot], t0 = p.bodies[0].translation();
+      for (const b of p.bodies) { const t = b.translation(); b.setTranslation({ x: t.x + x - t0.x, y: t.y, z: t.z + 3 - t0.z }, true); b.setLinvel({ x: 0, y: 0, z: 0 }, true); }
+    }
+    d.step({ x: 0, z: 0, b: i === 200 || i === 216 ? BTN.A1 : 0, a: Math.PI / 2 });
+    const h = d.cli.snapshot().h.find(h => h[0] === 0);
+    if (h && flew < 0) flew = i;
+    if (h?.[5] && caught < 0) caught = i;
+    if (hostCaught < 0 && d.snaps.at(-1)?.h.some(h => h[0] === 0 && h[5])) hostCaught = i;
+    gaps.push(1 - (d.cli.players[0].bodies?.[0].translation().x ?? -9));
+  }
+  const hostGap = d.host.players[1].bodies[0].translation().x - d.host.players[0].bodies[0].translation().x, leapGap = gaps[hostCaught - 1];
+  console.log('own hook flies at', flew, 'caught', caught, 'host catch arrives', hostCaught, '| my copy that close by then:', leapGap.toFixed(2), 'host gap', hostGap.toFixed(2));
+  assert.ok(flew === 201 && caught > flew && caught < hostCaught, 'my hook flies and catches on my copy first');
+  assert.ok(leapGap < 2.2 && hostGap < 2, 'the recast leaps on my copy before the host says it caught, and on the host');
 }
 
 // 13. snapshot is small
