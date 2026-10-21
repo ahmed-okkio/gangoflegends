@@ -4,7 +4,7 @@ const fs = require('fs');
 
 // SMOKE=<png path> loads SMOKE_HASH (default #practice-girders), screenshots after SMOKE_MS, then quits. Offscreen, no window.
 const smoke = process.env.SMOKE;
-const dev = process.argv.includes('--dev'); // npm run dev: straight into Girders practice with DevTools open
+const dev = process.argv.includes('--dev'); // npm run dev: straight into practice (DEV_MAP, default Girders) with DevTools open
 if (smoke) app.setPath('userData', path.join(app.getPath('temp'), `gangoflegends-test-${process.pid}`));
 
 app.whenReady().then(() => {
@@ -16,7 +16,7 @@ app.whenReady().then(() => {
   });
   const updates = app.isPackaged && !smoke;
   // v feeds the lobby version check; u=1 makes the page start behind the "checking for updates" screen
-  win.loadFile(path.join(__dirname, 'index.html'), { query: { v: app.getVersion(), u: updates ? '1' : '0' }, hash: smoke ? (process.env.SMOKE_HASH ?? 'practice-girders') : dev ? 'practice-girders' : '' });
+  win.loadFile(path.join(__dirname, 'index.html'), { query: { v: app.getVersion(), u: updates ? '1' : '0' }, hash: smoke ? (process.env.SMOKE_HASH ?? 'practice-girders') : dev ? `practice-${process.env.DEV_MAP || 'girders'}` : '' });
   if (dev) win.webContents.openDevTools({ mode: 'detach' });
   if (updates) checkForUpdates(win);
   if (!smoke) return;
@@ -35,13 +35,13 @@ app.whenReady().then(() => {
 function checkForUpdates(win) {
   const { autoUpdater } = require('electron-updater');
   const show = s => win.webContents.executeJavaScript(`window.__update?.(${JSON.stringify(s)})`).catch(() => {});
-  // the page starts blocked; every outcome except a found update releases it
+  // the page starts blocked; every outcome except a found update releases it. found: the new version, once there is one
   let found = false;
   const release = () => { if (!found) show({ done: true }); };
   autoUpdater.on('update-not-available', release);
   setTimeout(release, 15000); // a hung check (bad connection) never locks anyone out
-  autoUpdater.on('update-available', i => { found = true; show({ v: i.version, p: 0 }); });
-  autoUpdater.on('download-progress', d => show({ p: d.percent, got: d.transferred, total: d.total }));
+  autoUpdater.on('update-available', i => { found = i.version; show({ v: found, p: 0 }); });
+  autoUpdater.on('download-progress', d => show({ v: found, p: d.percent, got: d.transferred, total: d.total }));
   autoUpdater.on('error', () => { found = false; show({ done: true }); }); // offline or GitHub down: just play the current version
   autoUpdater.on('update-downloaded', () => {
     show({ p: 100, installing: true });

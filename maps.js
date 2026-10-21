@@ -47,6 +47,9 @@ export const MAPS = {
     // the stage has no spawn markers; these are on the floor behind the pit (z < -1.25 is the pit and its belts)
     spawns: [[-1.5, 0, 2], [-4.5, 0, 2], [-7.5, 0, 2], [-3, 0, 4.5], [-6, 0, 4.5], [2.5, 0, 4], [6, 0, 4], [4.5, 0, 0.2]],
     // both conveyors roll toward the pit, like Gang Beasts'
+    // by eye: ambient (lightmap, environment) turned down so the pit's light carries the room. That light is brighter,
+    // wider and longer than Gang Beasts' (2000, 65 degrees, 37.9) to reach the whole stage
+    view: { dim: 0.4, lights: { 'Fire Pit Light long': { intensity: 5000, angle: 120, inner: 90, range: 60 } } },
     belts: [{ min: [4.6, 0, -6.8], max: [15, 0, -3.2], top: 0.2, v: [-1, 0, 0] }, { min: [-15, 0, -6.8], max: [-2.6, 0, -3.2], top: 0.2, v: [1, 0, 0] }],
   },
   grind: {

@@ -38,7 +38,7 @@ export async function loadProps() {
 
 const std = (color, extra = {}) => new THREE.MeshStandardMaterial({ color, roughness: 0.5, ...extra });
 const glow = (color, k = 2.2) => new THREE.MeshStandardMaterial({ color, emissive: color, emissiveIntensity: k, roughness: 0.3 });
-// Gang Beasts' fire pit glow: the pit's mouth glows, red at the rim, hot orange (bright enough to bloom) in the middle
+// Gang Beasts' fire pit glow: the pit's mouth glows hot orange (bright enough to bloom) right up to the rim
 // (their shader fades it by the pit's depth behind it; distance from the rim stands in). The pit's side faces stay clear.
 function pitGlow(lo, hi) {
   return new THREE.ShaderMaterial({
@@ -46,7 +46,7 @@ function pitGlow(lo, hi) {
     vertexShader: 'varying vec3 vP; void main() { vec4 w = modelMatrix * vec4(position, 1.0); vP = w.xyz; gl_Position = projectionMatrix * viewMatrix * w; }',
     fragmentShader: `uniform vec2 lo, hi; varying vec3 vP;
       void main() { vec2 e = min(vP.xz - lo, hi - vP.xz); float d = min(e.x, e.y);
-        gl_FragColor = vec4(mix(vec3(1.0, 0.196, 0.0), vec3(7.5, 2.5, 0.0), smoothstep(0.3, 3.0, d)), smoothstep(0.0, 0.6, d)); }`, // rim _NearColor, middle _EmissionColor (30, 10, 0) scaled: three.js bloom spreads further than URP's
+        gl_FragColor = vec4(10.0, 2.6, 0.0, smoothstep(0.0, 0.08, d)); }`, // _EmissionColor (30, 10, 0) scaled: three.js bloom spreads further than URP's
     transparent: true, depthWrite: false,
   });
 }
@@ -282,7 +282,7 @@ export function createRenderer(canvas) {
     scene.add(world);
     animated = [];
     rollers = buildMap(world, MAPS[s.map], s.map);
-    avatars = s.players.map((p, slot) => { const a = makeAvatar(p.champ, playerColor(s, slot), p.name); world.add(a.group); return a; });
+    avatars = s.players.map((p, slot) => { const a = makeAvatar(p.champ, playerColor(s, slot), p.name, !!s.teams); world.add(a.group); return a; });
     hookPool = [];
     camAt.set(0, 0, 0); camDist = 14;
   }
@@ -323,14 +323,23 @@ export function createRenderer(canvas) {
   }
 
   // a stage imported from Gang Beasts: original meshes, textures and baked bounce light
-  // the incinerator's pit: a glowing surface that blooms, and now and then a splash of lava blobs arcing up out of it
+  // the incinerator's pit: a glowing surface that blooms, a steady warm light over it (Gang Beasts' flames suggest one),
+  // embers drifting up and now and then a splash of lava blobs arcing up out of it
   function pitFire(g, geo) {
     geo.computeBoundingBox();
     const { min, max } = geo.boundingBox;
     g.add(new THREE.Mesh(geo, pitGlow(new THREE.Vector2(min.x, min.z), new THREE.Vector2(max.x, max.z))));
-    const lava = new THREE.Color(4, 1.1, 0.15); // over the bloom threshold
-    let next = 0;
+    const lava = new THREE.Color(8, 2.2, 0.3), ember = lava; // past the bloom's soft knee
+    // gentle 1/d falloff, high up: beasts beside the pit get about sun-level light, so their gloss doesn't blow out and bloom
+    const heat = new THREE.PointLight(new THREE.Color(1, 0.4, 0.05), 14, 24, 1); // intensity by eye
+    heat.position.set((min.x + max.x) / 2, max.y + 3, (min.z + max.z) / 2);
+    g.add(heat);
+    let next = 0, nextEmber = 0;
     animated.push(o => {
+      if (o.time >= nextEmber) {
+        nextEmber = o.time + 0.08;
+        emit(new THREE.Vector3(rand(min.x, max.x), max.y, rand(min.z, max.z)), { color: ember, n: 1, speed: 2.5, size: 0.07, life: 2.2, grav: 3, spread: 0.2, up: 6 });
+      }
       if (o.time < next) return;
       next = o.time + rand(0.3, 1.2);
       emit(new THREE.Vector3(rand(min.x + 0.5, max.x - 0.5), max.y, rand(min.z + 0.5, max.z - 0.5)), { color: lava, n: 3 + Math.floor(rand(0, 4)), speed: 7, size: 0.22, life: 1.4, grav: -14, spread: 0.25, up: 4 });
@@ -368,7 +377,7 @@ export function createRenderer(canvas) {
       });
       if (d.emission && Math.max(...d.emission) > 0) m.emissive.setRGB(...d.emission.map(v => Math.min(v, 1)));
       // lightmapped surfaces get their ambient from the lightmap alone, like in Unity
-      if (li >= 0) { m.lightMap = lightmapTex[li]; m.lightMapIntensity = LIGHTMAP_GAIN; m.envMapIntensity = 0; }
+      if (li >= 0) { m.lightMap = lightmapTex[li]; m.lightMapIntensity = LIGHTMAP_GAIN * (view.dim ?? 1); m.envMapIntensity = 0; }
       return (mats[id] = m);
     };
     // static batching: every submesh is baked into world space (lightmap tiling into its uv1) and merged with the
@@ -403,25 +412,23 @@ export function createRenderer(canvas) {
     hemi.intensity = 0; rim.intensity = 0; sun.intensity = 0; // ambient: the environment map (beasts) and lightmaps (stage)
     const col = l => new THREE.Color().setRGB(...l.color, THREE.SRGBColorSpace);
     let spotShadows = 0;
-    for (const l of [...sc.lights ?? []].sort((a, b) => b.intensity - a.intensity)) {
+    for (const l0 of [...sc.lights ?? []].sort((a, b) => b.intensity - a.intensity)) {
+      const l = { ...l0, ...view.lights?.[l0.name] }; // maps.js can retune a light
       const I = l.intensity * LIGHT_GAIN;
       if (l.type === 'sun' && !sun.intensity) { sun.color.copy(col(l)); sun.intensity = I; sunOffset.set(...l.dir).normalize().multiplyScalar(-30); continue; }
       const L = l.type === 'sun' ? new THREE.DirectionalLight(col(l), I)
         : l.type === 'point' ? new THREE.PointLight(col(l), I, l.range, 2)
         : new THREE.SpotLight(col(l), I, l.range, l.angle / 2 * Math.PI / 180, 1 - l.inner / l.angle, 2);
       L.position.set(...l.p);
-      // PositionalJitter: hops to a random offset within its range every so often (the fire light's flicker)
-      if (l.jitter) {
-        const { range: [rx, ry, rz], every: [lo, hi] } = l.jitter;
-        let next = 0;
-        animated.push(o => { if (o.time >= next) { next = o.time + rand(lo, hi); L.position.set(l.p[0] + rand(-rx, rx), l.p[1] + rand(-ry, ry), l.p[2] + rand(-rz, rz)); } });
-      }
       if (L.target) { L.target.position.set(l.p[0] + l.dir[0], l.p[1] + l.dir[1], l.p[2] + l.dir[2]); g.add(L.target); }
       if (l.type === 'spot' && l.shadows && spotShadows < 4) { spotShadows++; L.castShadow = true; L.shadow.mapSize.set(1024, 1024); L.shadow.bias = -0.0005; }
       g.add(L);
     }
     // Gang Beasts' post profile (every stage's Volume): ACES, +1.4 EV, bloom intensity 1 over 2 (scatter 0.8), contrast +6, saturation +4, darker shadows, vignette 0.2
-    bloom.strength = 0.6; bloom.threshold = 2; bloom.radius = 0.8; renderer.toneMappingExposure = 0.8; scene.environmentIntensity = 0.5; // exposure: by eye (three's ACES curve isn't URP's)
+    // fine mips only: the glow hugs what blooms instead of washing the screen. Soft knee: things just over the threshold
+    // (eyes, champion glows, glossy highlights) bloom faintly, the pit and lava fully
+    bloom.highPassUniforms.smoothWidth.value = 2.5;
+    bloom.strength = 0.4; bloom.threshold = 2; bloom.radius = 0; bloom.compositeMaterial.uniforms.bloomFactors.value = [1, 0.75, 0.35, 0.1, 0]; renderer.toneMappingExposure = 0.8; scene.environmentIntensity = 0.5 * (view.dim ?? 1); // exposure: by eye (three's ACES curve isn't URP's)
     Object.assign(grade.uniforms, { strength: { value: 0.2 }, contrast: { value: 1.06 }, saturation: { value: 1.04 }, shadows: { value: 0.3 } });
     scene.fog = null;
     g.add(sky(...view.sky ?? ['#6fb2ee', '#d8ecfa', '#b9c9d6']));
@@ -434,7 +441,7 @@ export function createRenderer(canvas) {
   function buildMap(g, map, id) {
     sunOffset.set(8, 20, 6);
     Object.assign(grade.uniforms, { strength: { value: 0.35 }, contrast: { value: 1 }, saturation: { value: 1 }, shadows: { value: 0 } });
-    bloom.radius = 0.55; rim.intensity = 0.9;
+    bloom.radius = 0.55; bloom.highPassUniforms.smoothWidth.value = 0.01; bloom.compositeMaterial.uniforms.bloomFactors.value = [1, 0.8, 0.6, 0.4, 0.2]; rim.intensity = 0.9;
     cam = { side: 1, pitch: 0.63, min: 10, max: 24 };
     if (map.imported) { buildImported(g, map.imported, map.view); return []; }
     const paint = noiseTex('#d4502f', 0.12);
@@ -639,13 +646,13 @@ export function createRenderer(canvas) {
 
   // part frames (beast.js): chest origin at the waist joint, chest centre +0.25 up; head origin at the neck, skull centre (0, .17, .06) r .21;
   // forearm/shin point down their local -y; fist at HAND, foot at (0, -.12, 0)
-  function makeAvatar(champId, color, name) {
+  function makeAvatar(champId, color, name, belt) {
     const c = CHAMPS[champId], group = new THREE.Group();
     const body = champId === 'blitz' ? std(c.body, { metalness: 0.6, roughness: 0.32 }) : gummy(c.body);
     const parts = PARTS.map(() => { const g = new THREE.Group(); group.add(g); return g; });
     const skinned = (beastAsset ? beastMeshes : blobMeshes)(parts, body, glow(c.eyes, 2.5));
     if (skinned) group.add(skinned);
-    parts[HIPS].add(mesh(new THREE.TorusGeometry(0.2, 0.035, 10, 32).rotateX(Math.PI / 2), gummy(color), 0, 0.04, 0)); // team belt
+    if (belt) parts[HIPS].add(mesh(new THREE.TorusGeometry(0.2, 0.035, 10, 32).rotateX(Math.PI / 2), gummy(color), 0, 0.04, 0)); // team belt
     const fists = [];
     for (const [n, part, tag] of PROPS[champId]) {
       const o = propScenes[`${champId}/${n}`]?.clone();
