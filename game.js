@@ -5,7 +5,7 @@ import { CHAMPS, TEAM_NAMES, TEAM_COLORS, FFA_COLORS } from './champs.js';
 import { MAPS } from './maps.js';
 import * as net from './net.js';
 import { prepareMap, loadBeast } from './stages.js';
-import { PARTS } from './beast.js';
+import { PARTS, HIPS } from './beast.js';
 import { packSnap, unpackSnap } from './wire.js';
 import { loadSfx, play, ui, setVolume } from './sfx.js';
 
@@ -608,13 +608,15 @@ function frame(now) {
     // me: between my last two local steps, unless knocked out, hooked or grabbing / grabbed by someone (then the host's
     // ragdoll is the truth, and drawn on the same clock as whoever I'm tied to)
     const me = local.players[game.mySlot], limp = !me.alive || me.ko > 0 || me.hooked > 0 || me.tied;
-    const shift = carryOn(a, b, alpha, s[s.length - 1], at, dt);
+    const shift = carryOn(a, b, alpha, s[s.length - 1], at, dt), own = limp ? null : { slot: game.mySlot, a: game.mine[0] ?? game.mine[1], b: game.mine[1], alpha: acc / DT };
     if (!limp) shift[game.mySlot] = null;
+    slideOver(limp, own, a, b, alpha, shift, dt);
     // my own hook and glue: drawn from my copy (cast at once) until the host's catch / puddle shows up on screen
     const og = local.ownGlue.filter(g => !b.g?.some(h => h[5] === g.team && Math.hypot(h[0] - g.x, h[2] - g.z) < 1));
     const hostHook = h => h[0] !== game.mySlot || h[5], caught = b.h.some(h => h[0] === game.mySlot && h[5]);
     const drawn = { ...b, h: [...b.h.filter(hostHook), ...caught ? [] : game.myHooks ?? []], g: [...b.g ?? [], ...og.map(g => [g.x, g.y, g.z, g.t, g.r, g.team])] };
-    view.apply({ ...a, h: a.h.filter(hostHook) }, drawn, alpha, limp ? null : { slot: game.mySlot, a: game.mine[0] ?? game.mine[1], b: game.mine[1], alpha: acc / DT }, shift);
+    view.apply({ ...a, h: a.h.filter(hostHook) }, drawn, alpha, own, shift);
+    game.drawnHips = b.p[game.mySlot]?.[1] ? [...view.avatars()[game.mySlot].pos[HIPS]] : null;
     b.p.forEach((e, i) => { const o = a.p[i], d = shift[i]; local.place(i, ...(e[1] && o?.[1] ? [6, 7, 8].map((k, j) => o[k] + (e[k] - o[k]) * alpha + (d?.[j] ?? 0)) : [0, -100, 0])); });
     game.cur = { ...b, p: b.p.map((e, i) => i === game.mySlot && !limp ? game.mine[1] : e) };
   }
@@ -644,6 +646,22 @@ function carryOn(a, b, alpha, n, at, dt) {
     gaps[i] = gap = gap.map(v => v * fade);
     return ext.map((v, j) => v + gap[j]);
   });
+}
+
+// knocked out, hooked or tied to someone, I'm drawn from the host's ragdoll on the playback clock instead of my predicted
+// one, a round trip and the delay behind: switching either way jumped me (and the camera) by however far I'd moved in that
+// time. Instead that gap fades out (like carryOn's)
+function slideOver(limp, own, a, b, alpha, shift, dt) {
+  const i = game.mySlot, e = own ? own.b : b.p[i], o = own ? own.a : a.p[i], t = own ? own.alpha : alpha;
+  const at = e?.[1] && o?.[1] ? [6, 7, 8].map((k, j) => o[k] + (e[k] - o[k]) * t + (shift[i]?.[j] ?? 0)) : null;
+  if (limp !== game.wasLimp && at && game.drawnHips) {
+    const gap = game.drawnHips.map((v, j) => v - at[j]);
+    game.slide = Math.hypot(...gap) < 2 ? gap : null; // further: respawned or flung, just go there
+  }
+  game.wasLimp = limp;
+  if (!game.slide) return;
+  game.slide = game.slide.map(v => v * Math.pow(0.85, dt * 60));
+  shift[i] = game.slide.map((v, j) => v + (shift[i]?.[j] ?? 0));
 }
 
 const sendIn = m => {
