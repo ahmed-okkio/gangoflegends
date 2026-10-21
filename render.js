@@ -805,10 +805,11 @@ export function createRenderer(canvas) {
     }
     const m4 = new THREE.Matrix4(), q = new THREE.Quaternion();
     hookPool.forEach((h, i) => {
-      const d = b.h[i];
+      const d = b.h[i], o = d && a.h?.find(e => e[0] === d[0]); // the same hook in the older snapshot (one per champ)
       h.links.visible = h.head.visible = !!d && !!b.p[d[0]]?.[1];
       if (!h.links.visible) return;
-      h.head.position.set(d[1], d[2], d[3]);
+      // between the two snapshots like the bodies: it covers ~1m per snapshot, so drawn from the newer one it stepped
+      if (o) h.head.position.set(o[1], o[2], o[3]).lerp(tmp2.set(d[1], d[2], d[3]), alpha); else h.head.position.set(d[1], d[2], d[3]);
       const c = setup.players[d[0]]?.champ === 'thresh' ? '#7dff9a' : '#ffb347'; // Thresh's hook glows green
       h.head.material.color.set(c); h.head.material.emissive.set(c);
       const arm = avatars[d[0]].parts[FORE + 1]; // avatar groups sit at the origin, so part-local -> world is just the part's own transform
