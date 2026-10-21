@@ -61,5 +61,8 @@ export function playEvents(events) {
     else if (kind === 'fb') { play('swing', 0.7); play('grab', 0.6); }
     else if (kind === 'vi') play('swing', 0.8);
     else if (kind === 'pulv') { play('hitHard', 0.9); play('fall', 0.6); }
+    else if (kind === 'flay') { play('swing', 0.9); play('grab', 0.5); }
+    else if (kind === 'glue') play('body', 0.7);
+    else if (kind === 'fling') { play('grab', 0.7); play('swing', 0.8); }
   }
 }

@@ -265,6 +265,50 @@ function lineUp(sim, gap = 1.1) {
   assert.ok(combo.dist > solo.dist * 1.3, 'Headbutt after Pulverize knocks much further');
 }
 
+// 10e. Thresh: the hook tugs its target a little toward him and chains them; recast leaps him to them. Flay throws
+// whoever's in front over and behind him
+{
+  const tap = (sim, b, a) => run(sim, 2, i => sim.setInput(0, { x: 0, z: 0, b: i ? 0 : b, a }));
+  let sim = near('thresh', 'blitz');
+  run(sim, 90);
+  lineUp(sim, 5);
+  const gap0 = torso(sim, 1).x - torso(sim, 0).x;
+  tap(sim, BTN.A1, Math.PI / 2);
+  run(sim, 30, () => sim.setInput(0, { x: 0, z: 0, b: 0 }));
+  const gap1 = torso(sim, 1).x - torso(sim, 0).x;
+  assert.ok(sim.players[0].tether === 1 && gap1 < gap0 - 0.8 && gap1 > 2, `hooked, tugged a little (${gap0.toFixed(2)} -> ${gap1.toFixed(2)}), chained`);
+  tap(sim, BTN.A1, Math.PI / 2);
+  run(sim, 30, () => sim.setInput(0, { x: 0, z: 0, b: 0 }));
+  const gap2 = torso(sim, 1).x - torso(sim, 0).x;
+  assert.ok(sim.players[0].tether == null && gap2 < gap1 - 1, `recast leaps to them (${gap2.toFixed(2)})`);
+  sim = near('thresh', 'blitz');
+  run(sim, 90);
+  lineUp(sim, 1.5);
+  tap(sim, BTN.A2, Math.PI / 2);
+  run(sim, 40, () => sim.setInput(0, { x: 0, z: 0, b: 0 }));
+  assert.ok(torso(sim, 1).x < torso(sim, 0).x, 'Flay throws them behind Thresh');
+  console.log('thresh ok', gap0.toFixed(2), gap1.toFixed(2), gap2.toFixed(2));
+}
+
+// 10f. Singed: glue slows and grounds whoever's in it; Fling throws the champ beside him over to his other side
+{
+  let sim = near('singed', 'blitz');
+  run(sim, 90);
+  lineUp(sim, 5);
+  run(sim, 2, i => sim.setInput(0, { x: 0, z: 0, b: i ? 0 : BTN.A1, a: Math.PI / 2 }));
+  const x0 = torso(sim, 1).x;
+  run(sim, 60, () => { sim.setInput(0, { x: 0, z: 0, b: 0 }); sim.setInput(1, { x: 1, z: 0, b: BTN.JUMP }); });
+  const slow = torso(sim, 1).x - x0;
+  assert.ok(sim.snapshot().g.length === 1 && slow < 1.6, `glued: slow (${slow.toFixed(2)}m in 1s)`);
+  sim = near('singed', 'blitz');
+  run(sim, 90);
+  lineUp(sim, 1.1);
+  run(sim, 2, i => sim.setInput(0, { x: 0, z: 0, b: i ? 0 : BTN.A2 }));
+  run(sim, 50, () => sim.setInput(0, { x: 0, z: 0, b: 0 }));
+  assert.ok(torso(sim, 1).x < torso(sim, 0).x, 'Fling throws them to his other side');
+  console.log('singed ok', slow.toFixed(2));
+}
+
 // 11. a hooked champ goes limp and can't punch back
 {
   const sim = near('blitz', 'vi');

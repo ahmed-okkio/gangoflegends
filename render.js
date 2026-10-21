@@ -23,8 +23,10 @@ const PROPS = {
   vi: [['hair', HEAD], ['gauntletL', FORE, 'fist'], ['gauntletR', FORE + 1, 'fist']],
   sett: [['jacket', CHEST], ['fist', FORE, 'fist'], ['fist', FORE + 1, 'fist']],
   ali: [['horns', HEAD], ['cuff', FORE], ['cuff', FORE + 1]],
+  thresh: [['hood', HEAD], ['lantern', FORE]],
+  singed: [['tank', CHEST], ['goggles', HEAD]],
 };
-const PROP_FILE = { blitz: 'blitzcrank', hec: 'hecarim', vi: 'vi', sett: 'sett', ali: 'alistar' };
+const PROP_FILE = { blitz: 'blitzcrank', hec: 'hecarim', vi: 'vi', sett: 'sett', ali: 'alistar', thresh: 'thresh', singed: 'singed' };
 const propScenes = {}; // 'blitz/core' -> parsed glTF scene
 export async function loadProps() {
   if (Object.keys(propScenes).length) return;
@@ -182,7 +184,7 @@ export function createRenderer(canvas) {
   const rim = new THREE.DirectionalLight('#9ad8ff', 0.9); // cool back light so silhouettes pop
   scene.add(hemi, sun, sun.target, rim);
 
-  let world = null, avatars = [], rollers = [], hookPool = [], setup = null, animated = [];
+  let world = null, avatars = [], rollers = [], hookPool = [], gluePool = [], setup = null, animated = [];
   const camAt = new THREE.Vector3(0, 0, 0);
   let camDist = 14, shake = 0, time = 0;
   const sunOffset = new THREE.Vector3(8, 20, 6);
@@ -276,6 +278,16 @@ export function createRenderer(canvas) {
         emit(v, { color: '#c9a3b6', n: 22, speed: 6, size: 1.1, life: 0.9, grav: 0.6, dir, grow: true, additive: false, opacity: 0.7 });
         emit(v, { color: '#ff5fae', n: 10, speed: 8, size: 0.18, life: 0.4, grav: 0, dir });
         shake = Math.max(shake, 0.15);
+      } else if (kind === 'flay') { // Thresh's Flay: a green arc of chain swept through the line
+        const dir = tmp2.set(Math.sin(big), 0, Math.cos(big));
+        emit(v, { color: '#7dff9a', n: 18, speed: 7, size: 0.22, life: 0.35, grav: 0, dir: dir.negate() });
+        ring(v, '#7dff9a', 1.6);
+        shake = Math.max(shake, 0.1);
+      } else if (kind === 'glue') { // Singed's Mega Adhesive splatting down
+        emit(v, { color: '#a6ff00', n: 20, speed: 4, size: 0.3, life: 0.6, grav: 8, up: 3, additive: false, opacity: 0.9 });
+      } else if (kind === 'fling') {
+        emit(v, { color: '#d4ff3d', n: 12, speed: 4, size: 0.3, life: 0.5, grav: -2, up: 2 });
+        shake = Math.max(shake, 0.15);
       } else if (kind === 'pulv') { // Alistar's Pulverize: a shockwave across the floor and rubble thrown up
         v.y -= 0.6;
         ring(v, '#ffb347', 2.8, false, 0.4, true);
@@ -299,7 +311,7 @@ export function createRenderer(canvas) {
     rollers = buildMap(world, MAPS[s.map], s.map);
     for (const l of [hemi, sun, rim]) l.visible = l.intensity > 0; // an unlit light still costs every shader, and the sun a 4096² shadow pass
     avatars = s.players.map((p, slot) => { const a = makeAvatar(p.champ, playerColor(s, slot), p.name, !!s.teams); world.add(a.group); return a; });
-    hookPool = [];
+    hookPool = []; gluePool = [];
     camAt.set(0, 0, 0); camDist = 14;
   }
 
@@ -796,6 +808,8 @@ export function createRenderer(canvas) {
       h.links.visible = h.head.visible = !!d && !!b.p[d[0]]?.[1];
       if (!h.links.visible) return;
       h.head.position.set(d[1], d[2], d[3]);
+      const c = setup.players[d[0]]?.champ === 'thresh' ? '#7dff9a' : '#ffb347'; // Thresh's hook glows green
+      h.head.material.color.set(c); h.head.material.emissive.set(c);
       const arm = avatars[d[0]].parts[FORE + 1]; // avatar groups sit at the origin, so part-local -> world is just the part's own transform
       const from = tmp.fromArray(HAND[1]).applyQuaternion(arm.quaternion).add(arm.position), dir = tmp2.subVectors(h.head.position, from);
       const n = Math.min(40, Math.max(1, Math.floor(dir.length() / 0.1)));
@@ -807,6 +821,18 @@ export function createRenderer(canvas) {
       }
       h.links.count = n;
       h.links.instanceMatrix.needsUpdate = true;
+    });
+
+    // Singed's glue puddles, fading out over their last second
+    const gl = b.g ?? [];
+    while (gluePool.length < gl.length) {
+      const m = new THREE.Mesh(new THREE.CircleGeometry(1, 40).rotateX(-Math.PI / 2), new THREE.MeshBasicMaterial({ color: '#a6ff00', transparent: true, depthWrite: false }));
+      m.renderOrder = 4; world.add(m); gluePool.push(m);
+    }
+    gluePool.forEach((m, i) => {
+      const g = gl[i];
+      m.visible = !!g;
+      if (g) { m.position.set(g[0], g[1] + 0.03, g[2]); m.scale.setScalar(g[4]); m.material.opacity = 0.5 * Math.min(1, g[3]); }
     });
 
     for (const { r, roller } of rollers) roller.rotation.x = r.spin * b.mt;

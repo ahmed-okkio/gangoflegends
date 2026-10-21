@@ -200,7 +200,42 @@ def ali_cuff():  # forearm frame (hand at y -.337): a heavy bronze shackle on th
     cyl(BRONZE(), 0.075, 0.1, (0, -0.22, 0)); ring(IRON(), 0.078, 0.014, (0, -0.17, 0)); ring(IRON(), 0.078, 0.014, (0, -0.27, 0))
     for k, (y, z) in enumerate(((-0.28, -0.09), (-0.33, -0.12), (-0.38, -0.12))): ring(IRON(), 0.03, 0.01, (0, y, z), (k % 2, 0, (k + 1) % 2))
 
+# ---------------- Thresh: the Chain Warden, a ragged hood with a green glow inside and his soul lantern ----------------
+CLOAK = lambda: mat("cloak", (0.12, 0.14, 0.13), 0.8)
+SOUL = lambda: mat("soul", (0.45, 1.0, 0.6), 0.3, 0, glow=3)
+
+def thresh_hood():  # head frame (skull centre y .165, z .057, r .21): a hood open at the face, peaked at the back, green wisps
+    shell(CLOAK(), (0.255, 0.27, 0.25), (0, 0.19, 0.03), lambda x, y, z: z > 0.1 and y < 0.13 and abs(x) < 0.17)
+    tube(CLOAK(), [(0, 0.38, -0.08), (0, 0.42, -0.2), (0, 0.34, -0.33)], [0.09, 0.05, 0.004])  # the hood's peak
+    for x in (-0.07, 0.07): ball(SOUL(), 0.035, (x, 0.2, 0.25))  # eyes glowing out of the dark
+
+def thresh_lantern():  # forearm frame (hand at y -.337): the lantern hanging on a short chain under the hand
+    for k in range(3): ring(IRON(), 0.025, 0.008, (0, -0.39 - k * 0.045, 0), (k % 2, 0, (k + 1) % 2))
+    cyl(IRON(), 0.07, 0.03, (0, -0.52, 0), r2=0.03)  # cap
+    ball(SOUL(), 0.075, (0, -0.6, 0), (1, 1.2, 1))  # the trapped souls
+    for a in range(4):
+        x, z = math.cos(a * math.pi / 2) * 0.08, math.sin(a * math.pi / 2) * 0.08
+        cyl(IRON(), 0.012, 0.18, (x, -0.6, z))
+    cyl(IRON(), 0.08, 0.025, (0, -0.69, 0))  # base
+
+# ---------------- Singed: the Mad Chemist, a chem tank on his back and green-lensed goggles ----------------
+TANK = lambda: mat("tank", (0.45, 0.47, 0.4), 0.35, 0.6)
+CHEM = lambda: mat("chem", (0.65, 1.0, 0.0), 0.2, 0, glow=2.5)
+LEATHER = lambda: mat("leather", (0.32, 0.2, 0.12), 0.7)
+
+def singed_tank():  # chest frame (capsule r .193, centre y .254 z -.013; back surface ~z -.2): a tank with a window and a hose over the shoulder
+    cyl(TANK(), 0.12, 0.34, (0, 0.27, -0.3))
+    for y in (0.12, 0.42): ring(LEATHER(), 0.125, 0.02, (0, y, -0.3))
+    box(CHEM(), (0.06, 0.2, 0.05), (0, 0.27, -0.415), 0.02)  # window onto the brew
+    tube(CHEM(), [(0.05, 0.45, -0.3), (0.12, 0.55, -0.18), (0.16, 0.5, 0.02), (0.14, 0.38, 0.15)], [0.025] * 4)  # glowing hose
+
+def singed_goggles():  # head frame: a strap round the head and two big round lenses
+    ring(LEATHER(), 0.215, 0.018, (0, 0.21, 0.057), (0, 1, 0.12))
+    for x in (-0.08, 0.08):
+        cyl(BRONZE(), 0.06, 0.05, (x, 0.22, 0.25), (0, 0, 1)); cyl(CHEM(), 0.045, 0.055, (x, 0.22, 0.255), (0, 0, 1))
+
 PROPS = {
+    "thresh_hood": thresh_hood, "thresh_lantern": thresh_lantern, "singed_tank": singed_tank, "singed_goggles": singed_goggles,
     "alistar_horns": ali_horns, "alistar_cuff": ali_cuff,
     "blitzcrank_core": blitz_core, "blitzcrank_gauntletL": lambda: blitz_gauntlet(1), "blitzcrank_gauntletR": lambda: blitz_gauntlet(-1),
     "hecarim_blade": hec_blade, "hecarim_tail": hec_tail,
@@ -214,7 +249,8 @@ PIVOT = {"core": (0, 0.6347, -0.0101), "blade": (0, 1.0693, 0.0247), "tail": (0,
          "gauntletL": (0.2015, 0.6711, -0.0433), "gauntletR": (-0.2015, 0.6711, -0.0433),
          "hoofHand": (0.2015, 0.6711, -0.0433), "hoofFoot": (0.239, 0.1201, 0.0057),
          "hair": (0, 1.0693, 0.0247), "jacket": (0, 0.6347, -0.0101), "sleeve": (0.2015, 0.9447, -0.0425), "fist": (0.2015, 0.6711, -0.0433),
-         "horns": (0, 1.0693, 0.0247), "cuff": (0.2015, 0.6711, -0.0433)}
+         "horns": (0, 1.0693, 0.0247), "cuff": (0.2015, 0.6711, -0.0433), "hood": (0, 1.0693, 0.0247), "lantern": (0.2015, 0.6711, -0.0433),
+         "tank": (0, 0.6347, -0.0101), "goggles": (0, 1.0693, 0.0247)}
 
 def mannequin(dx):
     grey = mat("beast", (0.62, 0.6, 0.58), 0.6)
@@ -240,13 +276,13 @@ if preview:
     sc.render.engine = "BLENDER_WORKBENCH"; sc.display.shading.light = "STUDIO"; sc.display.shading.color_type = "MATERIAL"
     sc.display.shading.show_cavity = True; sc.display.shading.show_shadows = True
     sc.render.resolution_x, sc.render.resolution_y = 1800, 900
-    for champ, dx in (("blitzcrank", -2.2), ("hecarim", -1.1), ("vi", 0), ("sett", 1.1), ("alistar", 2.2)):
+    for champ, dx in (("blitzcrank", -2.2), ("hecarim", -1.1), ("vi", 0), ("sett", 1.1), ("alistar", 2.2), ("thresh", 3.3), ("singed", 4.4)):
         mannequin(dx)
         for name, ob in built.items():
             if name.startswith(champ): ob.location = B(Vector(PIVOT[name.split("_")[1]]) + Vector((dx, 0, 0)))
     cam = bpy.data.objects.new("cam", bpy.data.cameras.new("cam")); sc.collection.objects.link(cam); sc.camera = cam
-    cam.data.type = "ORTHO"; cam.data.ortho_scale = 5.8
+    cam.data.type = "ORTHO"; cam.data.ortho_scale = 8
     for view, d in (("front", (0.0, 0.25, 1)), ("three_quarter", (0.8, 0.35, 0.9)), ("back", (-0.5, 0.3, -1))):
-        target = B((0, 0.75, 0)); cam.location = target + B(Vector(d).normalized() * 6)
+        target = B((1.1, 0.75, 0)); cam.location = target + B(Vector(d).normalized() * 6)
         cam.rotation_euler = (target - cam.location).to_track_quat("-Z", "Y").to_euler()
         sc.render.filepath = os.path.join(out, f"preview_{view}.png"); bpy.ops.render.render(write_still=True)
