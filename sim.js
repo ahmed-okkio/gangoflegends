@@ -389,7 +389,7 @@ export function createSim({ mapId, players, practice = false, roundsToWin = 3, l
     if (!o) return;
     const n = Math.hypot(o.d.x, o.d.z) || 1;
     fx('fling', o.o.bodies[TORSO].translation(), 0, p.slot);
-    hit(o.o, TORSO, V(-o.d.x / n * 6, 10, -o.d.z / n * 6), 25);
+    hit(o.o, TORSO, V(-o.d.x / n * 9, 10, -o.d.z / n * 9), 25);
     if (o.o.ko <= 0 && o.o.safe <= 0) o.o.stun = Math.max(o.o.stun, 0.7);
   }
   // Alistar Q: slam the ground, launching everyone close into the air (stunned while they're up)

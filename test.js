@@ -334,6 +334,7 @@ function lineUp(sim, gap = 1.1) {
   lineUp(sim, 1.1);
   run(sim, 2, i => sim.setInput(0, { x: 0, z: 0, b: i ? 0 : BTN.A2 }));
   run(sim, 50, () => sim.setInput(0, { x: 0, z: 0, b: 0 }));
+  console.log('fling lands', (torso(sim, 0).x - torso(sim, 1).x).toFixed(2), 'm behind');
   assert.ok(torso(sim, 1).x < torso(sim, 0).x, 'Fling throws them to his other side');
   sim = near('singed', 'blitz');
   run(sim, 90);

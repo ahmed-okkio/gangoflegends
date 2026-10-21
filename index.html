@@ -272,6 +272,7 @@
         <span>Ping (ms)</span><input id="simPing" type="number" min="0" max="1000" step="10">
         <span>Jitter (ms)</span><input id="simJit" type="number" min="0" max="500" step="5">
         <span>Packet loss (%)</span><input id="simLoss" type="number" min="0" max="50" step="1">
+        <span>Over TCP</span><label class="relay"><input id="simTcp" type="checkbox"> Like the relay: lost packets stall what's behind them</label>
       </div>
     </div>
     <button id="practiceBtn" class="btn primary" data-sfx="start">Start practice</button>

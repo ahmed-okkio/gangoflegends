@@ -162,7 +162,9 @@ for (const [id, key, max] of SIM) {
   $(id).value = store.get(`sim_${key}`, 0);
   $(id).onchange = e => { e.target.value = Math.min(max, Math.max(0, Math.round(+e.target.value) || 0)); store.set(`sim_${key}`, e.target.value); };
 }
-const netSim = () => Object.fromEntries(SIM.map(([, key]) => [key, devOn() ? +store.get(`sim_${key}`, 0) : 0]));
+$('simTcp').checked = store.get('sim_tcp', '0') === '1';
+$('simTcp').onchange = e => store.set('sim_tcp', e.target.checked ? '1' : '0');
+const netSim = () => ({ ...Object.fromEntries(SIM.map(([, key]) => [key, devOn() ? +store.get(`sim_${key}`, 0) : 0])), tcp: store.get('sim_tcp', '0') === '1' });
 
 $('hostBtn').onclick = async () => {
   menuError('Opening lobby…', true);
@@ -217,12 +219,13 @@ function onSnap(m) {
   if (!game?.local || m.s.mt <= game.lastMt) return; // the unreliable channel can deliver out of order: an older one is stale
   game.lastMt = m.s.mt;
   game.snaps.push(m.s);
-  // host clock vs mine over the last 2s of snapshots: the quickest arrival sets the offset, and how late the rest
-  // came on average is the jitter the playback delay has to cover (a window, so a host whose sim runs a bit slow
-  // or a route that gets slower is followed within seconds)
-  const offs = game.offs; offs.push(m.s.mt - performance.now() / 1000); if (offs.length > 60) offs.shift();
+  // host clock vs mine over the last 5s of snapshots: the quickest arrival sets the offset, and the playback delay has to
+  // cover how late all but the latest 1% came. Not the average: over TCP (the relay, TURN) a lost packet holds up
+  // everything behind it for a round trip, and those stalls froze everyone else, then made them jump. (A window, so a
+  // host whose sim runs a bit slow or a route that gets slower is followed within seconds)
+  const offs = game.offs; offs.push(m.s.mt - performance.now() / 1000); if (offs.length > 150) offs.shift();
   game.off = Math.max(...offs);
-  game.jit = offs.reduce((sum, o) => sum + game.off - o, 0) / offs.length;
+  game.jit = offs.map(o => game.off - o).sort((a, b) => a - b)[Math.floor(0.99 * (offs.length - 1))];
   game.local.sync(m.s, m.s.p[game.mySlot]);
   // events ride along on several snapshots (any one can be lost); e[6] numbers them so each plays once.
   // My own swings already played when I made them
@@ -326,7 +329,7 @@ function updateHud(s, now) {
     view.setChamp(i, c);
     if (i === game.mySlot) { abilityHud(); escChamps(); }
   });
-  if (setup.practice) $('scores').innerHTML = `<span class="chip">Practice on ${MAPS[setup.map].name}${setup.lag ? ` · ${setup.lag.ping}ms` : ''}</span>`;
+  if (setup.practice) $('scores').innerHTML = `<span class="chip">Practice on ${MAPS[setup.map].name}${setup.lag ? ` · ${setup.lag.ping}ms${setup.lag.tcp ? ' TCP' : ''}` : ''}</span>`;
   else if (setup.teams) $('scores').innerHTML = s.sc.slice(0, setup.teams).map((n, t) => `<span class="chip" style="--pc:${TEAM_COLORS[t]}">${TEAM_NAMES[t]} <b>${n}</b></span>`).join('');
   else $('scores').innerHTML = setup.players.map((p, i) => `<span class="chip ${s.p[i]?.[1] ? '' : 'out'}" style="--pc:${playerColor(setup, i)}">${esc(p.name)} <b>${s.sc[i] ?? 0}</b></span>`).join('');
 
@@ -550,11 +553,12 @@ function frame(now) {
     // everyone else plays back on the host's clock, far enough behind to ride out the jitter seen so far and a lost snapshot
     const s = game.snaps;
     if (!s.length || !game.mine) return;
-    game.delay += (Math.min(0.35, Math.max(0.1, 0.05 + 4 * game.jit)) - game.delay) * 0.02;
-    // that clock runs at wall speed, nudged at most 5% fast or slow toward where it should be: the offset jumps a few ms
-    // whenever its quickest sample leaves the window, and jumping with it made everyone else stutter
+    game.delay += (Math.min(0.7, Math.max(0.1, game.jit + 0.08)) - game.delay) * 0.02;
+    // that clock runs at wall speed, nudged toward where it should be: at most 5% fast, or down to half speed while the
+    // delay grows (a moment of slow motion beats a freeze). The offset jumps a few ms whenever its quickest sample leaves
+    // the window, and jumping with it made everyone else stutter
     const want = now / 1000 + game.off - game.delay;
-    game.at = game.at == null || Math.abs(want - game.at) > 0.25 ? want : game.at + dt * (1 + Math.max(-0.05, Math.min(0.05, (want - game.at) * 2)));
+    game.at = game.at == null || Math.abs(want - game.at) > 0.25 ? want : game.at + dt * (1 + Math.max(-0.5, Math.min(0.05, (want - game.at) * 2)));
     const at = game.at;
     while (s.length > 2 && s[1].mt <= at) s.shift();
     const a = s[0], b = s[1] ?? a, alpha = b === a ? 1 : Math.min(1, Math.max(0, (at - a.mt) / (b.mt - a.mt)));
@@ -569,14 +573,17 @@ function frame(now) {
   view.render(dt);
 }
 
-const sendIn = m => { if (conn) return conn.sendFast(m); m = JSON.parse(JSON.stringify(m)); lagged(() => game.sim.setInput(game.mySlot, m)); };
+const sendIn = m => { if (conn) return conn.sendFast(m); m = JSON.parse(JSON.stringify(m)); lagged(() => game.sim.setInput(game.mySlot, m), 'up'); };
 // practice behind a simulated connection: the host's steps run here too (like the host branch above), and everything
 // between it and my predicted copy goes through lagged(): half the ping plus up to the jitter each way (so messages can
-// overtake each other, like on the unreliable channel), and some never arrive
-function lagged(fn) {
-  const g = game, { ping, jitter, loss } = g.setup.lag;
-  if (Math.random() * 100 < loss) return;
-  setTimeout(() => { if (game === g) fn(); }, ping / 2 + Math.random() * jitter);
+// overtake each other, like on the unreliable channel), and some never arrive. Like TCP (the relay, TURN over TCP),
+// nothing is lost or overtaken: a lost packet is resent a round trip later and holds up everything behind it
+function lagged(fn, dir) {
+  const g = game, { ping, jitter, loss, tcp } = g.setup.lag, now = performance.now(), lost = Math.random() * 100 < loss;
+  if (lost && !tcp) return;
+  let at = now + ping / 2 + Math.random() * jitter + (lost ? ping + 40 : 0);
+  if (tcp) at = g.fake[dir] = Math.max(g.fake[dir] ?? 0, at);
+  setTimeout(() => { if (game === g) fn(); }, at - now);
 }
 function fakeHost(dt, now) {
   const h = game.fake;
@@ -588,7 +595,7 @@ function fakeHost(dt, now) {
     if (++h.t % 2) continue;
     h.ev = h.ev.filter(e => now - e[7] < 250);
     const m = JSON.parse(JSON.stringify({ t: 'snap', s: game.sim.snapshot(), ev: h.ev.map(e => e.slice(0, 7)) }));
-    lagged(() => onSnap(m));
+    lagged(() => onSnap(m), 'down');
   }
 }
 
