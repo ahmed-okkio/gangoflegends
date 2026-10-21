@@ -808,7 +808,7 @@ export function createSim({ mapId, players, practice = false, roundsToWin = 3, l
     }
     // status is the host's call
     me.daze = e[2];
-    me.cd = me.cd.map((c, i) => Math.max(c, e[4 + i] / 10 - 0.2));
+    me.cd = me.cd.map((c, i) => Math.max(c, e[4 + i] / 10 - 0.1 - lag)); // the host's, as of `lag` ago (sent rounded up to 0.1s)
     me.stun = Math.max(me.stun, e[x + 5] - lag); // what's left of it now (taken whole, I stayed stunned a round trip longer than the host's me)
     if (e[x + 6]) me.hooked = 0.1;
     if (e[3] & 16 && me.ko <= 0) { me.daze = 0; cancel(me); down(me); }

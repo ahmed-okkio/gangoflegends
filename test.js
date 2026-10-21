@@ -22,6 +22,27 @@ function lineUp(sim, gap = 1.1) {
   sim.players[0].input = { x: 1, z: 0, b: 0 }; run(sim, 3); sim.players[0].input = { x: 0, z: 0, b: 0 };
 }
 
+// a host and a client predicting `slot`, `ow` ticks apart each way. step(inp, hostSide) runs one tick of both; the client's
+// inputs go up every tick (the last 6), snapshots and the host's events come down every other tick
+function duo(mapId, players, slot, ow, extra = {}) {
+  const host = createSim({ mapId, players, ...extra }), cli = createSim({ mapId, players, local: slot });
+  const wire = [], q = [], d = { host, cli, i: 0, snaps: [], events: [] };
+  d.step = (inp, hostSide) => {
+    cli.setInput(slot, inp); cli.step();
+    q.push([inp.x, inp.z, inp.b, inp.a, inp.d]); if (q.length > 6) q.shift();
+    wire.push({ to: 'host', at: d.i + ow, inp: { n: cli.tick, i: [...q] } });
+    for (const m of wire.filter(m => m.at === d.i)) {
+      if (m.to === 'host') host.setInput(slot, m.inp);
+      else { cli.sync(m.s, m.s.p[slot]); d.snaps.push(m.s); d.events.push(...m.ev); }
+    }
+    hostSide?.(host);
+    host.step();
+    if (d.i % 2) wire.push({ to: 'cli', at: d.i + ow, s: JSON.parse(JSON.stringify(host.snapshot())), ev: host.takeEvents() });
+    d.i++;
+  };
+  return d;
+}
+
 // 1. ragdolls stand on their own
 {
   const sim = near('blitz', 'hec');
@@ -454,6 +475,19 @@ function lineUp(sim, gap = 1.1) {
   }
   console.log('pulverize peak host', hostPeak.toFixed(2), 'client', cliPeak.toFixed(2));
   assert.ok(hostPeak > 1.5 && cliPeak - 0.41 > 0.8 * (hostPeak - 0.41), 'the client sees its own knock-up');
+}
+
+// 12d. at 400ms round trip a client's cooldown comes back when it should, not a round trip late
+{
+  const d = duo('grind', [{ id: 'a', name: 'A', champ: 'blitz', team: 0 }, { id: 'b', name: 'B', champ: 'hec', team: 1 }], 0, 12, { practice: true });
+  let ready = -1;
+  for (let i = 0; i < 500; i++) {
+    d.step({ x: 0, z: 0, b: i === 100 ? BTN.A2 : 0 }); // Power Fist, 5s
+    if (i > 100 && ready < 0 && d.cli.players[0].cd[1] <= 0) ready = i;
+  }
+  console.log('cooldown back after', ((ready - 100) / 60).toFixed(2), 's');
+  assert.ok(d.host.players[0].empower > 0 || d.host.players[0].cd[1] < 5, 'the host cast it too');
+  assert.ok(ready > 0 && (ready - 100) / 60 < 5.1, 'cooldown not held up by the ping');
 }
 
 // 13. snapshot is small
