@@ -32,7 +32,7 @@ export const CHAMPS = {
     name: 'Alistar', title: 'The Minotaur', body: '#6f6680', limb: '#514a5e', eyes: '#ff7043', glow: '#ffb347',
     abilities: [
       { id: 'pulverize', name: 'Pulverize', cd: 7, desc: 'Slam the ground, launching everyone around you into the air.' },
-      { id: 'headbutt', name: 'Headbutt', cd: 6, desc: 'Lunge forward and knock the first champ you hit far back. Headbutt someone still in the air from Pulverize to send them flying.' },
+      { id: 'headbutt', name: 'Headbutt', cd: 6, aim: 3.2, release: true, desc: 'Hold to aim at your cursor, let go to lunge and knock the first champ you hit far back. Headbutt someone still in the air from Pulverize to send them flying.' },
     ],
   },
 };
