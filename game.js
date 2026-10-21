@@ -565,8 +565,12 @@ function frame(now) {
       const ev = local.takeEvents();
       if (ev.length) view.fx(ev);
       game.mine = [game.mine?.[1], local.snapshot().p[game.mySlot]];
-      game.inq.push([inp.x, inp.z, inp.b, inp.a, inp.d]); if (game.inq.length > 6) game.inq.shift(); // each tick goes out 3 times
-      if (local.tick % 2 === 0) sendIn({ t: 'in', n: local.tick, i: game.inq });
+      game.inq.push([inp.x, inp.z, inp.b, inp.a, inp.d]); if (game.inq.length > 6) game.inq.shift(); // each tick goes out 3-6 times
+      // every tick on a steady link (my inputs reach the host up to a tick sooner, and it can keep fewer waiting); every
+      // other tick on a bursty one (TCP: every packet is one more chance of a stall: its stalls keep the lateness up), and
+      // for the first 10s, till that's known: loading the match throws it off for a few seconds (measured: on TCP, starting
+      // every tick then switching cost rubber-banding)
+      if (local.tick % (local.tick > 600 && game.jit < 0.06 ? 1 : 2) === 0) sendIn({ t: 'in', n: local.tick, i: game.inq });
     }
     if (now - (game.pingAt ?? 0) > 1000) { game.pingAt = now; sendIn({ t: 'ping', c: now }); }
     // everyone else plays back on the host's clock, far enough behind to ride out the jitter seen so far and a lost snapshot
