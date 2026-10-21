@@ -166,7 +166,8 @@ export async function host() {
       send(id, msg) { const c = conns.get(id); if (c?.open) c.send(msg); },
       broadcast(msg) { for (const c of conns.values()) if (c.open) c.send(msg); },
       // game state: the unreliable channel where there is one (relayed players: their only link)
-      broadcastFast(msg) { for (const [id, c] of conns) { const f = fast.get(id); if (f?.open) f.send(msg); else if (c.open) c.send(msg); } },
+      broadcastFast(msg) { for (const id of conns.keys()) this.sendFast(id, msg); },
+      sendFast(id, msg) { const c = conns.get(id), f = fast.get(id); if (f?.open) f.send(msg); else if (c?.open) c.send(msg); },
       kick(id) { conns.get(id)?.close(); conns.delete(id); },
       close() { peer.destroy(); ws.close(); },
     };

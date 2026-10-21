@@ -146,6 +146,8 @@
     filter: drop-shadow(0 4px 0 #2a1d08) drop-shadow(0 10px 24px rgba(0,0,0,.7)); animation: pop .3s cubic-bezier(.2, 1.5, .4, 1); }
   #banner small { display: block; margin-bottom: 10px; font: 700 24px var(--display); letter-spacing: .1em; }
   @keyframes pop { from { transform: scale(.7); opacity: 0; } }
+  #ping { position: absolute; top: 14px; left: 16px; font: 900 15px var(--body); color: var(--cyan); text-shadow: 0 1px 3px #000; }
+  #ping.meh { color: var(--gold); } #ping.bad { color: var(--bad); }
   #out { position: absolute; bottom: 130px; left: 0; right: 0; text-align: center; font: 900 28px var(--display); color: var(--bad); text-shadow: 0 2px 8px #000; }
   #abil { position: absolute; left: 20px; bottom: 20px; display: flex; gap: 10px; }
   /* chat: newest at the bottom, each line fades after a while; all of them come back while typing */
@@ -323,6 +325,7 @@
 
 <div id="hud" class="hidden">
   <div id="scores"></div>
+  <div id="ping"></div>
   <div id="banner" class="hidden"></div>
   <div id="out" class="hidden">You're out. Watch the rest of the round.</div>
   <div id="abil"></div>

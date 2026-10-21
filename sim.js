@@ -681,7 +681,8 @@ export function createSim({ mapId, players, practice = false, roundsToWin = 3, l
     }
 
     // lift (Gang Beasts' Shift): holding someone, carry them up over the head; let go of the hands mid-lift to throw
-    const vic = lift && p.grabs.find(g => g?.vic?.alive)?.vic;
+    // feet down, and not someone already lifting you: two lifting each other would climb forever
+    const vic = lift && p.grounded && p.grabs.find(g => g?.vic?.alive && g.vic.lifted !== p)?.vic;
     if (vic) {
       const goal = add(tp, add(V(0, 0.9, 0), mul(bf, 0.15))), vt = vic.bodies[TORSO].translation(), vv = vic.bodies[TORSO].linvel();
       const d = V(((goal.x - vt.x) * 6 - vv.x) * 0.3, ((goal.y - vt.y) * 6 - vv.y) * 0.3 + HOLD * DT, ((goal.z - vt.z) * 6 - vv.z) * 0.3);

@@ -180,6 +180,7 @@ $('hostBtn').onclick = async () => {
   conn.on('msg', (id, m) => {
     if (m.t === 'chat') hostChat(id, m.text);
     else if (m.t === 'in' && game?.sim) game.sim.setInput(game.setup.players.findIndex(p => p.id === id), m);
+    else if (m.t === 'ping') conn.sendFast(id, { t: 'pong', c: m.c });
     else if (m.t === 'pick' && CHAMPS[m.champ]) {
       const p = lobby.players.find(p => p.id === id);
       if (p) { p.champ = m.champ; pushLobby(); }
@@ -207,6 +208,7 @@ async function joinLobby(raw) {
     if (m.t === 'lobby') { lobby = m.lobby; game = null; renderLobby(); show('lobby'); }
     else if (m.t === 'start') startGame(m.setup);
     else if (m.t === 'snap') onSnap(m);
+    else if (m.t === 'pong') onPong(m);
     else if (m.t === 'deny') leave(m.msg);
     else if (m.t === 'chat') showChat(m.slot, m.text);
   });
@@ -232,6 +234,17 @@ function onSnap(m) {
   const ev = m.ev?.filter(e => e[6] > game.evN && e[5] !== game.mySlot);
   for (const e of m.ev ?? []) game.evN = Math.max(game.evN, e[6]);
   if (ev?.length) setTimeout(() => view.fx(ev), game.delay * 1000); // in step with the playback delay
+}
+
+// ping (top left): round trip of a ping over the same channel as the game, once a second; the median of the last 5,
+// so one held up by a hitch (loading the match, a stall) doesn't show
+function onPong(m) {
+  if (!game) return;
+  const p = game.pings = [...game.pings ?? [], performance.now() - m.c].slice(-5);
+  game.ping = [...p].sort((a, b) => a - b)[p.length >> 1];
+  const el = $('ping');
+  el.textContent = `${Math.round(game.ping)} ms`;
+  el.className = game.ping > 200 ? 'bad' : game.ping > 100 ? 'meh' : '';
 }
 
 function leave(msg) {
@@ -285,6 +298,7 @@ async function startGame(setup) {
   const myId = conn ? conn.myId : 'me';
   game = { setup, mySlot: setup.players.findIndex(p => p.id === myId), snaps: [], cur: null, fightAt: 0, sentEv: [], evN: 0, lastMt: -1, inq: [], offs: [], off: null, jit: 0, delay: 0.1, at: null };
   $('chatLog').replaceChildren();
+  $('ping').textContent = '';
   if (setup.practice || isHost()) game.sim = createSim({ mapId: setup.map, players: setup.players, practice: !!setup.practice, roundsToWin: setup.rounds });
   // my champ, predicted (sim.js). Practice behind a simulated connection has both: game.sim is the host
   if (!game.sim || setup.lag) game.local = createSim({ mapId: setup.map, players: setup.players, local: game.mySlot });
@@ -550,6 +564,7 @@ function frame(now) {
       game.inq.push([inp.x, inp.z, inp.b, inp.a, inp.d]); if (game.inq.length > 6) game.inq.shift(); // each tick goes out 3 times
       if (local.tick % 2 === 0) sendIn({ t: 'in', n: local.tick, i: game.inq });
     }
+    if (now - (game.pingAt ?? 0) > 1000) { game.pingAt = now; sendIn({ t: 'ping', c: now }); }
     // everyone else plays back on the host's clock, far enough behind to ride out the jitter seen so far and a lost snapshot
     const s = game.snaps;
     if (!s.length || !game.mine) return;
@@ -573,7 +588,11 @@ function frame(now) {
   view.render(dt);
 }
 
-const sendIn = m => { if (conn) return conn.sendFast(m); m = JSON.parse(JSON.stringify(m)); lagged(() => game.sim.setInput(game.mySlot, m), 'up'); };
+const sendIn = m => {
+  if (conn) return conn.sendFast(m);
+  m = JSON.parse(JSON.stringify(m));
+  lagged(() => m.t === 'ping' ? lagged(() => onPong({ c: m.c }), 'down') : game.sim.setInput(game.mySlot, m), 'up');
+};
 // practice behind a simulated connection: the host's steps run here too (like the host branch above), and everything
 // between it and my predicted copy goes through lagged(): half the ping plus up to the jitter each way (so messages can
 // overtake each other, like on the unreliable channel), and some never arrive. Like TCP (the relay, TURN over TCP),
