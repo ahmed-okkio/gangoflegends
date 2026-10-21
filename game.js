@@ -147,8 +147,22 @@ $('practiceBtn').onclick = () => startPractice(practiceMap);
 function startPractice(map) {
   const roster = Object.keys(CHAMPS).filter(c => c !== me.champ); // one dummy of each other champ
   const dummies = roster.slice(0, 7).map((champ, i) => ({ id: `dummy${i}`, name: 'Dummy', champ, team: i + 1 }));
-  startGame({ map, teams: 0, rounds: 3, practice: true, players: [{ id: 'me', name: me.name, champ: me.champ, team: 0 }, ...dummies] });
+  const lag = netSim();
+  startGame({ map, teams: 0, rounds: 3, practice: true, lag: lag.ping || lag.jitter || lag.loss ? lag : null, players: [{ id: 'me', name: me.name, champ: me.champ, team: 0 }, ...dummies] });
 }
+// dev mode (Settings) shows the practice connection simulator: ping (round trip), jitter (extra each way, up to) and
+// packet loss. Practice with any of them set plays me as a client of a host running right here
+const devOn = () => store.get('dev', '0') === '1';
+const showDev = () => $('netSim').classList.toggle('hidden', !devOn());
+$('devIn').checked = devOn();
+$('devIn').onchange = e => { store.set('dev', e.target.checked ? '1' : '0'); showDev(); };
+showDev();
+const SIM = [['simPing', 'ping', 1000], ['simJit', 'jitter', 500], ['simLoss', 'loss', 50]];
+for (const [id, key, max] of SIM) {
+  $(id).value = store.get(`sim_${key}`, 0);
+  $(id).onchange = e => { e.target.value = Math.min(max, Math.max(0, Math.round(+e.target.value) || 0)); store.set(`sim_${key}`, e.target.value); };
+}
+const netSim = () => Object.fromEntries(SIM.map(([, key]) => [key, devOn() ? +store.get(`sim_${key}`, 0) : 0]));
 
 $('hostBtn').onclick = async () => {
   menuError('Opening lobby…', true);
@@ -190,28 +204,31 @@ async function joinLobby(raw) {
   conn.on('msg', m => {
     if (m.t === 'lobby') { lobby = m.lobby; game = null; renderLobby(); show('lobby'); }
     else if (m.t === 'start') startGame(m.setup);
-    else if (m.t === 'snap' && game) {
-      if (m.s.mt <= game.lastMt) return; // the unreliable channel can deliver out of order: an older one is stale
-      game.lastMt = m.s.mt;
-      game.snaps.push(m.s);
-      // host clock vs mine over the last 2s of snapshots: the quickest arrival sets the offset, and how late the rest
-      // came on average is the jitter the playback delay has to cover (a window, so a host whose sim runs a bit slow
-      // or a route that gets slower is followed within seconds)
-      const offs = game.offs; offs.push(m.s.mt - performance.now() / 1000); if (offs.length > 60) offs.shift();
-      game.off = Math.max(...offs);
-      game.jit = offs.reduce((sum, o) => sum + game.off - o, 0) / offs.length;
-      game.local?.sync(m.s, m.s.p[game.mySlot]);
-      // events ride along on several snapshots (any one can be lost); e[6] numbers them so each plays once.
-      // My own swings already played when I made them
-      const ev = m.ev?.filter(e => e[6] > game.evN && e[5] !== game.mySlot);
-      for (const e of m.ev ?? []) game.evN = Math.max(game.evN, e[6]);
-      if (ev?.length) setTimeout(() => view.fx(ev), game.delay * 1000); // in step with the playback delay
-    }
+    else if (m.t === 'snap') onSnap(m);
     else if (m.t === 'deny') leave(m.msg);
     else if (m.t === 'chat') showChat(m.slot, m.text);
   });
   conn.on('close', () => leave('Lost connection to the host.'));
   conn.send({ t: 'pick', champ: me.champ });
+}
+
+// a snapshot from the host (or the practice connection simulator)
+function onSnap(m) {
+  if (!game?.local || m.s.mt <= game.lastMt) return; // the unreliable channel can deliver out of order: an older one is stale
+  game.lastMt = m.s.mt;
+  game.snaps.push(m.s);
+  // host clock vs mine over the last 2s of snapshots: the quickest arrival sets the offset, and how late the rest
+  // came on average is the jitter the playback delay has to cover (a window, so a host whose sim runs a bit slow
+  // or a route that gets slower is followed within seconds)
+  const offs = game.offs; offs.push(m.s.mt - performance.now() / 1000); if (offs.length > 60) offs.shift();
+  game.off = Math.max(...offs);
+  game.jit = offs.reduce((sum, o) => sum + game.off - o, 0) / offs.length;
+  game.local.sync(m.s, m.s.p[game.mySlot]);
+  // events ride along on several snapshots (any one can be lost); e[6] numbers them so each plays once.
+  // My own swings already played when I made them
+  const ev = m.ev?.filter(e => e[6] > game.evN && e[5] !== game.mySlot);
+  for (const e of m.ev ?? []) game.evN = Math.max(game.evN, e[6]);
+  if (ev?.length) setTimeout(() => view.fx(ev), game.delay * 1000); // in step with the playback delay
 }
 
 function leave(msg) {
@@ -266,7 +283,9 @@ async function startGame(setup) {
   game = { setup, mySlot: setup.players.findIndex(p => p.id === myId), snaps: [], cur: null, fightAt: 0, sentEv: [], evN: 0, lastMt: -1, inq: [], offs: [], off: null, jit: 0, delay: 0.1, at: null };
   $('chatLog').replaceChildren();
   if (setup.practice || isHost()) game.sim = createSim({ mapId: setup.map, players: setup.players, practice: !!setup.practice, roundsToWin: setup.rounds });
-  else game.local = createSim({ mapId: setup.map, players: setup.players, local: game.mySlot }); // my champ, predicted (sim.js)
+  // my champ, predicted (sim.js). Practice behind a simulated connection has both: game.sim is the host
+  if (!game.sim || setup.lag) game.local = createSim({ mapId: setup.map, players: setup.players, local: game.mySlot });
+  game.fake = setup.lag && { acc: 0, t: 0, n: 0, ev: [] };
   attract = null;
   view.setMatch(setup);
   abilityHud();
@@ -307,7 +326,7 @@ function updateHud(s, now) {
     view.setChamp(i, c);
     if (i === game.mySlot) { abilityHud(); escChamps(); }
   });
-  if (setup.practice) $('scores').innerHTML = `<span class="chip">Practice on ${MAPS[setup.map].name}</span>`;
+  if (setup.practice) $('scores').innerHTML = `<span class="chip">Practice on ${MAPS[setup.map].name}${setup.lag ? ` · ${setup.lag.ping}ms` : ''}</span>`;
   else if (setup.teams) $('scores').innerHTML = s.sc.slice(0, setup.teams).map((n, t) => `<span class="chip" style="--pc:${TEAM_COLORS[t]}">${TEAM_NAMES[t]} <b>${n}</b></span>`).join('');
   else $('scores').innerHTML = setup.players.map((p, i) => `<span class="chip ${s.p[i]?.[1] ? '' : 'out'}" style="--pc:${playerColor(setup, i)}">${esc(p.name)} <b>${s.sc[i] ?? 0}</b></span>`).join('');
 
@@ -435,12 +454,23 @@ addEventListener('click', e => { const t = e.target.closest('button, summary'); 
 $('quitBtn').onclick = () => leave();
 
 const k = act => binds[act].some(c => c && (c.startsWith('Mouse') ? mouse.has(+c.slice(5)) : keys.has(c)));
+// running: double-tap a move key (pressed again within 0.3s of letting it go); lasts until every move key is up
+const MOVES = ['up', 'down', 'left', 'right'], moveUp = {}, moveWas = {};
+let running = false;
 function readInput() {
+  const t = performance.now();
+  for (const d of MOVES) {
+    const on = k(d);
+    if (on && !moveWas[d] && t - (moveUp[d] ?? -1e9) < 300) running = true;
+    if (!on && moveWas[d]) moveUp[d] = t;
+    moveWas[d] = on;
+  }
+  if (!MOVES.some(k)) running = false;
   let x = (k('right') ? 1 : 0) - (k('left') ? 1 : 0);
   let z = (k('down') ? 1 : 0) - (k('up') ? 1 : 0);
   // Gang Beasts layout: each hand has its own button (tap punches with it, hold reaches out and grabs)
   let b = (k('jump') ? BTN.JUMP : 0) | (k('lhand') ? BTN.LEFT : 0) | (k('rhand') ? BTN.RIGHT : 0)
-    | (k('a1') ? BTN.A1 : 0) | (k('a2') ? BTN.A2 : 0) | (k('butt') ? BTN.BUTT : 0) | (k('lay') ? BTN.LAY : 0) | (k('lift') ? BTN.LIFT : 0);
+    | (k('a1') ? BTN.A1 : 0) | (k('a2') ? BTN.A2 : 0) | (k('butt') ? BTN.BUTT : 0) | (k('lay') ? BTN.LAY : 0) | (k('lift') ? BTN.LIFT : 0) | (running ? BTN.RUN : 0);
   const pad = [...(navigator.getGamepads?.() ?? [])].find(Boolean);
   if (pad) {
     const [ax, az] = pad.axes, on = i => pad.buttons[i]?.pressed;
@@ -450,14 +480,14 @@ function readInput() {
   }
   const side = view.camSide; // controls are camera-relative: up on the stick is away from the camera
   const a = game && cursor ? view.aimYaw(...cursor, game.mySlot) : null; // abilities aim at the cursor
-  return { x: Math.round(x * side * 100) / 100, z: Math.round(z * side * 100) / 100, b, a: a == null ? null : Math.round(a * 100) / 100 };
+  return { x: Math.round(x * side * 100) / 100, z: Math.round(z * side * 100) / 100, b, a: a == null ? null : Math.round(a * 100) / 100, d: a == null ? null : Math.round(view.aimDist() * 10) / 10 };
 }
 // my skillshot strip: shown while an aimed ability's key is held, if it was ready when pressed (sim.js casts the same way).
 // A windup ability's (aimMin) strip grows to its full reach over the windup
 const aiming = [false, false], held = [0, 0];
 function showAim(inp, dt) {
   const abs = CHAMPS[game.setup.players[game.mySlot].champ].abilities, mine = game.cur?.p[game.mySlot];
-  let range = 0, back = false;
+  let range = 0, back = false, point = null;
   const sim = game.sim ?? game.local, stuck = sim.stuck(game.mySlot);
   [BTN.A1, BTN.A2].forEach((btn, i) => {
     const ab = abs[i];
@@ -467,10 +497,11 @@ function showAim(inp, dt) {
     held[i] += dt;
     range = ab.aimMin ? ab.aimMin + (ab.aim - ab.aimMin) * Math.min(1, held[i] / ab.windup) : ab.aim;
     back = !!ab.back;
+    if (ab.point) point = { max: ab.aim, r: ab.radius };
   });
   game.lastB = inp.b;
   $('abil').classList.toggle('stuck', stuck);
-  view.setAim(inp.a == null ? null : { slot: game.mySlot, yaw: inp.a, range, back });
+  view.setAim(inp.a == null ? null : { slot: game.mySlot, yaw: inp.a, range, back, point, dist: inp.d });
 }
 
 // ---------- loop ----------
@@ -480,9 +511,9 @@ function frame(now) {
   const dt = Math.min(0.1, (now - last) / 1000);
   last = now;
   if (!game) { runAttract(dt); return; }
-  const inp = $('escMenu').classList.contains('hidden') ? readInput() : { x: 0, z: 0, b: 0, a: null };
+  const inp = $('escMenu').classList.contains('hidden') ? readInput() : { x: 0, z: 0, b: 0, a: null, d: null };
   showAim(inp, dt);
-  if (game.sim) {
+  if (game.sim && !game.local) {
     acc += dt;
     while (acc >= DT) {
       acc -= DT;
@@ -503,6 +534,7 @@ function frame(now) {
   } else {
     // my champ moves right away on my own copy (sim.js sync). Inputs go out every other tick, each message carrying
     // the last 6 ticks' inputs over the unreliable channel, so a lost or late message costs nothing; the host plays them back tick by tick.
+    if (game.fake) fakeHost(dt, now);
     const { local } = game;
     acc += dt;
     while (acc >= DT) {
@@ -512,8 +544,8 @@ function frame(now) {
       const ev = local.takeEvents();
       if (ev.length) view.fx(ev);
       game.mine = [game.mine?.[1], local.snapshot().p[game.mySlot]];
-      game.inq.push([inp.x, inp.z, inp.b, inp.a]); if (game.inq.length > 6) game.inq.shift(); // each tick goes out 3 times
-      if (local.tick % 2 === 0) conn.sendFast({ t: 'in', n: local.tick, i: game.inq });
+      game.inq.push([inp.x, inp.z, inp.b, inp.a, inp.d]); if (game.inq.length > 6) game.inq.shift(); // each tick goes out 3 times
+      if (local.tick % 2 === 0) sendIn({ t: 'in', n: local.tick, i: game.inq });
     }
     // everyone else plays back on the host's clock, far enough behind to ride out the jitter seen so far and a lost snapshot
     const s = game.snaps;
@@ -535,6 +567,29 @@ function frame(now) {
   }
   updateHud(game.cur, now);
   view.render(dt);
+}
+
+const sendIn = m => { if (conn) return conn.sendFast(m); m = JSON.parse(JSON.stringify(m)); lagged(() => game.sim.setInput(game.mySlot, m)); };
+// practice behind a simulated connection: the host's steps run here too (like the host branch above), and everything
+// between it and my predicted copy goes through lagged(): half the ping plus up to the jitter each way (so messages can
+// overtake each other, like on the unreliable channel), and some never arrive
+function lagged(fn) {
+  const g = game, { ping, jitter, loss } = g.setup.lag;
+  if (Math.random() * 100 < loss) return;
+  setTimeout(() => { if (game === g) fn(); }, ping / 2 + Math.random() * jitter);
+}
+function fakeHost(dt, now) {
+  const h = game.fake;
+  h.acc += dt;
+  while (h.acc >= DT) {
+    h.acc -= DT;
+    game.sim.step();
+    for (const e of game.sim.takeEvents()) h.ev.push([...e, ++h.n, now]);
+    if (++h.t % 2) continue;
+    h.ev = h.ev.filter(e => now - e[7] < 250);
+    const m = JSON.parse(JSON.stringify({ t: 'snap', s: game.sim.snapshot(), ev: h.ev.map(e => e.slice(0, 7)) }));
+    lagged(() => onSnap(m));
+  }
 }
 
 // ---------- menu backdrop: bots brawling on a stage behind the menus ----------

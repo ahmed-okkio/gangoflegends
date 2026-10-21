@@ -45,7 +45,7 @@ export const CHAMPS = {
   singed: {
     name: 'Singed', title: 'The Mad Chemist', body: '#7a8a5a', limb: '#5b6844', eyes: '#d4ff3d', glow: '#a6ff00',
     abilities: [
-      { id: 'adhesive', name: 'Mega Adhesive', cd: 9, aim: 6.5, release: true, radius: 1.6, desc: 'Hold to aim, let go to lob a glue puddle. Enemies in it move slowly and can not jump or use abilities for 3s.' },
+      { id: 'adhesive', name: 'Mega Adhesive', cd: 9, aim: 6.5, point: true, release: true, radius: 1.6, desc: 'Hold to aim at a spot (anywhere in range, even under you), let go to lob a glue puddle there. Enemies in it move slowly and can not jump or use abilities for 3s.' },
       { id: 'fling', name: 'Fling', cd: 7, desc: 'Grab the champ next to you and hurl them over your head behind you.' },
     ],
   },

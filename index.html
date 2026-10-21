@@ -266,6 +266,14 @@
     <h2>Practice</h2>
     <p class="lede">Try a stage against a dummy of every other champion. Press Esc to come back.</p>
     <div id="practiceMaps" class="maps"></div>
+    <div id="netSim" class="hidden">
+      <p class="hint">Simulated connection (dev): set any of these and you play as a client of a host running here, through a link this slow. 0 = off.</p>
+      <div class="settings" style="margin: 10px 0 16px">
+        <span>Ping (ms)</span><input id="simPing" type="number" min="0" max="1000" step="10">
+        <span>Jitter (ms)</span><input id="simJit" type="number" min="0" max="500" step="5">
+        <span>Packet loss (%)</span><input id="simLoss" type="number" min="0" max="50" step="1">
+      </div>
+    </div>
     <button id="practiceBtn" class="btn primary" data-sfx="start">Start practice</button>
   </section>
 
@@ -288,6 +296,7 @@
     <h2>Settings</h2>
     <p class="lede">Saved on this computer.</p>
     <label class="volrow">Volume <input class="vol" type="range" min="0" max="100"><output class="volOut"></output></label>
+    <label class="relay" style="margin-top: 18px"><input id="devIn" type="checkbox"> Dev mode (adds a connection simulator to Practice)</label>
   </section>
 </div>
 

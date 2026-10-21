@@ -769,7 +769,7 @@ export function createRenderer(canvas) {
           av.hay.reach(rangeMin + (range - rangeMin) * k);
         }
       }
-      const dizzy = flags & 16 ? 3 : pb[2] >= 60 ? 2 : 0;
+      const dizzy = flags & 16 ? 3 : flags & 256 || pb[2] >= 60 ? 2 : 0;
       av.stars.visible = dizzy > 0;
       av.stars.children.forEach((s, i) => { s.visible = i < dizzy; });
       av.stars.position.copy(head).y += 0.45;
@@ -855,19 +855,33 @@ export function createRenderer(canvas) {
   aimBar.renderOrder = 5; aimBar.visible = false; scene.add(aimBar);
   const aimBack = new THREE.Mesh(aimBar.geometry, aimBar.material.clone()); // the other half of a two-sided strip (Flay), dimmer
   aimBack.material.opacity = 0.15; aimBack.renderOrder = 5; aimBack.visible = false; scene.add(aimBack);
-  let aim = null;
+  // a spot-targeted ability (Singed Q): its range round my champ and the puddle where the cursor is
+  const ringMat = aimBar.material.clone(); ringMat.side = THREE.DoubleSide;
+  const aimRange = new THREE.Mesh(new THREE.RingGeometry(0.97, 1, 64).rotateX(-Math.PI / 2), ringMat);
+  const aimSpot = new THREE.Mesh(new THREE.CircleGeometry(1, 40).rotateX(-Math.PI / 2), new THREE.MeshBasicMaterial({ color: '#a6ff00', transparent: true, opacity: 0.35, depthWrite: false }));
+  for (const m of [aimRange, aimSpot]) { m.renderOrder = 5; m.visible = false; scene.add(m); }
+  let aim = null, aimD = 0; // aimD: the cursor's distance from my champ on the floor, from the last aimYaw()
   function aimYaw(cx, cy, slot) {
     const av = avatars[slot];
     if (!av) return null;
     const r = canvas.getBoundingClientRect(), hp = av.parts[HIPS].position;
     aimRay.setFromCamera(new THREE.Vector2((cx - r.left) / r.width * 2 - 1, 1 - (cy - r.top) / r.height * 2), camera);
     aimPlane.constant = HIP_HEIGHT - hp.y;
-    return aimRay.ray.intersectPlane(aimPlane, aimHit) ? Math.atan2(aimHit.x - hp.x, aimHit.z - hp.z) : null;
+    if (!aimRay.ray.intersectPlane(aimPlane, aimHit)) return null;
+    aimD = Math.hypot(aimHit.x - hp.x, aimHit.z - hp.z);
+    return Math.atan2(aimHit.x - hp.x, aimHit.z - hp.z);
   }
 
   function render(dt) {
     time += dt;
-    const me = aim?.range && avatars[aim.slot];
+    const spot = aim?.point && avatars[aim.slot];
+    aimRange.visible = aimSpot.visible = !!spot;
+    if (spot) {
+      const hp = spot.parts[HIPS].position, y = hp.y - HIP_HEIGHT + 0.05, d = Math.min(aim.dist, aim.point.max);
+      aimRange.position.set(hp.x, y, hp.z); aimRange.scale.setScalar(aim.point.max);
+      aimSpot.position.set(hp.x + Math.sin(aim.yaw) * d, y, hp.z + Math.cos(aim.yaw) * d); aimSpot.scale.setScalar(aim.point.r);
+    }
+    const me = !spot && aim?.range && avatars[aim.slot];
     aimBar.visible = !!me;
     aimBack.visible = !!me && !!aim.back;
     if (me) {
@@ -903,5 +917,5 @@ export function createRenderer(canvas) {
     world.add(avatars[slot].group);
   }
 
-  return { setMatch, setChamp, apply, fx, render, aimYaw, setAim: a => { aim = a; }, avatars: () => avatars, get camSide() { return cam.side; } };
+  return { setMatch, setChamp, apply, fx, render, aimYaw, aimDist: () => aimD, setAim: a => { aim = a; }, avatars: () => avatars, get camSide() { return cam.side; } };
 }

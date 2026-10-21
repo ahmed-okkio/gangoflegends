@@ -62,6 +62,7 @@ function lineUp(sim, gap = 1.1) {
   run(sim, 40, i => sim.setInput(0, { x: 0, z: 0, b: i < 2 ? BTN.A1 : 0 }));
   const after = torso(sim, 1).x - torso(sim, 0).x;
   console.log('hook gap', before.toFixed(2), '->', after.toFixed(2));
+  assert.ok(sim.players[1].dizzy > 0 && sim.players[1].stun > 0 && sim.players[1].hooked <= 0 && sim.snapshot().p[1][3] & 256, 'stunned on their feet (stars) after the pull, not limp');
   assert.ok(after < before - 2, 'hook pulls');
 }
 
@@ -217,6 +218,25 @@ function lineUp(sim, gap = 1.1) {
   console.log('sett ok');
 }
 
+// 10a. Sett's Facebreaker, timed right, stops Vi's Vault Breaker dash mid-flight
+{
+  const sim = near('sett', 'vi');
+  run(sim, 90);
+  lineUp(sim, 5);
+  const vi = sim.players[1];
+  vi.yaw = -Math.PI / 2;
+  run(sim, 40, () => sim.setInput(1, { x: 0, z: 0, b: BTN.A1, a: -Math.PI / 2 })); // wind up
+  sim.setInput(1, { x: 0, z: 0, b: 0, a: -Math.PI / 2 });
+  let stopped = false;
+  for (let i = 0; i < 40 && !stopped; i++) {
+    const near2 = Math.abs(torso(sim, 1).x - torso(sim, 0).x) < 2;
+    sim.setInput(0, { x: 0, z: 0, b: near2 ? BTN.A2 : 0 });
+    sim.step();
+    if (near2 && sim.players[0].cd[1] > 0) stopped = !vi.dash && vi.stun > 0;
+  }
+  assert.ok(stopped, 'Facebreaker cancels the dash');
+}
+
 // 10b. Sett's Haymaker windup doesn't flinch from punches
 {
   const sim = near('sett', 'blitz');
@@ -315,7 +335,20 @@ function lineUp(sim, gap = 1.1) {
   run(sim, 2, i => sim.setInput(0, { x: 0, z: 0, b: i ? 0 : BTN.A2 }));
   run(sim, 50, () => sim.setInput(0, { x: 0, z: 0, b: 0 }));
   assert.ok(torso(sim, 1).x < torso(sim, 0).x, 'Fling throws them to his other side');
+  sim = near('singed', 'blitz');
+  run(sim, 90);
+  run(sim, 2, i => sim.setInput(0, { x: 0, z: 0, b: i ? 0 : BTN.A1, a: 0, d: 0 })); // cursor on himself
+  const [g] = sim.snapshot().g, me0 = torso(sim, 0);
+  assert.ok(g && Math.hypot(g[0] - me0.x, g[2] - me0.z) < 0.3, 'glue can go right under Singed');
   console.log('singed ok', slow.toFixed(2));
+}
+
+// 10g. running (double-tapped move key) is faster than walking
+{
+  const walk = b => { const sim = near('blitz', 'hec'); run(sim, 90); lineUp(sim, 12); const x0 = torso(sim, 0).x; run(sim, 40, () => sim.setInput(0, { x: 1, z: 0, b })); return torso(sim, 0).x - x0; };
+  const w = walk(0), r = walk(BTN.RUN);
+  console.log('walk', w.toFixed(2), 'run', r.toFixed(2));
+  assert.ok(r > w * 1.4, 'running is faster');
 }
 
 // 11. a hooked champ goes limp and can't punch back
@@ -387,6 +420,29 @@ function lineUp(sim, gap = 1.1) {
   assert.ok(host.players[0].grabs.some(g => g?.vic) && maxErr < 0.3, 'held together, the client stays on the host');
 }
 
+// 12c. a knock-up the client never saw coming (host Alistar's Pulverize, 200ms round trip) still lifts its own copy
+// nearly as high as the host's (it used to rise late and low, then the hover spring ate the rest)
+{
+  const players = [{ id: 'a', name: 'A', champ: 'ali', team: 0 }, { id: 'b', name: 'B', champ: 'hec', team: 1 }];
+  const host = createSim({ mapId: 'grind', players, practice: true }), cli = createSim({ mapId: 'grind', players, local: 1 });
+  const A = host.players[0], b0 = host.players[1].bodies[0].translation(), a0 = A.bodies[0].translation();
+  for (const b of A.bodies) { const t = b.translation(); b.setTranslation({ x: t.x + b0.x - 1.2 - a0.x, y: t.y, z: t.z + b0.z - a0.z }, true); }
+  const wire = [], q = [];
+  let hostPeak = 0, cliPeak = 0;
+  for (let i = 0; i < 300; i++) {
+    cli.setInput(1, { x: 0, z: 0, b: 0 }); cli.step();
+    q.push([0, 0, 0]); if (q.length > 6) q.shift();
+    if (cli.tick % 2 === 0) wire.push({ to: 'host', at: i + 6, inp: { n: cli.tick, i: [...q] } });
+    for (const m of wire.filter(m => m.at === i)) m.to === 'host' ? host.setInput(1, m.inp) : cli.sync(m.s, m.s.p[1]);
+    host.setInput(0, { x: 0, z: 0, b: i === 120 ? BTN.A1 : 0 });
+    host.step();
+    if (i % 2) wire.push({ to: 'cli', at: i + 6, s: JSON.parse(JSON.stringify(host.snapshot())) });
+    if (i >= 120) { hostPeak = Math.max(hostPeak, host.players[1].bodies[10].translation().y); cliPeak = Math.max(cliPeak, cli.snapshot().p[1][7]); }
+  }
+  console.log('pulverize peak host', hostPeak.toFixed(2), 'client', cliPeak.toFixed(2));
+  assert.ok(hostPeak > 1.5 && cliPeak - 0.41 > 0.8 * (hostPeak - 0.41), 'the client sees its own knock-up');
+}
+
 // 13. snapshot is small
 {
   const sim = createSim({ mapId: 'girders', players: Array.from({ length: 8 }, (_, i) => ({ id: i, name: 'P', champ: i % 2 ? 'hec' : 'blitz', team: i })) });
@@ -420,27 +476,4 @@ if ((await prepareMap('incinerator')).imported) {
   console.log('belt carried', (9.5 - torso(sim, 0).x).toFixed(2));
   assert.ok(torso(sim, 0).x < 8.5, 'belt rolls you toward the pit');
 }
-// 12c. a knock-up the client never saw coming (host Alistar's Pulverize, 200ms round trip) still lifts its own copy
-// nearly as high as the host's (it used to rise late and low, then the hover spring ate the rest)
-{
-  const players = [{ id: 'a', name: 'A', champ: 'ali', team: 0 }, { id: 'b', name: 'B', champ: 'hec', team: 1 }];
-  const host = createSim({ mapId: 'grind', players, practice: true }), cli = createSim({ mapId: 'grind', players, local: 1 });
-  const A = host.players[0], b0 = host.players[1].bodies[0].translation(), a0 = A.bodies[0].translation();
-  for (const b of A.bodies) { const t = b.translation(); b.setTranslation({ x: t.x + b0.x - 1.2 - a0.x, y: t.y, z: t.z + b0.z - a0.z }, true); }
-  const wire = [], q = [];
-  let hostPeak = 0, cliPeak = 0;
-  for (let i = 0; i < 300; i++) {
-    cli.setInput(1, { x: 0, z: 0, b: 0 }); cli.step();
-    q.push([0, 0, 0]); if (q.length > 6) q.shift();
-    if (cli.tick % 2 === 0) wire.push({ to: 'host', at: i + 6, inp: { n: cli.tick, i: [...q] } });
-    for (const m of wire.filter(m => m.at === i)) m.to === 'host' ? host.setInput(1, m.inp) : cli.sync(m.s, m.s.p[1]);
-    host.setInput(0, { x: 0, z: 0, b: i === 120 ? BTN.A1 : 0 });
-    host.step();
-    if (i % 2) wire.push({ to: 'cli', at: i + 6, s: JSON.parse(JSON.stringify(host.snapshot())) });
-    if (i >= 120) { hostPeak = Math.max(hostPeak, host.players[1].bodies[10].translation().y); cliPeak = Math.max(cliPeak, cli.snapshot().p[1][7]); }
-  }
-  console.log('pulverize peak host', hostPeak.toFixed(2), 'client', cliPeak.toFixed(2));
-  assert.ok(hostPeak > 1.5 && cliPeak - 0.41 > 0.8 * (hostPeak - 0.41), 'the client sees its own knock-up');
-}
-
 console.log('all ok');

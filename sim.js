@@ -8,7 +8,7 @@ import { PARTS, ANCHOR, HAND, HIP_HEIGHT, CHEST, HEAD, ARM, THIGH, FORE, LEG, HI
 export const initPhysics = () => RAPIER.init();
 export const DT = 1 / 60;
 // LEFT / RIGHT: one button per hand, like Gang Beasts: tap to punch with that hand, hold to reach out and grab with it
-export const BTN = { JUMP: 1, LEFT: 2, RIGHT: 4, A1: 8, A2: 16, BUTT: 32, LAY: 64, LIFT: 128 };
+export const BTN = { JUMP: 1, LEFT: 2, RIGHT: 4, A1: 8, A2: 16, BUTT: 32, LAY: 64, LIFT: 128, RUN: 256 }; // RUN: double-tapped a move key (game.js)
 const HANDS = [BTN.LEFT, BTN.RIGHT]; // arm 0 is the beast's left
 export const STAND = HIP_HEIGHT + PARTS[CHEST].p[1] - PARTS[HIPS].p[1]; // chest pivot height above the floor when standing
 
@@ -151,7 +151,7 @@ export function createSim({ mapId, players, practice = false, roundsToWin = 3, l
       alive: true, yaw, daze: 0, sinceHit: 9, ko: 0, cd: [0, 0], punch: null, punchCd: 0, grabs: [null, null], held: [0, 0],
       stun: 0, spin: 0, spinHit: null, charge: 0, empower: 0, jumpT: 0, phase: 0, grounded: false, prevB: p.input.b,
       butt: null, buttCd: 0, lying: false, climb: 0, safe: 0, hooked: 0, spinA: 0, chargeT: 0,
-      emp: null, dash: null, vault: 0, vaultBtn: 0, hay: 0, hayBtn: 0, fb: 0, pulv: 0, flay: 0, fling: 0, tether: null, leap: null,
+      emp: null, dash: null, vault: 0, vaultBtn: 0, hay: 0, hayBtn: 0, fb: 0, pulv: 0, flay: 0, fling: 0, tether: null, leap: null, dizzy: 0,
     });
   }
 
@@ -335,7 +335,7 @@ export function createSim({ mapId, players, practice = false, roundsToWin = 3, l
     const both = near.some(({ d }) => dot(d, f) >= 0) && near.some(({ d }) => dot(d, f) < 0);
     for (const { o, d } of near) {
       hit(o, TORSO, add(mul(norm(V(-d.x, 0, -d.z)), 7), V(0, 1.2, 0)), both ? 35 : 15);
-      if (o.ko <= 0 && o.safe <= 0) o.stun = Math.max(o.stun, both ? 1.5 : 0.6);
+      if (o.ko <= 0 && o.safe <= 0) { o.stun = Math.max(o.stun, both ? 1.5 : 0.6); cancel(o); } // timed right, it stops a dash (Vi Q) mid-flight
     }
   }
   // Thresh Q recast: fly at whoever the chain is on
@@ -363,7 +363,7 @@ export function createSim({ mapId, players, practice = false, roundsToWin = 3, l
   }
   // Singed Q: a glue puddle where the throw lands (on whatever floor is under that point; none = it falls away)
   function adhesive(p, f, t, ab) {
-    const at = add(t, mul(f, ab.aim - ab.radius)), ray = world.castRay(new RAPIER.Ray(V(at.x, t.y + 1, at.z), DOWN), 12, true, undefined, (1 << 16) | 1); // floor only
+    const at = add(t, mul(f, Math.min(ab.aim, p.aimD ?? ab.aim - ab.radius))), ray = world.castRay(new RAPIER.Ray(V(at.x, t.y + 1, at.z), DOWN), 12, true, undefined, (1 << 16) | 1); // floor only
     fx('swing', t, 0, p.slot);
     if (local >= 0 || !ray) return;
     const g = { x: at.x, y: t.y + 1 - ray.timeOfImpact, z: at.z, t: GLUE_T, r: ab.radius, team: p.team };
@@ -424,7 +424,7 @@ export function createSim({ mapId, players, practice = false, roundsToWin = 3, l
     p.prevB = inp.b;
 
     if (p.ko > 0 && (p.ko -= DT) <= 0) { wake(p); p.safe = SAFE; }
-    p.safe -= DT; p.hooked -= DT;
+    p.safe -= DT; p.hooked -= DT; p.dizzy -= DT;
     // lying down (hold): go limp like a KO, legs touch the floor; let go to get back up
     const lying = p.ko <= 0 && !!(inp.b & BTN.LAY);
     if (lying !== p.lying) { p.lying = lying; setLegGroups(p, lying ? bodyGroups(p) : legGroups(p)); }
@@ -452,6 +452,7 @@ export function createSim({ mapId, players, practice = false, roundsToWin = 3, l
       // key is let go; the held ones (Vi Q) start on press. Either way the champ turns to the cursor while held.
       // "lock" ones (Sett Q) take the cursor's aim on press and keep it.
       const aim = typeof inp.a === 'number' ? inp.a : null, abs = CHAMPS[p.champ].abilities;
+      p.aimD = typeof inp.d === 'number' ? inp.d : null; // how far away the cursor is (spot-targeted: Singed Q)
       if (glued(p, p.bodies[TORSO].translation())) p.aimBtn = 0; // stuck in enemy glue: no abilities
       else for (const i of [0, 1]) {
         const btn = i ? BTN.A2 : BTN.A1;
@@ -470,7 +471,7 @@ export function createSim({ mapId, players, practice = false, roundsToWin = 3, l
 
     // locomotion: steer the chest's velocity and hover it at standing height (Gang Beasts lifts the upper body too);
     // the same nudge goes to the whole core so the hips and legs hang underneath without stretching the joints
-    let speed = 3.6;
+    let speed = inp.b & BTN.RUN ? 6 : 3.6;
     if (p.charge > 0) { p.charge -= DT; p.chargeT += DT; speed = 3.6 + 5.4 * Math.min(1, p.chargeT / RAMP); mx = f.x; mz = f.z; }
     // Vi Q: hold to wind up (slowed), let go to dash; a longer windup (up to 1.25s) dashes further and hits harder.
     // Fully wound up it can be held 3s more, then goes by itself
@@ -638,7 +639,7 @@ export function createSim({ mapId, players, practice = false, roundsToWin = 3, l
       if (first) {
         const k = p.dash.power, air = !first.vic.grounded; // Alistar's Headbutt sends someone already airborne much further
         if (p.dash.ali) hit(first.vic, first.part, add(mul(f, air ? 14 : 9.7), V(0, air ? 4 : 3, 0)), air ? 40 : 30);
-        else hit(first.vic, first.part, add(mul(f, 6 + k * 6), V(0, 2 + k * 2, 0)), 25 + k * 20);
+        else hit(first.vic, first.part, mul(add(mul(f, 6 + k * 6), V(0, 2 + k * 2, 0)), 0.85), (25 + k * 20) * 0.85); // Vi Q
         p.dash = null;
         addVel(T, mul(f, -2));
       }
@@ -724,7 +725,7 @@ export function createSim({ mapId, players, practice = false, roundsToWin = 3, l
       h.vic.hooked = 0.1; // limp for as long as the pull lasts
       const vp = h.vic.bodies[TORSO].translation(), to = sub(h.o.bodies[TORSO].translation(), vp), d = len(to);
       h.pos = vp;
-      if (d < 1.4 || h.pull > 0.7) { h.vic.hooked = 0.5; return false; } // still limp a moment after landing: time to combo
+      if (d < 1.4 || h.pull > 0.7) { if (h.vic.ko <= 0 && h.vic.safe <= 0) { h.vic.stun = Math.max(h.vic.stun, 0.5); h.vic.dizzy = 0.5; } return false; } // stunned on their feet a moment after landing: time to combo
       const v = add(mul(to, 14 / d), V(0, 1.5, 0));
       for (const b of h.vic.bodies) b.setLinvel(v, true);
       return true;
@@ -773,8 +774,8 @@ export function createSim({ mapId, players, practice = false, roundsToWin = 3, l
     s.ch?.forEach((c, i) => { if (CHAMPS[c]) ps[i].champ = c; });
     if (!e[1]) { if (me.alive) removeRagdoll(me); return; }
     const x = SX, hp = V(e[6], e[7], e[8]), hv = V(e[x + 1], e[x + 2], e[x + 3]), ack = e[x + 4];
-    // countdown: my inputs land on the host a round trip (tick - ack) after this snapshot's clock, so start moving that much early
     const lag = (tick - ack) * DT; // this state is the host's me that long ago (a round trip, roughly)
+    // countdown: my inputs land on the host a round trip (tick - ack) after this snapshot's clock, so start moving that much early
     if (st === 'count') { timer = s.t - lag; if (timer <= 0) st = 'fight'; }
     if (!me.alive) { // (re)spawned on the host: start from the spawn point it used
       const near = map.spawns.map(([sx, , sz], i) => [Math.hypot(sx - hp.x, sz - hp.z), i]).sort((a, b) => a[0] - b[0])[0][1];
@@ -883,7 +884,8 @@ export function createSim({ mapId, players, practice = false, roundsToWin = 3, l
       p: ps.map(p => {
         if (!p.alive) return [p.slot, 0];
         const flags = (p.spin > 0) | (p.charge > 0) << 1 | (p.empower > 0) << 2 | (p.grabs.some(Boolean)) << 3 | (p.ko > 0) << 4 | (p.safe > 0) << 5 | (p.vault > 0 || p.hay > 0) << 6
-          | (p.grabs.some(g => g?.vic) || ps.some(q => q.grabs?.some(g => g?.vic === p))) << 7; // holding or held by a champ
+          | (p.grabs.some(g => g?.vic) || ps.some(q => q.grabs?.some(g => g?.vic === p))) << 7 // holding or held by a champ
+          | (p.dizzy > 0) << 8; // stunned on their feet (stars)
         // hips position + every part's rotation; clients rebuild the other positions from the joint anchors (beast.js fk)
         const t = p === me ? add(p.bodies[HIPS].translation(), smooth) : p.bodies[HIPS].translation();
         const out = [p.slot, 1, Math.round(p.daze), flags, Math.ceil(p.cd[0] * 10), Math.ceil(p.cd[1] * 10), r2(t.x), r2(t.y), r2(t.z)];
@@ -911,10 +913,10 @@ export function createSim({ mapId, players, practice = false, roundsToWin = 3, l
     setInput(slot, inp) {
       const p = ps[slot];
       if (!p) return;
-      const yaw = a => typeof a === 'number' && Number.isFinite(a) ? a : null;
-      if (!Array.isArray(inp.i)) { p.input = { x: +inp.x || 0, z: +inp.z || 0, b: inp.b | 0, a: yaw(inp.a) }; return; }
+      const yaw = a => typeof a === 'number' && Number.isFinite(a) ? a : null, dist = d => yaw(d) == null ? null : Math.max(0, Math.min(30, d));
+      if (!Array.isArray(inp.i)) { p.input = { x: +inp.x || 0, z: +inp.z || 0, b: inp.b | 0, a: yaw(inp.a), d: dist(inp.d) }; return; }
       const n = inp.n | 0;
-      inp.i.slice(-8).forEach(([x, z, b, a], k, all) => { const t = n - all.length + 1 + k; if (p.next == null || t >= p.next) p.q.set(t, { x: +x || 0, z: +z || 0, b: b | 0, a: yaw(a) }); });
+      inp.i.slice(-8).forEach(([x, z, b, a, d], k, all) => { const t = n - all.length + 1 + k; if (p.next == null || t >= p.next) p.q.set(t, { x: +x || 0, z: +z || 0, b: b | 0, a: yaw(a), d: dist(d) }); });
       p.newest = Math.max(p.newest, n);
       // first input, or way behind after a lag spike (feed() only trims a tick every 2s): line up 2 ticks behind
       if (p.next == null || p.newest - p.next > 30) { p.next = p.newest - 2; for (const t of p.q.keys()) if (t < p.next) p.q.delete(t); }
