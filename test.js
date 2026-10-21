@@ -300,6 +300,8 @@ function lineUp(sim, gap = 1.1) {
   run(sim, 60, () => { sim.setInput(0, { x: 0, z: 0, b: 0 }); sim.setInput(1, { x: 1, z: 0, b: BTN.JUMP }); });
   const slow = torso(sim, 1).x - x0;
   assert.ok(sim.snapshot().g.length === 1 && slow < 1.6, `glued: slow (${slow.toFixed(2)}m in 1s)`);
+  run(sim, 2, i => sim.setInput(1, { x: 0, z: 0, b: i ? 0 : BTN.A2 }));
+  assert.ok(sim.players[1].cd[1] === 0, 'no abilities in enemy glue');
   sim = near('singed', 'blitz');
   run(sim, 90);
   lineUp(sim, 1.1);

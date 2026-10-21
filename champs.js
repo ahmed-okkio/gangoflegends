@@ -38,14 +38,14 @@ export const CHAMPS = {
   thresh: {
     name: 'Thresh', title: 'The Chain Warden', body: '#3d4a3f', limb: '#2b352d', eyes: '#7dff9a', glow: '#7dff9a',
     abilities: [
-      { id: 'sentence', name: 'Death Sentence', cd: 10, aim: 9, release: true, desc: 'Hold to aim at your cursor, let go to throw your hook. It drags the first champ it hits a little toward you and stays chained to them for 2s: press again to leap to them.' },
+      { id: 'sentence', name: 'Death Sentence', cd: 10, aim: 9, release: true, desc: 'Hold to aim at your cursor, let go to throw your hook. It drags the first champ it hits a little toward you and holds them helpless on the chain for 2s: press again to fly all the way to them.' },
       { id: 'flay', name: 'Flay', cd: 7, aim: 3, release: true, desc: 'Hold to aim, let go to sweep your chain through a line, flinging everyone in it over and behind you.' },
     ],
   },
   singed: {
     name: 'Singed', title: 'The Mad Chemist', body: '#7a8a5a', limb: '#5b6844', eyes: '#d4ff3d', glow: '#a6ff00',
     abilities: [
-      { id: 'adhesive', name: 'Mega Adhesive', cd: 9, aim: 6.5, release: true, radius: 1.6, desc: 'Hold to aim, let go to lob a glue puddle. Champs in it move slowly and can not jump for 3s.' },
+      { id: 'adhesive', name: 'Mega Adhesive', cd: 9, aim: 6.5, release: true, radius: 1.6, desc: 'Hold to aim, let go to lob a glue puddle. Enemies in it move slowly and can not jump or use abilities for 3s.' },
       { id: 'fling', name: 'Fling', cd: 7, desc: 'Grab the champ next to you and hurl them over your head behind you.' },
     ],
   },

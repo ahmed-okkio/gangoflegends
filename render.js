@@ -23,7 +23,7 @@ const PROPS = {
   vi: [['hair', HEAD], ['gauntletL', FORE, 'fist'], ['gauntletR', FORE + 1, 'fist']],
   sett: [['jacket', CHEST], ['fist', FORE, 'fist'], ['fist', FORE + 1, 'fist']],
   ali: [['horns', HEAD], ['cuff', FORE], ['cuff', FORE + 1]],
-  thresh: [['hood', HEAD], ['lantern', FORE]],
+  thresh: [['crown', HEAD], ['pauldrons', CHEST], ['lantern', FORE]],
   singed: [['tank', CHEST], ['goggles', HEAD]],
 };
 const PROP_FILE = { blitz: 'blitzcrank', hec: 'hecarim', vi: 'vi', sett: 'sett', ali: 'alistar', thresh: 'thresh', singed: 'singed' };

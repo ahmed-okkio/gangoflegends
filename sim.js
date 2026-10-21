@@ -151,7 +151,7 @@ export function createSim({ mapId, players, practice = false, roundsToWin = 3, l
       alive: true, yaw, daze: 0, sinceHit: 9, ko: 0, cd: [0, 0], punch: null, punchCd: 0, grabs: [null, null], held: [0, 0],
       stun: 0, spin: 0, spinHit: null, charge: 0, empower: 0, jumpT: 0, phase: 0, grounded: false, prevB: p.input.b,
       butt: null, buttCd: 0, lying: false, climb: 0, safe: 0, hooked: 0, spinA: 0, chargeT: 0,
-      emp: null, dash: null, vault: 0, vaultBtn: 0, hay: 0, hayBtn: 0, fb: 0, pulv: 0, flay: 0, fling: 0, tether: null,
+      emp: null, dash: null, vault: 0, vaultBtn: 0, hay: 0, hayBtn: 0, fb: 0, pulv: 0, flay: 0, fling: 0, tether: null, leap: null,
     });
   }
 
@@ -214,7 +214,7 @@ export function createSim({ mapId, players, practice = false, roundsToWin = 3, l
   }
   // drop whatever the player was doing: knocked out, or caught by a hook
   function cancel(p) {
-    p.spin = 0; p.charge = 0; p.punch = null; p.butt = null; p.dash = null; p.vault = 0; p.hay = 0;
+    p.spin = 0; p.charge = 0; p.punch = null; p.butt = null; p.dash = null; p.vault = 0; p.hay = 0; p.leap = null;
     releaseGrabs(p);
   }
   const wake = p => setLegGroups(p, legGroups(p));
@@ -342,9 +342,7 @@ export function createSim({ mapId, players, practice = false, roundsToWin = 3, l
     p.tether = null;
     if (local < 0) hooks = hooks.filter(h => h.o !== p);
     if (!q?.alive) return;
-    const d = sub(q.bodies[TORSO].translation(), t), n = Math.hypot(d.x, d.z) || 1;
-    for (const b of p.bodies) b.setLinvel(V(d.x / n * 13, 3 + Math.max(0, d.y) * 2, d.z / n * 13), true);
-    p.jumpT = 0.4;
+    p.leap = { slot: q.slot, t: 0 }; // reeled in until he reaches them (control())
     fx('swing', t, 0, p.slot);
   }
   // Thresh E: sweep the chain through a line ahead, flinging everyone in it over and behind him
@@ -365,11 +363,12 @@ export function createSim({ mapId, players, practice = false, roundsToWin = 3, l
     const at = add(t, mul(f, ab.aim - ab.radius)), ray = world.castRay(new RAPIER.Ray(V(at.x, t.y + 1, at.z), DOWN), 12, true, undefined, (1 << 16) | 1); // floor only
     fx('swing', t, 0, p.slot);
     if (local >= 0 || !ray) return;
-    const g = { x: at.x, y: t.y + 1 - ray.timeOfImpact, z: at.z, t: GLUE_T, r: ab.radius };
+    const g = { x: at.x, y: t.y + 1 - ray.timeOfImpact, z: at.z, t: GLUE_T, r: ab.radius, team: p.team };
     glue.push(g);
     fx('glue', V(g.x, g.y, g.z), 0, p.slot);
   }
-  const glued = tp => glue.some(g => Math.hypot(tp.x - g.x, tp.z - g.z) < g.r && tp.y > g.y - 0.3 && tp.y < g.y + 1.6);
+  // in an enemy's glue (Singed and his team walk through their own)
+  const glued = (p, tp) => glue.some(g => g.team !== p.team && Math.hypot(tp.x - g.x, tp.z - g.z) < g.r && tp.y > g.y - 0.3 && tp.y < g.y + 1.6);
   // Singed E: grab the nearest champ beside him and throw them over his head to the other side
   function fling(p, t) {
     p.fling = 0.3;
@@ -450,7 +449,8 @@ export function createSim({ mapId, players, practice = false, roundsToWin = 3, l
       // key is let go; the held ones (Vi Q) start on press. Either way the champ turns to the cursor while held.
       // "lock" ones (Sett Q) take the cursor's aim on press and keep it.
       const aim = typeof inp.a === 'number' ? inp.a : null, abs = CHAMPS[p.champ].abilities;
-      for (const i of [0, 1]) {
+      if (glued(p, p.bodies[TORSO].translation())) p.aimBtn = 0; // stuck in enemy glue: no abilities
+      else for (const i of [0, 1]) {
         const btn = i ? BTN.A2 : BTN.A1;
         if (!abs[i].release) {
           if (pressed & btn) { if (abs[i].lock && aim != null && p.cd[i] <= 0) p.yaw = aim; useAbility(p, i); }
@@ -475,6 +475,11 @@ export function createSim({ mapId, players, practice = false, roundsToWin = 3, l
       if (move && inp.b & p.vaultBtn && p.vault < 4.25) { p.vault += DT; speed *= 0.35; }
       else { const w = Math.min(p.vault, 1.25); p.dash = { t: 0.2 + w * 0.3, power: w / 1.25 }; p.vault = 0; }
     }
+    if (p.leap) { // Thresh's Death Sentence recast: reeled along the chain all the way to them
+      const q = ps[p.leap.slot], d = q?.alive && sub(q.bodies[TORSO].translation(), tp);
+      if (!d || len(d) < 1.2 || (p.leap.t += DT) > 1) p.leap = null;
+      else { const v = add(mul(d, 14 / len(d)), V(0, 0.8, 0)); for (const b of p.bodies) b.setLinvel(v, true); p.jumpT = 0.1; }
+    }
     if (p.dash) { speed = 11; mx = f.x; mz = f.z; if ((p.dash.t -= DT) <= 0) p.dash = null; }
     // Sett Q: hold to plant and wind up, let go (or hold past 3 s) to throw it
     if (p.hay > 0) {
@@ -482,7 +487,7 @@ export function createSim({ mapId, players, practice = false, roundsToWin = 3, l
       else { if (move) haymaker(p, f, tp, hayK(p)); p.hay = 0; }
     }
     p.fb -= DT; p.pulv -= DT; p.flay -= DT; p.fling -= DT;
-    const stuck = glued(tp);
+    const stuck = glued(p, tp);
     if (stuck) speed *= 0.3;
     if (lying) speed = 1.2; // crawl
     const k = (p.grounded ? 0.2 : 0.04) * move;
@@ -709,7 +714,8 @@ export function createSim({ mapId, players, practice = false, roundsToWin = 3, l
         h.o.tether = h.vic.slot;
         const vp = h.vic.bodies[TORSO].translation(), to = sub(h.o.bodies[TORSO].translation(), vp), d = len(to);
         h.pos = vp;
-        if (h.pull < 0.12 && d > 1.4) { h.vic.hooked = 0.1; const v = add(mul(to, 6 / d), V(0, 1, 0)); for (const b of h.vic.bodies) b.setLinvel(v, true); }
+        h.vic.hooked = 0.1; // limp and helpless for as long as the chain holds, like Blitzcrank's hook
+        if (h.pull < 0.12 && d > 1.4) { const v = add(mul(to, 6 / d), V(0, 1, 0)); for (const b of h.vic.bodies) b.setLinvel(v, true); }
         return true;
       }
       h.vic.hooked = 0.1; // limp for as long as the pull lasts
@@ -756,7 +762,7 @@ export function createSim({ mapId, players, practice = false, roundsToWin = 3, l
   // error is measured against my history at that tick and the difference is folded into the present.
   function sync(s, e) {
     st = s.st;
-    glue = (s.g ?? []).map(([x, y, z, t, r]) => ({ x, y, z, t, r }));
+    glue = (s.g ?? []).map(([x, y, z, t, r, team]) => ({ x, y, z, t, r, team }));
     me.tether = null;
     for (const h of s.h ?? []) if (h[0] === local && h[4] >= 0) me.tether = h[4];
     s.ch?.forEach((c, i) => { if (CHAMPS[c]) ps[i].champ = c; });
@@ -865,7 +871,7 @@ export function createSim({ mapId, players, practice = false, roundsToWin = 3, l
         return out;
       }),
       h: hooks.map(h => [h.o.slot, r2(h.pos.x), r2(h.pos.y), r2(h.pos.z), h.thresh && h.vic ? h.vic.slot : -1]),
-      g: glue.map(g => [r2(g.x), r2(g.y), r2(g.z), r2(g.t), g.r]),
+      g: glue.map(g => [r2(g.x), r2(g.y), r2(g.z), r2(g.t), g.r, g.team]),
       ch: ps.map(p => p.champ),
     };
   }
