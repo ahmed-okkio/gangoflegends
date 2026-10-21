@@ -692,13 +692,14 @@ export function createSim({ mapId, players, practice = false, roundsToWin = 3, l
     p.lifted = vic || null;
   }
 
-  // play back the next queued client input (setInput), one per step. Ran dry (a late packet): hold the last input and
-  // don't advance, so the late one still plays when it lands instead of being dropped (a dropped press = a missed cast
-  // the client already predicted). The buffer grows to the network's jitter on its own, and shrinks back a tick at a
-  // time while it stays deeper than needed for 2s.
+  // play back the next queued client input (setInput), one per step. Ran dry (a late packet): don't advance, so the late
+  // one still plays when it lands instead of being dropped (a dropped press = a missed cast the client already
+  // predicted), and pause their champ meanwhile (step()). The buffer grows to the network's jitter on its own, and
+  // shrinks back a tick at a time while it stays deeper than needed for 2s.
   function feed(p) {
+    p.dry = false;
     if (!p.q.has(p.next)) {
-      if (!p.q.size) return;
+      if (!p.q.size) { p.dry = true; return; }
       p.next = Math.min(...p.q.keys()); // a gap that's never coming (every message repeats the last 6 ticks): carry on from what did arrive
     }
     p.input = p.q.get(p.next); p.q.delete(p.next); p.ack = p.next++;
@@ -866,9 +867,15 @@ export function createSim({ mapId, players, practice = false, roundsToWin = 3, l
     glue = glue.filter(g => (g.t -= DT) > 0);
     if (st === 'count' && (timer -= DT) <= 0) st = 'fight';
     const active = st !== 'count';
-    for (const p of ps) { if (p.next != null) feed(p); if (p.alive) { control(p, active); belts(p); } }
+    for (const p of ps) { if (p.next != null) feed(p); if (p.alive && !p.dry) { control(p, active); belts(p); } }
     stepHooks();
+    // a client whose inputs ran dry (a stall: the relay, TURN over TCP) is paused for the step, unless something is
+    // happening to them. Kept walking on the last input, they ran ahead of their own predicted copy by the whole stall,
+    // then the late inputs played on top and they got yanked back (measured: no more >0.5m corrections walking over TCP)
+    const paused = ps.filter(p => p.dry && p.alive && p.stun <= 0 && p.ko <= 0 && !(p.hooked > 0) && p.sinceHit > 0.5
+      && !p.grabs.some(g => g?.vic) && !ps.some(q => q.grabs?.some(g => g?.vic === p))).map(p => p.bodies.map(b => [b, b.translation(), b.rotation(), b.linvel(), b.angvel()]));
     world.step();
+    for (const bs of paused) for (const [b, t, r, v, w] of bs) { b.setTranslation(t, true); b.setRotation(r, true); b.setLinvel(v, true); b.setAngvel(w, true); }
 
     for (const p of ps) {
       if (p.alive && inKill(p.bodies[TORSO].translation())) { fx('out', p.bodies[TORSO].translation()); removeRagdoll(p); p.respawn = 1.5; }
