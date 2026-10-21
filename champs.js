@@ -17,14 +17,14 @@ export const CHAMPS = {
   vi: {
     name: 'Vi', title: 'The Piltover Enforcer', body: '#5b6b8c', limb: '#45526d', eyes: '#7fd3ff', glow: '#ff5fae',
     abilities: [
-      { id: 'vault', name: 'Vault Breaker', cd: 6, aim: 5, desc: 'Hold to wind up (aimed at your cursor), let go to dash and punch the first champ you hit. Longer windup, bigger hit.' },
+      { id: 'vault', name: 'Vault Breaker', cd: 6, aim: 5.95, aimMin: 2.2, windup: 1.25, desc: 'Hold to wind up (aimed at your cursor), let go to dash and punch the first champ you hit. Longer windup, bigger hit.' },
       { id: 'relentless', name: 'Relentless Force', cd: 4, desc: 'Your next punch smashes through its target into everyone behind it.' },
     ],
   },
   sett: {
     name: 'Sett', title: 'The Boss', body: '#c97a52', limb: '#9a5a3a', eyes: '#ffd166', glow: '#ffb000',
     abilities: [
-      { id: 'haymaker', name: 'Haymaker', cd: 8, range: 2.4, cone: 0.6, core: 0.35, desc: 'Getting hit fills your Grit. Hold to plant and charge it in (taking half daze), let go for a cone punch as strong as the Grit spent.' },
+      { id: 'haymaker', name: 'Haymaker', cd: 8, lock: true, rangeMin: 2, range: 5, windup: 1.5, cone: 0.4, base: 0.6, core: 0.175, desc: 'Hold to plant and wind up toward your cursor (taking half daze); everyone sees it coming. Let go for a cone punch: the longer the windup, the further and harder it hits.' },
       { id: 'facebreaker', name: 'Facebreaker', cd: 7, desc: 'Yank everyone close into you and stun them. Catch champs on both sides for a long stun.' },
     ],
   },

@@ -59,5 +59,6 @@ export function playEvents(events) {
     else if (kind === 'swing') play('swing', 0.35);
     else if (kind === 'grab') play('grab', 0.5);
     else if (kind === 'fb') { play('swing', 0.7); play('grab', 0.6); }
+    else if (kind === 'vi') play('swing', 0.8);
   }
 }

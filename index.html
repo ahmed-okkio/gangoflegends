@@ -158,6 +158,9 @@
   #keys { position: absolute; right: 20px; bottom: 20px; display: grid; gap: 6px; justify-items: end; font-size: 12.5px; color: #d6e0dd; text-shadow: 0 1px 3px #000; }
   #keys span { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; justify-content: flex-end; }
   body.playing:has(#escMenu.hidden), body.playing:has(#escMenu.hidden) * { cursor: none !important; }
+  /* in a match the mouse is locked to the window (game.js) and this crosshair is the cursor */
+  #crosshair { position: fixed; left: 0; top: 0; z-index: 50; pointer-events: none; display: none; }
+  body.playing:has(#escMenu.hidden) #crosshair { display: block; }
   #escMenu { position: absolute; inset: 0; pointer-events: auto; padding: 44px 56px; display: flex; flex-direction: column; justify-content: center; align-items: flex-start; gap: 4px;
     background: linear-gradient(90deg, rgba(6,16,20,.96) 0, rgba(6,16,20,.9) 420px, rgba(6,16,20,.35)); }
   #escMenu h2 { font-size: 54px; margin-bottom: 18px; }
@@ -206,6 +209,11 @@
   <div id="updTitle">Checking for updates…</div><div class="bar"><div id="updFill"></div></div><div id="updTxt">One moment</div>
 </div>
 <canvas id="view"></canvas>
+<svg id="crosshair" width="32" height="32" viewBox="0 0 32 32" fill="none" stroke-linecap="round">
+  <g stroke="#000" stroke-opacity=".5" stroke-width="4"><circle cx="16" cy="16" r="8"/><path d="M16 2v6M16 24v6M2 16h6M24 16h6"/></g>
+  <g stroke="#c8aa6e" stroke-width="2"><circle cx="16" cy="16" r="8"/><path d="M16 2v6M16 24v6M2 16h6M24 16h6"/></g>
+  <circle cx="16" cy="16" r="2.2" fill="#0ac8b9" stroke="#000" stroke-opacity=".6"/>
+</svg>
 
 <div id="menu" class="shell">
   <aside class="rail">

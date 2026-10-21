@@ -38,6 +38,7 @@ function show(screen) {
   for (const s of ['menu', 'lobby', 'hud']) $(s).classList.toggle('hidden', s !== screen);
   $('escMenu').classList.add('hidden');
   document.body.classList.toggle('playing', screen === 'hud'); // hides the cursor unless the Esc menu is up
+  if (screen === 'hud') lockMouse(); else document.exitPointerLock();
 }
 
 // ---------- controls: rebindable, saved on this machine ----------
@@ -295,19 +296,41 @@ addEventListener('keydown', e => {
   if (e.target.tagName === 'INPUT') return;
   keys.add(e.code);
   if (game && $('escMenu').classList.contains('hidden')) e.preventDefault(); // Space would click a focused button, Ctrl+key would act
-  if (e.code === 'Escape' && game) {
-    if (game.setup.practice) { game = null; show('menu'); }
-    else { $('escMenu').classList.toggle('hidden'); ui($('escMenu').classList.contains('hidden') ? 'close' : 'open'); }
-  }
+  if (e.code === 'Escape' && game) escape();
 });
+// Esc in a match: practice ends, a real match toggles the pause menu. Chromium also drops the mouse lock on Esc, and may
+// or may not pass the key on, so a lost lock counts as Esc too; one press within 300 ms is the same press
+let escAt = 0;
+function escape() {
+  if (performance.now() - escAt < 300) return;
+  escAt = performance.now();
+  if (game.setup.practice) { game = null; show('menu'); }
+  else { $('escMenu').classList.toggle('hidden'); ui($('escMenu').classList.contains('hidden') ? 'close' : 'open'); }
+  if (!$('escMenu').classList.contains('hidden') || !game) document.exitPointerLock(); else lockMouse();
+}
 addEventListener('keyup', e => keys.delete(e.code));
 addEventListener('blur', () => { keys.clear(); mouse.clear(); });
-$('view').addEventListener('mousedown', e => { mouse.add(e.button); if (e.button === 1) e.preventDefault(); }); // middle click: no autoscroll
+$('view').addEventListener('mousedown', e => { mouse.add(e.button); if (e.button === 1) e.preventDefault(); lockMouse(); }); // middle click: no autoscroll
 addEventListener('mouseup', e => mouse.delete(e.button));
-let cursor = null; // aims abilities (readInput)
-$('view').addEventListener('mousemove', e => { cursor = [e.clientX, e.clientY]; });
+// the mouse is locked to the window in a match (it can't wander onto another screen mid-fight); the crosshair is a
+// virtual cursor moved by the raw mouse motion and kept inside the view. cursor aims abilities (readInput)
+let cursor = null;
+const locked = () => document.pointerLockElement === $('view');
+function lockMouse() {
+  if (game && !locked() && $('escMenu').classList.contains('hidden')) $('view').requestPointerLock()?.catch?.(() => {}); // needs a click first
+}
+function moveCursor(x, y) {
+  const r = $('view').getBoundingClientRect();
+  cursor = [Math.min(r.right - 1, Math.max(r.left, x)), Math.min(r.bottom - 1, Math.max(r.top, y))];
+  $('crosshair').style.transform = `translate(${cursor[0] - 16}px, ${cursor[1] - 16}px)`;
+}
+addEventListener('mousemove', e => { if (locked()) moveCursor(cursor[0] + e.movementX, cursor[1] + e.movementY); else moveCursor(e.clientX, e.clientY); });
+document.addEventListener('pointerlockchange', () => {
+  if (locked()) { cursor ??= [innerWidth / 2, innerHeight / 2]; moveCursor(...cursor); }
+  else if (game && $('escMenu').classList.contains('hidden') && document.hasFocus()) escape(); // Esc released it (not alt-tab)
+});
 addEventListener('contextmenu', e => { if (game || rebinding) e.preventDefault(); });
-$('resumeBtn').onclick = () => $('escMenu').classList.add('hidden');
+$('resumeBtn').onclick = () => { $('escMenu').classList.add('hidden'); lockMouse(); };
 // volume sliders (menu + Esc menu) share one saved setting each
 function slider(cls, key, def, apply, sample) {
   const els = document.querySelectorAll('.' + cls), outs = document.querySelectorAll(`.${cls}Out`);
@@ -345,18 +368,22 @@ function readInput() {
   const a = game && cursor ? view.aimYaw(...cursor, game.mySlot) : null; // abilities aim at the cursor
   return { x: Math.round(x * side * 100) / 100, z: Math.round(z * side * 100) / 100, b, a: a == null ? null : Math.round(a * 100) / 100 };
 }
-// my skillshot strip: shown while an aimed ability's key is held, if it was ready when pressed (sim.js casts the same way)
-const aiming = [false, false];
-function showAim(inp) {
+// my skillshot strip: shown while an aimed ability's key is held, if it was ready when pressed (sim.js casts the same way).
+// A windup ability's (aimMin) strip grows to its full reach over the windup
+const aiming = [false, false], held = [0, 0];
+function showAim(inp, dt) {
   const abs = CHAMPS[game.setup.players[game.mySlot].champ].abilities, mine = game.cur?.p[game.mySlot];
-  let shown = null;
+  let range = 0;
   [BTN.A1, BTN.A2].forEach((btn, i) => {
+    const ab = abs[i];
     if (!(inp.b & btn)) aiming[i] = false;
-    else if (!aiming[i] && !(game.lastB & btn)) aiming[i] = !!abs[i].aim && !(mine?.[4 + i] > 0);
-    if (aiming[i] && inp.a != null) shown = { slot: game.mySlot, yaw: inp.a, range: abs[i].aim };
+    else if (!aiming[i] && !(game.lastB & btn)) { aiming[i] = !!ab.aim && !(mine?.[4 + i] > 0); held[i] = 0; }
+    if (!aiming[i]) return;
+    held[i] += dt;
+    range = ab.aimMin ? ab.aimMin + (ab.aim - ab.aimMin) * Math.min(1, held[i] / ab.windup) : ab.aim;
   });
   game.lastB = inp.b;
-  view.setAim(shown);
+  view.setAim(inp.a == null ? null : { slot: game.mySlot, yaw: inp.a, range });
 }
 
 // ---------- loop ----------
@@ -367,7 +394,7 @@ function frame(now) {
   last = now;
   if (!game) { runAttract(dt); return; }
   const inp = $('escMenu').classList.contains('hidden') ? readInput() : { x: 0, z: 0, b: 0, a: null };
-  showAim(inp);
+  showAim(inp, dt);
   if (game.sim) {
     acc += dt;
     while (acc >= DT) {

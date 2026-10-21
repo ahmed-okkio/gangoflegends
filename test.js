@@ -199,14 +199,12 @@ function lineUp(sim, gap = 1.1) {
     { id: 'a', name: 'A', champ: 'sett', team: 0 }, { id: 'b', name: 'B', champ: 'hec', team: 1 }, { id: 'c', name: 'C', champ: 'blitz', team: 2 }] });
   run(sim, 90);
   lineUp(sim, 1.4);
-  // Haymaker: hold to pour Grit in; full Grit hits far harder than none, and Sett stands still while charging
-  sim.players[0].grit = 100;
+  // Haymaker: a full windup hits hard, and Sett stands still while winding up
   const hx = torso(sim, 0).x;
   let moved = 0;
   run(sim, 120, i => { sim.setInput(0, { x: 1, z: 0, b: i < 100 ? BTN.A1 : 0 }); if (i === 99) moved = torso(sim, 0).x - hx; });
   assert.ok(Math.abs(moved) < 0.3, `stands still while charging (${moved})`);
   assert.ok(sim.players[1].daze >= 70 || sim.players[1].ko > 0, `full haymaker hits hard (${sim.players[1].daze})`);
-  assert.ok(sim.players[0].grit < 5, 'uses up the Grit');
   // C goes behind Sett, B in front: Facebreaker catches both and stuns
   lineUp(sim, 1.2);
   const c = sim.players[2], at = torso(sim, 0), ct = c.bodies[0].translation();

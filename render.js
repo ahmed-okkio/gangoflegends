@@ -194,7 +194,8 @@ export function createRenderer(canvas) {
   const particles = [];
   const pGroup = new THREE.Group();
   scene.add(pGroup);
-  function emit(pos, { color = '#fff', n = 8, speed = 4, size = 0.25, life = 0.5, grav = -6, spread = 1, up = 0, additive = true, opacity = 1 }) {
+  // dir: a heading the burst leans along (the random spread is added to it); grow: puffs that swell as they fade (smoke)
+  function emit(pos, { color = '#fff', n = 8, speed = 4, size = 0.25, life = 0.5, grav = -6, spread = 1, up = 0, additive = true, opacity = 1, dir = null, grow = false }) {
     for (let i = 0; i < n; i++) {
       let p = particles.find(q => q.life <= 0);
       if (!p) {
@@ -203,8 +204,10 @@ export function createRenderer(canvas) {
         pGroup.add(p.sprite);
         particles.push(p);
       }
-      const d = new THREE.Vector3(rand(-1, 1), rand(-1, 1) * spread + up, rand(-1, 1)).normalize().multiplyScalar(speed * rand(0.4, 1));
-      Object.assign(p, { vel: d, life: life * rand(0.7, 1.2), max: life, size: size * rand(0.7, 1.3), grav, opacity });
+      const d = new THREE.Vector3(rand(-1, 1), rand(-1, 1) * spread + up, rand(-1, 1));
+      if (dir) d.multiplyScalar(0.45).add(dir);
+      d.normalize().multiplyScalar(speed * rand(0.4, 1));
+      Object.assign(p, { vel: d, life: life * rand(0.7, 1.2), max: life, size: size * rand(0.7, 1.3), grav, opacity, grow });
       p.max = p.life;
       p.sprite.material.color.set(color);
       p.sprite.material.blending = additive ? THREE.AdditiveBlending : THREE.NormalBlending;
@@ -222,7 +225,7 @@ export function createRenderer(canvas) {
       p.sprite.position.addScaledVector(p.vel, dt);
       const k = p.life / p.max;
       p.sprite.material.opacity = k * p.opacity;
-      p.sprite.scale.setScalar(p.size * (0.5 + k * 0.7));
+      p.sprite.scale.setScalar(p.size * (p.grow ? 2 - k * 1.4 : 0.5 + k * 0.7));
     }
   }
   const rings = [];
@@ -267,6 +270,11 @@ export function createRenderer(canvas) {
         ring(v, '#ffb000', 2.4, true, 0.35);
         ring(v, '#ffffff', 2.4, true, 0.2);
         shake = Math.max(shake, 0.12);
+      } else if (kind === 'vi') { // Relentless Force: a blast of smoke shoved out through the cone behind the target (sim.js relentless)
+        const dir = tmp2.set(Math.sin(big), 0, Math.cos(big));
+        emit(v, { color: '#c9a3b6', n: 22, speed: 6, size: 1.1, life: 0.9, grav: 0.6, dir, grow: true, additive: false, opacity: 0.7 });
+        emit(v, { color: '#ff5fae', n: 10, speed: 8, size: 0.18, life: 0.4, grav: 0, dir });
+        shake = Math.max(shake, 0.15);
       } else if (kind === 'out') {
         emit(v, { color: '#ffffff', n: 30, speed: 6, size: 0.5, life: 0.9, grav: 2, additive: false, opacity: 0.8 });
         emit(v, { color: '#ff7a3d', n: 16, speed: 8, size: 0.35, life: 0.5, grav: 0 });
@@ -676,30 +684,27 @@ export function createRenderer(canvas) {
     // Rampage swirl
     const swirl = new THREE.Mesh(new THREE.TorusGeometry(0.75, 0.05, 6, 40).rotateX(Math.PI / 2), new THREE.MeshBasicMaterial({ color: c.eyes, transparent: true, opacity: 0.6, blending: THREE.AdditiveBlending, depthWrite: false }));
     group.add(swirl);
-    // Sett's Grit bar over his head: dark back, orange fill, bright part = what the Haymaker being charged will spend
-    let grit = null;
-    if (champId === 'sett') {
-      const bar = (c, o, z) => { const s = new THREE.Sprite(new THREE.SpriteMaterial({ color: c, depthTest: false, opacity: o, transparent: true })); s.center.set(0, 0.5); s.renderOrder = 10 + z; group.add(s); return s; };
-      grit = { back: bar('#0b1426', 0.75, 0), fill: bar('#ff8a00', 1, 1), use: bar('#fff3b0', 1, 2) };
-    }
-    // Haymaker range on the floor while it charges, like League's indicator: the cone, its brighter centre strip
-    // (hits harder) and an edge that fills in with the Grit going into it
+    // Haymaker range on the floor while it charges, like League's indicator: the cone at full reach, its brighter centre
+    // strip (hits harder) and a fill out to the reach wound up so far
     let hay = null;
     if (champId === 'sett') {
-      const { range, cone, core } = c.abilities[0];
+      const { range, cone, base, core } = c.abilities[0], back = base / Math.tan(cone); // the shape sim.js haymaker hits
       const mat = (o, col = '#ffb000') => new THREE.MeshBasicMaterial({ color: col, transparent: true, opacity: o, depthWrite: false, side: THREE.DoubleSide, blending: THREE.AdditiveBlending });
       const flat = g => g.rotateX(Math.PI / 2); // drawn in xy pointing +y; laid on the floor pointing +z
+      // the cone between from and to metres past Sett, its point back behind him
+      const sector = (from, to) => flat(new THREE.RingGeometry(back + from, back + to, 40, 1, Math.PI / 2 - cone, cone * 2).translate(0, -back, 0));
       hay = new THREE.Group();
-      hay.add(new THREE.Mesh(flat(new THREE.CircleGeometry(range, 40, Math.PI / 2 - cone, cone * 2)), mat(0.12)));
-      hay.add(new THREE.Mesh(flat(new THREE.RingGeometry(range - 0.06, range, 40, 1, Math.PI / 2 - cone, cone * 2)), mat(0.7)));
+      hay.add(new THREE.Mesh(sector(0, range), mat(0.12)));
+      hay.add(new THREE.Mesh(sector(range - 0.06, range), mat(0.7)));
       hay.add(new THREE.Mesh(flat(new THREE.PlaneGeometry(core * 2, range * 0.95).translate(0, range * 0.475, 0)), mat(0.12, '#fff3b0')));
-      hay.fill = new THREE.Mesh(flat(new THREE.CircleGeometry(range, 40, Math.PI / 2 - cone, cone * 2)), mat(0.22, '#ff8a00'));
+      hay.fill = new THREE.Mesh(sector(0, range), mat(0.22, '#ff8a00'));
+      hay.reach = r => { r = Math.round(r * 20) / 20; if (r !== hay.fill.r) { hay.fill.r = r; hay.fill.geometry.dispose(); hay.fill.geometry = sector(0, r); } };
       hay.add(hay.fill);
       for (const m of hay.children) m.renderOrder = 5;
       hay.visible = false;
       group.add(hay);
     }
-    return { group, parts, tag, stars, fists, swirl, grit, hay, champId, glow: c.glow ?? '#ff8a00', torsoMat: body, glowBase: body.emissive.clone(), eyes: c.eyes, q: PARTS.map(() => [0, 0, 0, 1]), pos: PARTS.map(() => [0, 0, 0]) };
+    return { group, parts, tag, stars, fists, swirl, hay, champId, glow: c.glow ?? '#ff8a00', torsoMat: body, glowBase: body.emissive.clone(), eyes: c.eyes, q: PARTS.map(() => [0, 0, 0, 1]), pos: PARTS.map(() => [0, 0, 0]) };
   }
 
   const qa = new THREE.Quaternion(), qb = new THREE.Quaternion(), tmp = new THREE.Vector3(), tmp2 = new THREE.Vector3();
@@ -731,21 +736,15 @@ export function createRenderer(canvas) {
       }
       const flags = pb[3], head = av.parts[HEAD].position, torso = av.parts[CHEST].position;
       av.tag.position.copy(head).y += 0.65;
-      if (av.grit) {
-        const x = 9 + PARTS.length * 4, w = 0.9, h = 0.1, { back, fill, use } = av.grit;
-        for (const [s, k] of [[back, 1], [fill, (pb[x] ?? 0) / 100], [use, (pb[x + 1] ?? 0) / 100]]) {
-          s.position.copy(head); s.position.x -= cam.side * w / 2; s.position.y += 0.9; // left end, as seen from the camera; just above the name
-          s.scale.set(Math.max(0.001, w * k), h, 1);
-        }
-      }
       if (av.hay) {
+        // winding up: everyone sees it, locked to Sett's yaw (sent in the snapshot, so it doesn't sway with his body)
+        const x = 9 + PARTS.length * 4;
         av.hay.visible = !!(flags & 64);
         if (av.hay.visible) {
-          const fwd = tmp2.set(0, 0, 1).applyQuaternion(av.parts[CHEST].quaternion);
           av.hay.position.set(torso.x, av.parts[HIPS].position.y - HIP_HEIGHT + 0.04, torso.z);
-          av.hay.rotation.y = Math.atan2(fwd.x, fwd.z);
-          const k = Math.max(0.15, (pb[9 + PARTS.length * 4 + 1] ?? 0) / 100); // Grit going in = how far the fill reaches
-          av.hay.fill.scale.set(k, 1, k);
+          av.hay.rotation.y = pb[x + 8] ?? 0;
+          const { rangeMin, range } = CHAMPS.sett.abilities[0], k = (pb[x] ?? 0) / 100;
+          av.hay.reach(rangeMin + (range - rangeMin) * k);
         }
       }
       const dizzy = flags & 16 ? 3 : pb[2] >= 60 ? 2 : 0;
@@ -813,7 +812,7 @@ export function createRenderer(canvas) {
   }
 
   // aiming, mine only: the cursor's point on the floor under my champ -> a world yaw, and a League-style skillshot
-  // strip under my champ while an aimed ability is held (game.js)
+  // strip under my champ while an aimed ability is held (game.js; range 0 = no strip)
   const aimRay = new THREE.Raycaster(), aimPlane = new THREE.Plane(new THREE.Vector3(0, 1, 0), 0), aimHit = new THREE.Vector3();
   const aimBar = new THREE.Mesh(new THREE.PlaneGeometry(1, 1).rotateX(-Math.PI / 2).translate(0, 0, 0.5),
     new THREE.MeshBasicMaterial({ color: '#0ac8b9', transparent: true, opacity: 0.3, depthWrite: false, blending: THREE.AdditiveBlending }));
@@ -830,7 +829,7 @@ export function createRenderer(canvas) {
 
   function render(dt) {
     time += dt;
-    const me = aim && avatars[aim.slot];
+    const me = aim?.range && avatars[aim.slot];
     aimBar.visible = !!me;
     if (me) { const hp = me.parts[HIPS].position; aimBar.position.set(hp.x, hp.y - HIP_HEIGHT + 0.05, hp.z); aimBar.rotation.y = aim.yaw; aimBar.scale.set(0.7, 1, aim.range); }
     for (const fn of animated) fn({ dt, time });
