@@ -234,6 +234,17 @@ function lineUp(sim, gap = 1.1) {
   assert.ok(hits > 0 && s.hay > 0 && s.ko <= 0, 'still winding up after being punched');
 }
 
+// 10c. switching champ: right away in practice, next round in a match
+{
+  const sim = near('blitz', 'hec');
+  run(sim, 30);
+  sim.setChamp(0, 'sett');
+  assert.ok(sim.players[0].champ === 'sett' && sim.players[0].alive && sim.snapshot().ch[0] === 'sett', 'practice: swapped now');
+  const m = createSim({ mapId: 'girders', players: [{ id: 'a', name: 'A', champ: 'blitz', team: 0 }, { id: 'b', name: 'B', champ: 'hec', team: 1 }] });
+  m.setChamp(0, 'vi');
+  assert.ok(m.players[0].champ === 'blitz', 'match: not until the next round');
+}
+
 // 11. a hooked champ goes limp and can't punch back
 {
   const sim = near('blitz', 'vi');

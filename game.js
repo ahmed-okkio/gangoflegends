@@ -164,7 +164,11 @@ $('hostBtn').onclick = async () => {
   conn.on('msg', (id, m) => {
     if (m.t === 'chat') hostChat(id, m.text);
     else if (m.t === 'in' && game?.sim) game.sim.setInput(game.setup.players.findIndex(p => p.id === id), m);
-    else if (m.t === 'pick' && CHAMPS[m.champ]) { const p = lobby.players.find(p => p.id === id); if (p) { p.champ = m.champ; pushLobby(); } }
+    else if (m.t === 'pick' && CHAMPS[m.champ]) {
+      const p = lobby.players.find(p => p.id === id);
+      if (p) { p.champ = m.champ; pushLobby(); }
+      game?.sim?.setChamp(game.setup.players.findIndex(p => p.id === id), m.champ); // mid-match: from next round
+    }
   });
   conn.on('leave', id => {
     lobby.players = lobby.players.filter(p => p.id !== id);
@@ -259,16 +263,44 @@ async function startGame(setup) {
   else game.local = createSim({ mapId: setup.map, players: setup.players, local: game.mySlot }); // my champ, predicted (sim.js)
   attract = null;
   view.setMatch(setup);
-  const mine = CHAMPS[setup.players[game.mySlot]?.champ ?? 'blitz'];
-  $('abil').innerHTML = mine.abilities.map((a, i) => `<div class="slot"><kbd data-act="a${i + 1}"></kbd><b>${a.name}</b><i></i><span class="cd"></span></div>`).join('');
-  showKeys();
+  abilityHud();
+  escChamps();
   show('hud');
 }
+function abilityHud() {
+  const mine = CHAMPS[game.setup.players[game.mySlot]?.champ ?? 'blitz'];
+  $('abil').innerHTML = mine.abilities.map((a, i) => `<div class="slot"><kbd data-act="a${i + 1}"></kbd><b>${a.name}</b><i></i><span class="cd"></span></div>`).join('');
+  showKeys();
+}
+// Esc menu: switch champ for the next round (practice: right away)
+function escChamps() {
+  const now = game.setup.players[game.mySlot]?.champ;
+  $('escChamps').innerHTML = Object.entries(CHAMPS).map(([id, c]) =>
+    `<button class="${id === me.champ ? 'on' : ''}" data-id="${id}" data-sfx="pick" style="--c:${c.body};--e:${c.eyes}"><span class="bean"></span>${c.name}</button>`).join('');
+  $('escChampNote').textContent = me.champ === now ? '' : game.setup.practice ? '' : `${CHAMPS[me.champ].name} from next round`;
+}
+$('escChamps').onclick = e => {
+  const id = e.target.closest('button')?.dataset.id;
+  if (!id || !game) return;
+  me.champ = id; store.set('champ', id);
+  for (const g of [$('champs'), $('lobbyChamps')]) for (const b of g.children) b.classList.toggle('on', b.dataset.id === id);
+  $('champName').textContent = CHAMPS[id].name;
+  if (game.sim) { game.sim.setChamp(game.mySlot, id); if (lobby) lobby.players[0].champ = id; }
+  else conn.send({ t: 'pick', champ: id });
+  escChamps();
+};
 
 const teamName = t => game.setup.teams ? `${TEAM_NAMES[t]} Team` : game.setup.players[t]?.name ?? '?';
 const plural = t => game.setup.teams ? 'win' : 'wins';
 function updateHud(s, now) {
   const { setup } = game;
+  // someone's champ swap went through (a new round started): rebuild their beast, and my ability bar if it's me
+  s.ch?.forEach((c, i) => {
+    if (!setup.players[i] || setup.players[i].champ === c || !CHAMPS[c]) return;
+    setup.players[i].champ = c;
+    view.setChamp(i, c);
+    if (i === game.mySlot) { abilityHud(); escChamps(); }
+  });
   if (setup.practice) $('scores').innerHTML = `<span class="chip">Practice on ${MAPS[setup.map].name}</span>`;
   else if (setup.teams) $('scores').innerHTML = s.sc.slice(0, setup.teams).map((n, t) => `<span class="chip" style="--pc:${TEAM_COLORS[t]}">${TEAM_NAMES[t]} <b>${n}</b></span>`).join('');
   else $('scores').innerHTML = setup.players.map((p, i) => `<span class="chip ${s.p[i]?.[1] ? '' : 'out'}" style="--pc:${playerColor(setup, i)}">${esc(p.name)} <b>${s.sc[i] ?? 0}</b></span>`).join('');

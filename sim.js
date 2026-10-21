@@ -119,6 +119,7 @@ export function createSim({ mapId, players, practice = false, roundsToWin = 3, l
   let order = shuffle(map.spawns.map((_, i) => i));
 
   function spawn(p, at = order[p.slot % order.length]) {
+    if (p.nextChamp) { p.champ = p.nextChamp; p.nextChamp = null; } // picked from the Esc menu mid-match
     const [sx, sy, sz] = map.spawns[at];
     const yaw = Math.atan2(-sx, -sz); // face the middle
     const q = qyaw(yaw), base = V(sx, sy + 0.05, sz);
@@ -545,7 +546,7 @@ export function createSim({ mapId, players, practice = false, roundsToWin = 3, l
         if (p.spinHit.has(vic)) continue;
         p.spinHit.add(vic);
         const vt = vic.bodies[TORSO].translation();
-        hit(vic, part, add(mul(norm(V(vt.x - tp.x, 0, vt.z - tp.z)), 6), V(0, 2, 0)), 24);
+        hit(vic, part, add(mul(norm(V(vt.x - tp.x, 0, vt.z - tp.z)), 7.5), V(0, 2.5, 0)), 24);
       }
     }
     if (p.dash) {
@@ -562,7 +563,7 @@ export function createSim({ mapId, players, practice = false, roundsToWin = 3, l
       if (first) { // hits as hard as the gallop has built up
         const r = Math.min(1, p.chargeT / RAMP);
         p.charge = 0;
-        hit(first.vic, first.part, add(mul(f, 5 + 6 * r), V(0, 1.5 + 2.5 * r, 0)), 20 + 25 * r);
+        hit(first.vic, first.part, mul(add(mul(f, 5 + 6 * r), V(0, 1.5 + 2.5 * r, 0)), 1.25), 20 + 25 * r);
         addVel(T, mul(f, -2));
       }
     }
@@ -668,6 +669,7 @@ export function createSim({ mapId, players, practice = false, roundsToWin = 3, l
   // error is measured against my history at that tick and the difference is folded into the present.
   function sync(s, e) {
     st = s.st;
+    s.ch?.forEach((c, i) => { if (CHAMPS[c]) ps[i].champ = c; });
     if (!e[1]) { if (me.alive) removeRagdoll(me); return; }
     const x = 9 + PARTS.length * 4, hp = V(e[6], e[7], e[8]), hv = V(e[x + 1], e[x + 2], e[x + 3]), ack = e[x + 4];
     // countdown: my inputs land on the host a round trip (tick - ack) after this snapshot's clock, so start moving that much early
@@ -762,6 +764,7 @@ export function createSim({ mapId, players, practice = false, roundsToWin = 3, l
         return out;
       }),
       h: hooks.map(h => [h.o.slot, r2(h.pos.x), r2(h.pos.y), r2(h.pos.z)]),
+      ch: ps.map(p => p.champ),
     };
   }
 
@@ -784,6 +787,13 @@ export function createSim({ mapId, players, practice = false, roundsToWin = 3, l
       p.newest = Math.max(p.newest, n);
       // first input, or way behind after a lag spike (feed() only trims a tick every 2s): line up 2 ticks behind
       if (p.next == null || p.newest - p.next > 30) { p.next = p.newest - 2; for (const t of p.q.keys()) if (t < p.next) p.q.delete(t); }
+    },
+    // switch champ from the next round on (practice: right away, respawning somewhere free)
+    setChamp(slot, id) {
+      const p = ps[slot];
+      if (!p || !CHAMPS[id]) return;
+      p.nextChamp = id;
+      if (practice && p.alive) { removeRagdoll(p); spawn(p, freeSpawn()); }
     },
     drop(slot) { const p = ps[slot]; if (p) { p.left = true; removeRagdoll(p); } },
   };

@@ -856,5 +856,13 @@ export function createRenderer(canvas) {
     composer.render(dt);
   }
 
-  return { setMatch, apply, fx, render, aimYaw, setAim: a => { aim = a; }, avatars: () => avatars, get camSide() { return cam.side; } };
+  // a champ swapped mid-match (sim.js setChamp): rebuild that beast
+  function setChamp(slot, champ) {
+    const p = setup.players[slot];
+    world.remove(avatars[slot].group);
+    avatars[slot] = makeAvatar(champ, playerColor(setup, slot), p.name, !!setup.teams);
+    world.add(avatars[slot].group);
+  }
+
+  return { setMatch, setChamp, apply, fx, render, aimYaw, setAim: a => { aim = a; }, avatars: () => avatars, get camSide() { return cam.side; } };
 }
