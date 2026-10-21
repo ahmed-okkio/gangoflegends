@@ -54,6 +54,17 @@ function lineUp(sim, gap = 1.1) {
   assert.ok(kos <= 1, `no chain KO right after waking (${kos})`);
 }
 
+// 2b. punch aim assist: someone off to the side, but in front, still gets hit
+{
+  const sim = near('blitz', 'hec');
+  run(sim, 90);
+  lineUp(sim, 0.9);
+  for (const b of sim.players[1].bodies) { const t = b.translation(); b.setTranslation({ x: t.x, y: t.y, z: t.z + 0.75 }, true); }
+  run(sim, 22, i => sim.setInput(0, { x: 0, z: 0, b: i < 3 ? BTN.LEFT : 0 }));
+  console.log('aim assist daze', sim.players[1].daze.toFixed(0));
+  assert.ok(sim.players[1].daze > 0, 'punch tracks a target off to the side');
+}
+
 // 3. Blitz hook pulls from range
 {
   const sim = near('blitz', 'hec');

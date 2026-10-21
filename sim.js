@@ -191,6 +191,17 @@ export function createSim({ mapId, players, practice = false, roundsToWin = 3, l
     }
     return [...seen.values()];
   }
+  // Gang Beasts' punch targeting: the nearest beast of another team within reach and in front of me (a 120° cone)
+  function punchTarget(p, f) {
+    const tp = p.bodies[TORSO].translation();
+    let best = null, bd = 1.6;
+    for (const q of ps) {
+      if (q.team === p.team || !q.bodies) continue;
+      const d = sub(q.bodies[TORSO].translation(), tp), h = Math.hypot(d.x, d.z);
+      if (h < bd && d.x * f.x + d.z * f.z > h * 0.5) { best = q; bd = h; }
+    }
+    return best;
+  }
 
   function hit(vic, part, dv, daze) {
     if (local >= 0) return; // a prediction copy only learns about hits from the host
@@ -540,8 +551,11 @@ export function createSim({ mapId, players, practice = false, roundsToWin = 3, l
     // punching turns the shoulders into it: wound back, then the punching side drives forward (that's the reach)
     const cock = p.held.findIndex(h => h > 0 && h < TAP && p.grounded);
     const tw = p.punch ? (p.punch.arm ? 0.7 : -0.7) : cock >= 0 ? (cock ? -0.3 : 0.3) : 0;
-    orient(p.bodies[WAIST], qmul(qyaw(p.yaw + p.spinA + tw * 0.4), qaxis(X, lean * 0.5)), 10, up, [T, ...UPPER.map(i => p.bodies[i])]);
-    orient(T, qmul(qyaw(p.yaw + p.spinA + tw), qaxis(X, lean)), 20, up, UPPER.map(i => p.bodies[i]));
+    // a punch with a target tracks it: the shoulders turn to them and the fist (below) flies at them.
+    // ponytail: on a prediction copy the target is a stand-in at hip height, so my own fist aims ~20cm low until the host corrects it
+    const aimTo = p.punch?.to?.bodies && sub(p.punch.to.bodies[TORSO].translation(), tp), ay = aimTo ? Math.atan2(aimTo.x, aimTo.z) : p.yaw + p.spinA;
+    orient(p.bodies[WAIST], qmul(qyaw(ay + tw * 0.4), qaxis(X, lean * 0.5)), 10, up, [T, ...UPPER.map(i => p.bodies[i])]);
+    orient(T, qmul(qyaw(ay + tw), qaxis(X, lean)), 20, up, UPPER.map(i => p.bodies[i]));
     orient(H, qmul(yq, qaxis(X, lean * 0.6)), 20, up);
 
     const hspeed = Math.hypot(tv.x, tv.z), gait = Math.min(1, hspeed / 2);
@@ -553,10 +567,11 @@ export function createSim({ mapId, players, practice = false, roundsToWin = 3, l
       if (ctrl && inp.b & HANDS[arm]) p.held[arm] += DT;
       else if (p.held[arm] > 0) {
         if (p.held[arm] < TAP && !p.grabs[arm] && move && p.punchCd <= 0 && p.spin <= 0) {
-          p.punch = { arm, t: 0, hit: new Set() }; // already drawn back while the button was down
+          const to = punchTarget(p, f), d = to && sub(to.bodies[TORSO].translation(), tp);
+          p.punch = { arm, t: 0, hit: new Set(), to }; // already drawn back while the button was down
           p.punchCd = 0.25;
           fx('swing', handPos(p, arm), 0, p.slot);
-          addVel(T, mul(f, 1.5)); // lunge into it
+          addVel(T, mul(d ? norm(V(d.x, 0, d.z)) : f, 1.5)); // lunge into it
         }
         p.held[arm] = 0;
       }
@@ -590,8 +605,8 @@ export function createSim({ mapId, players, practice = false, roundsToWin = 3, l
       if (p.fb > 0) { ua = fa = p.fb > 0.18 ? add(mul(side, s), mul(bf, -0.3)) : add(mul(side, s * 0.15), bf); str = 0.9; }
       // punch: the fist sweeps round from the side to the front (a short hook) out of the cocked pose below
       if (p.punch?.arm === i) {
-        const u = Math.min(1, p.punch.t / 0.1);
-        ua = add(add(mul(side, s * 0.9 * (1 - u)), mul(bf, 0.3 + 0.7 * u)), V(0, 0.15, 0)); fa = add(bf, V(0, 0.1, 0)); str = 0.9; fs = 0.8;
+        const u = Math.min(1, p.punch.t / 0.1), d = aimTo ? norm(aimTo) : bf, sd = norm(V(d.z, 0, -d.x));
+        ua = add(add(mul(sd, s * 0.9 * (1 - u)), mul(d, 0.3 + 0.7 * u)), V(0, 0.15, 0)); fa = add(d, V(0, 0.1, 0)); str = 0.9; fs = 0.8;
       }
       if (p.spin > 0) { ua = fa = add(mul(side, s), mul(bf, 0.1)); str = 0.5; fs = 0.4; }
       if (p.held[i] > 0 && !grabbing[i] && p.punch?.arm !== i) { ua = add(add(mul(bf, -0.5), mul(side, s * 0.7)), V(0, -0.3, 0)); fa = add(bf, V(0, 0.3, 0)); str = 0.6; fs = 0.7; } // cocked: elbow back and out
@@ -622,15 +637,15 @@ export function createSim({ mapId, players, practice = false, roundsToWin = 3, l
     // punch hits land as hard as the fist is moving, so a spinning or running punch carries the body's momentum
     if (p.punch && p.punch.t > 0.01) {
       const arm = p.bodies[FORE + p.punch.arm], hp = handPos(p, p.punch.arm);
-      const fv = add(arm.linvel(), cross(arm.angvel(), sub(hp, arm.worldCom())));
+      const fv = add(arm.linvel(), cross(arm.angvel(), sub(hp, arm.worldCom()))), pf = aimTo ? norm(V(aimTo.x, 0, aimTo.z)) : f;
       for (const { vic, part } of playersNear(p, hp, 0.2)) {
         if (p.punch.hit.has(vic)) continue;
         const sp = len(sub(fv, vic.bodies[part].linvel()));
         if (sp < 2.5) continue; // a resting fist just pushes
         p.punch.hit.add(vic);
-        if (p.empower > 0 && p.emp === 'through') { p.empower = 0; relentless(p, vic, part, f); }
-        else if (p.empower > 0) { p.empower = 0; hit(vic, part, add(mul(f, 2), V(0, 10, 0)), 45); }
-        else { const k = Math.min(sp, 12) / 6; hit(vic, part, add(mul(norm(add(norm(fv), f)), 2.2 * k), V(0, 0.6, 0)), 20 * k); }
+        if (p.empower > 0 && p.emp === 'through') { p.empower = 0; relentless(p, vic, part, pf); }
+        else if (p.empower > 0) { p.empower = 0; hit(vic, part, add(mul(pf, 2), V(0, 10, 0)), 45); }
+        else { const k = Math.min(sp, 12) / 6; hit(vic, part, add(mul(norm(add(norm(fv), pf)), 2.2 * k), V(0, 0.6, 0)), 20 * k); }
       }
     }
     if (p.spin > 0) for (let i = 0; i < 2; i++) {
