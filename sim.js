@@ -194,8 +194,10 @@ export function createSim({ mapId, players, practice = false, roundsToWin = 3, l
     if (dv.y > 2) vic.jumpT = Math.max(vic.jumpT, 0.3); // don't let the hover spring swallow a launch
     // knocked out, or just back up from it: still gets knocked around, but no stagger or daze, so no chain stuns
     if (vic.ko > 0 || vic.safe > 0) return;
-    vic.stun = Math.max(vic.stun, 0.15 + len(dv) * 0.04); // let the knockback play out before control returns
-    vic.daze += daze * (part === HEAD ? 1.5 : 1) * (vic.hay > 0 ? 0.5 : 1); // Sett's Haymaker windup shrugs off half
+    // let the knockback play out before control returns. Sett's Haymaker windup doesn't flinch (only a knockout stops it)
+    // and shrugs off half the daze
+    if (!(vic.hay > 0)) vic.stun = Math.max(vic.stun, 0.15 + len(dv) * 0.04);
+    vic.daze += daze * (part === HEAD ? 1.5 : 1) * (vic.hay > 0 ? 0.5 : 1);
     if (vic.daze >= 100) knockOut(vic);
   }
 
@@ -339,7 +341,7 @@ export function createSim({ mapId, players, practice = false, roundsToWin = 3, l
       const d = sub(o.bodies[TORSO].translation(), apex), dist = Math.hypot(d.x, d.z), along = (d.x * f.x + d.z * f.z);
       if (dist < back || dist > back + range || Math.abs(d.y) > 1.2 || along < dist * Math.cos(cone)) continue;
       const centre = Math.abs(d.x * f.z - d.z * f.x) < core;
-      hit(o, TORSO, mul(add(mul(f, centre ? 5 + 9 * k : 4 + 6 * k), V(0, 1.5 + 2 * k, 0)), 0.75), (centre ? 25 + 75 * k : 15 + 45 * k) * 0.75);
+      hit(o, TORSO, mul(add(mul(f, centre ? 5 + 9 * k : 4 + 6 * k), V(0, 1.5 + 2 * k, 0)), 1.125), (centre ? 25 + 75 * k : 15 + 45 * k) * 1.125);
     }
   }
 
@@ -374,13 +376,13 @@ export function createSim({ mapId, players, practice = false, roundsToWin = 3, l
     if (move) {
       if (p.charge > 0) { if (m > 0.2) p.yaw = turnToward(p.yaw, Math.atan2(mx, mz), 3 * DT); }
       else if (m > 0.2 && !p.dash && !(p.hay > 0)) p.yaw = Math.atan2(mx, mz); // a Haymaker windup holds its aim
-      // aiming (input.a: the cursor's yaw, null = where you face): "release" abilities (hook, charge) go off when the
+      // aiming (input.a: the cursor's yaw, null = where you face): "release" abilities (hook) go off when the
       // key is let go; the held ones (Vi Q) start on press. Either way the champ turns to the cursor while held.
       // "lock" ones (Sett Q) take the cursor's aim on press and keep it.
       const aim = typeof inp.a === 'number' ? inp.a : null, abs = CHAMPS[p.champ].abilities;
       for (const i of [0, 1]) {
         const btn = i ? BTN.A2 : BTN.A1;
-        if (!abs[i].release || (abs[i].id === 'charge' && p.charge > 0)) {
+        if (!abs[i].release) {
           if (pressed & btn) { if (abs[i].lock && aim != null && p.cd[i] <= 0) p.yaw = aim; useAbility(p, i); }
           continue;
         }
@@ -571,7 +573,9 @@ export function createSim({ mapId, players, practice = false, roundsToWin = 3, l
       if (!grabbing[i] || p.over) { if (p.grabs[i]) { world.removeImpulseJoint(p.grabs[i].j, true); p.grabs[i] = null; } continue; }
       if (p.grabs[i]) continue;
       const arm = p.bodies[FORE + i], hp = handPos(p, i);
-      const c = overlap(hp, 0.16, worldAndOthers(p))[0], target = c?.parent();
+      // a prediction copy only grabs the world: another champ's stand-in trails the host by the ping, and a joint to it
+      // dragged me around (holding each other floated and teleported). The host's grab reaches me through sync()
+      const c = overlap(hp, 0.16, worldAndOthers(p)).find(c => !owner.get(c.handle)?.proxy), target = c?.parent();
       if (!target) continue;
       const local = qrot(qconj(target.rotation()), sub(hp, target.translation()));
       const j = world.createImpulseJoint(RAPIER.JointData.spherical(V(...HAND[i]), local), arm, target, true);
@@ -681,18 +685,21 @@ export function createSim({ mapId, players, practice = false, roundsToWin = 3, l
     else if (!(e[3] & 16) && me.ko > 0) { me.ko = 0; wake(me); }
     if (e[3] & 16) me.ko = e[x + 7];
     me.safe = e[3] & 32 ? Math.max(me.safe, 0.1) : 0;
+    me.tied = !!(e[3] & 128); // holding / held by a champ: two ragdolls tied together only the host can simulate
     const h = hist.get(ack);
     if (!h) return;
-    const limp = me.ko > 0 || me.hooked > 0, dp = sub(hp, h.pos), dv = sub(hv, h.vel);
+    const limp = me.ko > 0 || me.hooked > 0 || me.tied, dp = sub(hp, h.pos), dv = sub(hv, h.vel);
     err = len(dp);
     // standing up, the hover spring bobs the two copies slightly out of phase: their heights differ by centimetres and
     // their vertical speeds by metres a second. Correcting that kicked me into the floor and back (bouncing, falling
     // through at high ping), so only a real gap (launched, fell) counts vertically
     if (!limp && Math.abs(dp.y) < 0.3) dp.y = 0;
     if (!limp && Math.abs(dv.y) < 4) dv.y = 0;
-    // correct the whole error at once (the drawn copy eases it in through `smooth`), velocity only when it's well off;
-    // tiny errors are left alone (no shimmer). Knocked out or hooked I'm drawn from the host's state, so stay right on it.
-    const d = len(dp), kp = d < 0.03 && !limp ? 0 : 1, kv = len(dv) > 2.5 || limp ? 1 : len(dv) < 0.2 ? 0 : 0.2;
+    // ragdolls never match exactly and the stand-ins I bump into trail by the ping, so small drift (<10cm) is left alone,
+    // a moderate one is pulled in a third per snapshot (eased in through `smooth`, no visible snap), and only a real
+    // gap (>0.5m: a hit I didn't see) is taken at once. Velocity only when it's well off. Knocked out, hooked or tied to
+    // someone I'm drawn from the host's state, so stay right on it.
+    const d = len(dp), kp = limp || d > 0.5 ? 1 : d < 0.1 ? 0 : 0.35, kv = len(dv) > 3 || limp ? 1 : len(dv) < 0.5 ? 0 : 0.2;
     const cp = mul(dp, kp), cv = mul(dv, kv);
     shift(cp, cv);
     if (d < 4) smooth = sub(smooth, cp); // not a respawn-sized jump
@@ -743,7 +750,8 @@ export function createSim({ mapId, players, practice = false, roundsToWin = 3, l
       st, tm: Math.ceil(timer), t: r2(timer), rn: round, mt: r3(mt), sc: scores, win,
       p: ps.map(p => {
         if (!p.alive) return [p.slot, 0];
-        const flags = (p.spin > 0) | (p.charge > 0) << 1 | (p.empower > 0) << 2 | (p.grabs.some(Boolean)) << 3 | (p.ko > 0) << 4 | (p.safe > 0) << 5 | (p.vault > 0 || p.hay > 0) << 6;
+        const flags = (p.spin > 0) | (p.charge > 0) << 1 | (p.empower > 0) << 2 | (p.grabs.some(Boolean)) << 3 | (p.ko > 0) << 4 | (p.safe > 0) << 5 | (p.vault > 0 || p.hay > 0) << 6
+          | (p.grabs.some(g => g?.vic) || ps.some(q => q.grabs?.some(g => g?.vic === p))) << 7; // holding or held by a champ
         // hips position + every part's rotation; clients rebuild the other positions from the joint anchors (beast.js fk)
         const t = p === me ? add(p.bodies[HIPS].translation(), smooth) : p.bodies[HIPS].translation();
         const out = [p.slot, 1, Math.round(p.daze), flags, Math.ceil(p.cd[0] * 10), Math.ceil(p.cd[1] * 10), r2(t.x), r2(t.y), r2(t.z)];

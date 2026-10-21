@@ -478,8 +478,9 @@ function frame(now) {
     const at = now / 1000 + game.off - game.delay;
     while (s.length > 2 && s[1].mt <= at) s.shift();
     const a = s[0], b = s[1] ?? a, alpha = b === a ? 1 : Math.min(1, Math.max(0, (at - a.mt) / (b.mt - a.mt)));
-    // me: between my last two local steps, unless knocked out or hooked (then the host's ragdoll is the truth)
-    const me = local.players[game.mySlot], limp = !me.alive || me.ko > 0 || me.hooked > 0;
+    // me: between my last two local steps, unless knocked out, hooked or grabbing / grabbed by someone (then the host's
+    // ragdoll is the truth, and drawn on the same clock as whoever I'm tied to)
+    const me = local.players[game.mySlot], limp = !me.alive || me.ko > 0 || me.hooked > 0 || me.tied;
     view.apply(a, b, alpha, limp ? null : { slot: game.mySlot, a: game.mine[0] ?? game.mine[1], b: game.mine[1], alpha: acc / DT });
     b.p.forEach((e, i) => { const o = a.p[i]; local.place(i, ...(e[1] && o?.[1] ? [6, 7, 8].map(k => o[k] + (e[k] - o[k]) * alpha) : [0, -100, 0])); });
     game.cur = { ...b, p: b.p.map((e, i) => i === game.mySlot && !limp ? game.mine[1] : e) };

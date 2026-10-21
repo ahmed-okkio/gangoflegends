@@ -11,7 +11,7 @@ export const CHAMPS = {
     name: 'Hecarim', title: 'The Shadow of War', body: '#2f6274', limb: '#1d3f4c', eyes: '#5ff7d2',
     abilities: [
       { id: 'rampage', name: 'Rampage', cd: 4, desc: 'Spin with both fists out, smacking everyone around you. Works on the move and mid-charge.' },
-      { id: 'charge', name: 'Devastating Charge', cd: 8, aim: 6, release: true, desc: 'Hold to aim at your cursor, let go to gallop, building up speed, and bowl over the first champ you reach. Faster hits harder. Press again to stop.' },
+      { id: 'charge', name: 'Devastating Charge', cd: 8, desc: 'Gallop, building up speed, and bowl over the first champ you reach. Steer as you go; faster hits harder. Press again to stop.' },
     ],
   },
   vi: {
@@ -24,7 +24,7 @@ export const CHAMPS = {
   sett: {
     name: 'Sett', title: 'The Boss', body: '#c97a52', limb: '#9a5a3a', eyes: '#ffd166', glow: '#ffb000',
     abilities: [
-      { id: 'haymaker', name: 'Haymaker', cd: 8, lock: true, rangeMin: 2, range: 5, windup: 1.5, cone: 0.4, base: 0.6, core: 0.175, desc: 'Hold to plant and wind up toward your cursor (taking half daze); everyone sees it coming. Let go for a cone punch: the longer the windup, the further and harder it hits.' },
+      { id: 'haymaker', name: 'Haymaker', cd: 8, lock: true, rangeMin: 2, range: 5, windup: 1.5, cone: 0.4, base: 0.6, core: 0.175, desc: 'Hold to plant and wind up toward your cursor: punches can not stop it (only a knockout can) and deal half daze. Everyone sees it coming. Let go for a cone punch: the longer the windup, the further and harder it hits.' },
       { id: 'facebreaker', name: 'Facebreaker', cd: 7, desc: 'Yank everyone close into you and stun them. Catch champs on both sides for a long stun.' },
     ],
   },
