@@ -212,14 +212,22 @@ export function createSim({ mapId, players, practice = false, roundsToWin = 3, l
     fx('ko', p.bodies[HEAD].translation());
     p.ko = 3.2; p.daze = 0;
     cancel(p);
+    down(p);
+  }
+  // knocked out: legs collide like the rest, and the body slides easily (less friction and drag) so it gets shoved around
+  function down(p) {
     setLegGroups(p, bodyGroups(p));
+    for (const b of p.bodies) { b.setLinearDamping(0.4); for (let c = 0; c < b.numColliders(); c++) b.collider(c).setFriction(0.35); }
   }
   // drop whatever the player was doing: knocked out, or caught by a hook
   function cancel(p) {
     p.spin = 0; p.charge = 0; p.punch = null; p.butt = null; p.dash = null; p.vault = 0; p.hay = 0; p.leap = null;
     releaseGrabs(p);
   }
-  const wake = p => setLegGroups(p, legGroups(p));
+  function wake(p) {
+    setLegGroups(p, legGroups(p));
+    for (const b of p.bodies) { b.setLinearDamping(1); for (let c = 0; c < b.numColliders(); c++) b.collider(c).setFriction(0.8); }
+  }
   function setLegGroups(p, g) {
     p.bodies.forEach((b, i) => { if (isLeg(i)) for (let c = 0; c < b.numColliders(); c++) b.collider(c).setCollisionGroups(g); });
   }
@@ -638,7 +646,7 @@ export function createSim({ mapId, players, practice = false, roundsToWin = 3, l
       const [first] = [0, ...(p.dash.ali ? [0.9, 1.8] : [])].flatMap(h => playersNear(p, add(tp, add(mul(f, 0.45), V(0, h, 0))), 0.6));
       if (first) {
         const k = p.dash.power, air = !first.vic.grounded; // Alistar's Headbutt sends someone already airborne much further
-        if (p.dash.ali) hit(first.vic, first.part, add(mul(f, air ? 14 : 9.7), V(0, air ? 4 : 3, 0)), air ? 40 : 30);
+        if (p.dash.ali) hit(first.vic, first.part, add(mul(f, air ? 11.2 : 7.8), V(0, air ? 4 : 3, 0)), air ? 40 : 30);
         else hit(first.vic, first.part, mul(add(mul(f, 6 + k * 6), V(0, 2 + k * 2, 0)), 0.85), (25 + k * 20) * 0.85); // Vi Q
         p.dash = null;
         addVel(T, mul(f, -2));
@@ -786,7 +794,7 @@ export function createSim({ mapId, players, practice = false, roundsToWin = 3, l
     me.cd = me.cd.map((c, i) => Math.max(c, e[4 + i] / 10 - 0.2));
     me.stun = Math.max(me.stun, e[x + 5] - lag); // what's left of it now (taken whole, I stayed stunned a round trip longer than the host's me)
     if (e[x + 6]) me.hooked = 0.1;
-    if (e[3] & 16 && me.ko <= 0) { me.daze = 0; cancel(me); setLegGroups(me, bodyGroups(me)); }
+    if (e[3] & 16 && me.ko <= 0) { me.daze = 0; cancel(me); down(me); }
     else if (!(e[3] & 16) && me.ko > 0) { me.ko = 0; wake(me); }
     if (e[3] & 16) me.ko = e[x + 7];
     me.safe = e[3] & 32 ? Math.max(me.safe, 0.1) : 0;
