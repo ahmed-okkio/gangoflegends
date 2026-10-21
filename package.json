@@ -40,6 +40,8 @@
       "!release/**",
       "!release.cjs",
       "!DESIGN.md",
+      "!research_notes/**",
+      "!reports/**",
       "!assets/props/preview_*.png",
       "!worker/**",
       "!node_modules/three/src/**",

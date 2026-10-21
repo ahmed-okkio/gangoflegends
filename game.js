@@ -6,6 +6,7 @@ import { MAPS } from './maps.js';
 import * as net from './net.js';
 import { prepareMap, loadBeast } from './stages.js';
 import { PARTS } from './beast.js';
+import { packSnap, unpackSnap } from './wire.js';
 import { loadSfx, play, ui, setVolume } from './sfx.js';
 
 const $ = id => document.getElementById(id);
@@ -221,7 +222,7 @@ async function joinLobby(raw) {
 function onSnap(m) {
   if (!game?.local || m.s.mt <= game.lastMt) return; // the unreliable channel can deliver out of order: an older one is stale
   game.lastMt = m.s.mt;
-  game.snaps.push(m.s);
+  game.snaps.push(unpackSnap(m.s));
   // host clock vs mine: the quickest arrival over the last 5s sets the offset (short, so it follows the host's clock when
   // that loses time: a frame of theirs over 0.1s), and the playback delay has to cover how late all but the latest 1% came
   // over the last 30s. Not the average: over TCP (the relay, TURN) a lost packet holds up everything behind it for a round
@@ -546,7 +547,7 @@ function frame(now) {
       // ponytail: full JSON snapshots at 30Hz over PeerJS's reliable channel (~2KB each); move to an unreliable binary channel if 8-player games stutter
       if (conn && ++tick % 2 === 0) {
         game.sentEv = game.sentEv.filter(e => now - e[7] < 250); // each event goes out on ~7 snapshots
-        conn.broadcastFast({ t: 'snap', s: game.cur, ev: game.sentEv.map(e => e.slice(0, 7)) });
+        conn.broadcastFast({ t: 'snap', s: packSnap(game.cur), ev: game.sentEv.map(e => e.slice(0, 7)) });
       }
     }
     if (!game.cur) return;
@@ -649,7 +650,7 @@ function fakeHost(dt, now) {
     for (const e of game.sim.takeEvents()) h.ev.push([...e, ++h.n, now]);
     if (++h.t % 2) continue;
     h.ev = h.ev.filter(e => now - e[7] < 250);
-    const m = JSON.parse(JSON.stringify({ t: 'snap', s: game.sim.snapshot(), ev: h.ev.map(e => e.slice(0, 7)) }));
+    const m = JSON.parse(JSON.stringify({ t: 'snap', s: packSnap(game.sim.snapshot()), ev: h.ev.map(e => e.slice(0, 7)) }));
     lagged(() => onSnap(m), 'down');
   }
 }

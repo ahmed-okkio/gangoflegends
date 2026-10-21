@@ -2,6 +2,7 @@
 import assert from 'node:assert/strict';
 import { initPhysics, createSim, BTN, STAND } from './sim.js';
 import { prepareMap } from './stages.js';
+import { packSnap, unpackSnap } from './wire.js';
 
 await initPhysics();
 Math.random = () => 0.9999; // spawn shuffle leaves the order alone, so spawns match what these checks were tuned on
@@ -449,8 +450,18 @@ function lineUp(sim, gap = 1.1) {
   const sim = createSim({ mapId: 'girders', players: Array.from({ length: 8 }, (_, i) => ({ id: i, name: 'P', champ: i % 2 ? 'hec' : 'blitz', team: i })) });
   run(sim, 120);
   const bytes = JSON.stringify(sim.snapshot()).length;
-  console.log('8p snapshot bytes', bytes);
-  assert.ok(bytes < 5000);
+  // on the wire (wire.js): rotations packed, and back turned the same to within 0.1 degree
+  const snap = sim.snapshot(), wire = JSON.stringify(packSnap(snap)), back = unpackSnap(JSON.parse(wire));
+  console.log('8p snapshot bytes', bytes, 'on the wire', wire.length);
+  assert.ok(bytes < 5000 && wire.length < bytes * 0.55);
+  assert.deepEqual(back.p.map(e => e.length), snap.p.map(e => e.length));
+  for (const [i, e] of snap.p.entries()) for (let k = 0; k < e.length; k++) {
+    if (k < 9 || k >= e.length - 9) assert.ok(back.p[i][k] === e[k], `field ${k}`); // (=== : JSON makes -0 a 0)
+    else if ((k - 9) % 4 === 0) { // the same turn: the rounded original isn't quite unit length
+      const q = [0, 1, 2, 3].map(j => e[k + j]), dot = q.reduce((t, c, j) => t + c * back.p[i][k + j], 0) / Math.hypot(...q);
+      assert.ok(Math.abs(dot) > 1 - 1e-6, `part ${(k - 9) / 4} turned`);
+    }
+  }
   assert.ok(sim.players.every(p => p.alive), 'nobody falls off at spawn');
 }
 
