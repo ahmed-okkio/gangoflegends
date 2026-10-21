@@ -43,6 +43,7 @@ const HOLD = 20; // m/s^2 lift on the core (= gravity), so the hover spring only
 const SAFE = 2.5; // seconds of daze/stagger immunity after getting up from a knockout
 const CHARGE = 3, RAMP = 1.5; // Hecarim E: lasts 3s, speeds up evenly from walking to full gallop over the first 1.5s
 const FB_R = 2.4; // Sett E reach
+const PULV_R = 2.8; // Alistar Q reach
 const SPIN = 0.3; // Hecarim Q: seconds for its one turn
 const TWIST = 0.7; // how firmly arms hold their roll (aimPart)
 const TAP = 0.2; // a hand let go within this many seconds punches; held longer, it grabs
@@ -148,7 +149,7 @@ export function createSim({ mapId, players, practice = false, roundsToWin = 3, l
       alive: true, yaw, daze: 0, sinceHit: 9, ko: 0, cd: [0, 0], punch: null, punchCd: 0, grabs: [null, null], held: [0, 0],
       stun: 0, spin: 0, spinHit: null, charge: 0, empower: 0, jumpT: 0, phase: 0, grounded: false, prevB: p.input.b,
       butt: null, buttCd: 0, lying: false, climb: 0, safe: 0, hooked: 0, spinA: 0, chargeT: 0,
-      emp: null, dash: null, vault: 0, vaultBtn: 0, hay: 0, hayBtn: 0, fb: 0,
+      emp: null, dash: null, vault: 0, vaultBtn: 0, hay: 0, hayBtn: 0, fb: 0, pulv: 0,
     });
   }
 
@@ -311,6 +312,8 @@ export function createSim({ mapId, players, practice = false, roundsToWin = 3, l
     else if (ab.id === 'relentless') { p.empower = 4; p.emp = 'through'; }
     else if (ab.id === 'haymaker') { p.hay = DT; p.hayBtn = btn; } // charges while held, see control()
     else if (ab.id === 'facebreaker') facebreaker(p, f, t);
+    else if (ab.id === 'pulverize') pulverize(p, t);
+    else if (ab.id === 'headbutt') { p.dash = { t: 0.25, power: 1, ali: true }; fx('swing', t, 0, p.slot); }
   }
 
   // Sett E: yank everyone close on both sides into him and stun them; caught from both sides at once stuns for longer
@@ -324,6 +327,19 @@ export function createSim({ mapId, players, practice = false, roundsToWin = 3, l
     for (const { o, d } of near) {
       hit(o, TORSO, add(mul(norm(V(-d.x, 0, -d.z)), 7), V(0, 1.2, 0)), both ? 35 : 15);
       if (o.ko <= 0 && o.safe <= 0) o.stun = Math.max(o.stun, both ? 1.5 : 0.6);
+    }
+  }
+  // Alistar Q: slam the ground, launching everyone close into the air (stunned while they're up)
+  function pulverize(p, t) {
+    p.pulv = 0.3;
+    fx('pulv', t, 0, p.slot);
+    if (local >= 0) return;
+    for (const o of ps) {
+      if (o === p || !o.alive) continue;
+      const d = sub(o.bodies[TORSO].translation(), t);
+      if (Math.hypot(d.x, d.z) > PULV_R || Math.abs(d.y) > 1.2) continue;
+      hit(o, TORSO, add(mul(norm(V(d.x, 0, d.z)), 1.5), V(0, 9, 0)), 20);
+      if (o.ko <= 0 && o.safe <= 0) o.stun = Math.max(o.stun, 1);
     }
   }
   // Sett Q: a cone punch whose reach and power grow with the windup (k 0..1); the middle of the cone hits hardest
@@ -411,7 +427,7 @@ export function createSim({ mapId, players, practice = false, roundsToWin = 3, l
       if (move && inp.b & p.hayBtn && p.hay < 3) { p.hay += DT; speed = 0; }
       else { if (move) haymaker(p, f, tp, hayK(p)); p.hay = 0; }
     }
-    p.fb -= DT;
+    p.fb -= DT; p.pulv -= DT;
     if (lying) speed = 1.2; // crawl
     const k = (p.grounded ? 0.2 : 0.04) * move;
     const dv = V((mx * speed + gv[0] - tv.x) * k, 0, (mz * speed + gv[2] - tv.z) * k);
@@ -495,6 +511,7 @@ export function createSim({ mapId, players, practice = false, roundsToWin = 3, l
       if (p.hay > 0 && i === 1) { ua = add(mul(bf, -0.8), V(0, 0.4, 0)); fa = add(bf, V(0, 0.6, 0)); str = 0.6; } // cocked back
       if (p.hay > 0 && i === 0) { ua = fa = add(bf, V(0, 0.2, 0)); str = 0.5; } // guard hand out front
       // Facebreaker: arms fling wide, then slam together in front
+      if (p.pulv > 0) { ua = fa = add(mul(bf, 0.6), DOWN); str = 0.9; } // both fists slammed into the floor
       if (p.fb > 0) { ua = fa = p.fb > 0.18 ? add(mul(side, s), mul(bf, -0.3)) : add(mul(side, s * 0.15), bf); str = 0.9; }
       // punch: the fist sweeps round from the side to the front (a short hook) out of the cocked pose below
       if (p.punch?.arm === i) {
@@ -550,11 +567,13 @@ export function createSim({ mapId, players, practice = false, roundsToWin = 3, l
       }
     }
     if (p.dash) {
-      const [first] = playersNear(p, add(tp, mul(f, 0.45)), 0.6);
+      // Alistar's Headbutt also catches someone above him (launched by Pulverize), up to ~2m over his head
+      const [first] = [0, ...(p.dash.ali ? [0.9, 1.8] : [])].flatMap(h => playersNear(p, add(tp, add(mul(f, 0.45), V(0, h, 0))), 0.6));
       if (first) {
-        const k = p.dash.power;
+        const k = p.dash.power, air = !first.vic.grounded; // Alistar's Headbutt sends someone already airborne much further
+        if (p.dash.ali) hit(first.vic, first.part, add(mul(f, air ? 18 : 12), V(0, air ? 4 : 3, 0)), air ? 40 : 30);
+        else hit(first.vic, first.part, add(mul(f, 6 + k * 6), V(0, 2 + k * 2, 0)), 25 + k * 20);
         p.dash = null;
-        hit(first.vic, first.part, add(mul(f, 6 + k * 6), V(0, 2 + k * 2, 0)), 25 + k * 20);
         addVel(T, mul(f, -2));
       }
     }
@@ -604,10 +623,11 @@ export function createSim({ mapId, players, practice = false, roundsToWin = 3, l
   function feed(p) {
     if (!p.q.has(p.next)) {
       if (!p.q.size) return;
-      p.next = Math.min(...p.q.keys()); // a gap that's never coming: carry on from what did arrive
+      p.next = Math.min(...p.q.keys()); // a gap that's never coming (every message repeats the last 6 ticks): carry on from what did arrive
     }
     p.input = p.q.get(p.next); p.q.delete(p.next); p.ack = p.next++;
-    p.slack = Math.min(p.slack, p.newest - p.ack);
+    let ready = 0; while (p.q.has(p.next + ready)) ready++; // the unbroken run waiting (newest - ack overstates it when they come out of order)
+    p.slack = Math.min(p.slack, ready);
     if (++p.win >= 120) {
       const a = p.q.get(p.next), b = p.q.get(p.next + 1);
       if (p.slack > 1 && a && b) { b.b |= a.b; p.q.delete(p.next++); } // skip one, keeping its presses
@@ -664,6 +684,7 @@ export function createSim({ mapId, players, practice = false, roundsToWin = 3, l
     q.bodies = PARTS.map(() => body);
   }
   const hips = () => me.bodies[HIPS];
+  const SX = 9 + PARTS.length * 4; // where a snapshot entry's extras start (see snapshot())
   const shift = (dp, dv) => { for (const b of me.bodies) { b.setTranslation(add(b.translation(), dp), true); addVel(b, dv); } };
   // e: my entry in a host snapshot (see snapshot()). The host's state is my state `ack` local ticks ago, so the
   // error is measured against my history at that tick and the difference is folded into the present.
@@ -671,7 +692,7 @@ export function createSim({ mapId, players, practice = false, roundsToWin = 3, l
     st = s.st;
     s.ch?.forEach((c, i) => { if (CHAMPS[c]) ps[i].champ = c; });
     if (!e[1]) { if (me.alive) removeRagdoll(me); return; }
-    const x = 9 + PARTS.length * 4, hp = V(e[6], e[7], e[8]), hv = V(e[x + 1], e[x + 2], e[x + 3]), ack = e[x + 4];
+    const x = SX, hp = V(e[6], e[7], e[8]), hv = V(e[x + 1], e[x + 2], e[x + 3]), ack = e[x + 4];
     // countdown: my inputs land on the host a round trip (tick - ack) after this snapshot's clock, so start moving that much early
     if (st === 'count') { timer = s.t - (tick - ack) * DT; if (timer <= 0) st = 'fight'; }
     if (!me.alive) { // (re)spawned on the host: start from the spawn point it used
@@ -688,20 +709,28 @@ export function createSim({ mapId, players, practice = false, roundsToWin = 3, l
     if (e[3] & 16) me.ko = e[x + 7];
     me.safe = e[3] & 32 ? Math.max(me.safe, 0.1) : 0;
     me.tied = !!(e[3] & 128); // holding / held by a champ: two ragdolls tied together only the host can simulate
+    // knocked out, hooked or tied to another champ: I'm drawn from the host's state (game.js) and can't predict it, so
+    // the ragdoll is just kept on it, ready to predict from there once I'm free. (Correcting the prediction instead
+    // overshot every snapshot and grew: holding each other and jumping flung me metres up and down.)
+    if (me.ko > 0 || me.hooked > 0 || me.tied) {
+      err = len(sub(hp, hips().translation()));
+      shift(sub(hp, hips().translation()), sub(hv, hips().linvel()));
+      hist.clear(); smooth = V();
+      return;
+    }
     const h = hist.get(ack);
     if (!h) return;
-    const limp = me.ko > 0 || me.hooked > 0 || me.tied, dp = sub(hp, h.pos), dv = sub(hv, h.vel);
+    const dp = sub(hp, h.pos), dv = sub(hv, h.vel);
     err = len(dp);
     // standing up, the hover spring bobs the two copies slightly out of phase: their heights differ by centimetres and
     // their vertical speeds by metres a second. Correcting that kicked me into the floor and back (bouncing, falling
     // through at high ping), so only a real gap (launched, fell) counts vertically
-    if (!limp && Math.abs(dp.y) < 0.3) dp.y = 0;
-    if (!limp && Math.abs(dv.y) < 4) dv.y = 0;
+    if (Math.abs(dp.y) < 0.3) dp.y = 0;
+    if (Math.abs(dv.y) < 4) dv.y = 0;
     // ragdolls never match exactly and the stand-ins I bump into trail by the ping, so small drift (<10cm) is left alone,
     // a moderate one is pulled in a third per snapshot (eased in through `smooth`, no visible snap), and only a real
-    // gap (>0.5m: a hit I didn't see) is taken at once. Velocity only when it's well off. Knocked out, hooked or tied to
-    // someone I'm drawn from the host's state, so stay right on it.
-    const d = len(dp), kp = limp || d > 0.5 ? 1 : d < 0.1 ? 0 : 0.35, kv = len(dv) > 3 || limp ? 1 : len(dv) < 0.5 ? 0 : 0.2;
+    // gap (>0.5m: a hit I didn't see) is taken at once. Velocity only when it's well off.
+    const d = len(dp), kp = d > 0.5 ? 1 : d < 0.1 ? 0 : 0.35, kv = len(dv) > 3 ? 1 : len(dv) < 0.5 ? 0 : 0.2;
     const cp = mul(dp, kp), cv = mul(dv, kv);
     shift(cp, cv);
     if (d < 4) smooth = sub(smooth, cp); // not a respawn-sized jump
@@ -714,10 +743,11 @@ export function createSim({ mapId, players, practice = false, roundsToWin = 3, l
     if (me.alive) { control(me, st !== 'count'); belts(me); }
     world.step();
     if (me.alive) hist.set(tick, { pos: hips().translation(), vel: hips().linvel() });
-    smooth = mul(smooth, 0.8);
+    smooth = mul(smooth, 0.88);
     hist.delete(tick - 240);
   }
-  // others' stand-ins go where the screen shows them (hips position from the interpolated snapshot)
+  // others' stand-ins go where the screen shows them (hips position from the interpolated snapshot). ponytail: tried
+  // extrapolating them to where they'll be when my input reaches the host; overshooting into me shoved me off ledges
   function place(slot, x, y, z) { const q = ps[slot]; if (q !== me) q.bodies[0].setNextKinematicTranslation(V(x, y, z)); }
 
   function step() {

@@ -22,8 +22,9 @@ const PROPS = {
   hec: [['blade', HEAD], ['tail', HIPS], ['hoofHand', FORE], ['hoofHand', FORE + 1], ['hoofFoot', LEG], ['hoofFoot', LEG + 1]],
   vi: [['hair', HEAD], ['gauntletL', FORE, 'fist'], ['gauntletR', FORE + 1, 'fist']],
   sett: [['jacket', CHEST], ['fist', FORE, 'fist'], ['fist', FORE + 1, 'fist']],
+  ali: [['horns', HEAD], ['cuff', FORE], ['cuff', FORE + 1]],
 };
-const PROP_FILE = { blitz: 'blitzcrank', hec: 'hecarim', vi: 'vi', sett: 'sett' };
+const PROP_FILE = { blitz: 'blitzcrank', hec: 'hecarim', vi: 'vi', sett: 'sett', ali: 'alistar' };
 const propScenes = {}; // 'blitz/core' -> parsed glTF scene
 export async function loadProps() {
   if (Object.keys(propScenes).length) return;
@@ -229,15 +230,15 @@ export function createRenderer(canvas) {
     }
   }
   const rings = [];
-  // a ring that bursts outward facing the camera, or (inward) lies on the floor and closes in on its centre
-  function ring(pos, color, size, inward = false, max = 0.3) {
+  // a ring that bursts outward facing the camera, or (inward) lies on the floor and closes in on its centre; flat: on the floor either way
+  function ring(pos, color, size, inward = false, max = 0.3, flat = inward) {
     let r = rings.find(q => q.life <= 0);
     if (!r) {
       r = { m: new THREE.Mesh(new THREE.RingGeometry(0.7, 1, 48), new THREE.MeshBasicMaterial({ transparent: true, blending: THREE.AdditiveBlending, depthWrite: false, side: THREE.DoubleSide })) };
       scene.add(r.m); rings.push(r);
     }
     r.m.position.copy(pos);
-    if (inward) r.m.rotation.set(-Math.PI / 2, 0, 0); else r.m.quaternion.copy(camera.quaternion);
+    if (flat) r.m.rotation.set(-Math.PI / 2, 0, 0); else r.m.quaternion.copy(camera.quaternion);
     r.m.material.color.set(color);
     Object.assign(r, { life: max, max, size, inward });
     r.m.visible = true;
@@ -275,6 +276,12 @@ export function createRenderer(canvas) {
         emit(v, { color: '#c9a3b6', n: 22, speed: 6, size: 1.1, life: 0.9, grav: 0.6, dir, grow: true, additive: false, opacity: 0.7 });
         emit(v, { color: '#ff5fae', n: 10, speed: 8, size: 0.18, life: 0.4, grav: 0, dir });
         shake = Math.max(shake, 0.15);
+      } else if (kind === 'pulv') { // Alistar's Pulverize: a shockwave across the floor and rubble thrown up
+        v.y -= 0.6;
+        ring(v, '#ffb347', 2.8, false, 0.4, true);
+        ring(v, '#ffffff', 2.2, false, 0.25, true);
+        emit(v, { color: '#8a7a66', n: 24, speed: 5, size: 0.4, life: 0.7, grav: 8, up: 4, additive: false, opacity: 0.9 });
+        shake = Math.max(shake, 0.3);
       } else if (kind === 'out') {
         emit(v, { color: '#ffffff', n: 30, speed: 6, size: 0.5, life: 0.9, grav: 2, additive: false, opacity: 0.8 });
         emit(v, { color: '#ff7a3d', n: 16, speed: 8, size: 0.35, life: 0.5, grav: 0 });

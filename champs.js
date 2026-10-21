@@ -28,6 +28,13 @@ export const CHAMPS = {
       { id: 'facebreaker', name: 'Facebreaker', cd: 7, desc: 'Yank everyone close into you and stun them. Catch champs on both sides for a long stun.' },
     ],
   },
+  ali: {
+    name: 'Alistar', title: 'The Minotaur', body: '#6f6680', limb: '#514a5e', eyes: '#ff7043', glow: '#ffb347',
+    abilities: [
+      { id: 'pulverize', name: 'Pulverize', cd: 7, desc: 'Slam the ground, launching everyone around you into the air.' },
+      { id: 'headbutt', name: 'Headbutt', cd: 6, desc: 'Lunge forward and knock the first champ you hit far back. Headbutt someone still in the air from Pulverize to send them flying.' },
+    ],
+  },
 };
 
 export const TEAM_COLORS = ['#ff4d5e', '#3d8bff', '#2ecc71', '#ffc93c'];

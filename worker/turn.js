@@ -1,7 +1,7 @@
 // Cloudflare Worker for Gang of Legends' networking fallbacks.
 //  /room/<CODE>  WebSocket relay: when two players can't connect peer-to-peer (strict NAT, mainland China), the host
 //                and that player both connect here and a Durable Object (one per lobby code) passes messages between them.
-//  /             TURN credentials, once a Cloudflare TURN key is set (worker/secrets.json: TURN_KEY_ID, TURN_KEY_API_TOKEN).
+//  /             TURN credentials (worker secrets TURN_KEY_ID, TURN_KEY_API_TOKEN).
 // Deploy: npx wrangler deploy (from worker/).
 // ponytail: anyone can open (or take over) a room; add auth if that or the free quota (100k requests/day) ever gets abused.
 

@@ -12,6 +12,12 @@ function emitter() {
     emit(type, ...args) { for (const fn of fns[type] || []) fn(...args); },
   };
 }
+// PeerJS's reliable: false only drops ordering; channels labelled 'fast' also never retransmit, so a lost snapshot or
+// input is just skipped (the next one supersedes it) instead of stalling everything behind it for a round trip
+const createDataChannel = RTCPeerConnection.prototype.createDataChannel;
+RTCPeerConnection.prototype.createDataChannel = function (label, o) {
+  return createDataChannel.call(this, label, label === 'fast' ? { ...o, ordered: false, maxRetransmits: 0 } : o);
+};
 const timeout = (ms, msg) => new Promise((_, rej) => setTimeout(() => rej(new Error(msg)), ms));
 
 // Connection log for debugging players who can't connect (menu: Network test / Copy network log)
@@ -27,8 +33,8 @@ const STUN = [
   { urls: 'stun:stun.miwifi.com:3478' },
 ];
 // TURN would relay WebRTC itself when two players can't reach each other directly. TURN_URL hands out short-lived
-// credentials (worker/turn.js, once Cloudflare TURN is paid for); empty = STUN only, the WebSocket relay covers those players.
-const TURN_URL = '';
+// credentials (worker/turn.js) until the monthly cap; when it says no, STUN only and the WebSocket relay covers those players.
+const TURN_URL = 'https://gangoflegends-turn.ahmed-okkio.workers.dev/';
 // WebSocket relay (worker/turn.js Room): when WebRTC can't connect (strict NAT, mainland China) the joining player and
 // the host both talk to a Cloudflare Durable Object that passes messages along. Slower than direct, but always gets through.
 // ponytail: free Workers plan (~100k requests/day, 20 relayed messages = 1 request); move to paid if lots of people relay.
@@ -124,13 +130,19 @@ export async function host() {
     }
     log('host: lobby open');
     // players are WebRTC connections or relay stand-ins, both { open, send, close }
-    const ev = emitter(), conns = new Map();
+    const ev = emitter(), conns = new Map(), fast = new Map(); // fast: each direct player's unreliable channel
     const data = (id, conn, msg) => {
       if (msg?.t === 'hello' && !conns.has(id)) { conns.set(id, conn); ev.emit('join', id, String(msg.name || 'Player').slice(0, 14), String(msg.v || 'old')); }
       else if (conns.has(id)) ev.emit('msg', id, msg);
     };
     const gone = id => { log('host: lost', id); if (conns.delete(id)) ev.emit('leave', id); };
     peer.on('connection', conn => {
+      if (conn.label === 'fast') {
+        conn.on('open', () => { log('host: fast channel open', conn.peer); fast.set(conn.peer, conn); });
+        conn.on('data', msg => conns.has(conn.peer) && ev.emit('msg', conn.peer, msg));
+        conn.on('close', () => fast.delete(conn.peer));
+        return;
+      }
       log('host: incoming connection', conn.peer);
       watch(conn);
       conn.on('data', msg => data(conn.peer, conn, msg));
@@ -153,6 +165,8 @@ export async function host() {
       mode: 'host', code, myId: 'host', on: ev.on,
       send(id, msg) { const c = conns.get(id); if (c?.open) c.send(msg); },
       broadcast(msg) { for (const c of conns.values()) if (c.open) c.send(msg); },
+      // game state: the unreliable channel where there is one (relayed players: their only link)
+      broadcastFast(msg) { for (const [id, c] of conns) { const f = fast.get(id); if (f?.open) f.send(msg); else if (c.open) c.send(msg); } },
       kick(id) { conns.get(id)?.close(); conns.delete(id); },
       close() { peer.destroy(); ws.close(); },
     };
@@ -178,7 +192,8 @@ function joinRelay(code, name, v) {
       if (ready) return ev.emit('msg', msg);
       // the host always answers hello (lobby or deny); hand that answer over once the caller has its handlers attached
       ready = true; clearTimeout(t); log('join: host answered via relay');
-      res({ mode: 'client', myId, on: ev.on, send(m) { if (ws.readyState === 1) ws.send(JSON.stringify(m)); }, close() { ws.onclose = null; ws.close(); } });
+      const send = m => { if (ws.readyState === 1) ws.send(JSON.stringify(m)); };
+      res({ mode: 'client', myId, on: ev.on, send, sendFast: send, close() { ws.onclose = null; ws.close(); } });
       setTimeout(() => ev.emit('msg', msg));
     };
     ws.onclose = e => { log('join: relay closed', e.code, e.reason); if (ready) ev.emit('close'); else fail(e.reason || 'Could not reach the relay server.'); };
@@ -206,7 +221,11 @@ async function joinDirect(code, name, v) {
     conn.on('data', msg => ev.emit('msg', msg));
     conn.on('close', () => { log('join: connection closed'); ev.emit('close'); });
     conn.send({ t: 'hello', name, v });
-    return { mode: 'client', myId: peer.id, on: ev.on, send(msg) { if (conn.open) conn.send(msg); }, close() { peer.destroy(); } };
+    const fast = peer.connect(PREFIX + code, { reliable: false, serialization: 'json', label: 'fast' });
+    fast.on('open', () => log('join: fast channel open'));
+    fast.on('data', msg => ev.emit('msg', msg));
+    const send = msg => { if (conn.open) conn.send(msg); };
+    return { mode: 'client', myId: peer.id, on: ev.on, send, sendFast: msg => fast.open ? fast.send(msg) : send(msg), close() { peer.destroy(); } };
   } catch (e) {
     log('join: failed', e.type || '', e.message);
     peer.destroy();

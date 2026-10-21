@@ -245,6 +245,26 @@ function lineUp(sim, gap = 1.1) {
   assert.ok(m.players[0].champ === 'blitz', 'match: not until the next round');
 }
 
+// 10d. Alistar: Pulverize launches whoever's close; Headbutt knocks them back, much further while they're airborne
+{
+  const knock = combo => {
+    const sim = near('ali', 'blitz');
+    run(sim, 90);
+    lineUp(sim, 1.3);
+    const x0 = torso(sim, 1).x;
+    let peak = 0;
+    if (combo) { run(sim, 2, i => sim.setInput(0, { x: 0, z: 0, b: i ? 0 : BTN.A1 })); run(sim, 10, () => { sim.setInput(0, { x: 0, z: 0, b: 0 }); peak = Math.max(peak, torso(sim, 1).y); }); }
+    run(sim, 2, i => sim.setInput(0, { x: 0, z: 0, b: i ? 0 : BTN.A2 }));
+    run(sim, 50, () => { sim.setInput(0, { x: 0, z: 0, b: 0 }); peak = Math.max(peak, torso(sim, 1).y); });
+    return { peak, dist: torso(sim, 1).x - x0 };
+  };
+  const solo = knock(false), combo = knock(true);
+  console.log('alistar headbutt', solo.dist.toFixed(2), 'after pulverize', combo.dist.toFixed(2), 'launch peak', combo.peak.toFixed(2));
+  assert.ok(combo.peak > STAND + 0.8, 'Pulverize launches');
+  assert.ok(solo.dist > 1.5, 'Headbutt knocks back');
+  assert.ok(combo.dist > solo.dist * 1.3, 'Headbutt after Pulverize knocks much further');
+}
+
 // 11. a hooked champ goes limp and can't punch back
 {
   const sim = near('blitz', 'vi');
@@ -284,6 +304,34 @@ function lineUp(sim, gap = 1.1) {
   assert.ok(maxErr < 0.15, 'prediction stays close');
   // it's walking off the girder, ~0.5s ahead of the host, so the two drift; moderate drift is pulled in gradually (sync())
   assert.ok(postErr / postN < 0.6, 'catches up with a hit it did not predict');
+}
+
+// 12b. a client holding a champ (and holding jump) stays on the host's state instead of being flung about
+{
+  const players = [{ id: 'a', name: 'A', champ: 'blitz', team: 0 }, { id: 'b', name: 'B', champ: 'hec', team: 1 }];
+  const host = createSim({ mapId: 'grind', players }), cli = createSim({ mapId: 'grind', players, local: 0 });
+  const G = BTN.LEFT | BTN.RIGHT, wire = [], q = [];
+  let maxErr = 0;
+  for (let i = 0; i < 450; i++) {
+    if (i === 160) {
+      for (const [slot, x] of [[0, -4], [1, -3.05]]) {
+        const p = host.players[slot], dx = x - p.bodies[0].translation().x, dz = 3 - p.bodies[0].translation().z;
+        for (const b of p.bodies) { const t = b.translation(); b.setTranslation({ x: t.x + dx, y: t.y, z: t.z + dz }, true); b.setLinvel({ x: 0, y: 0, z: 0 }, true); }
+      }
+      host.players[0].yaw = Math.PI / 2; host.players[1].yaw = -Math.PI / 2;
+    }
+    const b = i > 170 ? G | (i > 260 ? BTN.JUMP : 0) : 0, inp = { x: 0, z: 0, b, a: i > 160 ? Math.PI / 2 : null };
+    cli.setInput(0, inp); cli.step();
+    q.push([inp.x, inp.z, inp.b, inp.a]); if (q.length > 6) q.shift();
+    if (cli.tick % 2 === 0) wire.push({ to: 'host', at: i + 10, inp: { n: cli.tick, i: [...q] } });
+    for (const m of wire.filter(m => m.at === i)) m.to === 'host' ? host.setInput(0, m.inp) : cli.sync(m.s, m.s.p[0]);
+    host.setInput(1, { x: 0, z: 0, b });
+    host.step();
+    if (i % 2) wire.push({ to: 'cli', at: i + 10, s: JSON.parse(JSON.stringify(host.snapshot())) });
+    if (i > 300) maxErr = Math.max(maxErr, cli.err);
+  }
+  console.log('tied err', maxErr.toFixed(2));
+  assert.ok(host.players[0].grabs.some(g => g?.vic) && maxErr < 0.3, 'held together, the client stays on the host');
 }
 
 // 13. snapshot is small

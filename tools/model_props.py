@@ -1,5 +1,5 @@
 """Model the champion props (Blitzcrank's gauntlets and chest core, Hecarim's head blade, tail and hooves, Vi's gauntlets
-and hair, Sett's fists and fur-collared jacket) from scratch in Gang Beasts costume style: chunky bevelled blocks, domes and tubes in a few
+and hair, Sett's fists and fur-collared jacket, Alistar's horns, nose ring and shackles) from scratch in Gang Beasts costume style: chunky bevelled blocks, domes and tubes in a few
 solid toy colours. The League models are reference only (tools/import_lol.py fetches them for side-by-side renders).
 
 Run with Blender (headless): blender -b --python tools/model_props.py [-- --preview]
@@ -186,7 +186,22 @@ def sett_jacket():  # chest frame (capsule along x: r .193, half length .082, ce
     pts = [on_vest(-0.15, 0.3, 1.1), on_vest(-0.16, 0.4, 1.12)] +           [(math.sin(a) * 0.17, 0.46, -math.cos(a) * 0.1) for a in (-1.1, -0.5, 0, 0.5, 1.1)] + [on_vest(0.16, 0.4, 1.12), on_vest(0.15, 0.3, 1.1)]
     tube(FUR(), pts, [0.035, 0.06, 0.07, 0.075, 0.075, 0.075, 0.07, 0.06, 0.035])
 
+# ---------------- Alistar: the Minotaur, great horns, a gold nose ring and broken shackles ----------------
+IVORY = lambda: mat("ivory", (0.93, 0.88, 0.74), 0.5)
+BRONZE = lambda: mat("bronze", (0.72, 0.45, 0.18), 0.35, 0.6)
+
+def ali_horns():  # head frame (skull centre y .165, z .057, r .21): two big horns sweeping out, then up and forward; nose ring
+    for s in (1, -1):
+        ring(BRONZE(), 0.06, 0.022, (s * 0.2, 0.28, 0.06), (1, 0.4 * s, 0))  # band where each horn leaves the skull
+        tube(IVORY(), [(s * 0.15, 0.27, 0.06), (s * 0.3, 0.3, 0.07), (s * 0.42, 0.38, 0.12), (s * 0.47, 0.5, 0.2), (s * 0.45, 0.6, 0.26)], [0.075, 0.068, 0.05, 0.03, 0.004])
+    ring(BRONZE(), 0.055, 0.014, (0, 0.04, 0.275), (1, 0, 0))  # nose ring through the snout
+
+def ali_cuff():  # forearm frame (hand at y -.337): a heavy bronze shackle on the wrist with a broken chain swinging off it
+    cyl(BRONZE(), 0.075, 0.1, (0, -0.22, 0)); ring(IRON(), 0.078, 0.014, (0, -0.17, 0)); ring(IRON(), 0.078, 0.014, (0, -0.27, 0))
+    for k, (y, z) in enumerate(((-0.28, -0.09), (-0.33, -0.12), (-0.38, -0.12))): ring(IRON(), 0.03, 0.01, (0, y, z), (k % 2, 0, (k + 1) % 2))
+
 PROPS = {
+    "alistar_horns": ali_horns, "alistar_cuff": ali_cuff,
     "blitzcrank_core": blitz_core, "blitzcrank_gauntletL": lambda: blitz_gauntlet(1), "blitzcrank_gauntletR": lambda: blitz_gauntlet(-1),
     "hecarim_blade": hec_blade, "hecarim_tail": hec_tail,
     "hecarim_hoofHand": lambda: hec_hoof(-0.24, -0.44, 0.1),  # forearm frame: hand at y -.337
@@ -198,7 +213,8 @@ PROPS = {
 PIVOT = {"core": (0, 0.6347, -0.0101), "blade": (0, 1.0693, 0.0247), "tail": (0, 0.4223, 0.0002),
          "gauntletL": (0.2015, 0.6711, -0.0433), "gauntletR": (-0.2015, 0.6711, -0.0433),
          "hoofHand": (0.2015, 0.6711, -0.0433), "hoofFoot": (0.239, 0.1201, 0.0057),
-         "hair": (0, 1.0693, 0.0247), "jacket": (0, 0.6347, -0.0101), "sleeve": (0.2015, 0.9447, -0.0425), "fist": (0.2015, 0.6711, -0.0433)}
+         "hair": (0, 1.0693, 0.0247), "jacket": (0, 0.6347, -0.0101), "sleeve": (0.2015, 0.9447, -0.0425), "fist": (0.2015, 0.6711, -0.0433),
+         "horns": (0, 1.0693, 0.0247), "cuff": (0.2015, 0.6711, -0.0433)}
 
 def mannequin(dx):
     grey = mat("beast", (0.62, 0.6, 0.58), 0.6)
@@ -224,12 +240,12 @@ if preview:
     sc.render.engine = "BLENDER_WORKBENCH"; sc.display.shading.light = "STUDIO"; sc.display.shading.color_type = "MATERIAL"
     sc.display.shading.show_cavity = True; sc.display.shading.show_shadows = True
     sc.render.resolution_x, sc.render.resolution_y = 1800, 900
-    for champ, dx in (("blitzcrank", -1.65), ("hecarim", -0.55), ("vi", 0.55), ("sett", 1.65)):
+    for champ, dx in (("blitzcrank", -2.2), ("hecarim", -1.1), ("vi", 0), ("sett", 1.1), ("alistar", 2.2)):
         mannequin(dx)
         for name, ob in built.items():
             if name.startswith(champ): ob.location = B(Vector(PIVOT[name.split("_")[1]]) + Vector((dx, 0, 0)))
     cam = bpy.data.objects.new("cam", bpy.data.cameras.new("cam")); sc.collection.objects.link(cam); sc.camera = cam
-    cam.data.type = "ORTHO"; cam.data.ortho_scale = 4.6
+    cam.data.type = "ORTHO"; cam.data.ortho_scale = 5.8
     for view, d in (("front", (0.0, 0.25, 1)), ("three_quarter", (0.8, 0.35, 0.9)), ("back", (-0.5, 0.3, -1))):
         target = B((0, 0.75, 0)); cam.location = target + B(Vector(d).normalized() * 6)
         cam.rotation_euler = (target - cam.location).to_track_quat("-Z", "Y").to_euler()
