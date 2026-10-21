@@ -17,7 +17,19 @@ install = sys.argv[2] if len(sys.argv) > 2 else r"S:\SteamLibrary\steamapps\comm
 bundles = os.path.join(install, r"Gang Beasts_Data\StreamingAssets\aa\StandaloneWindows64-LocalBundles")
 out = os.path.join(os.path.dirname(__file__), "..", "gbcache", stage)
 os.makedirs(out, exist_ok=True)
-env = UnityPy.load(*glob.glob(os.path.join(bundles, f"stages-{stage}_*.bundle")), *glob.glob(os.path.join(bundles, "core-stages*.bundle")))
+# the stage's bundles plus every bundle they reference (shared props live in other stages' and core bundles)
+cab_bundle = {}
+for f in glob.glob(os.path.join(bundles, "*.bundle")):
+    for bf in UnityPy.load(f).files.values():
+        for cab in getattr(bf, "files", None) or {}: cab_bundle[cab.lower()] = f
+need, todo = set(), glob.glob(os.path.join(bundles, f"stages-{stage}_*.bundle")) + glob.glob(os.path.join(bundles, "core-stages*.bundle"))
+while todo:
+    f = todo.pop()
+    if f in need: continue
+    need.add(f)
+    for sf in UnityPy.load(f).assets:
+        todo += [cab_bundle[c] for c in (e.path.split("/")[-1].lower() for e in sf.externals) if c in cab_bundle]
+env = UnityPy.load(*need)
 
 # ---------- 4x4 matrix helpers (row-major, column vectors) ----------
 def trs(p, q, s):
@@ -82,7 +94,7 @@ def in_scene(o):
     return "_scenes_" in str(getattr(o.assets_file.parent, "name", ""))
 
 # ---------- export ----------
-meshes, materials, textures, renderers, colliders, spawns, kills = {}, {}, {}, [], [], [], []
+meshes, materials, textures, renderers, colliders, capsules, trimeshes, spawns, kills = {}, {}, {}, [], [], [], [], [], []
 
 def export_texture(ptr):
     if not ptr.path_id: return None
@@ -138,7 +150,7 @@ def export_mesh(ptr):
     return key
 
 for o in env.objects:
-    if o.type.name not in ("MeshRenderer", "BoxCollider"): continue
+    if o.type.name not in ("MeshRenderer", "BoxCollider", "CapsuleCollider", "SphereCollider", "MeshCollider"): continue
     if not in_scene(o): continue  # shared bundles also hold prefabs that aren't placed in this stage
     try: c = o.read()
     except Exception: continue
@@ -163,7 +175,7 @@ for o in env.objects:
             "lightmap": c.m_LightmapIndex if c.m_LightmapIndex < 65534 else -1,
             "lmso": rnd([c.m_LightmapTilingOffset.x, c.m_LightmapTilingOffset.y, c.m_LightmapTilingOffset.z, c.m_LightmapTilingOffset.w], 6),
         })
-    else:
+    elif o.type.name == "BoxCollider":
         cm = mmul(m, trs([c.m_Center.x, c.m_Center.y, c.m_Center.z], [0, 0, 0, 1], [c.m_Size.x, c.m_Size.y, c.m_Size.z]))
         pos, q, size = decompose(flipz(cm))
         box = {"path": p, "p": rnd(pos), "q": rnd(q, 5), "h": rnd([s / 2 for s in size])}
@@ -171,9 +183,27 @@ for o in env.objects:
             if "kill" in p.lower(): kills.append(box)
         elif "/City" not in p and "/Camera" not in p:  # Camera Blocker only stops the camera; beasts fall through it
             colliders.append(box)
+    elif c.m_IsTrigger or "/City" in p or "/Camera" in p: continue
+    # everything else is frozen where it sits in the scene (ropes, props): physics props would need syncing over the network
+    elif o.type.name in ("CapsuleCollider", "SphereCollider"):
+        # Rapier capsules run along local y: turn Unity's x / z direction onto it
+        axis = getattr(c, "m_Direction", 1)
+        cm = mmul(m, trs([c.m_Center.x, c.m_Center.y, c.m_Center.z], [[0, 0, -0.70711, 0.70711], [0, 0, 0, 1], [0.70711, 0, 0, 0.70711]][axis], [1, 1, 1]))
+        pos, q, s = decompose(flipz(cm))
+        r = c.m_Radius * max(s[0], s[2])
+        half = max(0, getattr(c, "m_Height", 0) / 2 * s[1] - r)
+        capsules.append({"path": p, "p": rnd(pos), "q": rnd(q, 5), "r": round(r, 4), "hh": round(half, 4)})
+    elif c.m_Mesh.path_id:  # MeshCollider: the mesh's triangles, placed by `matrix`
+        try: trimeshes.append({"path": p, "mesh": export_mesh(c.m_Mesh), "matrix": [rnd(r, 5) for r in flipz(m)]})
+        except Exception as e: print("  collider mesh failed", p, e)
 
+# free-for-all spawn points: named "Player Spawnpoint" (Girders), or the children of the single-player group
+# ("SingleSpawns", "1-8", "StartSpawns") elsewhere. Stages that place players from code (Ring) get none; maps.js supplies those.
+def spawn_point(pid):
+    parent = parent_of[pid] in transforms and gos[go_of[parent_of[pid]]].m_Name
+    return gos[go_of[pid]].m_Name == "Player Spawnpoint" or parent in ("SingleSpawns", "1-8", "StartSpawns") and not gos[go_of[pid]].m_Name.startswith("GameObject")
 for pid in transforms:
-    if gos[go_of[pid]].m_Name == "Player Spawnpoint" and is_active(pid):
+    if spawn_point(pid) and is_active(pid):
         x, y, z = xform(wm(pid), [0, 0, 0]); spawns.append(rnd([x, y, -z]))
 
 # lightmaps live in the scene's LightmapSettings. They're RGBM (gamma space: rgb * a * 5); decode to plain RGB.
@@ -205,6 +235,6 @@ for o in env.objects:
             d = xform(wm(pid), [0, 0, 1]); o0 = xform(wm(pid), [0, 0, 0])
             env_light["sun"] = {"color": rnd([l.m_Color.r, l.m_Color.g, l.m_Color.b]), "intensity": l.m_Intensity, "dir": rnd([d[0] - o0[0], d[1] - o0[1], -(d[2] - o0[2])])}
 
-json.dump({"stage": stage, "meshes": meshes, "materials": materials, "renderers": renderers, "colliders": colliders,
+json.dump({"stage": stage, "meshes": meshes, "materials": materials, "renderers": renderers, "colliders": colliders, "capsules": capsules, "trimeshes": trimeshes,
            "spawns": spawns, "kill": kills, "lightmaps": lightmaps, "env": env_light}, open(os.path.join(out, "scene.json"), "w"), indent=0)
-print(f"{stage}: {len(renderers)} renderers, {len(meshes)} meshes, {len(materials)} materials, {len(colliders)} colliders, {len(spawns)} spawns, {len(kills)} kill boxes, lightmaps {lightmaps}")
+print(f"{stage}: {len(renderers)} renderers, {len(meshes)} meshes, {len(materials)} materials, {len(colliders)} boxes, {len(capsules)} capsules, {len(trimeshes)} mesh colliders, {len(spawns)} spawns, {len(kills)} kill boxes, lightmaps {lightmaps}")

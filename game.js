@@ -40,6 +40,50 @@ function show(screen) {
   document.body.classList.toggle('playing', screen === 'hud'); // hides the cursor unless the Esc menu is up
 }
 
+// ---------- controls: rebindable, saved on this machine ----------
+// each action takes up to two keys or mouse buttons ('Mouse0' left, 'Mouse1' middle, 'Mouse2' right)
+const ACTIONS = [
+  ['up', 'Move up', ['KeyW', 'ArrowUp']], ['down', 'Move down', ['KeyS', 'ArrowDown']],
+  ['left', 'Move left', ['KeyA', 'ArrowLeft']], ['right', 'Move right', ['KeyD', 'ArrowRight']],
+  ['jump', 'Jump / climb', ['Space']], ['lhand', 'Left hand', ['Mouse0', 'KeyJ']], ['rhand', 'Right hand', ['Mouse2', 'KeyK']],
+  ['a1', 'Ability 1', ['KeyQ']], ['a2', 'Ability 2', ['KeyE']], ['butt', 'Headbutt', ['KeyF', 'Mouse1']], ['lay', 'Lie down (hold)', ['ControlLeft']],
+];
+let binds = {};
+try { binds = JSON.parse(store.get('binds', '{}')) || {}; } catch {}
+for (const [id, , def] of ACTIONS) if (!Array.isArray(binds[id])) binds[id] = [...def];
+const MOUSE = ['LMB', 'MMB', 'RMB', 'M4', 'M5'];
+const ARROWS = { Up: '↑', Down: '↓', Left: '←', Right: '→' };
+const keyName = c => !c ? '–' : c.startsWith('Mouse') ? MOUSE[+c.slice(5)] ?? c : c.replace(/^(Key|Digit)/, '')
+  .replace(/^Arrow(\w+)/, (_, d) => ARROWS[d]).replace(/^(Control|Shift|Alt|Meta)(Left|Right)$/, (_, m) => m === 'Control' ? 'Ctrl' : m);
+// every <kbd data-act="..."> on the page shows that action's first key
+const showKeys = () => { for (const el of document.querySelectorAll('[data-act]')) el.textContent = keyName(binds[el.dataset.act].find(Boolean)); };
+let rebinding = null; // { id, slot } while waiting for the next key or click
+function renderBinds() {
+  const wait = (id, s) => rebinding?.id === id && rebinding.slot === s;
+  $('binds').innerHTML = ACTIONS.map(([id, label]) => `<span class="bindrow">${label}<i></i>${[0, 1].map(s =>
+    `<button class="bind ${wait(id, s) ? 'wait' : ''}" data-id="${id}" data-slot="${s}">${wait(id, s) ? 'press…' : keyName(binds[id][s])}</button>`).join('')}</span>`).join('');
+  showKeys();
+}
+$('binds').onclick = e => { const b = e.target.closest('.bind'); if (b) { rebinding = { id: b.dataset.id, slot: +b.dataset.slot }; renderBinds(); } };
+$('bindReset').onclick = () => { for (const [id, , def] of ACTIONS) binds[id] = [...def]; store.set('binds', JSON.stringify(binds)); rebinding = null; renderBinds(); };
+// Esc cancels, Backspace/Delete clears the slot; a key taken from another action is removed there
+function bindTo(code) {
+  const { id, slot } = rebinding;
+  rebinding = null;
+  if (code) for (const a in binds) binds[a] = binds[a].map(c => c === code ? null : c);
+  binds[id][slot] = code;
+  store.set('binds', JSON.stringify(binds));
+  renderBinds();
+}
+addEventListener('keydown', e => {
+  if (!rebinding) return;
+  e.preventDefault(); e.stopImmediatePropagation();
+  if (e.code === 'Escape') { rebinding = null; renderBinds(); } else bindTo(e.code === 'Backspace' || e.code === 'Delete' ? null : e.code);
+}, true);
+// any mouse button binds, except a left click on a key slot (that just picks the slot)
+addEventListener('mousedown', e => { if (rebinding && !(e.button === 0 && e.target.closest('.bind'))) { e.preventDefault(); e.stopImmediatePropagation(); bindTo(`Mouse${e.button}`); } }, true);
+renderBinds();
+
 // ---------- menu ----------
 $('nameIn').value = me.name;
 $('nameIn').addEventListener('input', e => { me.name = e.target.value.trim().slice(0, 14) || 'Summoner'; store.set('name', me.name); });
@@ -51,8 +95,9 @@ function champCards(el, onPick) {
     <button class="champ ${id === me.champ ? 'on' : ''}" data-id="${id}" style="--c:${c.body};--e:${c.eyes}">
       <span class="bean"></span>
       <b>${c.name}</b><small>${c.title}</small>
-      ${c.abilities.map(a => `<span class="ab"><kbd>${a.key}</kbd><span><b>${a.name}</b>${a.desc}</span></span>`).join('')}
+      ${c.abilities.map((a, i) => `<span class="ab"><kbd data-act="a${i + 1}"></kbd><span><b>${a.name}</b>${a.desc}</span></span>`).join('')}
     </button>`).join('');
+  showKeys();
   el.onclick = e => {
     const id = e.target.closest('.champ')?.dataset.id;
     if (!id) return;
@@ -188,7 +233,8 @@ async function startGame(setup) {
   else game.local = createSim({ mapId: setup.map, players: setup.players, local: game.mySlot }); // my champ, predicted (sim.js)
   view.setMatch(setup);
   const mine = CHAMPS[setup.players[game.mySlot]?.champ ?? 'blitz'];
-  $('abil').innerHTML = mine.abilities.map(a => `<div class="slot"><kbd>${a.key}</kbd><b>${a.name}</b><i></i><span class="cd"></span></div>`).join('');
+  $('abil').innerHTML = mine.abilities.map((a, i) => `<div class="slot"><kbd data-act="a${i + 1}"></kbd><b>${a.name}</b><i></i><span class="cd"></span></div>`).join('');
+  showKeys();
   show('hud');
 }
 
@@ -237,7 +283,7 @@ addEventListener('keyup', e => keys.delete(e.code));
 addEventListener('blur', () => { keys.clear(); mouse.clear(); });
 $('view').addEventListener('mousedown', e => { mouse.add(e.button); if (e.button === 1) e.preventDefault(); }); // middle click: no autoscroll
 addEventListener('mouseup', e => mouse.delete(e.button));
-addEventListener('contextmenu', e => { if (game) e.preventDefault(); });
+addEventListener('contextmenu', e => { if (game || rebinding) e.preventDefault(); });
 $('resumeBtn').onclick = () => $('escMenu').classList.add('hidden');
 // volume sliders (menu + Esc menu) share one saved setting
 const vols = document.querySelectorAll('.vol');
@@ -246,13 +292,13 @@ vols.forEach(el => { el.oninput = () => applyVol(+el.value); el.onchange = () =>
 applyVol(+store.get('volume', 70));
 $('quitBtn').onclick = () => leave();
 
-const k = (...codes) => codes.some(c => keys.has(c));
+const k = act => binds[act].some(c => c && (c.startsWith('Mouse') ? mouse.has(+c.slice(5)) : keys.has(c)));
 function readInput() {
-  let x = (k('KeyD', 'ArrowRight') ? 1 : 0) - (k('KeyA', 'ArrowLeft') ? 1 : 0);
-  let z = (k('KeyS', 'ArrowDown') ? 1 : 0) - (k('KeyW', 'ArrowUp') ? 1 : 0);
-  // Gang Beasts layout: each mouse button is a hand (tap punches with it, hold reaches out and grabs)
-  let b = (k('Space') ? BTN.JUMP : 0) | (k('KeyJ') || mouse.has(0) ? BTN.LEFT : 0) | (k('KeyK') || mouse.has(2) ? BTN.RIGHT : 0)
-    | (k('KeyX') ? BTN.A1 : 0) | (k('KeyC') ? BTN.A2 : 0) | (k('KeyF', 'KeyH') || mouse.has(1) ? BTN.BUTT : 0) | (k('ControlLeft') ? BTN.LAY : 0);
+  let x = (k('right') ? 1 : 0) - (k('left') ? 1 : 0);
+  let z = (k('down') ? 1 : 0) - (k('up') ? 1 : 0);
+  // Gang Beasts layout: each hand has its own button (tap punches with it, hold reaches out and grabs)
+  let b = (k('jump') ? BTN.JUMP : 0) | (k('lhand') ? BTN.LEFT : 0) | (k('rhand') ? BTN.RIGHT : 0)
+    | (k('a1') ? BTN.A1 : 0) | (k('a2') ? BTN.A2 : 0) | (k('butt') ? BTN.BUTT : 0) | (k('lay') ? BTN.LAY : 0);
   const pad = [...(navigator.getGamepads?.() ?? [])].find(Boolean);
   if (pad) {
     const [ax, az] = pad.axes, on = i => pad.buttons[i]?.pressed;

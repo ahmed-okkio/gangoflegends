@@ -1,6 +1,6 @@
 {
   "name": "gang-of-legends",
-  "version": "1.4.1",
+  "version": "1.5.0",
   "description": "Gang Beasts-style ragdoll brawler with League of Legends champions. Free fan game.",
   "main": "main.cjs",
   "scripts": {
@@ -41,7 +41,19 @@
       "!release.cjs",
       "!DESIGN.md",
       "!assets/props/preview_*.png",
-      "!worker/**"
+      "!worker/**",
+      "!node_modules/three/src/**",
+      {
+        "from": "node_modules/three/examples/jsm",
+        "to": "node_modules/three/examples/jsm",
+        "filter": [
+          "environments/**",
+          "loaders/**",
+          "postprocessing/**",
+          "shaders/**",
+          "utils/**"
+        ]
+      }
     ],
     "win": {
       "target": "nsis"
@@ -57,19 +69,9 @@
       "repo": "gangoflegends",
       "releaseType": "release"
     },
-    "asar": false,
-    "extraResources": [
-      {
-        "from": "node_modules/three/examples/jsm",
-        "to": "app/node_modules/three/examples/jsm",
-        "filter": [
-          "environments/**",
-          "loaders/**",
-          "postprocessing/**",
-          "shaders/**",
-          "utils/**"
-        ]
-      }
+    "asar": true,
+    "electronLanguages": [
+      "en-US"
     ]
   }
 }

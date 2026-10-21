@@ -10,6 +10,7 @@ export const MAPS = {
     name: 'Girders',
     blurb: 'A half-built tower high above the city. Mind the drop.',
     gb: 'girders', // replaced by the imported Gang Beasts stage when gbcache/girders exists
+    view: { poro: [-4.6, 0, -3.2, 0.8] }, // imported look: sky colours, camera, easter egg (render.js buildImported)
     killY: -8,
     boxes: [
       box(0, -0.2, 0, 8, 0.2, 1.1),          // long beam
@@ -25,9 +26,40 @@ export const MAPS = {
     kill: [],
     spawns: [[-6, 0, 0], [6, 0, 0], [0, 0, -5.5], [0, 0, 5.5], [-1.6, 0, 1.6], [1.6, 0, -1.6], [-5.5, 0, -4.5], [5.5, 0, 4.5]],
   },
+  // more Gang Beasts stages; without an import each is just a plain floor
+  rooftop: {
+    name: 'Rooftop',
+    blurb: 'A city rooftop in the rain. The edge is closer than it looks.',
+    gb: 'rooftop',
+    killY: -6,
+    boxes: [box(0, -0.2, -3, 8, 0.2, 5, 'plate')],
+    rollers: [], kill: [],
+    spawns: [[-6, 0, -3], [6, 0, -3], [0, 0, -7], [0, 0, 1], [-3, 0, -5], [3, 0, -1], [-3, 0, -1], [3, 0, -5]],
+  },
+  ring: {
+    name: 'Ring',
+    blurb: 'A boxing ring. Throw them over the ropes.',
+    gb: 'ring',
+    view: { cam: { pitch: 34, min: 8, max: 12 } }, // inside the arena: the ceiling starts at y = 12
+    killY: -3,
+    boxes: [box(0, 0.8, 0, 3.4, 0.2, 3.4, 'plate')],
+    rollers: [], kill: [],
+    // the stage places players from code, so these are ours: a circle on the canvas (top at y = 1)
+    spawns: [...Array(8)].map((_, i) => [2.3 * Math.sin(i * Math.PI / 4), 1, 2.3 * Math.cos(i * Math.PI / 4)]),
+  },
+  lighthouse: {
+    name: 'Lighthouse',
+    blurb: 'Round the lamp at the top of the lighthouse, a long way above the sea.',
+    gb: 'lighthouse',
+    killY: 20,
+    boxes: [box(0, 29.3, 0, 4, 0.2, 4, 'plate')],
+    rollers: [], kill: [],
+    // placed from code in the original: a circle on the balcony round the lamp room
+    spawns: [...Array(8)].map((_, i) => [4 * Math.sin(i * Math.PI / 4), 29.5, 4 * Math.cos(i * Math.PI / 4)]),
+  },
   grind: {
     name: 'Grind',
-    hidden: true, // ponytail: v1 ships Girders only; the sim tests still use this arena
+    hidden: true, // not in the menus; the sim tests use this arena
     blurb: 'A Zaun chem-works with a hungry grinder in the middle.',
     killY: -6,
     boxes: [

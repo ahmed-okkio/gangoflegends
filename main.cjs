@@ -45,7 +45,7 @@ function checkForUpdates(win) {
   autoUpdater.on('error', () => { found = false; show({ done: true }); }); // offline or GitHub down: just play the current version
   autoUpdater.on('update-downloaded', () => {
     show({ p: 100, installing: true });
-    setTimeout(() => autoUpdater.quitAndInstall(true, true), 1200); // silent install, then reopen
+    setTimeout(() => autoUpdater.quitAndInstall(true, true), 300); // long enough to paint "Installing…"; silent install, then reopen
   });
   win.webContents.once('did-finish-load', () => autoUpdater.checkForUpdates().catch(() => {}));
 }

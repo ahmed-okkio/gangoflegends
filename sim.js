@@ -71,8 +71,11 @@ export function createSim({ mapId, players, practice = false, roundsToWin = 3, l
   const owner = new Map(); // collider handle -> { p, part }
 
   const ground = world.createRigidBody(RAPIER.RigidBodyDesc.fixed());
-  for (const b of map.boxes)
-    world.createCollider(RAPIER.ColliderDesc.cuboid(...b.s).setTranslation(...b.p).setRotation(b.q ? { x: b.q[0], y: b.q[1], z: b.q[2], w: b.q[3] } : QI).setFriction(0.9).setCollisionGroups(WORLD_GROUPS), ground);
+  const fixed = (desc, p = [0, 0, 0], q) => world.createCollider(desc.setTranslation(...p).setRotation(q ? { x: q[0], y: q[1], z: q[2], w: q[3] } : QI).setFriction(0.9).setCollisionGroups(WORLD_GROUPS), ground);
+  for (const b of map.boxes) fixed(RAPIER.ColliderDesc.cuboid(...b.s), b.p, b.q);
+  // imported stages also have capsules / balls and triangle meshes (world-space vertices, see stages.js)
+  for (const c of map.caps ?? []) fixed(c.hh ? RAPIER.ColliderDesc.capsule(c.hh, c.r) : RAPIER.ColliderDesc.ball(c.r), c.p, c.q);
+  for (const t of map.tris ?? []) fixed(RAPIER.ColliderDesc.trimesh(t.v, t.i));
   const rollerRot = (r, t) => qmul(qaxis(X, r.spin * t), qaxis(Z, Math.PI / 2)); // cylinder is y-up; lay it along x
   const rollers = map.rollers.map(r => {
     const body = world.createRigidBody(RAPIER.RigidBodyDesc.kinematicPositionBased().setTranslation(...r.p).setRotation(rollerRot(r, 0)));
@@ -82,7 +85,7 @@ export function createSim({ mapId, players, practice = false, roundsToWin = 3, l
 
   const ps = players.map((pl, slot) => ({
     ...pl, slot, bit: 1 << (slot + 1), champ: CHAMPS[pl.champ] ? pl.champ : 'blitz',
-    alive: false, bodies: null, input: { x: 0, z: 0, b: 0 }, prevB: 0, respawn: 0, ack: 0, q: new Map(), next: null, newest: -1,
+    alive: false, bodies: null, input: { x: 0, z: 0, b: 0 }, prevB: 0, respawn: 0, ack: 0, q: new Map(), next: null, newest: -1, slack: 99, win: 0,
   }));
   const teamCount = new Set(ps.map(p => p.team)).size;
   const scores = Array(Math.max(...ps.map(p => p.team)) + 1).fill(0);
@@ -511,12 +514,22 @@ export function createSim({ mapId, players, practice = false, roundsToWin = 3, l
     }
   }
 
-  // play back the next queued client input (setInput); a missing one repeats the last, which is right nearly always
+  // play back the next queued client input (setInput), one per step. Ran dry (a late packet): hold the last input and
+  // don't advance, so the late one still plays when it lands instead of being dropped (a dropped press = a missed cast
+  // the client already predicted). The buffer grows to the network's jitter on its own, and shrinks back a tick at a
+  // time while it stays deeper than needed for 2s.
   function feed(p) {
-    const inp = p.q.get(p.next);
-    if (inp) p.input = inp;
-    p.q.delete(p.next);
-    p.ack = p.next++;
+    if (!p.q.has(p.next)) {
+      if (!p.q.size) return;
+      p.next = Math.min(...p.q.keys()); // a gap that's never coming: carry on from what did arrive
+    }
+    p.input = p.q.get(p.next); p.q.delete(p.next); p.ack = p.next++;
+    p.slack = Math.min(p.slack, p.newest - p.ack);
+    if (++p.win >= 120) {
+      const a = p.q.get(p.next), b = p.q.get(p.next + 1);
+      if (p.slack > 1 && a && b) { b.b |= a.b; p.q.delete(p.next++); } // skip one, keeping its presses
+      p.win = 0; p.slack = 99;
+    }
   }
 
   function stepHooks() {
@@ -552,6 +565,7 @@ export function createSim({ mapId, players, practice = false, roundsToWin = 3, l
   // ---------- client prediction (local >= 0) ----------
   const me = ps[local], hist = new Map(); // local tick -> my hips { pos, vel } after that step
   let tick = 0, err = 0; // err: last correction size (m), for tests
+  let smooth = V(); // drawn offset that eases a correction in over ~0.1s instead of popping (added in snapshot())
   if (me) for (const q of ps) if (q !== me) {
     // everyone else: a kinematic bean the size of a standing beast, so I bump into them and can grab them
     const body = world.createRigidBody(RAPIER.RigidBodyDesc.kinematicPositionBased().setTranslation(0, -100, 0));
@@ -586,11 +600,12 @@ export function createSim({ mapId, players, practice = false, roundsToWin = 3, l
     if (!h) return;
     const dp = sub(hp, h.pos), dv = sub(hv, h.vel), d = len(dp);
     err = d;
-    // far off (teleport, missed a big hit): jump there. Otherwise ease in, and take velocity jumps (knockback) whole.
-    // knocked out or hooked I'm drawn from the host's state, so just stay on it; tiny errors are left alone (no shimmer)
-    const limp = me.ko > 0 || me.hooked > 0, kp = d > 2 || limp ? 1 : d < 0.03 ? 0 : 0.25, kv = len(dv) > 2.5 || limp ? 1 : len(dv) < 0.2 ? 0 : 0.2;
+    // correct the whole error at once (the drawn copy eases it in through `smooth`), velocity only when it's well off;
+    // tiny errors are left alone (no shimmer). Knocked out or hooked I'm drawn from the host's state, so stay right on it.
+    const limp = me.ko > 0 || me.hooked > 0, kp = d < 0.03 && !limp ? 0 : 1, kv = len(dv) > 2.5 || limp ? 1 : len(dv) < 0.2 ? 0 : 0.2;
     const cp = mul(dp, kp), cv = mul(dv, kv);
     shift(cp, cv);
+    if (d < 4) smooth = sub(smooth, cp); // not a respawn-sized jump
     for (const [t, v] of hist) if (t > ack) { v.pos = add(v.pos, cp); v.vel = add(v.vel, cv); } // they already include the old error
   }
   function stepLocal() {
@@ -600,6 +615,7 @@ export function createSim({ mapId, players, practice = false, roundsToWin = 3, l
     if (me.alive) control(me, st !== 'count');
     world.step();
     if (me.alive) hist.set(tick, { pos: hips().translation(), vel: hips().linvel() });
+    smooth = mul(smooth, 0.8);
     hist.delete(tick - 240);
   }
   // others' stand-ins go where the screen shows them (hips position from the interpolated snapshot)
@@ -639,7 +655,7 @@ export function createSim({ mapId, players, practice = false, roundsToWin = 3, l
         if (!p.alive) return [p.slot, 0];
         const flags = (p.spin > 0) | (p.charge > 0) << 1 | (p.empower > 0) << 2 | (p.grabs.some(Boolean)) << 3 | (p.ko > 0) << 4 | (p.safe > 0) << 5 | (p.vault > 0 || p.hay > 0) << 6;
         // hips position + every part's rotation; clients rebuild the other positions from the joint anchors (beast.js fk)
-        const t = p.bodies[HIPS].translation();
+        const t = p === me ? add(p.bodies[HIPS].translation(), smooth) : p.bodies[HIPS].translation();
         const out = [p.slot, 1, Math.round(p.daze), flags, Math.ceil(p.cd[0] * 10), Math.ceil(p.cd[1] * 10), r2(t.x), r2(t.y), r2(t.z)];
         for (const b of p.bodies) { const q = b.rotation(); out.push(r3(q.x), r3(q.y), r3(q.z), r3(q.w)); }
         // then: Grit, Haymaker charge, and what a predicting client needs to line itself up (sync())
@@ -667,8 +683,8 @@ export function createSim({ mapId, players, practice = false, roundsToWin = 3, l
       const n = inp.n | 0;
       inp.i.slice(-8).forEach(([x, z, b], k, all) => { const t = n - all.length + 1 + k; if (p.next == null || t >= p.next) p.q.set(t, { x: +x || 0, z: +z || 0, b: b | 0 }); });
       p.newest = Math.max(p.newest, n);
-      // first input, or the buffer drifted too deep (lag builds up) or ran dry (stale inputs): line up 2 ticks behind
-      if (p.next == null || p.newest - p.next > 8 || p.next - p.newest > 6) { p.next = p.newest - 2; for (const t of p.q.keys()) if (t < p.next) p.q.delete(t); }
+      // first input, or way behind after a lag spike (feed() only trims a tick every 2s): line up 2 ticks behind
+      if (p.next == null || p.newest - p.next > 30) { p.next = p.newest - 2; for (const t of p.q.keys()) if (t < p.next) p.q.delete(t); }
     },
     drop(slot) { const p = ps[slot]; if (p) { p.left = true; removeRagdoll(p); } },
   };

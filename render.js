@@ -276,11 +276,11 @@ export function createRenderer(canvas) {
   }
 
   // a stage imported from Gang Beasts: original meshes, textures and baked bounce light
-  function buildImported(g, { scene: sc, bins, base }) {
+  function buildImported(g, { scene: sc, bins, base }, view = {}) {
     const loader = new THREE.TextureLoader(), texCache = {};
     // per-renderer lightmap tiling needs a texture clone each; clone only once the image exists
-    const lmWaiting = [];
-    const lightmapTex = sc.lightmaps[0] && loader.load(base + sc.lightmaps[0], t => { for (const fn of lmWaiting.splice(0)) fn(t); });
+    const lmWaiting = sc.lightmaps.map(() => []);
+    const lightmapTex = sc.lightmaps.map((name, i) => loader.load(base + name, t => { for (const fn of lmWaiting[i].splice(0)) fn(t); }));
     const tex = (name, srgb = true) => texCache[name] ??= Object.assign(loader.load(base + name), {
       colorSpace: srgb ? THREE.SRGBColorSpace : THREE.NoColorSpace, wrapS: THREE.RepeatWrapping, wrapT: THREE.RepeatWrapping, anisotropy: 8,
     });
@@ -298,23 +298,24 @@ export function createRenderer(canvas) {
       geos[key] = geo;
     }
     const mats = {};
-    const material = (key, lm) => {
-      const id = key + (lm ? lm.join() : '');
+    const material = (key, lm, li) => {
+      const id = key + (lm ? li + lm.join() : '');
       if (mats[id]) return mats[id];
       const d = sc.materials[key];
       const m = new THREE.MeshStandardMaterial({
-        color: new THREE.Color().setRGB(d.color[0], d.color[1], d.color[2], THREE.SRGBColorSpace),
+        // water uses Gang Beasts' own shader; a plain sea blue stands in
+        color: /^Water/.test(d.name) ? new THREE.Color('#2f7fb5') : new THREE.Color().setRGB(d.color[0], d.color[1], d.color[2], THREE.SRGBColorSpace),
         map: d.map ? tex(d.map) : null, roughness: 1 - d.smoothness * 0.8, metalness: d.metallic,
       });
       if (d.emission && Math.max(...d.emission) > 0) m.emissive.setRGB(...d.emission.map(v => Math.min(v, 1)));
-      if (lm && lightmapTex) {
+      if (lm && lightmapTex[li]) {
         const attach = t => {
           const c = t.clone();
           c.colorSpace = THREE.SRGBColorSpace; c.channel = 1;
           c.repeat.set(lm[0], lm[1]); c.offset.set(lm[2], lm[3]);
           m.lightMap = c; m.lightMapIntensity = LIGHTMAP_GAIN; m.needsUpdate = true;
         };
-        if (lightmapTex.image) attach(lightmapTex); else lmWaiting.push(attach);
+        if (lightmapTex[li].image) attach(lightmapTex[li]); else lmWaiting[li].push(attach);
       }
       return (mats[id] = m);
     };
@@ -325,7 +326,7 @@ export function createRenderer(canvas) {
       geo.setIndex(src.index);
       r.subs.forEach((s, i) => { if (meta.subs[s]) geo.addGroup(meta.subs[s][0], meta.subs[s][1], Math.min(i, r.mats.length - 1)); });
       const lm = r.lightmap >= 0 && meta.uv1 ? r.lmso : null;
-      const m = new THREE.Mesh(geo, r.mats.map(k => material(k, lm)));
+      const m = new THREE.Mesh(geo, r.mats.map(k => material(k, lm, r.lightmap)));
       if (r.matrix) { m.matrixAutoUpdate = false; m.matrix.set(...r.matrix.flat()); }
       const city = r.path.includes('/City');
       m.castShadow = !city; m.receiveShadow = !city;
@@ -341,15 +342,17 @@ export function createRenderer(canvas) {
     rim.intensity = 0.4;
     bloom.strength = 0.25; bloom.threshold = 1.4; renderer.toneMappingExposure = 1; scene.environmentIntensity = 0.35;
     scene.fog = null;
-    g.add(sky('#6fb2ee', '#d8ecfa', '#b9c9d6'));
-    cam = { side: -1, pitch: 27 * Math.PI / 180, min: 17, max: 28 }; // the stage's own camera looks from -z at 27 degrees
-    g.add(poro(-4.6, 0, -3.2, 0.8)); // easter egg on the ground floor
+    g.add(sky(...view.sky ?? ['#6fb2ee', '#d8ecfa', '#b9c9d6']));
+    // like the stage's own camera: Girders' looks from -z at 27 degrees
+    const c = { side: -1, pitch: 27, min: 17, max: 28, ...view.cam };
+    cam = { ...c, pitch: c.pitch * Math.PI / 180 };
+    if (view.poro) g.add(poro(...view.poro)); // easter egg
   }
 
   function buildMap(g, map, id) {
     sunOffset.set(8, 20, 6);
     cam = { side: 1, pitch: 0.63, min: 10, max: 24 };
-    if (map.imported) { buildImported(g, map.imported); return []; }
+    if (map.imported) { buildImported(g, map.imported, map.view); return []; }
     const paint = noiseTex('#d4502f', 0.12);
     const girder = std('#ffffff', { map: paint, roughness: 0.55, metalness: 0.35 });
     const rivet = std('#a23a22', { metalness: 0.5, roughness: 0.4 });

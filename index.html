@@ -51,6 +51,11 @@
   body.playing:has(#escMenu.hidden), body.playing:has(#escMenu.hidden) * { cursor: none !important; }
   .controls { display: grid; grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); gap: 6px 14px; color: #c9d1e0; font-size: 13px; }
   .controls span { display: flex; gap: 6px; align-items: center; }
+  .controls.hints { margin-top: 8px; }
+  .bindrow i { flex: 1; }
+  .bind { min-width: 44px; height: 26px; padding: 0 6px; border-radius: 6px; background: var(--ink); color: var(--gold-2); border: 2px solid var(--gold); font: 14px var(--display); cursor: pointer; }
+  .bind:hover { border-color: var(--gold-2); }
+  .bind.wait { background: var(--gold); color: var(--ink); }
   .legal { margin-top: 18px; font-size: 11px; color: var(--muted); font-weight: 700; }
 
   #lobbyCode { cursor: pointer; font: 54px var(--display); letter-spacing: 8px; color: var(--teal); }
@@ -121,16 +126,10 @@
     <div id="menuErr" class="err"></div>
     <div class="row netrow"><button id="netTestBtn" class="btn small">Network test</button><button id="netLogBtn" class="btn small">Copy network log</button><label class="relay"><input id="relayIn" type="checkbox"> Use relay (if you can't connect, e.g. from China)</label></div>
     <h2>Controls</h2>
-    <div class="controls">
-      <span><kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd> move</span>
-      <span><kbd>Space</kbd> jump</span>
-      <span>Left click / <kbd>J</kbd> left hand</span>
-      <span>Right click / <kbd>K</kbd> right hand</span>
-      <span style="grid-column: 1 / -1">Tap a hand to punch with it, hold it to reach out and grab</span>
-      <span><kbd>X</kbd><kbd>C</kbd> abilities</span>
-      <span><kbd>F</kbd> / middle click headbutt</span>
-      <span><kbd>Ctrl</kbd> hold to lie down</span>
-      <span>Hold a hand + <kbd>Space</kbd> climb a ledge</span>
+    <div id="binds" class="controls"></div>
+    <div class="controls hints">
+      <span style="grid-column: 1 / -1">Click a key to change it (Esc cancels, Backspace clears). <button id="bindReset" class="btn small">Reset to defaults</button></span>
+      <span style="grid-column: 1 / -1">Tap a hand to punch with it, hold it to reach out and grab. Hold a hand + jump to climb a ledge.</span>
       <span style="grid-column: 1 / -1">Gamepad: LT/LB left hand, RT/RB right hand, A jump, B lie down, X/Y abilities, right stick click headbutt</span>
     </div>
     <label class="volrow">Volume <input class="vol" type="range" min="0" max="100"></label>
@@ -165,7 +164,7 @@
   <div id="banner" class="hidden"></div>
   <div id="out" class="hidden">You're out! Watch the rest of the round.</div>
   <div id="abil"></div>
-  <div id="keys"><span>Hands <kbd>LMB</kbd> <kbd>RMB</kbd> (tap punch, hold grab) · Headbutt <kbd>F</kbd> · Lie <kbd>Ctrl</kbd> · Jump <kbd>Space</kbd></span><span>Esc menu</span></div>
+  <div id="keys"><span>Hands <kbd data-act="lhand"></kbd> <kbd data-act="rhand"></kbd> (tap punch, hold grab) · Headbutt <kbd data-act="butt"></kbd> · Lie <kbd data-act="lay"></kbd> · Jump <kbd data-act="jump"></kbd></span><span>Esc menu</span></div>
   <div id="escMenu" class="hidden"><div class="card"><button id="resumeBtn" class="btn">Resume</button><label class="volrow">Volume <input class="vol" type="range" min="0" max="100"></label><button id="quitBtn" class="btn gold">Leave match</button></div></div>
 </div>
 

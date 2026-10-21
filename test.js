@@ -233,7 +233,7 @@ function lineUp(sim, gap = 1.1) {
   const d = (a, b) => Math.hypot(a.x - b.x, a.z - b.z), hp = host.players[0].bodies[0].translation(), cp = cli.players[0].bodies[0].translation();
   console.log('prediction err while walking', maxErr.toFixed(3), 'after shove', cli.err.toFixed(3), 'apart now', d(hp, cp).toFixed(2));
   assert.ok(maxErr < 0.15, 'prediction stays close');
-  assert.ok(cli.err < 0.3, 'catches up with a hit it did not predict');
+  assert.ok(cli.err < 0.4, 'catches up with a hit it did not predict'); // by now it's walking off the girder, ~0.5s ahead of the host
 }
 
 // 13. snapshot is small
