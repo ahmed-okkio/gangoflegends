@@ -37,6 +37,7 @@ let game = null;  // { setup, mySlot, sim?, snaps, cur, fightAt }
 function show(screen) {
   for (const s of ['menu', 'lobby', 'hud']) $(s).classList.toggle('hidden', s !== screen);
   $('escMenu').classList.add('hidden');
+  $('chat').classList.remove('open'); $('chatIn').classList.add('hidden');
   document.body.classList.toggle('playing', screen === 'hud'); // hides the cursor unless the Esc menu is up
   if (screen === 'hud') lockMouse(); else document.exitPointerLock();
 }
@@ -48,6 +49,7 @@ const ACTIONS = [
   ['left', 'Move left', ['KeyA', 'ArrowLeft']], ['right', 'Move right', ['KeyD', 'ArrowRight']],
   ['jump', 'Jump / climb', ['Space']], ['lhand', 'Left hand', ['Mouse0', 'KeyJ']], ['rhand', 'Right hand', ['Mouse2', 'KeyK']],
   ['a1', 'Ability 1', ['KeyQ']], ['a2', 'Ability 2', ['KeyE']], ['butt', 'Headbutt', ['KeyF', 'Mouse1']], ['lay', 'Lie down (hold)', ['ControlLeft']], ['lift', 'Lift (hold, grabbing)', ['ShiftLeft']],
+  ['chat', 'Chat', ['KeyT', 'Enter']],
 ];
 let binds = {};
 try { binds = JSON.parse(store.get('binds', '{}')) || {}; } catch {}
@@ -160,7 +162,8 @@ $('hostBtn').onclick = async () => {
     pushLobby();
   });
   conn.on('msg', (id, m) => {
-    if (m.t === 'in' && game?.sim) game.sim.setInput(game.setup.players.findIndex(p => p.id === id), m);
+    if (m.t === 'chat') hostChat(id, m.text);
+    else if (m.t === 'in' && game?.sim) game.sim.setInput(game.setup.players.findIndex(p => p.id === id), m);
     else if (m.t === 'pick' && CHAMPS[m.champ]) { const p = lobby.players.find(p => p.id === id); if (p) { p.champ = m.champ; pushLobby(); } }
   });
   conn.on('leave', id => {
@@ -176,7 +179,7 @@ $('joinBtn').onclick = () => joinLobby($('codeIn').value);
 $('codeIn').addEventListener('keydown', e => { if (e.key === 'Enter') joinLobby(e.target.value); });
 async function joinLobby(raw) {
   const code = net.cleanCode(raw);
-  if (code.length !== 5) return menuError('Lobby codes are 5 letters.');
+  if (code.length !== 3) return menuError('Lobby codes are 3 characters.');
   menuError('Connecting…', true);
   try { conn = await net.join(code, me.name, VERSION); } catch (e) { conn = null; return menuError(e.message); }
   menuError();
@@ -196,6 +199,7 @@ async function joinLobby(raw) {
       if (ev?.length) setTimeout(() => view.fx(ev), game.delay * 1000); // in step with the playback delay
     }
     else if (m.t === 'deny') leave(m.msg);
+    else if (m.t === 'chat') showChat(m.slot, m.text);
   });
   conn.on('close', () => leave('Lost connection to the host.'));
   conn.send({ t: 'pick', champ: me.champ });
@@ -250,6 +254,7 @@ async function startGame(setup) {
   await Promise.all([prepareMap(setup.map), loadBeast(), loadProps(), loadSfx()]);
   const myId = conn ? conn.myId : 'me';
   game = { setup, mySlot: setup.players.findIndex(p => p.id === myId), snaps: [], cur: null, fightAt: 0, pendingEv: [], inq: [], offs: [], off: null, jit: 0, delay: 0.1 };
+  $('chatLog').replaceChildren();
   if (setup.practice || isHost()) game.sim = createSim({ mapId: setup.map, players: setup.players, practice: !!setup.practice, roundsToWin: setup.rounds });
   else game.local = createSim({ mapId: setup.map, players: setup.players, local: game.mySlot }); // my champ, predicted (sim.js)
   attract = null;
@@ -297,6 +302,7 @@ addEventListener('keydown', e => {
   keys.add(e.code);
   if (game && $('escMenu').classList.contains('hidden')) e.preventDefault(); // Space would click a focused button, Ctrl+key would act
   if (e.code === 'Escape' && game) escape();
+  else if (conn && game && binds.chat.includes(e.code) && $('escMenu').classList.contains('hidden')) openChat();
 });
 // Esc in a match: practice ends, a real match toggles the pause menu. Chromium also drops the mouse lock on Esc, and may
 // or may not pass the key on, so a lost lock counts as Esc too; one press within 300 ms is the same press
@@ -327,10 +333,50 @@ function moveCursor(x, y) {
 addEventListener('mousemove', e => { if (locked()) moveCursor(cursor[0] + e.movementX, cursor[1] + e.movementY); else moveCursor(e.clientX, e.clientY); });
 document.addEventListener('pointerlockchange', () => {
   if (locked()) { cursor ??= [innerWidth / 2, innerHeight / 2]; moveCursor(...cursor); }
-  else if (game && $('escMenu').classList.contains('hidden') && document.hasFocus()) escape(); // Esc released it (not alt-tab)
+  else if (game && $('escMenu').classList.contains('hidden') && !chatting() && document.hasFocus()) escape(); // Esc released it (not alt-tab)
 });
 addEventListener('contextmenu', e => { if (game || rebinding) e.preventDefault(); });
 $('resumeBtn').onclick = () => { $('escMenu').classList.add('hidden'); lockMouse(); };
+
+// ---------- chat (matches only): T opens it; the host relays every line to everyone ----------
+const chatting = () => !$('chatIn').classList.contains('hidden');
+function openChat() {
+  keys.clear(); mouse.clear(); // whatever was held stops, instead of walking on while I type
+  $('chat').classList.add('open'); $('chatIn').classList.remove('hidden');
+  document.exitPointerLock(); // after chatting() turns true, so losing the lock isn't taken for Esc
+  setTimeout(() => $('chatIn').focus()); // after this keydown, so the T isn't typed
+}
+function closeChat() {
+  $('chat').classList.remove('open'); $('chatIn').classList.add('hidden'); $('chatIn').value = ''; $('chatIn').blur();
+  lockMouse();
+}
+$('chatIn').addEventListener('keydown', e => {
+  e.stopPropagation();
+  if (e.key === 'Enter') { const text = $('chatIn').value.trim(); if (text) isHost() ? hostChat('host', text) : conn?.send({ t: 'chat', text }); closeChat(); }
+  else if (e.key === 'Escape') closeChat();
+});
+// host: a player's line, checked (text only, 120 chars, one line a second) and passed to everyone with their slot
+const chatAt = new Map();
+function hostChat(id, text) {
+  const slot = game?.setup.players.findIndex(p => p.id === id) ?? -1;
+  if (slot < 0 || typeof text !== 'string' || performance.now() - (chatAt.get(id) ?? -1e4) < 1000) return;
+  text = text.trim().slice(0, 120);
+  if (!text) return;
+  chatAt.set(id, performance.now());
+  conn.broadcast({ t: 'chat', slot, text });
+  showChat(slot, text);
+}
+function showChat(slot, text) {
+  const p = game?.setup.players[slot];
+  if (!p || typeof text !== 'string') return;
+  const line = document.createElement('p'), who = document.createElement('b');
+  line.style.setProperty('--pc', playerColor(game.setup, slot));
+  who.textContent = p.name; line.append(who, text.slice(0, 120)); // text, never HTML
+  $('chatLog').append(line);
+  while ($('chatLog').children.length > 8) $('chatLog').firstChild.remove();
+  setTimeout(() => line.classList.add('old'), 10000);
+  ui('pick');
+}
 // volume sliders (menu + Esc menu) share one saved setting each
 function slider(cls, key, def, apply, sample) {
   const els = document.querySelectorAll('.' + cls), outs = document.querySelectorAll(`.${cls}Out`);

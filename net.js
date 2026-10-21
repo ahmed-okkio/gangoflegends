@@ -2,8 +2,8 @@
 // The host's peer id is derived from a short lobby code; PeerJS's public server is only used to introduce peers.
 const PREFIX = 'gangoflegends-v1-';
 const ALPHABET = 'ABCDEFGHJKMNPQRSTUVWXYZ23456789';
-const makeCode = () => [...Array(5)].map(() => ALPHABET[Math.floor(Math.random() * ALPHABET.length)]).join('');
-export const cleanCode = s => s.toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, 5);
+const makeCode = () => [...Array(3)].map(() => ALPHABET[Math.floor(Math.random() * ALPHABET.length)]).join('');
+export const cleanCode = s => s.toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, 3);
 
 function emitter() {
   const fns = {};

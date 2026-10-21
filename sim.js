@@ -396,10 +396,11 @@ export function createSim({ mapId, players, practice = false, roundsToWin = 3, l
     // the same nudge goes to the whole core so the hips and legs hang underneath without stretching the joints
     let speed = 3.6;
     if (p.charge > 0) { p.charge -= DT; p.chargeT += DT; speed = 3.6 + 5.4 * Math.min(1, p.chargeT / RAMP); mx = f.x; mz = f.z; }
-    // Vi Q: hold to wind up (slowed), let go (or max out) to dash; a longer windup dashes further and hits harder
+    // Vi Q: hold to wind up (slowed), let go to dash; a longer windup (up to 1.25s) dashes further and hits harder.
+    // Fully wound up it can be held 3s more, then goes by itself
     if (p.vault > 0) {
-      if (move && inp.b & p.vaultBtn && p.vault < 1.25) { p.vault += DT; speed *= 0.35; }
-      else { p.dash = { t: 0.2 + p.vault * 0.3, power: p.vault / 1.25 }; p.vault = 0; }
+      if (move && inp.b & p.vaultBtn && p.vault < 4.25) { p.vault += DT; speed *= 0.35; }
+      else { const w = Math.min(p.vault, 1.25); p.dash = { t: 0.2 + w * 0.3, power: w / 1.25 }; p.vault = 0; }
     }
     if (p.dash) { speed = 11; mx = f.x; mz = f.z; if ((p.dash.t -= DT) <= 0) p.dash = null; }
     // Sett Q: hold to plant and wind up, let go (or hold past 3 s) to throw it
@@ -632,6 +633,13 @@ export function createSim({ mapId, players, practice = false, roundsToWin = 3, l
 
   const inKill = t => t.y < map.killY || (map.bound && Math.max(Math.abs(t.x), Math.abs(t.z)) > map.bound) || map.kill.some(k => t.x > k.min[0] && t.x < k.max[0] && t.y > k.min[1] && t.y < k.max[1] && t.z > k.min[2] && t.z < k.max[2]);
 
+  // a spawn point nobody's standing on: a random one clear by 2m, else the one furthest from everyone
+  function freeSpawn() {
+    const gap = i => Math.min(99, ...ps.filter(q => q.alive).map(q => { const t = q.bodies[TORSO].translation(); return Math.hypot(t.x - map.spawns[i][0], t.z - map.spawns[i][2]); }));
+    const all = map.spawns.map((_, i) => i), clear = all.filter(i => gap(i) > 2);
+    return clear.length ? clear[Math.floor(Math.random() * clear.length)] : all.reduce((a, b) => gap(b) > gap(a) ? b : a);
+  }
+
   function resetRound() {
     for (const p of ps) removeRagdoll(p);
     order = shuffle(order);
@@ -675,11 +683,16 @@ export function createSim({ mapId, players, practice = false, roundsToWin = 3, l
     me.safe = e[3] & 32 ? Math.max(me.safe, 0.1) : 0;
     const h = hist.get(ack);
     if (!h) return;
-    const dp = sub(hp, h.pos), dv = sub(hv, h.vel), d = len(dp);
-    err = d;
+    const limp = me.ko > 0 || me.hooked > 0, dp = sub(hp, h.pos), dv = sub(hv, h.vel);
+    err = len(dp);
+    // standing up, the hover spring bobs the two copies slightly out of phase: their heights differ by centimetres and
+    // their vertical speeds by metres a second. Correcting that kicked me into the floor and back (bouncing, falling
+    // through at high ping), so only a real gap (launched, fell) counts vertically
+    if (!limp && Math.abs(dp.y) < 0.3) dp.y = 0;
+    if (!limp && Math.abs(dv.y) < 4) dv.y = 0;
     // correct the whole error at once (the drawn copy eases it in through `smooth`), velocity only when it's well off;
     // tiny errors are left alone (no shimmer). Knocked out or hooked I'm drawn from the host's state, so stay right on it.
-    const limp = me.ko > 0 || me.hooked > 0, kp = d < 0.03 && !limp ? 0 : 1, kv = len(dv) > 2.5 || limp ? 1 : len(dv) < 0.2 ? 0 : 0.2;
+    const d = len(dp), kp = d < 0.03 && !limp ? 0 : 1, kv = len(dv) > 2.5 || limp ? 1 : len(dv) < 0.2 ? 0 : 0.2;
     const cp = mul(dp, kp), cv = mul(dv, kv);
     shift(cp, cv);
     if (d < 4) smooth = sub(smooth, cp); // not a respawn-sized jump
@@ -710,7 +723,7 @@ export function createSim({ mapId, players, practice = false, roundsToWin = 3, l
 
     for (const p of ps) {
       if (p.alive && inKill(p.bodies[TORSO].translation())) { fx('out', p.bodies[TORSO].translation()); removeRagdoll(p); p.respawn = 1.5; }
-      if (practice && !p.alive && !p.left && (p.respawn -= DT) <= 0) spawn(p, Math.floor(Math.random() * map.spawns.length));
+      if (practice && !p.alive && !p.left && (p.respawn -= DT) <= 0) spawn(p, freeSpawn());
     }
     if (practice) return;
     if (st === 'fight' && teamCount > 1) {

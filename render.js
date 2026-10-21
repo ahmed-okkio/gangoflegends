@@ -290,6 +290,7 @@ export function createRenderer(canvas) {
     scene.add(world);
     animated = [];
     rollers = buildMap(world, MAPS[s.map], s.map);
+    for (const l of [hemi, sun, rim]) l.visible = l.intensity > 0; // an unlit light still costs every shader, and the sun a 4096² shadow pass
     avatars = s.players.map((p, slot) => { const a = makeAvatar(p.champ, playerColor(s, slot), p.name, !!s.teams); world.add(a.group); return a; });
     hookPool = [];
     camAt.set(0, 0, 0); camDist = 14;
@@ -451,6 +452,8 @@ export function createRenderer(canvas) {
     Object.assign(grade.uniforms, { strength: { value: 0.35 }, contrast: { value: 1 }, saturation: { value: 1 }, shadows: { value: 0 } });
     bloom.radius = 0.55; bloom.highPassUniforms.smoothWidth.value = 0.01; bloom.compositeMaterial.uniforms.bloomFactors.value = [1, 0.8, 0.6, 0.4, 0.2]; rim.intensity = 0.9;
     cam = { side: 1, pitch: 0.63, min: 10, max: 24 };
+    // Gang Beasts' stages have their occlusion baked into the lightmaps; AO on top cost about half the frame (Incinerator)
+    ao.enabled = !map.imported;
     if (map.imported) { buildImported(g, map.imported, map.view); return []; }
     const paint = noiseTex('#d4502f', 0.12);
     const girder = std('#ffffff', { map: paint, roughness: 0.55, metalness: 0.35 });

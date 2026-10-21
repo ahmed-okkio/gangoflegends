@@ -148,6 +148,15 @@
   @keyframes pop { from { transform: scale(.7); opacity: 0; } }
   #out { position: absolute; bottom: 130px; left: 0; right: 0; text-align: center; font: 900 28px var(--display); color: var(--bad); text-shadow: 0 2px 8px #000; }
   #abil { position: absolute; left: 20px; bottom: 20px; display: flex; gap: 10px; }
+  /* chat: newest at the bottom, each line fades after a while; all of them come back while typing */
+  #chat { position: absolute; left: 20px; bottom: 150px; width: min(440px, 60vw); display: grid; gap: 3px; }
+  #chatLog { display: grid; gap: 3px; justify-items: start; }
+  #chatLog p { margin: 0; padding: 3px 9px; background: rgba(1, 10, 19, .55); border-left: 2px solid var(--pc); font-size: 13.5px; color: var(--text); text-shadow: 0 1px 2px #000; overflow-wrap: anywhere; transition: opacity .6s; }
+  #chatLog p b { color: var(--pc); margin-right: 6px; }
+  #chatLog p.old { opacity: 0; }
+  #chat.open #chatLog p.old { opacity: 1; }
+  #chatIn { padding: 7px 10px; background: rgba(1, 10, 19, .85); border: 1px solid var(--gold-lo); color: var(--text); font: 600 14px var(--body); }
+  #chatIn:focus { outline: none; border-color: var(--gold); }
   .slot { position: relative; overflow: hidden; width: 100px; height: 100px; background: linear-gradient(#11303a, #071418); border: 2px solid var(--gold); box-shadow: inset 0 0 18px rgba(10,200,185,.18); padding: 9px; display: flex; flex-direction: column; justify-content: space-between; }
   .slot b { font: 900 14px/1.1 var(--display); color: var(--gold-hi); position: relative; }
   .slot kbd { position: relative; align-self: flex-start; }
@@ -209,7 +218,7 @@
   <div id="updTitle">Checking for updates…</div><div class="bar"><div id="updFill"></div></div><div id="updTxt">One moment</div>
 </div>
 <canvas id="view"></canvas>
-<svg id="crosshair" width="32" height="32" viewBox="0 0 32 32" fill="none" stroke-linecap="round">
+<svg id="crosshair" style="transform: translate(-99px, -99px)" width="32" height="32" viewBox="0 0 32 32" fill="none" stroke-linecap="round">
   <g stroke="#000" stroke-opacity=".5" stroke-width="4"><circle cx="16" cy="16" r="8"/><path d="M16 2v6M16 24v6M2 16h6M24 16h6"/></g>
   <g stroke="#c8aa6e" stroke-width="2"><circle cx="16" cy="16" r="8"/><path d="M16 2v6M16 24v6M2 16h6M24 16h6"/></g>
   <circle cx="16" cy="16" r="2.2" fill="#0ac8b9" stroke="#000" stroke-opacity=".6"/>
@@ -234,7 +243,7 @@
     <p class="lede">Up to 8 players. One of you hosts and shares the lobby code; everyone else joins with it.</p>
     <div class="playgrid">
       <button id="hostBtn" class="bigbtn" data-sfx="start">Host a game<small>You get a code to share</small></button>
-      <div class="joinbox"><b>Join a game</b><div class="row"><input id="codeIn" maxlength="5" placeholder="Code" aria-label="Lobby code"><button id="joinBtn" class="btn primary">Join</button></div></div>
+      <div class="joinbox"><b>Join a game</b><div class="row"><input id="codeIn" maxlength="3" placeholder="Code" aria-label="Lobby code"><button id="joinBtn" class="btn primary">Join</button></div></div>
     </div>
     <div id="menuErr" class="err"></div>
     <details class="trouble"><summary>Can't connect?</summary>
@@ -297,6 +306,7 @@
   <div id="banner" class="hidden"></div>
   <div id="out" class="hidden">You're out. Watch the rest of the round.</div>
   <div id="abil"></div>
+  <div id="chat"><div id="chatLog"></div><input id="chatIn" class="hidden" maxlength="120" placeholder="Say something. Enter sends, Esc cancels" aria-label="Chat message"></div>
   <div id="keys"><span>Punch / grab <kbd data-act="lhand"></kbd><kbd data-act="rhand"></kbd> Headbutt <kbd data-act="butt"></kbd> Lift <kbd data-act="lift"></kbd> Jump / climb <kbd data-act="jump"></kbd> Lie down <kbd data-act="lay"></kbd></span><span>Menu <kbd>Esc</kbd></span></div>
   <div id="escMenu" class="hidden">
     <h2>Paused</h2>

@@ -43,7 +43,7 @@ let cached = null; // TURN credentials { at, body }, per isolate: one set an hou
 
 export default {
   async fetch(req, env) {
-    const room = new URL(req.url).pathname.match(/^\/room\/([A-Z0-9]{5})$/);
+    const room = new URL(req.url).pathname.match(/^\/room\/([A-Z0-9]{3,5})$/);
     if (room) return env.ROOM.get(env.ROOM.idFromName(room[1])).fetch(req);
     if (!env.TURN_KEY_ID) return new Response('no TURN key', { status: 502, headers: { 'access-control-allow-origin': '*' } });
     if (!cached || Date.now() - cached.at > 3600e3) {
