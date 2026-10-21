@@ -52,6 +52,25 @@ export const MAPS = {
     view: { dim: 0.4, lights: { 'Fire Pit Light long': { intensity: 5000, angle: 120, inner: 90, range: 60 } } },
     belts: [{ min: [4.6, 0, -6.8], max: [15, 0, -3.2], top: 0.2, v: [-1, 0, 0] }, { min: [-15, 0, -6.8], max: [-2.6, 0, -3.2], top: 0.2, v: [1, 0, 0] }],
   },
+  trawler: {
+    name: 'Trawler',
+    blurb: 'A fishing boat out at sea. Throw them overboard, or down the hold.',
+    gb: 'trawler',
+    view: { sea: 0.5 }, // water height, by the propeller (top 0.1) and rudder (0.66): Gang Beasts draws its sea at runtime (render.js)
+    killY: -6,
+    boxes: [box(0, -0.2, 0, 9, 0.2, 2.5, 'plate')],
+    rollers: [], kill: [],
+    spawns: [[-6, 0, 0], [6, 0, 0], [-3, 0, -1.5], [3, 0, 1.5], [-3, 0, 1.5], [3, 0, -1.5], [0, 0, -1.5], [0, 0, 1.5]],
+  },
+  subway: {
+    name: 'Subway',
+    blurb: 'An underground platform between two tracks. Mind the gap.',
+    gb: 'subway',
+    killY: -6,
+    boxes: [box(3.5, -0.2, 0, 8, 0.2, 3, 'plate')],
+    rollers: [], kill: [],
+    spawns: [[9.5, 0, 1.5], [2.3, 0, -2.5], [5.2, 0, 2.5], [-2.5, 0, 1.5], [-2.5, 0, -1.5], [9.5, 0, -1.5], [2.3, 0, 2.5], [5.3, 0, -2.5]],
+  },
   grind: {
     name: 'Grind',
     hidden: true, // not in the menus; the sim tests use this arena

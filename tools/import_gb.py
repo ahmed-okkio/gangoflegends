@@ -78,11 +78,14 @@ def wm(pid):
         par = parent_of[pid]
         world[pid] = mmul(wm(par), local) if par in transforms else local
     return world[pid]
+# networked roots the game switches on at runtime (Trawler's boat is saved inactive, waiting for the server to spawn it)
+WAKE = {"trawler": {"Trawler"}}
 def is_active(pid):
     if pid not in active:
         go = gos.get(go_of[pid])
         par = parent_of[pid]
-        active[pid] = bool(go and go.m_IsActive) and (is_active(par) if par in transforms else True)
+        on = bool(go and (go.m_IsActive or par not in transforms and go.m_Name in WAKE.get(stage, ())))
+        active[pid] = on and (is_active(par) if par in transforms else True)
     return active[pid]
 def path(pid):
     names = []
@@ -159,6 +162,8 @@ for o in env.objects:
     if pid is None or not (is_active(pid) or "_breakable" in path(pid)) or not getattr(c, "m_Enabled", True): continue
     p = path(pid)
     m = wm(pid)
+    # beasts (layer Actor) pass through Ball Only (11), Glass Only (14) and Ignore All (19): Trawler's stage-wide Bubble Collider, rope boxes
+    if o.type.name != "MeshRenderer" and not c.m_IsTrigger and gos[go_of[pid]].m_Layer in (11, 14, 19): continue
     if o.type.name == "MeshRenderer":
         go = gos[go_of[pid]]
         mf = next((comp for comp in (x.component.read() if hasattr(x, "component") else x.read() for x in go.m_Component) if comp.object_reader.type.name == "MeshFilter"), None)
@@ -183,9 +188,9 @@ for o in env.objects:
         box = {"path": p, "p": rnd(pos), "q": rnd(q, 5), "h": rnd([s / 2 for s in size])}
         if c.m_IsTrigger:
             if "kill" in p.lower(): kills.append(box)
-        elif "/City" not in p and "/Camera" not in p:  # Camera Blocker only stops the camera; beasts fall through it
+        elif "/City" not in p and "/Camera" not in p and "AI_Helpers" not in p:  # Camera Blocker only stops the camera; beasts fall through it. AI_Helpers: bot hints (Subway's sits over a track)
             colliders.append(box)
-    elif c.m_IsTrigger or "/City" in p or "/Camera" in p: continue
+    elif c.m_IsTrigger or "/City" in p or "/Camera" in p or "AI_Helpers" in p: continue
     # everything else is frozen where it sits in the scene (ropes, props): physics props would need syncing over the network
     elif o.type.name in ("CapsuleCollider", "SphereCollider"):
         # Rapier capsules run along local y: turn Unity's x / z direction onto it
@@ -207,6 +212,10 @@ def spawn_point(pid):
 for pid in transforms:
     if spawn_point(pid) and is_active(pid):
         x, y, z = xform(wm(pid), [0, 0, 0]); spawns.append(rnd([x, y, -z]))
+    # Trawler: one "Spawn Point" that Gang Beasts spreads the beasts around (its _raduis, 1.5m)
+    elif gos[go_of[pid]].m_Name == "Spawn Point" and is_active(pid):
+        x, y, z = xform(wm(pid), [0, 0, 0])
+        spawns += [rnd([x + 1.5 * math.cos(a * math.pi / 4), y, -z + 1.5 * math.sin(a * math.pi / 4)]) for a in range(8)]
 
 # lightmaps live in the scene's LightmapSettings. They're RGBM: linear = (5 * a * rgb) ^ 2.2. Stored as sRGB rgb * a, so nothing
 # clips; the renderer scales by 5 ^ 2.2 (LIGHTMAP_RGBM in render.js).

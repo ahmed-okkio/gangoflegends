@@ -460,6 +460,11 @@ export function createRenderer(canvas) {
     Object.assign(grade.uniforms, { strength: { value: 0.2 }, contrast: { value: 1.06 }, saturation: { value: 1.04 }, shadows: { value: 0.3 } });
     scene.fog = null;
     g.add(sky(...view.sky ?? ['#6fb2ee', '#d8ecfa', '#b9c9d6']));
+    // Trawler's sea is built at runtime by Gang Beasts' water script (nothing to import): a plain sea at its height
+    if (view.sea != null) {
+      const sea = new THREE.Mesh(new THREE.PlaneGeometry(3000, 3000).rotateX(-Math.PI / 2), new THREE.MeshStandardMaterial({ color: '#1d5f8c', roughness: 0.55, transparent: true, opacity: 0.92 }));
+      sea.position.y = view.sea; sea.receiveShadow = true; g.add(sea);
+    }
     // like the stage's own camera: Girders' looks from -z at 27 degrees
     const c = { side: -1, pitch: 27, min: 17, max: 28, ...view.cam };
     cam = { ...c, pitch: c.pitch * Math.PI / 180 };
