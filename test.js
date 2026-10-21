@@ -287,6 +287,13 @@ function lineUp(sim, gap = 1.1) {
   tap(sim, BTN.A2, Math.PI / 2);
   run(sim, 40, () => sim.setInput(0, { x: 0, z: 0, b: 0 }));
   assert.ok(torso(sim, 1).x < torso(sim, 0).x, 'Flay throws them behind Thresh');
+  sim = near('thresh', 'blitz');
+  run(sim, 90);
+  lineUp(sim, 1.5);
+  const before = torso(sim, 1).x;
+  tap(sim, BTN.A2, -Math.PI / 2); // aimed away from them
+  run(sim, 40, () => sim.setInput(0, { x: 0, z: 0, b: 0 }));
+  assert.ok(torso(sim, 1).x > before + 1, 'Flay aimed away pushes them off');
   console.log('thresh ok', gap0.toFixed(2), gap1.toFixed(2), gap2.toFixed(2));
 }
 

@@ -345,7 +345,8 @@ export function createSim({ mapId, players, practice = false, roundsToWin = 3, l
     p.leap = { slot: q.slot, t: 0 }; // reeled in until he reaches them (control())
     fx('swing', t, 0, p.slot);
   }
-  // Thresh E: sweep the chain through a line ahead, flinging everyone in it over and behind him
+  // Thresh E: sweep the chain through a line on both sides of him, flinging everyone in it away from where he aimed:
+  // aimed at them, they go over and behind him; aimed away, they're pushed off
   function flay(p, f, t) {
     p.flay = 0.3;
     fx('flay', add(t, mul(f, 1.5)), Math.atan2(f.x, f.z), p.slot);
@@ -353,8 +354,8 @@ export function createSim({ mapId, players, practice = false, roundsToWin = 3, l
     for (const o of ps) {
       if (o === p || !o.alive) continue;
       const d = sub(o.bodies[TORSO].translation(), t), along = d.x * f.x + d.z * f.z;
-      if (along < -0.3 || along > 3.2 || Math.abs(d.x * f.z - d.z * f.x) > 0.8 || Math.abs(d.y) > 1.2) continue;
-      hit(o, TORSO, add(mul(f, -7), V(0, 10, 0)), 20);
+      if (Math.abs(along) > 3.2 || Math.abs(d.x * f.z - d.z * f.x) > 0.8 || Math.abs(d.y) > 1.2) continue;
+      hit(o, TORSO, add(mul(f, -7), V(0, along > 0 ? 10 : 5, 0)), 20); // the ones in front have to clear him
       if (o.ko <= 0 && o.safe <= 0) o.stun = Math.max(o.stun, 0.5);
     }
   }
@@ -634,7 +635,7 @@ export function createSim({ mapId, players, practice = false, roundsToWin = 3, l
       const [first] = [0, ...(p.dash.ali ? [0.9, 1.8] : [])].flatMap(h => playersNear(p, add(tp, add(mul(f, 0.45), V(0, h, 0))), 0.6));
       if (first) {
         const k = p.dash.power, air = !first.vic.grounded; // Alistar's Headbutt sends someone already airborne much further
-        if (p.dash.ali) hit(first.vic, first.part, add(mul(f, air ? 18 : 12), V(0, air ? 4 : 3, 0)), air ? 40 : 30);
+        if (p.dash.ali) hit(first.vic, first.part, add(mul(f, air ? 14 : 9.7), V(0, air ? 4 : 3, 0)), air ? 40 : 30);
         else hit(first.vic, first.part, add(mul(f, 6 + k * 6), V(0, 2 + k * 2, 0)), 25 + k * 20);
         p.dash = null;
         addVel(T, mul(f, -2));
@@ -721,7 +722,7 @@ export function createSim({ mapId, players, practice = false, roundsToWin = 3, l
       h.vic.hooked = 0.1; // limp for as long as the pull lasts
       const vp = h.vic.bodies[TORSO].translation(), to = sub(h.o.bodies[TORSO].translation(), vp), d = len(to);
       h.pos = vp;
-      if (d < 1.4 || h.pull > 0.7) return false;
+      if (d < 1.4 || h.pull > 0.7) { h.vic.hooked = 0.5; return false; } // still limp a moment after landing: time to combo
       const v = add(mul(to, 14 / d), V(0, 1.5, 0));
       for (const b of h.vic.bodies) b.setLinvel(v, true);
       return true;
@@ -903,6 +904,8 @@ export function createSim({ mapId, players, practice = false, roundsToWin = 3, l
       p.nextChamp = id;
       if (practice && p.alive) { removeRagdoll(p); spawn(p, freeSpawn()); }
     },
+    // in an enemy's glue: no abilities (game.js greys out the ability bar)
+    stuck(slot) { const p = ps[slot]; return !!p?.alive && !!p.bodies && glued(p, p.bodies[TORSO].translation()); },
     drop(slot) { const p = ps[slot]; if (p) { p.left = true; removeRagdoll(p); } },
   };
 }

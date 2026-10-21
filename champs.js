@@ -10,7 +10,7 @@ export const CHAMPS = {
   hec: {
     name: 'Hecarim', title: 'The Shadow of War', body: '#2f6274', limb: '#1d3f4c', eyes: '#5ff7d2',
     abilities: [
-      { id: 'rampage', name: 'Rampage', cd: 4, desc: 'Spin with both fists out, smacking everyone around you. Works on the move and mid-charge.' },
+      { id: 'rampage', name: 'Rampage', cd: 3, desc: 'Spin with both fists out, smacking everyone around you. Works on the move and mid-charge.' },
       { id: 'charge', name: 'Devastating Charge', cd: 8, desc: 'Gallop, building up speed, and bowl over the first champ you reach. Steer as you go; faster hits harder. Press again to stop.' },
     ],
   },
@@ -39,7 +39,7 @@ export const CHAMPS = {
     name: 'Thresh', title: 'The Chain Warden', body: '#3d4a3f', limb: '#2b352d', eyes: '#7dff9a', glow: '#7dff9a',
     abilities: [
       { id: 'sentence', name: 'Death Sentence', cd: 10, aim: 9, release: true, desc: 'Hold to aim at your cursor, let go to throw your hook. It drags the first champ it hits a little toward you and holds them helpless on the chain for 2s: press again to fly all the way to them.' },
-      { id: 'flay', name: 'Flay', cd: 7, aim: 3, release: true, desc: 'Hold to aim, let go to sweep your chain through a line, flinging everyone in it over and behind you.' },
+      { id: 'flay', name: 'Flay', cd: 7, aim: 3, back: true, release: true, desc: 'Hold to aim, let go to sweep your chain through a line on both sides of you. Everyone in it is flung away from your cursor: aim at them to throw them over and behind you, aim away to push them off.' },
     ],
   },
   singed: {

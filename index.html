@@ -164,6 +164,9 @@
   .slot .cd { position: absolute; inset: 0; display: grid; place-items: center; font: 900 38px var(--display); color: var(--text); }
   .slot.cooling { border-color: var(--gold-lo); box-shadow: none; }
   .slot.cooling b { color: var(--dust); }
+  /* stuck in Singed's glue: no abilities */
+  #abil.stuck .slot { filter: grayscale(1) brightness(.55); border-color: var(--gold-lo); }
+  #abil.stuck .slot::after { content: ''; position: absolute; inset: 0; background: linear-gradient(to top right, transparent 47%, #ff4d5e 47%, #ff4d5e 53%, transparent 53%); }
   #keys { position: absolute; right: 20px; bottom: 20px; display: grid; gap: 6px; justify-items: end; font-size: 12.5px; color: #d6e0dd; text-shadow: 0 1px 3px #000; }
   #keys span { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; justify-content: flex-end; }
   body.playing:has(#escMenu.hidden), body.playing:has(#escMenu.hidden) * { cursor: none !important; }

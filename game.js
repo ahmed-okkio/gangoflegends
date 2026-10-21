@@ -456,17 +456,20 @@ function readInput() {
 const aiming = [false, false], held = [0, 0];
 function showAim(inp, dt) {
   const abs = CHAMPS[game.setup.players[game.mySlot].champ].abilities, mine = game.cur?.p[game.mySlot];
-  let range = 0;
+  let range = 0, back = false;
+  const sim = game.sim ?? game.local, stuck = sim.stuck(game.mySlot);
   [BTN.A1, BTN.A2].forEach((btn, i) => {
     const ab = abs[i];
     if (!(inp.b & btn)) aiming[i] = false;
-    else if (!aiming[i] && !(game.lastB & btn)) { aiming[i] = !!ab.aim && !(mine?.[4 + i] > 0); held[i] = 0; }
+    else if (!aiming[i] && !(game.lastB & btn)) { aiming[i] = !!ab.aim && !(mine?.[4 + i] > 0) && !stuck; held[i] = 0; }
     if (!aiming[i]) return;
     held[i] += dt;
     range = ab.aimMin ? ab.aimMin + (ab.aim - ab.aimMin) * Math.min(1, held[i] / ab.windup) : ab.aim;
+    back = !!ab.back;
   });
   game.lastB = inp.b;
-  view.setAim(inp.a == null ? null : { slot: game.mySlot, yaw: inp.a, range });
+  $('abil').classList.toggle('stuck', stuck);
+  view.setAim(inp.a == null ? null : { slot: game.mySlot, yaw: inp.a, range, back });
 }
 
 // ---------- loop ----------

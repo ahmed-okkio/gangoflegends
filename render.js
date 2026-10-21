@@ -853,6 +853,8 @@ export function createRenderer(canvas) {
   const aimBar = new THREE.Mesh(new THREE.PlaneGeometry(1, 1).rotateX(-Math.PI / 2).translate(0, 0, 0.5),
     new THREE.MeshBasicMaterial({ color: '#0ac8b9', transparent: true, opacity: 0.3, depthWrite: false, blending: THREE.AdditiveBlending }));
   aimBar.renderOrder = 5; aimBar.visible = false; scene.add(aimBar);
+  const aimBack = new THREE.Mesh(aimBar.geometry, aimBar.material.clone()); // the other half of a two-sided strip (Flay), dimmer
+  aimBack.material.opacity = 0.15; aimBack.renderOrder = 5; aimBack.visible = false; scene.add(aimBack);
   let aim = null;
   function aimYaw(cx, cy, slot) {
     const av = avatars[slot];
@@ -867,7 +869,11 @@ export function createRenderer(canvas) {
     time += dt;
     const me = aim?.range && avatars[aim.slot];
     aimBar.visible = !!me;
-    if (me) { const hp = me.parts[HIPS].position; aimBar.position.set(hp.x, hp.y - HIP_HEIGHT + 0.05, hp.z); aimBar.rotation.y = aim.yaw; aimBar.scale.set(0.7, 1, aim.range); }
+    aimBack.visible = !!me && !!aim.back;
+    if (me) {
+      const hp = me.parts[HIPS].position;
+      for (const [bar, yaw] of [[aimBar, aim.yaw], [aimBack, aim.yaw + Math.PI]]) { bar.position.set(hp.x, hp.y - HIP_HEIGHT + 0.05, hp.z); bar.rotation.y = yaw; bar.scale.set(0.7, 1, aim.range); }
+    }
     for (const fn of animated) fn({ dt, time });
     stepParticles(dt);
     stepRings(dt);
