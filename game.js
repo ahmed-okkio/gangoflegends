@@ -5,6 +5,7 @@ import { CHAMPS, TEAM_NAMES, TEAM_COLORS, FFA_COLORS } from './champs.js';
 import { MAPS } from './maps.js';
 import * as net from './net.js';
 import { prepareMap, loadBeast } from './stages.js';
+import { PARTS } from './beast.js';
 import { loadSfx, play, ui, setVolume } from './sfx.js';
 
 const $ = id => document.getElementById(id);
@@ -221,11 +222,12 @@ function onSnap(m) {
   if (!game?.local || m.s.mt <= game.lastMt) return; // the unreliable channel can deliver out of order: an older one is stale
   game.lastMt = m.s.mt;
   game.snaps.push(m.s);
-  // host clock vs mine over the last 5s of snapshots: the quickest arrival sets the offset, and the playback delay has to
+  // host clock vs mine over the last 30s of snapshots: the quickest arrival sets the offset, and the playback delay has to
   // cover how late all but the latest 1% came. Not the average: over TCP (the relay, TURN) a lost packet holds up
-  // everything behind it for a round trip, and those stalls froze everyone else, then made them jump. (A window, so a
-  // host whose sim runs a bit slow or a route that gets slower is followed within seconds)
-  const offs = game.offs; offs.push(m.s.mt - performance.now() / 1000); if (offs.length > 150) offs.shift();
+  // everything behind it for a round trip, and those stalls froze everyone else, then made them jump. 30s, not 5: a
+  // stall every few seconds dropped out of a short window, the delay shrank and the next stall froze them again (media
+  // players remember about as long). Still a window, so a route that gets slower is followed
+  const offs = game.offs; offs.push(m.s.mt - performance.now() / 1000); if (offs.length > 900) offs.shift();
   game.off = Math.max(...offs);
   game.jit = offs.map(o => game.off - o).sort((a, b) => a - b)[Math.floor(0.99 * (offs.length - 1))];
   game.local.sync(m.s, m.s.p[game.mySlot]);
@@ -569,23 +571,49 @@ function frame(now) {
     const s = game.snaps;
     if (!s.length || !game.mine) return;
     game.delay += (Math.min(0.7, Math.max(0.1, game.jit + 0.08)) - game.delay) * 0.02;
-    // that clock runs at wall speed, nudged toward where it should be: at most 5% fast, or down to half speed while the
-    // delay grows (a moment of slow motion beats a freeze). The offset jumps a few ms whenever its quickest sample leaves
-    // the window, and jumping with it made everyone else stutter
+    // that clock runs at wall speed, nudged toward where it should be: at most 5% fast or 15% slow (slower shows as slow
+    // motion; engines stay within 0.85-1.1x). The offset jumps a few ms whenever its quickest sample leaves the window,
+    // and jumping with it made everyone else stutter
     const want = now / 1000 + game.off - game.delay;
-    game.at = game.at == null || Math.abs(want - game.at) > 0.25 ? want : game.at + dt * (1 + Math.max(-0.5, Math.min(0.05, (want - game.at) * 2)));
+    game.at = game.at == null || Math.abs(want - game.at) > 0.25 ? want : game.at + dt * (1 + Math.max(-0.15, Math.min(0.05, (want - game.at) * 2)));
     const at = game.at;
     while (s.length > 2 && s[1].mt <= at) s.shift();
     const a = s[0], b = s[1] ?? a, alpha = b === a ? 1 : Math.min(1, Math.max(0, (at - a.mt) / (b.mt - a.mt)));
     // me: between my last two local steps, unless knocked out, hooked or grabbing / grabbed by someone (then the host's
     // ragdoll is the truth, and drawn on the same clock as whoever I'm tied to)
     const me = local.players[game.mySlot], limp = !me.alive || me.ko > 0 || me.hooked > 0 || me.tied;
-    view.apply(a, b, alpha, limp ? null : { slot: game.mySlot, a: game.mine[0] ?? game.mine[1], b: game.mine[1], alpha: acc / DT });
-    b.p.forEach((e, i) => { const o = a.p[i]; local.place(i, ...(e[1] && o?.[1] ? [6, 7, 8].map(k => o[k] + (e[k] - o[k]) * alpha) : [0, -100, 0])); });
+    const shift = carryOn(a, b, alpha, s[s.length - 1], at, dt);
+    if (!limp) shift[game.mySlot] = null;
+    view.apply(a, b, alpha, limp ? null : { slot: game.mySlot, a: game.mine[0] ?? game.mine[1], b: game.mine[1], alpha: acc / DT }, shift);
+    b.p.forEach((e, i) => { const o = a.p[i], d = shift[i]; local.place(i, ...(e[1] && o?.[1] ? [6, 7, 8].map((k, j) => o[k] + (e[k] - o[k]) * alpha + (d?.[j] ?? 0)) : [0, -100, 0])); });
     game.cur = { ...b, p: b.p.map((e, i) => i === game.mySlot && !limp ? game.mine[1] : e) };
   }
   updateHud(game.cur, now);
   view.render(dt);
+}
+
+// a stall (a lost snapshot; over the relay or TURN-over-TCP, a round trip): past the newest snapshot everyone else carries
+// on from it for a moment instead of freezing, sideways at their hips' speed, slowing down, at most 0.15s (ragdolls can't
+// be extrapolated far: floors, walls, each other). When the next one lands, where they were drawn and where it puts them
+// differ: that gap fades out (15% a frame at 60fps) instead of jumping. Returns how far to draw each one's hips off the snapshots
+const VX = 10 + PARTS.length * 4; // hips velocity in a snapshot entry (sim.js snapshot())
+const carry = (e, t) => { const k = 0.15 * (1 - Math.exp(-Math.min(t, 0.15) / 0.15)); return [e[VX] * k, 0, e[VX + 2] * k]; };
+function carryOn(a, b, alpha, n, at, dt) {
+  const was = game.carry, gaps = game.gaps ??= [], fade = Math.pow(0.85, dt * 60);
+  game.carry = at > n.mt ? n : null;
+  return b.p.map((e, i) => {
+    const o = a.p[i];
+    if (!e[1] || !o?.[1]) return gaps[i] = null;
+    const ext = game.carry?.p[i]?.[1] ? carry(n.p[i], at - n.mt) : [0, 0, 0];
+    let gap = gaps[i] ?? [0, 0, 0];
+    if (was && was !== n && was.p[i]?.[1]) { // drawn from the old newest until now: start from there
+      const w = was.p[i], wc = carry(w, at - was.mt);
+      gap = [6, 7, 8].map((k, j) => gap[j] + w[k] + wc[j] - (o[k] + (e[k] - o[k]) * alpha + ext[j]));
+      if (Math.hypot(...gap) > 1.5) gap = [0, 0, 0]; // respawned, flung: just go there
+    }
+    gaps[i] = gap = gap.map(v => v * fade);
+    return ext.map((v, j) => v + gap[j]);
+  });
 }
 
 const sendIn = m => {

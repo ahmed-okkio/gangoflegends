@@ -732,7 +732,8 @@ export function createRenderer(canvas) {
   const qa = new THREE.Quaternion(), qb = new THREE.Quaternion(), tmp = new THREE.Vector3(), tmp2 = new THREE.Vector3();
   // draw an interpolated state between snapshots a and b; `own` ({ slot, a, b, alpha }) draws one player from its own
   // pair of states instead (a predicting client's own champ)
-  function apply(a, b, alpha, own) {
+  // shift: per slot, how far to draw the hips off the snapshots (game.js carryOn)
+  function apply(a, b, alpha, own, shift) {
     if (!setup) return;
     const centre = new THREE.Vector3(), alive = [];
     b.p.forEach((pb, slot) => {
@@ -749,7 +750,7 @@ export function createRenderer(canvas) {
         qb.set(pb[o], pb[o + 1], pb[o + 2], pb[o + 3]);
         qa.slerp(qb, lerp).toArray(av.q[i]);
       }
-      tmp.set(src[6], src[7], src[8]).lerp(tmp2.set(pb[6], pb[7], pb[8]), lerp).toArray(av.pos[HIPS]);
+      tmp.set(src[6], src[7], src[8]).lerp(tmp2.set(pb[6], pb[7], pb[8]), lerp).add(shift?.[slot] ? tmp2.fromArray(shift[slot]) : tmp2.set(0, 0, 0)).toArray(av.pos[HIPS]);
       for (const i of ORDER) {
         const par = PARTS[i].parent;
         if (par >= 0) { const a = qrot(av.q[par], ANCHOR[i]); av.pos[i] = av.pos[par].map((v, k) => v + a[k]); }
