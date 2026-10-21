@@ -249,6 +249,10 @@ function onPong(m) {
   game.ping = [...p].sort((a, b) => a - b)[p.length >> 1];
   const el = $('ping');
   el.textContent = `${Math.round(game.ping)} ms`;
+  // dev mode: frames this second, the slowest one, and how far behind everyone else is drawn: a slow PC or a slow link
+  const fr = game.fr ?? { n: 0, worst: 0 };
+  if (devOn()) el.textContent += ` · ${fr.n} fps · worst frame ${Math.round(fr.worst * 1000)} ms · others ${Math.round(game.delay * 1000)} ms behind`;
+  game.fr = { n: 0, worst: 0 };
   el.className = game.ping > 200 ? 'bad' : game.ping > 100 ? 'meh' : '';
 }
 
@@ -533,6 +537,7 @@ function frame(now) {
   const dt = Math.min(0.1, (now - last) / 1000);
   last = now;
   if (!game) { runAttract(dt); return; }
+  const fr = game.fr ??= { n: 0, worst: 0 }; fr.n++; fr.worst = Math.max(fr.worst, dt); // for the ping line (onPong)
   const inp = $('escMenu').classList.contains('hidden') ? readInput() : { x: 0, z: 0, b: 0, a: null, d: null };
   showAim(inp, dt);
   if (game.sim && !game.local) {
