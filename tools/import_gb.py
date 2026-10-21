@@ -206,7 +206,8 @@ for pid in transforms:
     if spawn_point(pid) and is_active(pid):
         x, y, z = xform(wm(pid), [0, 0, 0]); spawns.append(rnd([x, y, -z]))
 
-# lightmaps live in the scene's LightmapSettings. They're RGBM (gamma space: rgb * a * 5); decode to plain RGB.
+# lightmaps live in the scene's LightmapSettings. They're RGBM: linear = (5 * a * rgb) ^ 2.2. Stored as sRGB rgb * a, so nothing
+# clips; the renderer scales by 5 ^ 2.2 (LIGHTMAP_RGBM in render.js).
 lightmaps = []
 for o in env.objects:
     if o.type.name == "LightmapSettings" and in_scene(o):
@@ -214,13 +215,13 @@ for o in env.objects:
             tex = lm.m_Lightmap.read()
             name = f"lightmap_{len(lightmaps)}.png"
             im = tex.image.convert("RGBA")
-            px = [(min(255, int(r * a * 5 / 255)), min(255, int(g * a * 5 / 255)), min(255, int(b * a * 5 / 255))) for r, g, b, a in im.getdata()]
+            px = [(round(r * a / 255), round(g * a / 255), round(b * a / 255)) for r, g, b, a in im.getdata()]
             from PIL import Image
             dec = Image.new("RGB", im.size); dec.putdata(px); dec.save(os.path.join(out, name))
             lightmaps.append(name)
 
-# ambient + realtime sun, so the renderer can match the original lighting
-env_light = {}
+# ambient + the lights that shine at runtime (realtime and mixed; baked-only ones are already in the lightmaps)
+env_light, lights = {}, []
 for o in env.objects:
     if not in_scene(o): continue
     if o.type.name == "RenderSettings":
@@ -231,10 +232,15 @@ for o in env.objects:
     elif o.type.name == "Light":
         l = o.read()
         pid = tf_of_go.get(l.m_GameObject.path_id)
-        if l.m_Type == 1 and l.m_Enabled and pid is not None and is_active(pid):
+        t = o.read_typetree()
+        bake = t.get("m_Lightmapping", 4)  # 1 mixed, 2 baked, 4 realtime
+        if l.m_Enabled and pid is not None and is_active(pid) and bake != 2 and l.m_Type in (0, 1, 2) and l.m_Intensity > 0:
             d = xform(wm(pid), [0, 0, 1]); o0 = xform(wm(pid), [0, 0, 0])
-            env_light["sun"] = {"color": rnd([l.m_Color.r, l.m_Color.g, l.m_Color.b]), "intensity": l.m_Intensity, "dir": rnd([d[0] - o0[0], d[1] - o0[1], -(d[2] - o0[2])])}
+            lights.append({"type": ["spot", "sun", "point"][l.m_Type], "color": rnd([l.m_Color.r, l.m_Color.g, l.m_Color.b]), "intensity": round(l.m_Intensity, 3),
+                           "p": rnd([o0[0], o0[1], -o0[2]]), "dir": rnd([d[0] - o0[0], d[1] - o0[1], -(d[2] - o0[2])]), "range": round(l.m_Range, 2),
+                           "angle": round(l.m_SpotAngle, 2), "inner": round(t.get("m_InnerSpotAngle", l.m_SpotAngle * 0.8), 2),
+                           "shadows": t["m_Shadows"]["m_Type"] > 0, "mask": t["m_CullingMask"]["m_Bits"], "name": gos[l.m_GameObject.path_id].m_Name})
 
 json.dump({"stage": stage, "meshes": meshes, "materials": materials, "renderers": renderers, "colliders": colliders, "capsules": capsules, "trimeshes": trimeshes,
-           "spawns": spawns, "kill": kills, "lightmaps": lightmaps, "env": env_light}, open(os.path.join(out, "scene.json"), "w"), indent=0)
-print(f"{stage}: {len(renderers)} renderers, {len(meshes)} meshes, {len(materials)} materials, {len(colliders)} boxes, {len(capsules)} capsules, {len(trimeshes)} mesh colliders, {len(spawns)} spawns, {len(kills)} kill boxes, lightmaps {lightmaps}")
+           "spawns": spawns, "kill": kills, "lightmaps": lightmaps, "env": env_light, "lights": lights}, open(os.path.join(out, "scene.json"), "w"), indent=0)
+print(f"{stage}: {len(renderers)} renderers, {len(meshes)} meshes, {len(materials)} materials, {len(colliders)} boxes, {len(capsules)} capsules, {len(trimeshes)} mesh colliders, {len(spawns)} spawns, {len(kills)} kill boxes, lightmaps {lightmaps}, lights {[(x["type"], x["name"], x["intensity"], x["mask"]) for x in lights]}")

@@ -28,7 +28,8 @@ GROUPS = {
 os.makedirs(OUT, exist_ok=True)
 index = {g: [] for g in GROUPS}
 seen = set()
-for f in glob.glob(os.path.join(GB, r"Gang Beasts_Data\StreamingAssets\aa\StandaloneWindows64-LocalBundles\core-audio*.bundle")):
+BUNDLES = os.path.join(GB, r"Gang Beasts_Data\StreamingAssets\aa\StandaloneWindows64-LocalBundles")
+for f in glob.glob(os.path.join(BUNDLES, "core-audio*.bundle")):
     for o in UnityPy.load(f).objects:
         if o.type.name != "AudioClip": continue
         name = o.peek_name()

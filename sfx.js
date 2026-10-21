@@ -28,6 +28,28 @@ export function play(group, vol = 1, rate = 0.92 + Math.random() * 0.16) {
   }, () => {});
 }
 
+// menu sounds: short synthesized ticks, quiet and clean. [from Hz, to Hz, seconds, gain, wave, delay]
+const UI = {
+  hover: [[2600, 2600, 0.016, 0.012, 'sine']],
+  click: [[1100, 1500, 0.045, 0.03, 'sine']],
+  open: [[520, 880, 0.08, 0.025, 'sine']],
+  close: [[880, 520, 0.08, 0.025, 'sine']],
+  back: [[760, 480, 0.06, 0.03, 'sine']],
+  pick: [[1050, 1050, 0.04, 0.028, 'sine'], [1575, 1575, 0.07, 0.024, 'sine', 0.045]],
+  start: [[660, 660, 0.07, 0.03, 'sine'], [990, 990, 0.14, 0.03, 'sine', 0.07]],
+  error: [[260, 190, 0.14, 0.04, 'triangle']],
+};
+export function ui(kind) {
+  if (!ctx) return;
+  if (ctx.state === 'suspended') ctx.resume();
+  for (const [f0, f1, dur, vol, type, delay = 0] of UI[kind] ?? []) {
+    const t = ctx.currentTime + delay, o = ctx.createOscillator(), g = ctx.createGain();
+    o.type = type; o.frequency.setValueAtTime(f0, t); o.frequency.exponentialRampToValueAtTime(f1, t + dur);
+    g.gain.setValueAtTime(0, t); g.gain.linearRampToValueAtTime(vol * volume, t + 0.004); g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+    o.connect(g).connect(ctx.destination); o.start(t); o.stop(t + dur + 0.02);
+  }
+}
+
 // sim fx events -> sounds
 export function playEvents(events) {
   for (const [kind, , , , big] of events) {

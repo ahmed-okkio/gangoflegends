@@ -36,26 +36,14 @@ export const MAPS = {
     rollers: [], kill: [],
     spawns: [[-6, 0, -3], [6, 0, -3], [0, 0, -7], [0, 0, 1], [-3, 0, -5], [3, 0, -1], [-3, 0, -1], [3, 0, -5]],
   },
-  ring: {
-    name: 'Ring',
-    blurb: 'A boxing ring. Throw them over the ropes.',
-    gb: 'ring',
-    view: { cam: { pitch: 34, min: 8, max: 12 } }, // inside the arena: the ceiling starts at y = 12
-    killY: -3,
-    boxes: [box(0, 0.8, 0, 3.4, 0.2, 3.4, 'plate')],
+  incinerator: {
+    name: 'Incinerator',
+    blurb: 'A furnace pit with a lid that opens. Keep off the middle.',
+    gb: 'incinerator',
+    killY: -6,
+    boxes: [box(0, -0.2, 0, 6, 0.2, 4, 'plate')],
     rollers: [], kill: [],
-    // the stage places players from code, so these are ours: a circle on the canvas (top at y = 1)
-    spawns: [...Array(8)].map((_, i) => [2.3 * Math.sin(i * Math.PI / 4), 1, 2.3 * Math.cos(i * Math.PI / 4)]),
-  },
-  lighthouse: {
-    name: 'Lighthouse',
-    blurb: 'Round the lamp at the top of the lighthouse, a long way above the sea.',
-    gb: 'lighthouse',
-    killY: 20,
-    boxes: [box(0, 29.3, 0, 4, 0.2, 4, 'plate')],
-    rollers: [], kill: [],
-    // placed from code in the original: a circle on the balcony round the lamp room
-    spawns: [...Array(8)].map((_, i) => [4 * Math.sin(i * Math.PI / 4), 29.5, 4 * Math.cos(i * Math.PI / 4)]),
+    spawns: [[-4, 0, -2], [4, 0, -2], [-4, 0, 2], [4, 0, 2], [-1.5, 0, -2], [1.5, 0, -2], [-1.5, 0, 2], [1.5, 0, 2]],
   },
   grind: {
     name: 'Grind',

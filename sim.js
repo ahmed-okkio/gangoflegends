@@ -8,7 +8,7 @@ import { PARTS, ANCHOR, HAND, HIP_HEIGHT, CHEST, HEAD, ARM, THIGH, FORE, LEG, HI
 export const initPhysics = () => RAPIER.init();
 export const DT = 1 / 60;
 // LEFT / RIGHT: one button per hand, like Gang Beasts: tap to punch with that hand, hold to reach out and grab with it
-export const BTN = { JUMP: 1, LEFT: 2, RIGHT: 4, A1: 8, A2: 16, BUTT: 32, LAY: 64 };
+export const BTN = { JUMP: 1, LEFT: 2, RIGHT: 4, A1: 8, A2: 16, BUTT: 32, LAY: 64, LIFT: 128 };
 const HANDS = [BTN.LEFT, BTN.RIGHT]; // arm 0 is the beast's left
 export const STAND = HIP_HEIGHT + PARTS[CHEST].p[1] - PARTS[HIPS].p[1]; // chest pivot height above the floor when standing
 
@@ -52,12 +52,17 @@ const isLeg = i => (i >= THIGH && i < THIGH + 2) || (i >= LEG && i < LEG + 2);
 const Q = a => ({ x: a[0], y: a[1], z: a[2], w: a[3] });
 const ROT_X = qaxis(Z, Math.PI / 2), ROT_Z = qaxis(X, Math.PI / 2); // capsules are y-up in Rapier
 
-// collision groups: (membership << 16) | filter. bit 0 = world, bit slot+1 = that player.
-// A ragdoll never collides with itself; legs ignore the world unless knocked out (the torso hovers instead).
+// collision groups: (membership << 16) | filter. bit 0 = world, bit slot+1 = that player, bit 9 = forearms.
+// A ragdoll doesn't collide with itself, except its forearms with its chest (fists can't pass through
+// the body; the rest stays out of it, hanging and climbing hands would brush it all the time). Legs ignore the world unless
+// knocked out (the torso hovers instead).
+const FIST = 1 << 9;
 const WORLD_GROUPS = (1 << 16) | 0xffff;
 const bodyGroups = p => (p.bit << 16) | (0xffff & ~p.bit);
-const legGroups = p => (p.bit << 16) | (0xffff & ~p.bit & ~1);
-const worldAndOthers = p => (1 << 16) | (0xffff & ~p.bit); // ground rays, grabs
+const legGroups = p => (p.bit << 16) | (0xffff & ~p.bit & ~1 & ~FIST);
+const lowGroups = p => (p.bit << 16) | (0xffff & ~p.bit & ~FIST); // everything but the chest
+const fistGroups = p => ((p.bit | FIST) << 16) | 0xffff;
+const worldAndOthers = p => (1 << 16) | (0xffff & ~p.bit & ~FIST); // ground rays, grabs: never your own fists
 const othersOnly = p => (1 << 16) | (0x1fe & ~p.bit);      // hit checks
 
 // local >= 0: a client's prediction copy. Only that player's ragdoll is simulated (straight from local input, so moving and
@@ -109,7 +114,7 @@ export function createSim({ mapId, players, practice = false, roundsToWin = 3, l
       for (const sh of part.shapes) {
         const desc = sh.ball ? RAPIER.ColliderDesc.ball(sh.ball) : RAPIER.ColliderDesc.capsule(sh.cap[1], sh.cap[0]).setRotation(sh.cap[2] === 'x' ? ROT_X : sh.cap[2] === 'z' ? ROT_Z : QI);
         const col = world.createCollider(desc.setTranslation(...sh.c).setMass(part.mass / part.shapes.length).setFriction(0.8)
-          .setCollisionGroups(isLeg(i) ? legGroups(p) : bodyGroups(p)), body);
+          .setCollisionGroups(isLeg(i) ? legGroups(p) : i === FORE || i === FORE + 1 ? fistGroups(p) : i === CHEST ? bodyGroups(p) : lowGroups(p)), body);
         owner.set(col.handle, { p, part: i });
       }
       return body;
@@ -235,6 +240,23 @@ export function createSim({ mapId, players, practice = false, roundsToWin = 3, l
     const axis = qrot(b.rotation(), DOWN), roll = mul(axis, dot(dw, axis));
     turn(b, add(mul(sub(dw, roll), strength), mul(roll, Math.max(strength, twist))), carry, track);
   }
+  // joint tone. Rapier's ball joints have no angle limits, so a part bent past `lim` from its rest pose (relative to its
+  // parent) is pushed back, and a limp beast keeps a weak pull toward its rest pose: Gang Beasts' knocked-out beasts
+  // still have their joint drives, which is what keeps the upper body in one piece when they flop.
+  const TONE = [[WAIST, 0.9, 0.3], [CHEST, 0.9, 0.3], [HEAD, 0.7, 0.2], [ARM, 2.2, 0.04], [ARM + 1, 2.2, 0.04], [THIGH, 1.6, 0.06], [THIGH + 1, 1.6, 0.06]]; // [part, limit (rad), limp pull]
+  function tone(p, limp) {
+    for (const [i, lim, pull] of TONE) {
+      const b = p.bodies[i], par = p.bodies[PARTS[i].parent];
+      let e = qmul(qmul(par.rotation(), REST[i]), qconj(b.rotation()));
+      if (e.w < 0) e = { x: -e.x, y: -e.y, z: -e.z, w: -e.w };
+      const s = Math.hypot(e.x, e.y, e.z), ang = 2 * Math.atan2(s, e.w);
+      if (s < 1e-5 || (!limp && (ang <= lim || i === ARM || i === ARM + 1))) continue; // awake, the arms pose freely
+      const axis = mul(V(e.x, e.y, e.z), 1 / s), rel = sub(b.angvel(), par.angvel());
+      let dw = limp ? mul(sub(mul(axis, ang * 10), rel), pull) : V();
+      if (ang > lim) dw = add(dw, mul(sub(mul(axis, (ang - lim) * 15), mul(rel, 0.5)), 0.6));
+      turn(b, dw, []);
+    }
+  }
   // rotate a body towards a target orientation, about its joint pivot (the body origin) rather than its centre of mass,
   // so the joint doesn't eat the correction. `carry` bodies turn rigidly with it, so heavy arms and head ride along.
   function orient(b, qt, k, strength, carry = []) {
@@ -291,11 +313,12 @@ export function createSim({ mapId, players, practice = false, roundsToWin = 3, l
     addVel(p.bodies[FORE + 1], add(mul(f, 9), V(0, 1, 0)));
     fx('hit', add(t, mul(f, 1.2)), 1, p.slot);
     if (local >= 0) return;
+    const { range, cone, core } = CHAMPS.sett.abilities[0]; // render.js draws the same area while it charges
     for (const o of ps) {
       if (o === p || !o.alive) continue;
       const d = sub(o.bodies[TORSO].translation(), t), dist = Math.hypot(d.x, d.z), along = (d.x * f.x + d.z * f.z);
-      if (dist > 2.4 || Math.abs(d.y) > 1.2 || along < dist * Math.cos(0.6)) continue;
-      const centre = Math.abs(d.x * f.z - d.z * f.x) < 0.35;
+      if (dist > range || Math.abs(d.y) > 1.2 || along < dist * Math.cos(cone)) continue;
+      const centre = Math.abs(d.x * f.z - d.z * f.x) < core;
       hit(o, TORSO, mul(add(mul(f, centre ? 5 + 9 * k : 4 + 6 * k), V(0, 1.5 + 2 * k, 0)), 1.5), (centre ? 25 + 75 * k : 15 + 45 * k) * 1.5);
     }
   }
@@ -357,22 +380,30 @@ export function createSim({ mapId, players, practice = false, roundsToWin = 3, l
     const dv = V((mx * speed - tv.x) * k, 0, (mz * speed - tv.z) * k);
     if (p.grounded && p.jumpT <= 0) dv.y = ((STAND - ray.timeOfImpact) * 12 - tv.y) * 0.35 + HOLD * DT;
     if (p.grounded && move && pressed & BTN.JUMP) { dv.y = 6.5 - tv.y; p.jumpT = 0.3; }
-    // climbing: hanging off a ledge by the hands, jump hauls the chest up past the hands, then they let go and
-    // the body rolls forward over the edge
+    // climbing: hanging off a ledge by the hands, hold jump to push yourself up until the hands are at your waist (arms
+    // pushing down on the ledge) and stay up there; push the stick toward the ledge from the top to let go and roll over it
     const ledge = p.grabs.reduce((y, g, i) => g?.target.isFixed() ? Math.max(y, handPos(p, i).y) : y, -Infinity);
-    if (move && !p.grounded && ledge > -Infinity && pressed & BTN.JUMP && p.climb <= 0) { p.climb = 1.2; p.over = false; }
-    if (p.climb > 0) {
-      p.climb -= DT;
-      if (!p.over && ledge > -Infinity && tp.y < ledge + 0.6) {
-        // haul up, held just behind the hands so the chest neither swings out nor jams under the lip
-        const held = p.grabs.map((g, i) => g && handPos(p, i)).filter(Boolean), hx = held.reduce((a, h) => a + h.x, 0) / held.length, hz = held.reduce((a, h) => a + h.z, 0) / held.length;
-        dv.y = (5 - tv.y) * 0.5 + HOLD * DT;
-        dv.x = ((hx - f.x * 0.3 - tp.x) * 4 - tv.x) * 0.3; dv.z = ((hz - f.z * 0.3 - tp.z) * 4 - tv.z) * 0.3; // stay just out from the wall
-      } else {
-        if (!p.over) { p.over = true; p.climb = Math.min(p.climb, 0.4); releaseGrabs(p); }
-        dv.y = (1.5 - tv.y) * 0.3 + HOLD * DT;
-        dv.x = (f.x * 3 - tv.x) * 0.4; dv.z = (f.z * 3 - tv.z) * 0.4;
+    p.pushUp = move && !p.grounded && ledge > -Infinity && !!(inp.b & BTN.JUMP) && !p.over;
+    if (p.pushUp) {
+      // held just behind the hands so the chest neither swings out nor jams under the lip
+      const held = p.grabs.map((g, i) => g?.target.isFixed() && handPos(p, i)).filter(Boolean), hx = held.reduce((a, h) => a + h.x, 0) / held.length, hz = held.reduce((a, h) => a + h.z, 0) / held.length;
+      const to = norm(V(hx - tp.x, 0, hz - tp.z));
+      // the hands may be on the wall face: the top is found by probing down just past them
+      const probe = world.castRay(new RAPIER.Ray(V(hx + to.x * 0.2, ledge + 1, hz + to.z * 0.2), DOWN), 1.2, true, undefined, worldAndOthers(p));
+      const top = probe ? Math.max(ledge, ledge + 1 - probe.timeOfImpact) : ledge;
+      // and the hands work their way up the face to the lip
+      for (const g of p.grabs) if (g?.target.isFixed()) {
+        const R = g.target.rotation(), T = g.target.translation(), w = add(qrot(R, g.j.anchor2()), T);
+        if (w.y < top - 0.02) { w.y = Math.min(top, w.y + 2 * DT); g.j.setAnchor2(qrot(qconj(R), sub(w, T))); }
       }
+      dv.y = ((top + 0.4 - tp.y) * 6 - tv.y) * 0.5 + HOLD * DT;
+      dv.x = ((hx - to.x * 0.3 - tp.x) * 4 - tv.x) * 0.3; dv.z = ((hz - to.z * 0.3 - tp.z) * 4 - tv.z) * 0.3;
+      if (tp.y > top + 0.25 && m > 0.2 && mx * to.x + mz * to.z > 0) { p.over = true; p.climb = 0.4; p.overDir = to; releaseGrabs(p); }
+    }
+    if (p.climb > 0) { // rolling over the edge
+      p.climb -= DT;
+      dv.y = (1.5 - tv.y) * 0.3 + HOLD * DT;
+      dv.x = (p.overDir.x * 3 - tv.x) * 0.4; dv.z = (p.overDir.z * 3 - tv.z) * 0.4;
     }
     if (p.grounded || move) for (const i of CORE) addVel(p.bodies[i], dv);
 
@@ -391,7 +422,7 @@ export function createSim({ mapId, players, practice = false, roundsToWin = 3, l
     p.phase += hspeed * DT * 4.5;
     // hands, Gang Beasts style: pressing one cocks that arm back; let go quickly (a tap) and it throws the punch,
     // keep holding and it reaches out and grabs instead
-    const grabbing = [false, false];
+    const grabbing = [false, false], lift = ctrl && inp.b & BTN.LIFT;
     for (const arm of [0, 1]) {
       if (ctrl && inp.b & HANDS[arm]) p.held[arm] += DT;
       else if (p.held[arm] > 0) {
@@ -436,7 +467,8 @@ export function createSim({ mapId, players, practice = false, roundsToWin = 3, l
       if (p.spin > 0) { ua = fa = add(mul(side, s), mul(bf, 0.1)); str = 0.5; fs = 0.4; }
       if (p.held[i] > 0 && !grabbing[i] && p.punch?.arm !== i) { ua = add(add(mul(bf, -0.5), mul(side, s * 0.7)), V(0, -0.3, 0)); fa = add(bf, V(0, 0.3, 0)); str = 0.6; fs = 0.7; } // cocked: elbow back and out
       if (grabbing[i] && !p.grounded) { ua = fa = add(mul(bf, 0.5), V(0, 1, 0)); str = 0.8; } // reach up for ledges
-      if (p.climb > 0) { ua = fa = add(mul(bf, 0.3), DOWN); str = 0.8; } // push down on the ledge
+      if (p.pushUp || p.climb > 0) { ua = fa = add(mul(bf, 0.3), DOWN); str = 0.8; } // push down on the ledge
+      if (lift && p.grabs[i]?.vic) { ua = fa = add(V(0, 1, 0), mul(bf, 0.3)); str = 0.9; } // overhead
       const free = !p.grabs[i]?.target.isFixed() || !p.grounded; // hanging or climbing, arm momentum is what lifts the beast
       aimPart(p, ARM + i, ua, 14, str * ctrl, [p.bodies[FORE + i]], free, TWIST);
       aimPart(p, FORE + i, fa, 14, str * fs * ctrl, [], free, TWIST);
@@ -444,6 +476,7 @@ export function createSim({ mapId, players, practice = false, roundsToWin = 3, l
       aimPart(p, THIGH + i, add(DOWN, mul(bf, swing * 0.7 * gait)), 14, 0.5 * ctrl, [p.bodies[LEG + i]]);
       aimPart(p, LEG + i, add(DOWN, mul(bf, (swing * 0.7 - Math.max(0, Math.cos(p.phase + i * Math.PI)) * 0.9) * gait)), 14, 0.5 * ctrl);
     }
+    tone(p, p.ko > 0 || p.hooked > 0);
     const back = mul(leak, -1 / p.bodies.reduce((m, b) => m + b.mass(), 0));
     for (const b of p.bodies) addVel(b, back);
 
@@ -504,14 +537,25 @@ export function createSim({ mapId, players, practice = false, roundsToWin = 3, l
       if (!grabbing[i] || p.over) { if (p.grabs[i]) { world.removeImpulseJoint(p.grabs[i].j, true); p.grabs[i] = null; } continue; }
       if (p.grabs[i]) continue;
       const arm = p.bodies[FORE + i], hp = handPos(p, i);
-      const target = overlap(hp, 0.16, worldAndOthers(p))[0]?.parent();
+      const c = overlap(hp, 0.16, worldAndOthers(p))[0], target = c?.parent();
       if (!target) continue;
       const local = qrot(qconj(target.rotation()), sub(hp, target.translation()));
       const j = world.createImpulseJoint(RAPIER.JointData.spherical(V(...HAND[i]), local), arm, target, true);
       j.setContactsEnabled(false);
-      p.grabs[i] = { j, target };
+      const o = owner.get(c.handle);
+      p.grabs[i] = { j, target, vic: o && !o.proxy ? o.p : null };
       fx('grab', hp, 0, p.slot);
     }
+
+    // lift (Gang Beasts' Shift): holding someone, carry them up over the head; let go of the hands mid-lift to throw
+    const vic = lift && p.grabs.find(g => g?.vic?.alive)?.vic;
+    if (vic) {
+      const goal = add(tp, add(V(0, 0.9, 0), mul(bf, 0.15))), vt = vic.bodies[TORSO].translation(), vv = vic.bodies[TORSO].linvel();
+      const d = V(((goal.x - vt.x) * 6 - vv.x) * 0.3, ((goal.y - vt.y) * 6 - vv.y) * 0.3 + HOLD * DT, ((goal.z - vt.z) * 6 - vv.z) * 0.3);
+      for (const b of vic.bodies) addVel(b, d);
+      vic.jumpT = Math.max(vic.jumpT, 0.1); // their hover spring would fight it
+    } else if (ctrl && p.lifted?.alive && !p.grabs.some(g => g?.vic === p.lifted)) for (const b of p.lifted.bodies) addVel(b, add(mul(f, 8), V(0, 4, 0)));
+    p.lifted = vic || null;
   }
 
   // play back the next queued client input (setInput), one per step. Ran dry (a late packet): hold the last input and

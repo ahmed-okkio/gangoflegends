@@ -130,6 +130,22 @@ function lineUp(sim, gap = 1.1) {
   console.log('grab ok');
 }
 
+// 7b. lift: grab, hold lift and B goes up over A's head; let go of the hands and B is thrown
+{
+  const sim = near('blitz', 'hec');
+  run(sim, 90);
+  lineUp(sim, 0.95);
+  run(sim, 30, () => sim.setInput(0, { x: 0, z: 0, b: BTN.LEFT | BTN.RIGHT }));
+  run(sim, 60, () => sim.setInput(0, { x: 0, z: 0, b: BTN.LEFT | BTN.RIGHT | BTN.LIFT }));
+  const up = torso(sim, 1).y - torso(sim, 0).y;
+  assert.ok(up > 0.6, `lifted overhead (${up.toFixed(2)})`);
+  assert.ok(upright(sim, 0) > 0.8, `lifter stays up (${upright(sim, 0).toFixed(2)})`);
+  const x = torso(sim, 1).x;
+  run(sim, 20, () => sim.setInput(0, { x: 0, z: 0, b: BTN.LIFT }));
+  assert.ok(torso(sim, 1).x - x > 1, `thrown (${(torso(sim, 1).x - x).toFixed(2)})`);
+  console.log('lift ok');
+}
+
 // 8. headbutt dazes, lying down drops you and you get back up, hanging off a ledge you can climb up
 {
   const sim = near('blitz', 'hec');
@@ -148,7 +164,11 @@ function lineUp(sim, gap = 1.1) {
   p.yaw = Math.PI;
   run(sim, 40, () => sim.setInput(0, { x: 0, z: 0, b: (BTN.LEFT | BTN.RIGHT) }));
   assert.ok(p.grabs.every(Boolean), 'hangs by both hands');
-  run(sim, 60, i => sim.setInput(0, { x: 0, z: 0, b: (BTN.LEFT | BTN.RIGHT) | (i === 2 ? BTN.JUMP : 0) }));
+  // hold jump: pushes up until the hands are at the waist, and stays there
+  run(sim, 60, () => sim.setInput(0, { x: 0, z: 0, b: BTN.LEFT | BTN.RIGHT | BTN.JUMP }));
+  assert.ok(p.grabs.every(Boolean) && torso(sim, 0).y > 0.3, `pushes up on the ledge ${torso(sim, 0).y.toFixed(2)}`);
+  // push toward the ledge (-z): rolls over it
+  run(sim, 60, () => sim.setInput(0, { x: 0, z: -1, b: BTN.LEFT | BTN.RIGHT | BTN.JUMP }));
   assert.ok(p.alive && torso(sim, 0).y > 0.3 && torso(sim, 0).z < 5, `climbs onto the ledge ${JSON.stringify(torso(sim, 0))}`);
   console.log('headbutt + lie down + climb ok');
 }

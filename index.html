@@ -5,167 +5,297 @@
 <title>Gang of Legends</title>
 <meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-inline' 'wasm-unsafe-eval'; img-src 'self' data: blob:; connect-src 'self' data: https://0.peerjs.com wss://0.peerjs.com https://gangoflegends-turn.ahmed-okkio.workers.dev wss://gangoflegends-turn.ahmed-okkio.workers.dev">
 <style>
-  @font-face { font-family: 'Lilita One'; src: url('node_modules/@fontsource/lilita-one/files/lilita-one-latin-400-normal.woff2') format('woff2'); }
+  @font-face { font-family: 'Cinzel'; font-weight: 700; src: url('node_modules/@fontsource/cinzel/files/cinzel-latin-700-normal.woff2') format('woff2'); }
+  @font-face { font-family: 'Cinzel'; font-weight: 900; src: url('node_modules/@fontsource/cinzel/files/cinzel-latin-900-normal.woff2') format('woff2'); }
   @font-face { font-family: 'Nunito'; font-weight: 700; src: url('node_modules/@fontsource/nunito/files/nunito-latin-700-normal.woff2') format('woff2'); }
   @font-face { font-family: 'Nunito'; font-weight: 900; src: url('node_modules/@fontsource/nunito/files/nunito-latin-900-normal.woff2') format('woff2'); }
+  /* hextech: deep teal-black, brushed gold trim, cyan glow for whatever is under the cursor or chosen */
   :root {
-    --ink: #0b1426; --ink-2: #1b2a44; --paper: #f0e6d2; --gold: #c8aa6e; --gold-2: #f0d48a; --teal: #0ac8b9; --muted: #7d8aa3; --bad: #ff5468;
-    --display: 'Lilita One', 'Segoe UI Black', sans-serif; --body: 'Nunito', 'Segoe UI', sans-serif;
+    --night: #091418; --deep: #061014; --plate: #0f2228; --plate-2: #132d35; --line: #1e3a40;
+    --text: #e8e1cf; --dust: #8ea3a3; --gold: #c8aa6e; --gold-hi: #f0e6d2; --gold-lo: #785a28;
+    --cyan: #0ac8b9; --cyan-hi: #cdfafa; --bad: #e84057;
+    --display: 'Cinzel', Georgia, serif; --body: 'Nunito', 'Segoe UI', sans-serif;
+    --glow: 0 0 14px rgba(10,200,185,.35), inset 0 0 14px rgba(10,200,185,.12);
   }
   * { box-sizing: border-box; }
-  html, body { margin: 0; height: 100%; overflow: hidden; background: var(--ink); color: var(--paper); font: 700 15px var(--body); user-select: none; }
+  html, body { margin: 0; height: 100%; overflow: hidden; background: var(--night); color: var(--text); font: 700 15px/1.45 var(--body); user-select: none; }
   canvas { display: block; position: fixed; inset: 0; }
   .hidden { display: none !important; }
   button, select, input { font: inherit; color: inherit; }
-  kbd { display: inline-grid; place-items: center; min-width: 24px; height: 24px; padding: 0 5px; border-radius: 6px; background: var(--ink); color: var(--gold-2); border: 2px solid var(--gold); font: 14px var(--display); }
-
-  .screen { position: fixed; inset: 0; display: grid; place-items: center; overflow: auto; padding: 24px;
-    background: radial-gradient(ellipse at 50% -10%, #23406a 0%, transparent 60%), radial-gradient(ellipse at 100% 110%, #0d3b44 0%, transparent 55%), var(--ink); }
-  .card { width: min(880px, 100%); background: linear-gradient(#13213a, #0e192d); border: 2px solid var(--gold); border-radius: 18px; padding: 26px 28px; box-shadow: 0 0 0 6px rgba(200,170,110,.12), 0 30px 80px rgba(0,0,0,.5); }
-  h1 { margin: 0; font: 64px/0.95 var(--display); font-weight: 400; color: var(--gold-2); letter-spacing: 1px; text-shadow: 0 4px 0 #6b5428; }
-  h1 + p { margin: 6px 0 22px; color: var(--muted); }
-  h2 { margin: 18px 0 8px; font: 18px var(--display); font-weight: 400; color: var(--gold); letter-spacing: .5px; text-transform: uppercase; }
+  button { cursor: pointer; }
+  kbd { display: inline-grid; place-items: center; min-width: 24px; height: 23px; padding: 0 6px; border-radius: 2px; background: var(--deep); color: var(--gold-hi); border: 1px solid var(--gold-lo); font: 900 12px var(--body); }
+  h2 { margin: 0 0 6px; font: 900 32px/1.1 var(--display); color: var(--gold-hi); letter-spacing: .02em; }
+  h3 { margin: 26px 0 10px; font: 700 17px var(--display); color: var(--gold); }
+  .lede { margin: 0 0 22px; color: var(--dust); max-width: 56ch; }
   .row { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
   .grow { flex: 1; }
-  input, select { background: var(--ink); border: 2px solid var(--ink-2); border-radius: 10px; padding: 10px 12px; outline: none; }
-  input:focus, select:focus { border-color: var(--teal); }
-  select:disabled { opacity: .7; }
-  .btn { border: 0; border-radius: 12px; padding: 12px 20px; cursor: pointer; font: 20px var(--display); background: var(--ink-2); color: var(--paper); box-shadow: 0 4px 0 #050a14; transition: transform .06s; }
-  .btn:hover { filter: brightness(1.15); } .btn:active { transform: translateY(3px); box-shadow: 0 1px 0 #050a14; }
-  .btn.gold { background: linear-gradient(var(--gold-2), var(--gold)); color: var(--ink); box-shadow: 0 4px 0 #6b5428; }
-  .btn.teal { background: var(--teal); color: var(--ink); box-shadow: 0 4px 0 #066d65; }
-  #codeIn { width: 130px; text-transform: uppercase; letter-spacing: 3px; font: 20px var(--display); text-align: center; }
-  .err { min-height: 22px; margin-top: 12px; color: var(--bad); }
+  :focus-visible { outline: 2px solid var(--cyan); outline-offset: 2px; }
+  ::-webkit-scrollbar { width: 8px; } ::-webkit-scrollbar-track { background: transparent; } ::-webkit-scrollbar-thumb { background: var(--gold-lo); }
 
-  .champs { display: grid; grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); gap: 10px; }
-  .champ { position: relative; text-align: left; cursor: pointer; padding: 12px 12px 10px 56px; border-radius: 14px; border: 2px solid var(--ink-2); background: var(--ink); display: flex; flex-direction: column; gap: 3px; }
-  .champ:hover { border-color: var(--muted); }
-  .champ.on { border-color: var(--gold); box-shadow: 0 0 0 3px rgba(200,170,110,.25); }
-  .champ > b { font: 19px var(--display); font-weight: 400; color: var(--gold-2); }
-  .champ > small { color: var(--muted); margin-bottom: 6px; }
-  .bean { position: absolute; left: 12px; top: 14px; width: 34px; height: 48px; border-radius: 18px; background: radial-gradient(circle at 35% 30%, color-mix(in srgb, var(--c), #fff 30%), var(--c) 60%); }
-  .bean::after { content: ''; position: absolute; left: 9px; top: 12px; width: 16px; height: 5px; border-radius: 4px; background: var(--e); box-shadow: 0 0 10px var(--e); }
-  .ab { display: flex; gap: 6px; align-items: flex-start; font-size: 12px; color: #c9d1e0; line-height: 1.3; }
-  .ab b { display: block; color: var(--paper); font-weight: 900; }
+  /* buttons: gold-trimmed plates that light up cyan */
+  .btn { border: 2px solid var(--gold-lo); padding: 10px 24px; font: 700 16px var(--display); letter-spacing: .04em; background: linear-gradient(#173540, #0c1f25); color: var(--gold-hi); transition: border-color .12s, box-shadow .12s, color .12s; }
+  .btn:hover { border-color: var(--gold); box-shadow: var(--glow); color: var(--cyan-hi); }
+  .btn:active { transform: translateY(1px); }
+  .btn.primary { border-color: var(--gold); background: linear-gradient(#11505a, #08343b); color: var(--cyan-hi); }
+  .btn.primary:hover { background: linear-gradient(#16656f, #0a3f47); }
+  .btn.small { padding: 6px 14px; font-size: 13px; }
+  input, select { background: var(--deep); border: 1px solid var(--gold-lo); border-radius: 0; padding: 10px 12px; outline: none; font-weight: 900; }
+  input:focus, select:focus { border-color: var(--cyan); box-shadow: 0 0 8px rgba(10,200,185,.3); }
+  select:disabled { opacity: .6; }
+  input[type=range] { accent-color: var(--gold); padding: 0; border: 0; background: none; box-shadow: none; }
+  input[type=checkbox] { accent-color: var(--cyan); width: 17px; height: 17px; }
+  .err { min-height: 22px; margin-top: 14px; color: var(--bad); }
+  .err.ok { color: var(--dust); }
 
-  body.playing:has(#escMenu.hidden), body.playing:has(#escMenu.hidden) * { cursor: none !important; }
-  .controls { display: grid; grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); gap: 6px 14px; color: #c9d1e0; font-size: 13px; }
-  .controls span { display: flex; gap: 6px; align-items: center; }
-  .controls.hints { margin-top: 8px; }
+  /* ---------- shell: the rail on the left, the live arena behind, the chosen tab's panel ---------- */
+  .shell { position: fixed; inset: 0; display: grid; grid-template-columns: 380px minmax(0, 760px); gap: 44px; padding: 40px 48px;
+    background: linear-gradient(90deg, rgba(6,16,20,.97) 0, rgba(6,16,20,.92) 380px, rgba(6,16,20,.5) 62%, rgba(6,16,20,.12)); }
+  .rail { display: flex; flex-direction: column; min-height: 0; }
+  .logo { display: block; width: 330px; height: auto; margin: 0 0 30px -6px; filter: drop-shadow(0 8px 18px rgba(0,0,0,.6)); animation: rise .6s ease-out both; }
+  @keyframes rise { from { opacity: 0; transform: translateY(-10px) scale(.96); } }
+  .tabs { display: grid; gap: 2px; }
+  .tab { position: relative; border: 0; background: none; padding: 9px 16px 9px 22px; font: 700 22px var(--display); color: var(--dust); text-align: left; letter-spacing: .03em; transition: color .12s, background .12s; }
+  .tab::before { content: ''; position: absolute; left: 4px; top: 50%; width: 8px; height: 8px; margin-top: -4px; transform: rotate(45deg); border: 1px solid var(--gold-lo); }
+  .tab:hover { color: var(--gold-hi); }
+  .tab:hover::before { border-color: var(--gold); }
+  .tab.on { color: var(--gold-hi); background: linear-gradient(90deg, rgba(200,170,110,.16), transparent 85%); }
+  .tab.on::before { background: var(--cyan); border-color: var(--cyan-hi); box-shadow: 0 0 10px var(--cyan); }
+  .tab:focus-visible { outline: none; color: var(--cyan-hi); }
+  .tab small { font: 900 13px var(--body); color: var(--gold); margin-left: 8px; letter-spacing: 0; }
+  .who { margin-top: auto; display: grid; gap: 6px; color: var(--dust); font-size: 13px; }
+  .who input { font-size: 17px; }
+  .legal { margin: 14px 0 0; font-size: 11px; line-height: 1.4; color: #5d7474; max-width: 46ch; }
+  .ver { color: var(--dust); }
+
+  .panel { position: relative; align-self: start; max-height: 100%; overflow: auto; padding: 30px 34px; background: linear-gradient(rgba(15,34,40,.96), rgba(8,20,24,.96)); border: 1px solid var(--gold-lo); box-shadow: 0 20px 60px rgba(0,0,0,.5); }
+  .panel::before { content: ''; position: absolute; left: 0; right: 0; top: 0; height: 2px; background: linear-gradient(90deg, transparent, var(--gold), transparent); }
+  .panel.enter { animation: slide .18s ease-out; }
+  @keyframes slide { from { transform: translateX(14px); opacity: 0; } }
+
+  /* play online */
+  .playgrid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  .bigbtn { display: grid; gap: 4px; text-align: left; padding: 20px 22px; border: 2px solid var(--gold); background: linear-gradient(#11505a, #08343b); color: var(--cyan-hi); font: 900 24px/1.1 var(--display); transition: box-shadow .12s; }
+  .bigbtn small { font: 700 13px var(--body); color: var(--text); opacity: .75; }
+  .bigbtn:hover { box-shadow: var(--glow), 0 0 24px rgba(10,200,185,.25); }
+  .joinbox { display: grid; gap: 10px; padding: 16px 18px; border: 1px solid var(--line); background: rgba(6,16,20,.6); }
+  .joinbox b { font: 900 24px/1.1 var(--display); color: var(--gold-hi); }
+  #codeIn { width: 0; flex: 1; text-transform: uppercase; letter-spacing: 6px; font: 900 20px var(--body); text-align: center; }
+  details.trouble { margin-top: 22px; color: var(--dust); }
+  details.trouble summary { cursor: pointer; font-weight: 900; }
+  details.trouble summary:hover { color: var(--gold-hi); }
+  details.trouble .row { margin-top: 12px; }
+  .relay { display: flex; gap: 8px; align-items: center; font-size: 13px; }
+  .hint { color: var(--dust); font-size: 13px; margin: 14px 0 0; max-width: 70ch; }
+
+  /* practice: stage tiles; champions */
+  .maps { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 10px; margin-bottom: 22px; }
+  .map, .champ { border: 1px solid var(--line); background: rgba(19,45,53,.55); text-align: left; transition: border-color .12s, box-shadow .12s; }
+  .map:hover, .champ:hover { border-color: var(--gold-lo); }
+  .map.on, .champ.on { border-color: var(--gold); box-shadow: inset 0 0 0 1px var(--gold), var(--glow); background: rgba(19,58,66,.7); }
+  .map { padding: 14px 16px; display: grid; gap: 4px; }
+  .map b { font: 900 19px var(--display); color: var(--gold-hi); }
+  .map small { color: var(--dust); font-size: 13px; line-height: 1.35; }
+  .champs { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 10px; }
+  .champ { position: relative; padding: 16px 16px 14px 74px; display: flex; flex-direction: column; gap: 4px; }
+  .champ > b { font: 900 20px/1.1 var(--display); color: var(--gold-hi); }
+  .champ > small { color: var(--gold); margin-bottom: 8px; }
+  .bean { position: absolute; left: 16px; top: 16px; width: 42px; height: 58px; border-radius: 21px 21px 16px 16px; background: radial-gradient(circle at 35% 28%, color-mix(in srgb, var(--c), #fff 35%), var(--c) 55%, color-mix(in srgb, var(--c), #000 25%)); }
+  .bean::after { content: ''; position: absolute; left: 11px; top: 15px; width: 20px; height: 6px; border-radius: 4px; background: var(--e); box-shadow: 0 0 10px var(--e); }
+  .champ.on .bean { box-shadow: 0 0 0 2px var(--deep), 0 0 0 3px var(--gold); }
+  .ab { display: flex; gap: 8px; align-items: flex-start; font-size: 12.5px; color: #c4d0cd; line-height: 1.35; margin-top: 4px; }
+  .ab b { display: block; color: var(--text); font-weight: 900; }
+
+  /* controls + settings */
+  .controls { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 4px 22px; font-size: 14px; }
+  .bindrow { display: flex; gap: 6px; align-items: center; padding: 4px 0; border-bottom: 1px solid var(--line); }
   .bindrow i { flex: 1; }
-  .bind { min-width: 44px; height: 26px; padding: 0 6px; border-radius: 6px; background: var(--ink); color: var(--gold-2); border: 2px solid var(--gold); font: 14px var(--display); cursor: pointer; }
-  .bind:hover { border-color: var(--gold-2); }
-  .bind.wait { background: var(--gold); color: var(--ink); }
-  .legal { margin-top: 18px; font-size: 11px; color: var(--muted); font-weight: 700; }
+  .bind { min-width: 54px; height: 28px; padding: 0 8px; background: var(--deep); color: var(--gold-hi); border: 1px solid var(--gold-lo); font: 900 13px var(--body); }
+  .bind:hover { border-color: var(--cyan); box-shadow: 0 0 8px rgba(10,200,185,.35); }
+  .bind.wait { background: var(--cyan); color: var(--deep); border-color: var(--cyan-hi); }
+  .volrow { display: grid; grid-template-columns: 90px 1fr 40px; align-items: center; gap: 14px; margin-top: 10px; font: 700 17px var(--display); color: var(--gold-hi); }
+  .volrow output { color: var(--dust); font: 900 14px var(--body); text-align: right; }
 
-  #lobbyCode { cursor: pointer; font: 54px var(--display); letter-spacing: 8px; color: var(--teal); }
-  #lobbyPlayers { list-style: none; padding: 0; margin: 0; display: grid; gap: 6px; }
-  #lobbyPlayers li { display: flex; align-items: center; gap: 8px; padding: 9px 12px; border-radius: 10px; background: var(--ink); border-left: 5px solid var(--pc); }
-  #lobbyPlayers li.empty { border-left-color: var(--ink-2); color: var(--muted); }
-  #lobbyPlayers .dot { width: 12px; height: 12px; border-radius: 50%; background: var(--pc); }
-  #lobbyPlayers em { font-style: normal; font-size: 11px; color: var(--ink); background: var(--gold); padding: 1px 6px; border-radius: 5px; }
-  #lobbyPlayers .pick { margin-left: auto; color: var(--gold-2); }
-  #lobbyPlayers .team { color: var(--pc); min-width: 44px; text-align: right; }
-  .cols { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
-  @media (max-width: 760px) { .cols { grid-template-columns: 1fr; } }
-  .settings { display: grid; grid-template-columns: auto 1fr; gap: 8px 12px; align-items: center; }
-  #mapBlurb { color: var(--muted); font-size: 13px; margin: 8px 0 0; }
+  /* lobby */
+  .code { display: grid; justify-items: start; gap: 6px; margin-bottom: 24px; }
+  .code > span { color: var(--dust); font-size: 13px; }
+  #lobbyCode { border: 2px solid var(--gold); padding: 6px 20px 8px 26px; background: linear-gradient(#11505a, #08343b); color: var(--cyan-hi); font: 900 52px/1 var(--display); letter-spacing: 12px; transition: box-shadow .12s; }
+  #lobbyCode:hover { box-shadow: var(--glow); }
+  #lobbyPlayers { list-style: none; padding: 0; margin: 0; display: grid; gap: 3px; }
+  #lobbyPlayers li { display: flex; align-items: center; gap: 10px; padding: 8px 12px; background: rgba(15,34,40,.92); border-left: 4px solid var(--pc); }
+  #lobbyPlayers li.empty { border-left-color: var(--line); color: #4d6464; background: rgba(15,34,40,.45); }
+  #lobbyPlayers li b { font: 900 16px var(--display); color: var(--gold-hi); }
+  #lobbyPlayers em { font-style: normal; font-size: 11px; font-weight: 900; color: var(--deep); background: var(--gold); padding: 1px 7px; }
+  #lobbyPlayers em.me { background: var(--cyan); }
+  #lobbyPlayers .pick { margin-left: auto; color: var(--dust); }
+  #lobbyPlayers .team { color: var(--pc); min-width: 44px; text-align: right; font-weight: 900; }
+  #lobbyNote { color: var(--dust); margin: 14px 0; }
+  .lobbyacts { margin-top: auto; display: flex; gap: 10px; }
+  .lobbyacts .btn { flex: 1; padding: 13px; font-size: 18px; }
+  .settings { display: grid; grid-template-columns: 140px 1fr; gap: 10px 14px; align-items: center; max-width: 440px; }
+  #mapBlurb { color: var(--dust); font-size: 14px; margin: 12px 0 0; }
 
+  /* ---------- in match ---------- */
   #hud { position: fixed; inset: 0; pointer-events: none; }
   #hud button { pointer-events: auto; }
-  #scores { position: absolute; top: 14px; left: 0; right: 0; display: flex; justify-content: center; flex-wrap: wrap; gap: 8px; }
-  .chip { padding: 6px 12px; border-radius: 999px; background: rgba(11,20,38,.85); border: 2px solid var(--pc, var(--gold)); font-size: 14px; }
-  .chip b { font: 18px var(--display); font-weight: 400; color: var(--pc, var(--gold-2)); margin-left: 4px; }
-  .chip.out { opacity: .45; }
-  #banner { position: absolute; top: 26%; left: 0; right: 0; text-align: center; font: 84px var(--display); color: var(--gold-2); text-shadow: 0 5px 0 #6b5428, 0 10px 40px rgba(0,0,0,.6); animation: pop .25s ease-out; }
-  #banner small { display: block; font-size: 26px; color: var(--paper); text-shadow: 0 2px 0 #000; }
+  #scores { position: absolute; top: 14px; left: 0; right: 0; display: flex; justify-content: center; flex-wrap: wrap; gap: 6px; }
+  .chip { display: flex; align-items: center; gap: 10px; padding: 5px 14px 5px 10px; background: rgba(6,16,20,.88); border: 1px solid var(--gold-lo); border-left: 4px solid var(--pc, var(--gold)); font-weight: 900; font-size: 14px; }
+  .chip b { font: 900 20px/1 var(--display); color: var(--pc, var(--gold-hi)); }
+  .chip.out { opacity: .4; }
+  #banner { position: absolute; top: 24%; left: 0; right: 0; text-align: center; font: 900 104px/1 var(--display); letter-spacing: .03em;
+    background: linear-gradient(#fff8e6, #f0d48a 45%, #c8aa6e 55%, #8a6a32); -webkit-background-clip: text; background-clip: text; color: transparent;
+    filter: drop-shadow(0 4px 0 #2a1d08) drop-shadow(0 10px 24px rgba(0,0,0,.7)); animation: pop .3s cubic-bezier(.2, 1.5, .4, 1); }
+  #banner small { display: block; margin-bottom: 10px; font: 700 24px var(--display); letter-spacing: .1em; }
   @keyframes pop { from { transform: scale(.7); opacity: 0; } }
-  #out { position: absolute; bottom: 110px; left: 0; right: 0; text-align: center; font: 26px var(--display); color: var(--bad); text-shadow: 0 2px 0 #000; }
-  #abil { position: absolute; left: 18px; bottom: 18px; display: flex; gap: 10px; }
-  .slot { position: relative; overflow: hidden; width: 118px; height: 74px; border-radius: 12px; background: rgba(11,20,38,.9); border: 2px solid var(--gold); padding: 8px 10px; display: flex; flex-direction: column; gap: 6px; }
-  .slot b { font-size: 13px; line-height: 1.1; }
-  .slot i { position: absolute; left: 0; right: 0; bottom: 0; height: 0; background: rgba(0,0,0,.6); }
-  .slot .cd { position: absolute; right: 10px; top: 6px; font: 26px var(--display); color: var(--paper); }
-  .slot.cooling { border-color: var(--ink-2); }
-  #keys { position: absolute; right: 18px; bottom: 18px; display: grid; gap: 4px; font-size: 12px; color: #c9d1e0; text-align: right; text-shadow: 0 1px 2px #000; }
-  #escMenu { position: absolute; inset: 0; display: grid; place-items: center; background: rgba(5,10,20,.6); pointer-events: auto; }
-  #escMenu .card { width: 320px; text-align: center; display: grid; gap: 12px; }
-  .netrow { margin-top: 8px; align-items: center; }
-  .relay { display: flex; gap: 6px; align-items: center; color: #c9d1e0; font-size: 13px; }
-  .btn.small { padding: 6px 12px; font-size: 14px; }
-  .volrow { display: flex; align-items: center; gap: 12px; margin-top: 14px; color: var(--gold); font: 16px var(--display); }
-  .volrow input { flex: 1; accent-color: var(--gold); padding: 0; border: 0; background: none; }
-  #update { position: fixed; inset: 0; z-index: 1000; display: grid; place-items: center; background: rgba(5,10,20,.92); }
-  #update .card { width: min(460px, 90vw); text-align: center; }
-  #update .bar { height: 20px; margin: 16px 0 10px; border: 2px solid var(--gold); border-radius: 99px; background: var(--ink); overflow: hidden; }
-  #updFill { height: 100%; width: 0; background: linear-gradient(var(--gold-2), var(--gold)); transition: width .2s; }
+  #out { position: absolute; bottom: 130px; left: 0; right: 0; text-align: center; font: 900 28px var(--display); color: var(--bad); text-shadow: 0 2px 8px #000; }
+  #abil { position: absolute; left: 20px; bottom: 20px; display: flex; gap: 10px; }
+  .slot { position: relative; overflow: hidden; width: 100px; height: 100px; background: linear-gradient(#11303a, #071418); border: 2px solid var(--gold); box-shadow: inset 0 0 18px rgba(10,200,185,.18); padding: 9px; display: flex; flex-direction: column; justify-content: space-between; }
+  .slot b { font: 900 14px/1.1 var(--display); color: var(--gold-hi); position: relative; }
+  .slot kbd { position: relative; align-self: flex-start; }
+  .slot i { position: absolute; left: 0; right: 0; bottom: 0; height: 0; background: rgba(0,0,0,.7); }
+  .slot .cd { position: absolute; inset: 0; display: grid; place-items: center; font: 900 38px var(--display); color: var(--text); }
+  .slot.cooling { border-color: var(--gold-lo); box-shadow: none; }
+  .slot.cooling b { color: var(--dust); }
+  #keys { position: absolute; right: 20px; bottom: 20px; display: grid; gap: 6px; justify-items: end; font-size: 12.5px; color: #d6e0dd; text-shadow: 0 1px 3px #000; }
+  #keys span { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; justify-content: flex-end; }
+  body.playing:has(#escMenu.hidden), body.playing:has(#escMenu.hidden) * { cursor: none !important; }
+  #escMenu { position: absolute; inset: 0; pointer-events: auto; padding: 44px 56px; display: flex; flex-direction: column; justify-content: center; align-items: flex-start; gap: 4px;
+    background: linear-gradient(90deg, rgba(6,16,20,.96) 0, rgba(6,16,20,.9) 420px, rgba(6,16,20,.35)); }
+  #escMenu h2 { font-size: 54px; margin-bottom: 18px; }
+  #escMenu .volrow { width: 360px; margin: 10px 0 10px 22px; }
+
+  /* update screen */
+  #update { position: fixed; inset: 0; z-index: 1000; display: grid; place-content: center; justify-items: center; gap: 16px; background: var(--night); text-align: center; }
+  #update .logo { width: 300px; margin: 0 0 16px; }
+  #updTitle { font: 700 22px var(--display); color: var(--gold-hi); }
+  #update .bar { width: min(420px, 80vw); height: 14px; border: 1px solid var(--gold-lo); background: var(--deep); }
+  #updFill { height: 100%; width: 0; background: linear-gradient(90deg, #0a8f86, var(--cyan)); box-shadow: 0 0 10px var(--cyan); transition: width .2s; }
+  #updTxt { color: var(--dust); }
+
+  @media (max-width: 1000px) {
+    .shell { grid-template-columns: 1fr; overflow: auto; padding: 24px 16px; background: rgba(6,16,20,.95); }
+    .logo { width: 240px; }
+    .playgrid { grid-template-columns: 1fr; }
+  }
+  @media (prefers-reduced-motion: reduce) { *, *::before { animation: none !important; transition: none !important; } }
 </style>
 </head>
 <body>
-<div id="update" class="hidden"><div class="card"><h2 id="updTitle">Checking for updates…</h2><div class="bar"><div id="updFill"></div></div><div id="updTxt">One moment</div></div></div>
+<!-- the crest logo, drawn once and shown with <use> (menu + update screen) -->
+<svg width="0" height="0" style="position: absolute" aria-hidden="true">
+  <defs>
+    <linearGradient id="lgGold" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff8e6"/><stop offset=".42" stop-color="#f0d48a"/><stop offset=".55" stop-color="#c8aa6e"/><stop offset="1" stop-color="#7a5a24"/></linearGradient>
+    <linearGradient id="lgTrim" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#f0e6d2"/><stop offset=".5" stop-color="#c8aa6e"/><stop offset="1" stop-color="#785a28"/></linearGradient>
+    <linearGradient id="lgBg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#123139"/><stop offset="1" stop-color="#050e11"/></linearGradient>
+    <radialGradient id="lgGem" cx=".4" cy=".35" r=".7"><stop offset="0" stop-color="#e9ffff"/><stop offset=".4" stop-color="#0ac8b9"/><stop offset="1" stop-color="#05504a"/></radialGradient>
+    <filter id="lgGlow" x="-1" y="-1" width="3" height="3"><feGaussianBlur stdDeviation="5" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+    <symbol id="logo" viewBox="0 -30 480 300">
+      <polygon points="240,4 448,46 470,146 404,232 240,258 76,232 10,146 32,46" fill="url(#lgBg)" stroke="url(#lgTrim)" stroke-width="5"/>
+      <polygon points="240,18 434,56 454,144 394,220 240,244 86,220 26,144 46,56" fill="none" stroke="#785a28" stroke-width="1.5"/>
+      <polyline points="200,236 240,252 280,236" fill="none" stroke="url(#lgTrim)" stroke-width="3"/>
+      <g filter="url(#lgGlow)"><polygon points="240,-22 262,4 240,30 218,4" fill="url(#lgGem)" stroke="#f0e6d2" stroke-width="2"/></g>
+      <g stroke="url(#lgTrim)" stroke-width="2"><line x1="96" y1="86" x2="150" y2="86"/><line x1="330" y1="86" x2="384" y2="86"/></g>
+      <g fill="#c8aa6e"><polygon points="90,86 96,80 102,86 96,92"/><polygon points="378,86 384,80 390,86 384,92"/></g>
+      <text x="240" y="96" text-anchor="middle" font-family="Cinzel, Georgia, serif" font-weight="700" font-size="30" letter-spacing="10" fill="#f0e6d2">GANG OF</text>
+      <text x="240" y="184" text-anchor="middle" font-family="Cinzel, Georgia, serif" font-weight="900" font-size="80" textLength="408" lengthAdjust="spacingAndGlyphs" fill="url(#lgGold)" stroke="#2a1d08" stroke-width="2.5" paint-order="stroke">LEGENDS</text>
+      <line x1="120" y1="206" x2="360" y2="206" stroke="url(#lgTrim)" stroke-width="1.5"/>
+    </symbol>
+  </defs>
+</svg>
+<div id="update" class="hidden">
+  <svg class="logo" viewBox="0 0 480 300" role="img" aria-label="Gang of Legends"><use href="#logo"/></svg>
+  <div id="updTitle">Checking for updates…</div><div class="bar"><div id="updFill"></div></div><div id="updTxt">One moment</div>
+</div>
 <canvas id="view"></canvas>
 
-<div id="menu" class="screen">
-  <div class="card">
-    <h1>Gang of Legends</h1>
-    <p>Wobbly ragdoll brawls with League champions. Throw everyone else off the map.</p>
-    <div class="row">
-      <input id="nameIn" class="grow" maxlength="14" placeholder="Summoner name">
-    </div>
-    <h2>Champion</h2>
-    <div id="champs" class="champs"></div>
-    <h2>Play</h2>
-    <div class="row">
-      <button id="hostBtn" class="btn gold">Host game</button>
-      <input id="codeIn" maxlength="5" placeholder="CODE">
-      <button id="joinBtn" class="btn teal">Join</button>
-      <span class="grow"></span>
-      <select id="practiceMap"></select>
-      <button id="practiceBtn" class="btn">Practice</button>
+<div id="menu" class="shell">
+  <aside class="rail">
+    <svg class="logo" viewBox="0 0 480 300" role="img" aria-label="Gang of Legends"><use href="#logo"/></svg>
+    <nav class="tabs">
+      <button class="tab on" data-tab="play" data-sfx="open">Play online</button>
+      <button class="tab" data-tab="practice" data-sfx="open">Practice</button>
+      <button class="tab" data-tab="champion" data-sfx="open">Champion <small id="champName"></small></button>
+      <button class="tab" data-tab="controls" data-sfx="open">Controls</button>
+      <button class="tab" data-tab="settings" data-sfx="open">Settings</button>
+    </nav>
+    <label class="who">Summoner name<input id="nameIn" maxlength="14" placeholder="Summoner name"></label>
+    <p class="legal"><span class="ver" id="verTxt"></span><br>Gang of Legends was created under Riot Games' "Legal Jibber Jabber" policy using assets owned by Riot Games. Riot Games does not endorse or sponsor this project. Free fan game, not for sale.</p>
+  </aside>
+
+  <section class="panel" data-panel="play">
+    <h2>Play online</h2>
+    <p class="lede">Up to 8 players. One of you hosts and shares the lobby code; everyone else joins with it.</p>
+    <div class="playgrid">
+      <button id="hostBtn" class="bigbtn" data-sfx="start">Host a game<small>You get a code to share</small></button>
+      <div class="joinbox"><b>Join a game</b><div class="row"><input id="codeIn" maxlength="5" placeholder="Code" aria-label="Lobby code"><button id="joinBtn" class="btn primary">Join</button></div></div>
     </div>
     <div id="menuErr" class="err"></div>
-    <div class="row netrow"><button id="netTestBtn" class="btn small">Network test</button><button id="netLogBtn" class="btn small">Copy network log</button><label class="relay"><input id="relayIn" type="checkbox"> Use relay (if you can't connect, e.g. from China)</label></div>
+    <details class="trouble"><summary>Can't connect?</summary>
+      <p class="hint">Turn on the relay if direct connections fail (some networks and countries block them). Run the network test and send the copied log to whoever is helping you.</p>
+      <div class="row"><label class="relay"><input id="relayIn" type="checkbox"> Use the relay</label><span class="grow"></span><button id="netTestBtn" class="btn small">Run network test</button><button id="netLogBtn" class="btn small">Copy network log</button></div>
+    </details>
+  </section>
+
+  <section class="panel hidden" data-panel="practice">
+    <h2>Practice</h2>
+    <p class="lede">Try a stage against a dummy of every other champion. Press Esc to come back.</p>
+    <div id="practiceMaps" class="maps"></div>
+    <button id="practiceBtn" class="btn primary" data-sfx="start">Start practice</button>
+  </section>
+
+  <section class="panel hidden" data-panel="champion">
+    <h2>Champion</h2>
+    <p class="lede">Everyone brawls the same way: punch, grab, headbutt, lift, climb. Your champion adds two abilities on top.</p>
+    <div id="champs" class="champs"></div>
+  </section>
+
+  <section class="panel hidden" data-panel="controls">
     <h2>Controls</h2>
+    <p class="lede">Click a key to change it, then press the new key or mouse button. Esc cancels, Backspace clears.</p>
     <div id="binds" class="controls"></div>
-    <div class="controls hints">
-      <span style="grid-column: 1 / -1">Click a key to change it (Esc cancels, Backspace clears). <button id="bindReset" class="btn small">Reset to defaults</button></span>
-      <span style="grid-column: 1 / -1">Tap a hand to punch with it, hold it to reach out and grab. Hold a hand + jump to climb a ledge.</span>
-      <span style="grid-column: 1 / -1">Gamepad: LT/LB left hand, RT/RB right hand, A jump, B lie down, X/Y abilities, right stick click headbutt</span>
-    </div>
-    <label class="volrow">Volume <input class="vol" type="range" min="0" max="100"></label>
-    <p class="legal">Gang of Legends was created under Riot Games' "Legal Jibber Jabber" policy using assets owned by Riot Games. Riot Games does not endorse or sponsor this project. Free fan game, not for sale.</p>
-  </div>
+    <p class="hint">Tap a hand to punch with it, hold it to grab. Grab someone with both hands and hold Lift to raise them overhead, then let go of the hands to throw. Hanging off a ledge, hold Jump to push yourself up, then push toward the ledge to climb over.</p>
+    <p class="hint">Gamepad: LT/LB left hand, RT/RB right hand, A jump, B lie down, X and Y abilities, left stick click lift, right stick click headbutt.</p>
+    <p><button id="bindReset" class="btn small" data-sfx="back">Reset to defaults</button></p>
+  </section>
+
+  <section class="panel hidden" data-panel="settings">
+    <h2>Settings</h2>
+    <p class="lede">Saved on this computer.</p>
+    <label class="volrow">Volume <input class="vol" type="range" min="0" max="100"><output class="volOut"></output></label>
+  </section>
 </div>
 
-<div id="lobby" class="screen hidden">
-  <div class="card">
-    <div class="row"><div class="grow"><h2 style="margin:0">Lobby code (click to copy)</h2><div id="lobbyCode"></div></div>
-      <button id="leaveBtn" class="btn">Leave</button><button id="startBtn" class="btn gold">Start match</button></div>
-    <p id="lobbyNote" style="color:var(--muted);margin:4px 0 0"></p>
-    <div class="cols">
-      <div><h2>Players</h2><ul id="lobbyPlayers"></ul></div>
-      <div>
-        <h2>Match</h2>
-        <div class="settings">
-          <span>Map</span><select id="setMap"></select>
-          <span>Teams</span><select id="setTeams"><option value="0">Free for all</option><option value="2">2 teams</option><option value="3">3 teams</option><option value="4">4 teams</option></select>
-          <span>Rounds to win</span><select id="setRounds"><option>2</option><option>3</option><option>5</option></select>
-        </div>
-        <p id="mapBlurb"></p>
-      </div>
+<div id="lobby" class="shell hidden">
+  <aside class="rail">
+    <div class="code"><span>Lobby code, click to copy</span><button id="lobbyCode" data-sfx="pick"></button></div>
+    <ul id="lobbyPlayers"></ul>
+    <p id="lobbyNote"></p>
+    <div class="lobbyacts"><button id="leaveBtn" class="btn" data-sfx="back">Leave</button><button id="startBtn" class="btn primary" data-sfx="start">Start match</button></div>
+  </aside>
+  <section class="panel">
+    <h2>Match</h2>
+    <div class="settings" style="margin-top: 18px">
+      <span>Stage</span><select id="setMap"></select>
+      <span>Teams</span><select id="setTeams"><option value="0">Free for all</option><option value="2">2 teams</option><option value="3">3 teams</option><option value="4">4 teams</option></select>
+      <span>Rounds to win</span><select id="setRounds"><option>2</option><option>3</option><option>5</option></select>
     </div>
-    <h2>Your champion</h2>
+    <p id="mapBlurb"></p>
+    <h3>Your champion</h3>
     <div id="lobbyChamps" class="champs"></div>
-  </div>
+  </section>
 </div>
 
 <div id="hud" class="hidden">
   <div id="scores"></div>
   <div id="banner" class="hidden"></div>
-  <div id="out" class="hidden">You're out! Watch the rest of the round.</div>
+  <div id="out" class="hidden">You're out. Watch the rest of the round.</div>
   <div id="abil"></div>
-  <div id="keys"><span>Hands <kbd data-act="lhand"></kbd> <kbd data-act="rhand"></kbd> (tap punch, hold grab) · Headbutt <kbd data-act="butt"></kbd> · Lie <kbd data-act="lay"></kbd> · Jump <kbd data-act="jump"></kbd></span><span>Esc menu</span></div>
-  <div id="escMenu" class="hidden"><div class="card"><button id="resumeBtn" class="btn">Resume</button><label class="volrow">Volume <input class="vol" type="range" min="0" max="100"></label><button id="quitBtn" class="btn gold">Leave match</button></div></div>
+  <div id="keys"><span>Punch / grab <kbd data-act="lhand"></kbd><kbd data-act="rhand"></kbd> Headbutt <kbd data-act="butt"></kbd> Lift <kbd data-act="lift"></kbd> Jump / climb <kbd data-act="jump"></kbd> Lie down <kbd data-act="lay"></kbd></span><span>Menu <kbd>Esc</kbd></span></div>
+  <div id="escMenu" class="hidden">
+    <h2>Paused</h2>
+    <button id="resumeBtn" class="tab on" data-sfx="close">Resume</button>
+    <label class="volrow">Volume <input class="vol" type="range" min="0" max="100"><output class="volOut"></output></label>
+    <button id="quitBtn" class="tab" data-sfx="back">Leave match</button>
+  </div>
 </div>
 
 <script type="importmap">{ "imports": {

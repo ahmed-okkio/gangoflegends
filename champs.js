@@ -24,7 +24,7 @@ export const CHAMPS = {
   sett: {
     name: 'Sett', title: 'The Boss', body: '#c97a52', limb: '#9a5a3a', eyes: '#ffd166', glow: '#ffb000',
     abilities: [
-      { id: 'haymaker', name: 'Haymaker', cd: 8, desc: 'Getting hit fills your Grit. Hold to plant and charge it in (taking half daze), let go for a cone punch as strong as the Grit spent.' },
+      { id: 'haymaker', name: 'Haymaker', cd: 8, range: 2.4, cone: 0.6, core: 0.35, desc: 'Getting hit fills your Grit. Hold to plant and charge it in (taking half daze), let go for a cone punch as strong as the Grit spent.' },
       { id: 'facebreaker', name: 'Facebreaker', cd: 7, desc: 'Yank everyone close into you and stun them. Catch champs on both sides for a long stun.' },
     ],
   },

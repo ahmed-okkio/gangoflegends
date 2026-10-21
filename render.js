@@ -2,14 +2,16 @@
 import * as THREE from 'three';
 import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
 import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
+import { GTAOPass } from 'three/addons/postprocessing/GTAOPass.js';
 import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
 import { ShaderPass } from 'three/addons/postprocessing/ShaderPass.js';
 import { OutputPass } from 'three/addons/postprocessing/OutputPass.js';
 import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
 import { MAPS } from './maps.js';
 import { CHAMPS, TEAM_COLORS, FFA_COLORS } from './champs.js';
-import { PARTS, ORDER, ANCHOR, HAND, CHEST, HEAD, ARM, FORE, LEG, HIPS, qmul, qinv, qrot } from './beast.js';
+import { PARTS, ORDER, ANCHOR, HAND, CHEST, HEAD, ARM, FORE, LEG, HIPS, HIP_HEIGHT, qmul, qinv, qrot } from './beast.js';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
 import { beastAsset, xhr } from './stages.js';
 import { playEvents } from './sfx.js';
 
@@ -93,11 +95,34 @@ export const playerColor = (setup, slot) => {
 };
 
 const VignetteShader = {
-  uniforms: { tDiffuse: { value: null }, strength: { value: 0.35 } },
+  uniforms: { tDiffuse: { value: null }, strength: { value: 0.35 }, contrast: { value: 1 }, saturation: { value: 1 }, shadows: { value: 0 } },
   vertexShader: 'varying vec2 vUv; void main() { vUv = uv; gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0); }',
-  fragmentShader: `uniform sampler2D tDiffuse; uniform float strength; varying vec2 vUv;
-    void main() { vec4 c = texture2D(tDiffuse, vUv); float d = distance(vUv, vec2(0.5)); c.rgb *= 1.0 - strength * smoothstep(0.35, 0.85, d); gl_FragColor = c; }`,
+  // plus a light colour grade (Gang Beasts' URP profile: contrast, saturation, darker shadows), in display space
+  fragmentShader: `uniform sampler2D tDiffuse; uniform float strength, contrast, saturation, shadows; varying vec2 vUv;
+    void main() {
+      vec4 c = texture2D(tDiffuse, vUv); float l = dot(c.rgb, vec3(0.2126, 0.7152, 0.0722));
+      c.rgb = mix(vec3(l), c.rgb, saturation); c.rgb = (c.rgb - 0.5) * contrast + 0.5;
+      c.rgb *= 1.0 - shadows * (1.0 - smoothstep(0.0, 0.35, l));
+      float d = distance(vUv, vec2(0.5)); c.rgb *= 1.0 - strength * smoothstep(0.35, 0.85, d); gl_FragColor = c; }`,
 };
+
+// one submesh ([first index, count]) of an imported mesh as its own compact geometry, in world space (M), with the
+// renderer's lightmap scale/offset (lm) baked into uv1
+function submesh(src, [start, count], M, lm) {
+  const idx = src.index.array, remap = new Map(), out = new Uint32Array(count);
+  for (let i = 0; i < count; i++) { const v = idx[start + i]; out[i] = remap.get(v) ?? remap.set(v, remap.size).get(v); }
+  if (M && M.determinant() < 0) for (let i = 0; i < count; i += 3) [out[i + 1], out[i + 2]] = [out[i + 2], out[i + 1]]; // mirrored: keep the winding
+  const g = new THREE.BufferGeometry();
+  for (const [k, a] of Object.entries(src.attributes)) {
+    const n = a.itemSize, arr = new Float32Array(remap.size * n);
+    for (const [o, j] of remap) for (let c = 0; c < n; c++) arr[j * n + c] = a.array[o * n + c];
+    g.setAttribute(k, new THREE.BufferAttribute(arr, n));
+  }
+  g.setIndex(new THREE.BufferAttribute(out, 1));
+  if (M) g.applyMatrix4(M);
+  if (lm) { const u = g.attributes.uv1; for (let i = 0; i < u.count; i++) u.setXY(i, u.getX(i) * lm[0] + lm[2], u.getY(i) * lm[1] + lm[3]); }
+  return g;
+}
 
 export function createRenderer(canvas) {
   const renderer = new THREE.WebGLRenderer({ canvas, powerPreference: 'high-performance' });
@@ -111,14 +136,23 @@ export function createRenderer(canvas) {
   scene.environment = pmrem.fromScene(new RoomEnvironment(), 0.04).texture;
   scene.environmentIntensity = 0.55;
   const camera = new THREE.PerspectiveCamera(42, 1, 0.1, 600);
+  camera.layers.enable(1); // layer 1: the imported far-off city
 
-  // HDR render target with MSAA, bloom on the bright bits, then tone map + vignette
+  // HDR render target with MSAA, AO, bloom on the bright bits, then tone map + vignette
   const composer = new EffectComposer(renderer, new THREE.WebGLRenderTarget(1, 1, { samples: 4, type: THREE.HalfFloatType }));
   composer.addPass(new RenderPass(scene, camera));
+  // ambient occlusion: contact shading in corners, under props and between the beasts' limbs
+  // it sees through its own camera (synced in render()) without layer 1: the far-off city, ~300 draw calls of no use to it
+  const aoCam = new THREE.PerspectiveCamera();
+  const ao = new GTAOPass(scene, aoCam, 1, 1, undefined, { radius: 0.6, distanceExponent: 1.5, thickness: 2, scale: 1.2, samples: 6 }, { samples: 6, rings: 2, radius: 6 });
+  ao.blendIntensity = 0.85;
+  const aoSize = ao.setSize.bind(ao); ao.setSize = (w, h) => aoSize(w / 2, h / 2); // half res: soft anyway, a quarter of the cost
+  composer.addPass(ao);
   const bloom = new UnrealBloomPass(new THREE.Vector2(1, 1), 0.6, 0.55, 0.9);
   composer.addPass(bloom);
   composer.addPass(new OutputPass());
-  composer.addPass(new ShaderPass(VignetteShader));
+  const grade = new ShaderPass(VignetteShader);
+  composer.addPass(grade);
   const resize = () => {
     renderer.setSize(innerWidth, innerHeight);
     composer.setSize(innerWidth, innerHeight);
@@ -129,9 +163,9 @@ export function createRenderer(canvas) {
   const hemi = new THREE.HemisphereLight('#fff4e0', '#4a4060', 1.1);
   const sun = new THREE.DirectionalLight('#fff1d6', 2.6);
   sun.castShadow = true;
-  sun.shadow.mapSize.set(2048, 2048);
+  sun.shadow.mapSize.set(4096, 4096);
   Object.assign(sun.shadow.camera, { left: -15, right: 15, top: 15, bottom: -15, near: 1, far: 80 });
-  sun.shadow.bias = -0.0004; sun.shadow.normalBias = 0.02; sun.shadow.radius = 4;
+  sun.shadow.bias = -0.0003; sun.shadow.normalBias = 0.02;
   const rim = new THREE.DirectionalLight('#9ad8ff', 0.9); // cool back light so silhouettes pop
   scene.add(hemi, sun, sun.target, rim);
 
@@ -141,7 +175,8 @@ export function createRenderer(canvas) {
   const sunOffset = new THREE.Vector3(8, 20, 6);
   let cam = { side: 1, pitch: 0.63, min: 10, max: 24 }; // side -1 = camera on the -z side, looking +z
   // calibration knobs for imported Unity lighting (URP intensities don't map 1:1 onto three.js)
-  const LIGHTMAP_GAIN = 2.2, SUN_GAIN = 2.2, AMBIENT_GAIN = 3;
+  // Unity lights and lightmaps multiply albedo straight; three.js divides diffuse by PI. Lightmaps are RGBM: x 5^2.2 (tools/import_gb.py).
+  const LIGHTMAP_GAIN = Math.PI * 34.49, LIGHT_GAIN = Math.PI;
 
   // ---------- particles ----------
   const particles = [];
@@ -278,9 +313,7 @@ export function createRenderer(canvas) {
   // a stage imported from Gang Beasts: original meshes, textures and baked bounce light
   function buildImported(g, { scene: sc, bins, base }, view = {}) {
     const loader = new THREE.TextureLoader(), texCache = {};
-    // per-renderer lightmap tiling needs a texture clone each; clone only once the image exists
-    const lmWaiting = sc.lightmaps.map(() => []);
-    const lightmapTex = sc.lightmaps.map((name, i) => loader.load(base + name, t => { for (const fn of lmWaiting[i].splice(0)) fn(t); }));
+    const lightmapTex = sc.lightmaps.map(name => Object.assign(loader.load(base + name), { colorSpace: THREE.SRGBColorSpace, channel: 1 }));
     const tex = (name, srgb = true) => texCache[name] ??= Object.assign(loader.load(base + name), {
       colorSpace: srgb ? THREE.SRGBColorSpace : THREE.NoColorSpace, wrapS: THREE.RepeatWrapping, wrapT: THREE.RepeatWrapping, anisotropy: 8,
     });
@@ -298,8 +331,8 @@ export function createRenderer(canvas) {
       geos[key] = geo;
     }
     const mats = {};
-    const material = (key, lm, li) => {
-      const id = key + (lm ? li + lm.join() : '');
+    const material = (key, li) => {
+      const id = key + '|' + li;
       if (mats[id]) return mats[id];
       const d = sc.materials[key];
       const m = new THREE.MeshStandardMaterial({
@@ -308,39 +341,46 @@ export function createRenderer(canvas) {
         map: d.map ? tex(d.map) : null, roughness: 1 - d.smoothness * 0.8, metalness: d.metallic,
       });
       if (d.emission && Math.max(...d.emission) > 0) m.emissive.setRGB(...d.emission.map(v => Math.min(v, 1)));
-      if (lm && lightmapTex[li]) {
-        const attach = t => {
-          const c = t.clone();
-          c.colorSpace = THREE.SRGBColorSpace; c.channel = 1;
-          c.repeat.set(lm[0], lm[1]); c.offset.set(lm[2], lm[3]);
-          m.lightMap = c; m.lightMapIntensity = LIGHTMAP_GAIN; m.needsUpdate = true;
-        };
-        if (lightmapTex[li].image) attach(lightmapTex[li]); else lmWaiting[li].push(attach);
-      }
+      // lightmapped surfaces get their ambient from the lightmap alone, like in Unity
+      if (li >= 0) { m.lightMap = lightmapTex[li]; m.lightMapIntensity = LIGHTMAP_GAIN; m.envMapIntensity = 0; }
       return (mats[id] = m);
     };
+    // static batching: every submesh is baked into world space (lightmap tiling into its uv1) and merged with the
+    // others sharing its material, so the stage is a few dozen draw calls instead of ~1500
+    const batches = {};
     for (const r of sc.renderers) {
-      const src = geos[r.mesh], meta = sc.meshes[r.mesh];
-      const geo = new THREE.BufferGeometry();
-      for (const [k, a] of Object.entries(src.attributes)) geo.setAttribute(k, a);
-      geo.setIndex(src.index);
-      r.subs.forEach((s, i) => { if (meta.subs[s]) geo.addGroup(meta.subs[s][0], meta.subs[s][1], Math.min(i, r.mats.length - 1)); });
-      const lm = r.lightmap >= 0 && meta.uv1 ? r.lmso : null;
-      const m = new THREE.Mesh(geo, r.mats.map(k => material(k, lm, r.lightmap)));
-      if (r.matrix) { m.matrixAutoUpdate = false; m.matrix.set(...r.matrix.flat()); }
-      const city = r.path.includes('/City');
+      const src = geos[r.mesh], meta = sc.meshes[r.mesh], li = r.lightmap >= 0 && meta.uv1 ? r.lightmap : -1;
+      const M = r.matrix && new THREE.Matrix4().set(...r.matrix.flat()), city = r.path.includes('/City');
+      r.subs.forEach((s, i) => {
+        if (!meta.subs[s] || !r.mats.length) return;
+        const geo = submesh(src, meta.subs[s], M, li >= 0 && r.lmso), key = r.mats[Math.min(i, r.mats.length - 1)];
+        (batches[[key, li, city, Object.keys(geo.attributes)].join('|')] ??= { key, li, city, geos: [] }).geos.push(geo);
+      });
+    }
+    for (const { key, li, city, geos } of Object.values(batches)) {
+      const m = new THREE.Mesh(mergeGeometries(geos), material(key, li));
       m.castShadow = !city; m.receiveShadow = !city;
-      m.frustumCulled = false; // groups share the full combined bounding volume anyway
+      if (city) m.layers.set(1);
       g.add(m);
     }
-    const e = sc.env ?? {};
-    if (e.ambientSky) { hemi.color.setRGB(...e.ambientSky, THREE.SRGBColorSpace); hemi.groundColor.setRGB(...e.ambientGround, THREE.SRGBColorSpace); hemi.intensity = AMBIENT_GAIN; }
-    if (e.sun) {
-      sun.color.setRGB(...e.sun.color, THREE.SRGBColorSpace); sun.intensity = e.sun.intensity * SUN_GAIN;
-      sunOffset.set(...e.sun.dir).normalize().multiplyScalar(-30);
+    // the stage's runtime lights. The strongest directional one is the shadow-casting sun; a few spots cast shadows too
+    hemi.intensity = 0; rim.intensity = 0; sun.intensity = 0; // ambient: the environment map (beasts) and lightmaps (stage)
+    const col = l => new THREE.Color().setRGB(...l.color, THREE.SRGBColorSpace);
+    let spotShadows = 0;
+    for (const l of [...sc.lights ?? []].sort((a, b) => b.intensity - a.intensity)) {
+      const I = l.intensity * LIGHT_GAIN;
+      if (l.type === 'sun' && !sun.intensity) { sun.color.copy(col(l)); sun.intensity = I; sunOffset.set(...l.dir).normalize().multiplyScalar(-30); continue; }
+      const L = l.type === 'sun' ? new THREE.DirectionalLight(col(l), I)
+        : l.type === 'point' ? new THREE.PointLight(col(l), I, l.range, 2)
+        : new THREE.SpotLight(col(l), I, l.range, l.angle / 2 * Math.PI / 180, 1 - l.inner / l.angle, 2);
+      L.position.set(...l.p);
+      if (L.target) { L.target.position.set(l.p[0] + l.dir[0], l.p[1] + l.dir[1], l.p[2] + l.dir[2]); g.add(L.target); }
+      if (l.type === 'spot' && l.shadows && spotShadows < 4) { spotShadows++; L.castShadow = true; L.shadow.mapSize.set(1024, 1024); L.shadow.bias = -0.0005; }
+      g.add(L);
     }
-    rim.intensity = 0.4;
-    bloom.strength = 0.25; bloom.threshold = 1.4; renderer.toneMappingExposure = 1; scene.environmentIntensity = 0.35;
+    // Gang Beasts' post profile: ACES, +1.4 EV, bloom over 2, contrast +6, saturation +4, darker shadows, vignette 0.2
+    bloom.strength = 0.3; bloom.threshold = 2; bloom.radius = 0.8; renderer.toneMappingExposure = 0.8; scene.environmentIntensity = 0.5; // exposure: by eye (three's ACES curve isn't URP's)
+    Object.assign(grade.uniforms, { strength: { value: 0.2 }, contrast: { value: 1.06 }, saturation: { value: 1.04 }, shadows: { value: 0.3 } });
     scene.fog = null;
     g.add(sky(...view.sky ?? ['#6fb2ee', '#d8ecfa', '#b9c9d6']));
     // like the stage's own camera: Girders' looks from -z at 27 degrees
@@ -351,6 +391,8 @@ export function createRenderer(canvas) {
 
   function buildMap(g, map, id) {
     sunOffset.set(8, 20, 6);
+    Object.assign(grade.uniforms, { strength: { value: 0.35 }, contrast: { value: 1 }, saturation: { value: 1 }, shadows: { value: 0 } });
+    bloom.radius = 0.55; rim.intensity = 0.9;
     cam = { side: 1, pitch: 0.63, min: 10, max: 24 };
     if (map.imported) { buildImported(g, map.imported, map.view); return []; }
     const paint = noiseTex('#d4502f', 0.12);
@@ -478,7 +520,7 @@ export function createRenderer(canvas) {
     }
     // Jinx was here
     const tag = new THREE.Mesh(new THREE.PlaneGeometry(4, 1), new THREE.MeshBasicMaterial({ transparent: true, map: canvasTex(1024, 256, (x) => {
-      x.font = 'bold 150px "Lilita One", sans-serif'; x.textAlign = 'center'; x.lineWidth = 14;
+      x.font = '900 150px Nunito, sans-serif'; x.textAlign = 'center'; x.lineWidth = 14;
       x.strokeStyle = '#2a7dff'; x.strokeText('JINX WAS HERE', 512, 175);
       x.fillStyle = '#ff4fb8'; x.fillText('JINX WAS HERE', 512, 175);
     }, false) }));
@@ -572,7 +614,7 @@ export function createRenderer(canvas) {
     }
 
     const tag = new THREE.Sprite(new THREE.SpriteMaterial({ depthTest: false, map: canvasTex(512, 96, (x) => {
-      x.font = '64px "Lilita One", sans-serif'; x.textAlign = 'center'; x.lineWidth = 12; x.lineJoin = 'round';
+      x.font = '900 64px Nunito, sans-serif'; x.textAlign = 'center'; x.lineWidth = 12; x.lineJoin = 'round';
       x.strokeStyle = '#0b1426'; x.strokeText(name, 256, 70); x.fillStyle = color; x.fillText(name, 256, 70);
     }, false) }));
     tag.scale.set(1.8, 0.34, 1);
@@ -591,7 +633,24 @@ export function createRenderer(canvas) {
       const bar = (c, o, z) => { const s = new THREE.Sprite(new THREE.SpriteMaterial({ color: c, depthTest: false, opacity: o, transparent: true })); s.center.set(0, 0.5); s.renderOrder = 10 + z; group.add(s); return s; };
       grit = { back: bar('#0b1426', 0.75, 0), fill: bar('#ff8a00', 1, 1), use: bar('#fff3b0', 1, 2) };
     }
-    return { group, parts, tag, stars, fists, swirl, grit, champId, glow: c.glow ?? '#ff8a00', torsoMat: body, glowBase: body.emissive.clone(), eyes: c.eyes, q: PARTS.map(() => [0, 0, 0, 1]), pos: PARTS.map(() => [0, 0, 0]) };
+    // Haymaker range on the floor while it charges, like League's indicator: the cone, its brighter centre strip
+    // (hits harder) and an edge that fills in with the Grit going into it
+    let hay = null;
+    if (champId === 'sett') {
+      const { range, cone, core } = c.abilities[0];
+      const mat = (o, col = '#ffb000') => new THREE.MeshBasicMaterial({ color: col, transparent: true, opacity: o, depthWrite: false, side: THREE.DoubleSide, blending: THREE.AdditiveBlending });
+      const flat = g => g.rotateX(Math.PI / 2); // drawn in xy pointing +y; laid on the floor pointing +z
+      hay = new THREE.Group();
+      hay.add(new THREE.Mesh(flat(new THREE.CircleGeometry(range, 40, Math.PI / 2 - cone, cone * 2)), mat(0.12)));
+      hay.add(new THREE.Mesh(flat(new THREE.RingGeometry(range - 0.06, range, 40, 1, Math.PI / 2 - cone, cone * 2)), mat(0.7)));
+      hay.add(new THREE.Mesh(flat(new THREE.PlaneGeometry(core * 2, range * 0.95).translate(0, range * 0.475, 0)), mat(0.12, '#fff3b0')));
+      hay.fill = new THREE.Mesh(flat(new THREE.CircleGeometry(range, 40, Math.PI / 2 - cone, cone * 2)), mat(0.22, '#ff8a00'));
+      hay.add(hay.fill);
+      for (const m of hay.children) m.renderOrder = 5;
+      hay.visible = false;
+      group.add(hay);
+    }
+    return { group, parts, tag, stars, fists, swirl, grit, hay, champId, glow: c.glow ?? '#ff8a00', torsoMat: body, glowBase: body.emissive.clone(), eyes: c.eyes, q: PARTS.map(() => [0, 0, 0, 1]), pos: PARTS.map(() => [0, 0, 0]) };
   }
 
   const qa = new THREE.Quaternion(), qb = new THREE.Quaternion(), tmp = new THREE.Vector3(), tmp2 = new THREE.Vector3();
@@ -628,6 +687,16 @@ export function createRenderer(canvas) {
         for (const [s, k] of [[back, 1], [fill, (pb[x] ?? 0) / 100], [use, (pb[x + 1] ?? 0) / 100]]) {
           s.position.copy(head); s.position.x -= cam.side * w / 2; s.position.y += 0.9; // left end, as seen from the camera; just above the name
           s.scale.set(Math.max(0.001, w * k), h, 1);
+        }
+      }
+      if (av.hay) {
+        av.hay.visible = !!(flags & 64);
+        if (av.hay.visible) {
+          const fwd = tmp2.set(0, 0, 1).applyQuaternion(av.parts[CHEST].quaternion);
+          av.hay.position.set(torso.x, av.parts[HIPS].position.y - HIP_HEIGHT + 0.04, torso.z);
+          av.hay.rotation.y = Math.atan2(fwd.x, fwd.z);
+          const k = Math.max(0.15, (pb[9 + PARTS.length * 4 + 1] ?? 0) / 100); // Grit going in = how far the fill reaches
+          av.hay.fill.scale.set(k, 1, k);
         }
       }
       const dizzy = flags & 16 ? 3 : pb[2] >= 60 ? 2 : 0;
@@ -701,12 +770,18 @@ export function createRenderer(canvas) {
     stepRings(dt);
     shake = Math.max(0, shake - dt * 1.2);
     const j = shake * shake * 1.5;
-    camera.position.set(camAt.x + rand(-j, j), camAt.y + camDist * Math.sin(cam.pitch) + rand(-j, j), camAt.z + cam.side * camDist * Math.cos(cam.pitch));
-    camera.lookAt(camAt);
+    // menu backdrop: the camera comes in closer and frames the brawl low and to the right, under the menu panel
+    const d = setup?.menu ? camDist * 0.75 : camDist, ox = setup?.menu ? cam.side * d * 0.12 : 0, oy = setup?.menu ? d * 0.2 : 0;
+    camera.position.set(camAt.x + ox + rand(-j, j), camAt.y + oy + d * Math.sin(cam.pitch) + rand(-j, j), camAt.z + cam.side * d * Math.cos(cam.pitch));
+    camera.lookAt(camAt.x + ox, camAt.y + oy, camAt.z);
+    aoCam.copy(camera); aoCam.layers.set(0);
     const skyMesh = world?.getObjectByName('sky');
     if (skyMesh) skyMesh.position.copy(camera.position);
     sun.position.copy(camAt).add(sunOffset);
     sun.target.position.copy(camAt);
+    // shadow box just covers the view, so the map's texels go as far as they can
+    const sc = sun.shadow.camera, half = Math.round(camDist * 0.85);
+    if (sc.right !== half) { Object.assign(sc, { left: -half, right: half, top: half, bottom: -half }); sc.updateProjectionMatrix(); }
     rim.position.set(camAt.x - 6, camAt.y + 8, camAt.z - 14);
     composer.render(dt);
   }

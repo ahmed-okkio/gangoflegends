@@ -5,7 +5,7 @@ import { CHAMPS, TEAM_NAMES, TEAM_COLORS, FFA_COLORS } from './champs.js';
 import { MAPS } from './maps.js';
 import * as net from './net.js';
 import { prepareMap, loadBeast } from './stages.js';
-import { loadSfx, play, setVolume } from './sfx.js';
+import { loadSfx, play, ui, setVolume } from './sfx.js';
 
 const $ = id => document.getElementById(id);
 const esc = s => String(s).replace(/[&<>"']/g, c => `&#${c.charCodeAt(0)};`);
@@ -46,7 +46,7 @@ const ACTIONS = [
   ['up', 'Move up', ['KeyW', 'ArrowUp']], ['down', 'Move down', ['KeyS', 'ArrowDown']],
   ['left', 'Move left', ['KeyA', 'ArrowLeft']], ['right', 'Move right', ['KeyD', 'ArrowRight']],
   ['jump', 'Jump / climb', ['Space']], ['lhand', 'Left hand', ['Mouse0', 'KeyJ']], ['rhand', 'Right hand', ['Mouse2', 'KeyK']],
-  ['a1', 'Ability 1', ['KeyQ']], ['a2', 'Ability 2', ['KeyE']], ['butt', 'Headbutt', ['KeyF', 'Mouse1']], ['lay', 'Lie down (hold)', ['ControlLeft']],
+  ['a1', 'Ability 1', ['KeyQ']], ['a2', 'Ability 2', ['KeyE']], ['butt', 'Headbutt', ['KeyF', 'Mouse1']], ['lay', 'Lie down (hold)', ['ControlLeft']], ['lift', 'Lift (hold, grabbing)', ['ShiftLeft']],
 ];
 let binds = {};
 try { binds = JSON.parse(store.get('binds', '{}')) || {}; } catch {}
@@ -87,12 +87,29 @@ renderBinds();
 // ---------- menu ----------
 $('nameIn').value = me.name;
 $('nameIn').addEventListener('input', e => { me.name = e.target.value.trim().slice(0, 14) || 'Summoner'; store.set('name', me.name); });
-const mapOptions = Object.entries(MAPS).filter(([, m]) => !m.hidden).map(([id, m]) => `<option value="${id}">${m.name}</option>`).join('');
-$('practiceMap').innerHTML = $('setMap').innerHTML = mapOptions;
+const stages = Object.entries(MAPS).filter(([, m]) => !m.hidden);
+$('setMap').innerHTML = stages.map(([id, m]) => `<option value="${id}">${m.name}</option>`).join('');
+let practiceMap = MAPS[store.get('practiceMap')] && !MAPS[store.get('practiceMap')].hidden ? store.get('practiceMap') : stages[0][0];
+const renderMaps = () => { $('practiceMaps').innerHTML = stages.map(([id, m]) => `<button class="map ${id === practiceMap ? 'on' : ''}" data-id="${id}" data-sfx="pick"><b>${m.name}</b><small>${m.blurb}</small></button>`).join(''); };
+renderMaps();
+$('practiceMaps').onclick = e => { const id = e.target.closest('.map')?.dataset.id; if (id) { practiceMap = id; store.set('practiceMap', id); renderMaps(); } };
+$('practiceMaps').ondblclick = e => { if (e.target.closest('.map')) startPractice(practiceMap); };
+$('verTxt').textContent = VERSION === 'dev' ? 'Dev build' : `Version ${VERSION}`;
+// main menu tabs: the rail picks which panel shows
+document.querySelector('.tabs').onclick = e => {
+  const t = e.target.closest('.tab');
+  if (!t) return;
+  for (const b of document.querySelectorAll('.tabs .tab')) b.classList.toggle('on', b === t);
+  for (const p of document.querySelectorAll('#menu .panel')) {
+    const on = p.dataset.panel === t.dataset.tab;
+    p.classList.toggle('hidden', !on);
+    if (on) { p.classList.remove('enter'); void p.offsetWidth; p.classList.add('enter'); }
+  }
+};
 
 function champCards(el, onPick) {
   el.innerHTML = Object.entries(CHAMPS).map(([id, c]) => `
-    <button class="champ ${id === me.champ ? 'on' : ''}" data-id="${id}" style="--c:${c.body};--e:${c.eyes}">
+    <button class="champ ${id === me.champ ? 'on' : ''}" data-id="${id}" data-sfx="pick" style="--c:${c.body};--e:${c.eyes}">
       <span class="bean"></span>
       <b>${c.name}</b><small>${c.title}</small>
       ${c.abilities.map((a, i) => `<span class="ab"><kbd data-act="a${i + 1}"></kbd><span><b>${a.name}</b>${a.desc}</span></span>`).join('')}
@@ -102,25 +119,28 @@ function champCards(el, onPick) {
     const id = e.target.closest('.champ')?.dataset.id;
     if (!id) return;
     me.champ = id; store.set('champ', id);
-    for (const b of el.children) b.classList.toggle('on', b.dataset.id === id);
+    for (const g of [$('champs'), $('lobbyChamps')]) for (const b of g.children) b.classList.toggle('on', b.dataset.id === id);
+    $('champName').textContent = CHAMPS[id].name;
     onPick?.(id);
   };
 }
 champCards($('champs'));
+$('champName').textContent = CHAMPS[me.champ].name;
 
-const menuError = msg => { $('menuErr').textContent = msg || ''; };
+// problems in red with the error sound; progress and confirmations (ok) in grey
+const menuError = (msg, ok) => { $('menuErr').textContent = msg || ''; $('menuErr').classList.toggle('ok', !!ok); if (msg && !ok) ui('error'); };
 // network debugging for players who can't connect: run the test, then paste the log to whoever is helping
-$('netTestBtn').onclick = async () => { menuError('Testing network…'); menuError(await net.selfTest()); };
+$('netTestBtn').onclick = async () => { menuError('Testing network…', true); menuError(await net.selfTest(), true); };
 $('relayIn').checked = store.get('relay', '0') === '1';
 net.useRelay($('relayIn').checked);
 $('relayIn').onchange = e => { net.useRelay(e.target.checked); store.set('relay', e.target.checked ? '1' : '0'); };
 $('netLogBtn').onclick = async () => {
   const text = [`Gang of Legends ${VERSION}`, new Date().toString(), navigator.userAgent, ...net.netLog].join('\n');
-  try { await navigator.clipboard.writeText(text); menuError(`Copied ${net.netLog.length} log lines. Paste them to whoever is helping you.`); }
-  catch { const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([text])); a.download = 'gangoflegends-network-log.txt'; a.click(); menuError('Saved the log as a file.'); }
+  try { await navigator.clipboard.writeText(text); menuError(`Copied ${net.netLog.length} log lines. Paste them to whoever is helping you.`, true); }
+  catch { const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([text])); a.download = 'gangoflegends-network-log.txt'; a.click(); menuError('Saved the log as a file.', true); }
 };
 
-$('practiceBtn').onclick = () => startPractice($('practiceMap').value);
+$('practiceBtn').onclick = () => startPractice(practiceMap);
 function startPractice(map) {
   const roster = Object.keys(CHAMPS).filter(c => c !== me.champ); // one dummy of each other champ
   const dummies = roster.slice(0, 7).map((champ, i) => ({ id: `dummy${i}`, name: 'Dummy', champ, team: i + 1 }));
@@ -128,7 +148,7 @@ function startPractice(map) {
 }
 
 $('hostBtn').onclick = async () => {
-  menuError('Opening lobby…');
+  menuError('Opening lobby…', true);
   try { conn = await net.host(); } catch (e) { return menuError(e.message); }
   menuError();
   lobby = { code: conn.code, players: [{ id: 'host', name: me.name, champ: me.champ }], settings: { map: 'girders', teams: 0, rounds: 3 } };
@@ -156,7 +176,7 @@ $('codeIn').addEventListener('keydown', e => { if (e.key === 'Enter') joinLobby(
 async function joinLobby(raw) {
   const code = net.cleanCode(raw);
   if (code.length !== 5) return menuError('Lobby codes are 5 letters.');
-  menuError('Connecting…');
+  menuError('Connecting…', true);
   try { conn = await net.join(code, me.name, VERSION); } catch (e) { conn = null; return menuError(e.message); }
   menuError();
   conn.on('msg', m => {
@@ -201,9 +221,9 @@ function renderLobby() {
   $('lobbyCode').textContent = lobby.code;
   $('lobbyPlayers').innerHTML = lobby.players.map((p, i) => {
     const color = s.teams ? TEAM_COLORS[i % s.teams] : FFA_COLORS[i];
-    return `<li style="--pc:${color}"><span class="dot"></span><b>${esc(p.name)}</b>${p.id === myId ? ' <em>you</em>' : ''}${p.id === 'host' ? ' <em>host</em>' : ''}
+    return `<li style="--pc:${color}"><b>${esc(p.name)}</b>${p.id === myId ? ' <em class="me">you</em>' : ''}${p.id === 'host' ? ' <em>host</em>' : ''}
       <span class="pick">${CHAMPS[p.champ].name}</span>${s.teams ? `<span class="team">${TEAM_NAMES[i % s.teams]}</span>` : ''}</li>`;
-  }).join('') + `<li class="empty">${8 - lobby.players.length} open slots</li>`;
+  }).join('') + '<li class="empty">Open</li>'.repeat(8 - lobby.players.length);
   $('setMap').value = s.map; $('setTeams').value = s.teams; $('setRounds').value = s.rounds;
   for (const id of ['setMap', 'setTeams', 'setRounds']) $(id).disabled = !isHost();
   $('startBtn').classList.toggle('hidden', !isHost());
@@ -215,7 +235,7 @@ champCards($('lobbyChamps'), id => {
 });
 for (const [id, key, num] of [['setMap', 'map'], ['setTeams', 'teams', 1], ['setRounds', 'rounds', 1]])
   $(id).onchange = e => { lobby.settings[key] = num ? +e.target.value : e.target.value; pushLobby(); };
-$('lobbyCode').onclick = () => navigator.clipboard?.writeText(lobby.code);
+$('lobbyCode').onclick = () => { navigator.clipboard?.writeText(lobby.code); $('lobbyNote').textContent = 'Code copied.'; };
 $('leaveBtn').onclick = () => leave();
 $('startBtn').onclick = () => {
   const { map, teams, rounds } = lobby.settings;
@@ -231,6 +251,7 @@ async function startGame(setup) {
   game = { setup, mySlot: setup.players.findIndex(p => p.id === myId), snaps: [], cur: null, fightAt: 0, pendingEv: [], inq: [], offs: [], off: null, jit: 0, delay: 0.1 };
   if (setup.practice || isHost()) game.sim = createSim({ mapId: setup.map, players: setup.players, practice: !!setup.practice, roundsToWin: setup.rounds });
   else game.local = createSim({ mapId: setup.map, players: setup.players, local: game.mySlot }); // my champ, predicted (sim.js)
+  attract = null;
   view.setMatch(setup);
   const mine = CHAMPS[setup.players[game.mySlot]?.champ ?? 'blitz'];
   $('abil').innerHTML = mine.abilities.map((a, i) => `<div class="slot"><kbd data-act="a${i + 1}"></kbd><b>${a.name}</b><i></i><span class="cd"></span></div>`).join('');
@@ -242,7 +263,7 @@ const teamName = t => game.setup.teams ? `${TEAM_NAMES[t]} Team` : game.setup.pl
 const plural = t => game.setup.teams ? 'win' : 'wins';
 function updateHud(s, now) {
   const { setup } = game;
-  if (setup.practice) $('scores').innerHTML = `<span class="chip">Practice · ${MAPS[setup.map].name} · Esc to leave</span>`;
+  if (setup.practice) $('scores').innerHTML = `<span class="chip">Practice on ${MAPS[setup.map].name}</span>`;
   else if (setup.teams) $('scores').innerHTML = s.sc.slice(0, setup.teams).map((n, t) => `<span class="chip" style="--pc:${TEAM_COLORS[t]}">${TEAM_NAMES[t]} <b>${n}</b></span>`).join('');
   else $('scores').innerHTML = setup.players.map((p, i) => `<span class="chip ${s.p[i]?.[1] ? '' : 'out'}" style="--pc:${playerColor(setup, i)}">${esc(p.name)} <b>${s.sc[i] ?? 0}</b></span>`).join('');
 
@@ -276,7 +297,7 @@ addEventListener('keydown', e => {
   if (game && $('escMenu').classList.contains('hidden')) e.preventDefault(); // Space would click a focused button, Ctrl+key would act
   if (e.code === 'Escape' && game) {
     if (game.setup.practice) { game = null; show('menu'); }
-    else $('escMenu').classList.toggle('hidden');
+    else { $('escMenu').classList.toggle('hidden'); ui($('escMenu').classList.contains('hidden') ? 'close' : 'open'); }
   }
 });
 addEventListener('keyup', e => keys.delete(e.code));
@@ -285,11 +306,23 @@ $('view').addEventListener('mousedown', e => { mouse.add(e.button); if (e.button
 addEventListener('mouseup', e => mouse.delete(e.button));
 addEventListener('contextmenu', e => { if (game || rebinding) e.preventDefault(); });
 $('resumeBtn').onclick = () => $('escMenu').classList.add('hidden');
-// volume sliders (menu + Esc menu) share one saved setting
-const vols = document.querySelectorAll('.vol');
-const applyVol = v => { setVolume(v / 100); store.set('volume', v); vols.forEach(el => { el.value = v; }); };
-vols.forEach(el => { el.oninput = () => applyVol(+el.value); el.onchange = () => play('hit', 0.8); });
-applyVol(+store.get('volume', 70));
+// volume sliders (menu + Esc menu) share one saved setting each
+function slider(cls, key, def, apply, sample) {
+  const els = document.querySelectorAll('.' + cls), outs = document.querySelectorAll(`.${cls}Out`);
+  const set = v => { apply(v / 100); store.set(key, v); els.forEach(el => { el.value = v; }); outs.forEach(o => { o.textContent = v; }); };
+  els.forEach(el => { el.oninput = () => set(+el.value); el.onchange = sample; });
+  set(+store.get(key, def));
+}
+slider('vol', 'volume', 70, setVolume, () => play('hit', 0.8));
+
+// UI sounds: a tick on hover, and each button's data-sfx (default "click") on click
+let hovered = null;
+addEventListener('pointerover', e => {
+  const t = e.target.closest('button, select, summary');
+  if (t !== hovered && t && !t.disabled) ui('hover');
+  hovered = t;
+});
+addEventListener('click', e => { const t = e.target.closest('button, summary'); if (t) ui(t.dataset.sfx || 'click'); });
 $('quitBtn').onclick = () => leave();
 
 const k = act => binds[act].some(c => c && (c.startsWith('Mouse') ? mouse.has(+c.slice(5)) : keys.has(c)));
@@ -298,13 +331,13 @@ function readInput() {
   let z = (k('down') ? 1 : 0) - (k('up') ? 1 : 0);
   // Gang Beasts layout: each hand has its own button (tap punches with it, hold reaches out and grabs)
   let b = (k('jump') ? BTN.JUMP : 0) | (k('lhand') ? BTN.LEFT : 0) | (k('rhand') ? BTN.RIGHT : 0)
-    | (k('a1') ? BTN.A1 : 0) | (k('a2') ? BTN.A2 : 0) | (k('butt') ? BTN.BUTT : 0) | (k('lay') ? BTN.LAY : 0);
+    | (k('a1') ? BTN.A1 : 0) | (k('a2') ? BTN.A2 : 0) | (k('butt') ? BTN.BUTT : 0) | (k('lay') ? BTN.LAY : 0) | (k('lift') ? BTN.LIFT : 0);
   const pad = [...(navigator.getGamepads?.() ?? [])].find(Boolean);
   if (pad) {
     const [ax, az] = pad.axes, on = i => pad.buttons[i]?.pressed;
     if (Math.hypot(ax, az) > 0.2) { x = ax; z = az; }
     // triggers / bumpers are the hands, like Gang Beasts on a pad
-    b |= (on(0) ? BTN.JUMP : 0) | (on(4) || on(6) ? BTN.LEFT : 0) | (on(5) || on(7) ? BTN.RIGHT : 0) | (on(2) ? BTN.A1 : 0) | (on(3) ? BTN.A2 : 0) | (on(11) ? BTN.BUTT : 0) | (on(1) ? BTN.LAY : 0);
+    b |= (on(0) ? BTN.JUMP : 0) | (on(4) || on(6) ? BTN.LEFT : 0) | (on(5) || on(7) ? BTN.RIGHT : 0) | (on(2) ? BTN.A1 : 0) | (on(3) ? BTN.A2 : 0) | (on(11) ? BTN.BUTT : 0) | (on(1) ? BTN.LAY : 0) | (on(10) ? BTN.LIFT : 0);
   }
   const side = view.camSide; // controls are camera-relative: up on the stick is away from the camera
   return { x: Math.round(x * side * 100) / 100, z: Math.round(z * side * 100) / 100, b };
@@ -316,7 +349,7 @@ function frame(now) {
   requestAnimationFrame(frame);
   const dt = Math.min(0.1, (now - last) / 1000);
   last = now;
-  if (!game) return;
+  if (!game) { runAttract(dt); return; }
   const inp = $('escMenu').classList.contains('hidden') ? readInput() : { x: 0, z: 0, b: 0 };
   if (game.sim) {
     acc += dt;
@@ -364,6 +397,53 @@ function frame(now) {
   updateHud(game.cur, now);
   view.render(dt);
 }
+
+// ---------- menu backdrop: bots brawling on a stage behind the menus ----------
+let attract = null; // { sim, prev, cur, bots }
+async function startAttract() {
+  const map = 'rooftop', mark = attract = {};
+  await Promise.all([prepareMap(map), loadBeast(), loadProps(), loadSfx()]);
+  if (game || attract !== mark) return;
+  const players = [...Object.keys(CHAMPS), ...Object.keys(CHAMPS)].slice(0, 6).map((champ, i) => ({ id: `bot${i}`, name: '', champ, team: i }));
+  const sim = createSim({ mapId: map, players, practice: true });
+  view.setMatch({ map, teams: 0, rounds: 3, practice: true, menu: true, players });
+  attract = { sim, prev: null, cur: null, bots: players.map(() => ({ t: 0, x: 0, z: 0, hold: 0, hand: 0, ab: 0 })) };
+}
+// each bot walks at the nearest other one and throws punches when close, now and then an ability
+function botInput(sim, i, bot) {
+  const ps = sim.players, me = ps[i];
+  if (!me.alive) return { x: 0, z: 0, b: 0 };
+  const p = me.bodies[0].translation();
+  if ((bot.t -= DT) <= 0) {
+    bot.t = 0.4 + Math.random() * 0.8;
+    const foes = ps.filter((q, j) => j !== i && q.alive).map(q => q.bodies[0].translation()).sort((a, b) => Math.hypot(a.x - p.x, a.z - p.z) - Math.hypot(b.x - p.x, b.z - p.z));
+    const f = foes[0], d = f ? Math.hypot(f.x - p.x, f.z - p.z) : 0;
+    [bot.x, bot.z] = !f || d < 0.01 || Math.random() < 0.2 ? [0, 0] : [(f.x - p.x) / d, (f.z - p.z) / d];
+    if (f && d < 1.4) { bot.hold = Math.random() < 0.25 ? 30 : 3; bot.hand = Math.random() < 0.5 ? BTN.LEFT : BTN.RIGHT; } // a grab or a punch
+    if (Math.random() < 0.08) bot.ab = Math.random() < 0.5 ? BTN.A1 : BTN.A2;
+  }
+  const b = (bot.hold-- > 0 ? bot.hand : 0) | bot.ab;
+  bot.ab = 0;
+  return { x: bot.x, z: bot.z, b };
+}
+function runAttract(dt) {
+  if ($('menu').classList.contains('hidden') && $('lobby').classList.contains('hidden')) return;
+  if (!attract) { startAttract(); return; }
+  const a = attract;
+  if (!a.sim) return;
+  acc += dt;
+  while (acc >= DT) {
+    acc -= DT;
+    a.bots.forEach((bot, i) => a.sim.setInput(i, botInput(a.sim, i, bot)));
+    a.sim.step();
+    a.sim.takeEvents(); // the backdrop stays quiet
+    a.prev = a.cur; a.cur = a.sim.snapshot();
+  }
+  if (!a.cur) return;
+  view.apply(a.prev ?? a.cur, a.cur, acc / DT);
+  view.render(dt);
+}
+
 requestAnimationFrame(frame);
 show('menu');
 
