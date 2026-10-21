@@ -479,7 +479,7 @@ export function createSim({ mapId, players, practice = false, roundsToWin = 3, l
 
     // locomotion: steer the chest's velocity and hover it at standing height (Gang Beasts lifts the upper body too);
     // the same nudge goes to the whole core so the hips and legs hang underneath without stretching the joints
-    let speed = inp.b & BTN.RUN ? 6 : 3.6;
+    let speed = inp.b & BTN.RUN ? 4.8 : 3.6;
     if (p.charge > 0) { p.charge -= DT; p.chargeT += DT; speed = 3.6 + 5.4 * Math.min(1, p.chargeT / RAMP); mx = f.x; mz = f.z; }
     // Vi Q: hold to wind up (slowed), let go to dash; a longer windup (up to 1.25s) dashes further and hits harder.
     // Fully wound up it can be held 3s more, then goes by itself

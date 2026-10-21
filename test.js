@@ -350,7 +350,7 @@ function lineUp(sim, gap = 1.1) {
   const walk = b => { const sim = near('blitz', 'hec'); run(sim, 90); lineUp(sim, 12); const x0 = torso(sim, 0).x; run(sim, 40, () => sim.setInput(0, { x: 1, z: 0, b })); return torso(sim, 0).x - x0; };
   const w = walk(0), r = walk(BTN.RUN);
   console.log('walk', w.toFixed(2), 'run', r.toFixed(2));
-  assert.ok(r > w * 1.4, 'running is faster');
+  assert.ok(r > w * 1.15, 'running is faster');
 }
 
 // 11. a hooked champ goes limp and can't punch back
