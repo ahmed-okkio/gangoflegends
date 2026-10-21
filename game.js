@@ -222,14 +222,16 @@ function onSnap(m) {
   if (!game?.local || m.s.mt <= game.lastMt) return; // the unreliable channel can deliver out of order: an older one is stale
   game.lastMt = m.s.mt;
   game.snaps.push(m.s);
-  // host clock vs mine over the last 30s of snapshots: the quickest arrival sets the offset, and the playback delay has to
-  // cover how late all but the latest 1% came. Not the average: over TCP (the relay, TURN) a lost packet holds up
-  // everything behind it for a round trip, and those stalls froze everyone else, then made them jump. 30s, not 5: a
-  // stall every few seconds dropped out of a short window, the delay shrank and the next stall froze them again (media
-  // players remember about as long). Still a window, so a route that gets slower is followed
-  const offs = game.offs; offs.push(m.s.mt - performance.now() / 1000); if (offs.length > 900) offs.shift();
-  game.off = Math.max(...offs);
-  game.jit = offs.map(o => game.off - o).sort((a, b) => a - b)[Math.floor(0.99 * (offs.length - 1))];
+  // host clock vs mine: the quickest arrival over the last 5s sets the offset (short, so it follows the host's clock when
+  // that loses time: a frame of theirs over 0.1s), and the playback delay has to cover how late all but the latest 1% came
+  // over the last 30s. Not the average: over TCP (the relay, TURN) a lost packet holds up everything behind it for a round
+  // trip, and those stalls froze everyone else, then made them jump. 30s, not 5: a stall every few seconds dropped out of
+  // a short window, the delay shrank and the next stall froze them again (media players remember about as long). One
+  // that arrives right after a long frame of mine (loading the match, GC) waited on me, not the network: not counted
+  const offs = game.offs, t = performance.now();
+  if (!offs.length || t - last < 50) { offs.push(m.s.mt - t / 1000); if (offs.length > 900) offs.shift(); }
+  game.off = Math.max(...offs.slice(-150));
+  game.jit = offs.map(o => Math.max(0, game.off - o)).sort((a, b) => a - b)[Math.floor(0.99 * (offs.length - 1))];
   game.local.sync(m.s, m.s.p[game.mySlot]);
   // events ride along on several snapshots (any one can be lost); e[6] numbers them so each plays once.
   // My own swings already played when I made them
@@ -570,7 +572,9 @@ function frame(now) {
     // everyone else plays back on the host's clock, far enough behind to ride out the jitter seen so far and a lost snapshot
     const s = game.snaps;
     if (!s.length || !game.mine) return;
-    game.delay += (Math.min(0.7, Math.max(0.1, game.jit + 0.08)) - game.delay) * 0.02;
+    // the margin over that lateness grows with it: a steady link plays as little as 2 snapshots behind (a good ping gets
+    // others as fresh as it can), a bursty one keeps more spare (a gap past it carries on, see carryOn)
+    game.delay += (Math.min(0.7, Math.max(0.067, game.jit * 1.2 + 0.05)) - game.delay) * 0.02;
     // that clock runs at wall speed, nudged toward where it should be: at most 5% fast or 15% slow (slower shows as slow
     // motion; engines stay within 0.85-1.1x). The offset jumps a few ms whenever its quickest sample leaves the window,
     // and jumping with it made everyone else stutter
