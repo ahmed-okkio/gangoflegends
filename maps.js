@@ -2,6 +2,7 @@
 // box: centre p, half-extents s, material m. Top of the main floor is always y = 0.
 // kill: torso inside any of these boxes (or below killY) is eliminated.
 // rollers: kinematic cylinders along x that spin at `spin` rad/s; render reads the same data.
+// belts: conveyors { min, max, top, v }: the imported rollers in that x/z area become a slab at height top whose surface moves at v.
 
 const box = (x, y, z, hx, hy, hz, m = 'girder') => ({ p: [x, y, z], s: [hx, hy, hz], m });
 
@@ -43,7 +44,10 @@ export const MAPS = {
     killY: -6,
     boxes: [box(0, -0.2, 0, 6, 0.2, 4, 'plate')],
     rollers: [], kill: [],
-    spawns: [[-4, 0, -2], [4, 0, -2], [-4, 0, 2], [4, 0, 2], [-1.5, 0, -2], [1.5, 0, -2], [-1.5, 0, 2], [1.5, 0, 2]],
+    // the stage has no spawn markers; these are on the floor behind the pit (z < -1.25 is the pit and its belts)
+    spawns: [[-1.5, 0, 2], [-4.5, 0, 2], [-7.5, 0, 2], [-3, 0, 4.5], [-6, 0, 4.5], [2.5, 0, 4], [6, 0, 4], [4.5, 0, 0.2]],
+    // both conveyors roll toward the pit, like Gang Beasts'
+    belts: [{ min: [4.6, 0, -6.8], max: [15, 0, -3.2], top: 0.2, v: [-1, 0, 0] }, { min: [-15, 0, -6.8], max: [-2.6, 0, -3.2], top: 0.2, v: [1, 0, 0] }],
   },
   grind: {
     name: 'Grind',

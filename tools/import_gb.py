@@ -174,6 +174,8 @@ for o in env.objects:
             "matrix": None if (sbi and sbi.subMeshCount) else [rnd(r, 5) for r in flipz(m)],
             "lightmap": c.m_LightmapIndex if c.m_LightmapIndex < 65534 else -1,
             "lmso": rnd([c.m_LightmapTilingOffset.x, c.m_LightmapTilingOffset.y, c.m_LightmapTilingOffset.z, c.m_LightmapTilingOffset.w], 6),
+            # 0 no shadows, 1 on, 2 two-sided, 3 shadows only (invisible); Incinerator's fire light shines through walls that don't cast
+            "cast": int(c.m_CastShadows), "recv": bool(c.m_ReceiveShadows), "layer": go.m_Layer,
         })
     elif o.type.name == "BoxCollider":
         cm = mmul(m, trs([c.m_Center.x, c.m_Center.y, c.m_Center.z], [0, 0, 0, 1], [c.m_Size.x, c.m_Size.y, c.m_Size.z]))
@@ -222,6 +224,15 @@ for o in env.objects:
 
 # ambient + the lights that shine at runtime (realtime and mixed; baked-only ones are already in the lightmaps)
 env_light, lights = {}, []
+# PositionalJitter (Incinerator's fire lights): the light hops to a random offset within range every Min..MaxInterval s
+jitter = {}
+for o in env.objects:
+    if o.type.name != "MonoBehaviour" or not in_scene(o): continue
+    try: d = o.read_typetree()
+    except Exception: continue
+    if "JitterCurve" in d:
+        jitter[d["m_GameObject"]["m_PathID"]] = {"range": rnd([d["Range"]["x"], d["Range"]["y"], d["Range"]["z"]]), "every": rnd([d["MinimumInterval"], d["MaximumInterval"]])}
+
 for o in env.objects:
     if not in_scene(o): continue
     if o.type.name == "RenderSettings":
@@ -239,7 +250,7 @@ for o in env.objects:
             lights.append({"type": ["spot", "sun", "point"][l.m_Type], "color": rnd([l.m_Color.r, l.m_Color.g, l.m_Color.b]), "intensity": round(l.m_Intensity, 3),
                            "p": rnd([o0[0], o0[1], -o0[2]]), "dir": rnd([d[0] - o0[0], d[1] - o0[1], -(d[2] - o0[2])]), "range": round(l.m_Range, 2),
                            "angle": round(l.m_SpotAngle, 2), "inner": round(t.get("m_InnerSpotAngle", l.m_SpotAngle * 0.8), 2),
-                           "shadows": t["m_Shadows"]["m_Type"] > 0, "mask": t["m_CullingMask"]["m_Bits"], "name": gos[l.m_GameObject.path_id].m_Name})
+                           "shadows": t["m_Shadows"]["m_Type"] > 0, "mask": t["m_CullingMask"]["m_Bits"], "name": gos[l.m_GameObject.path_id].m_Name, "jitter": jitter.get(l.m_GameObject.path_id)})
 
 json.dump({"stage": stage, "meshes": meshes, "materials": materials, "renderers": renderers, "colliders": colliders, "capsules": capsules, "trimeshes": trimeshes,
            "spawns": spawns, "kill": kills, "lightmaps": lightmaps, "env": env_light, "lights": lights}, open(os.path.join(out, "scene.json"), "w"), indent=0)

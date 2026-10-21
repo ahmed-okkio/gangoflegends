@@ -304,6 +304,8 @@ addEventListener('keyup', e => keys.delete(e.code));
 addEventListener('blur', () => { keys.clear(); mouse.clear(); });
 $('view').addEventListener('mousedown', e => { mouse.add(e.button); if (e.button === 1) e.preventDefault(); }); // middle click: no autoscroll
 addEventListener('mouseup', e => mouse.delete(e.button));
+let cursor = null; // aims abilities (readInput)
+$('view').addEventListener('mousemove', e => { cursor = [e.clientX, e.clientY]; });
 addEventListener('contextmenu', e => { if (game || rebinding) e.preventDefault(); });
 $('resumeBtn').onclick = () => $('escMenu').classList.add('hidden');
 // volume sliders (menu + Esc menu) share one saved setting each
@@ -340,7 +342,21 @@ function readInput() {
     b |= (on(0) ? BTN.JUMP : 0) | (on(4) || on(6) ? BTN.LEFT : 0) | (on(5) || on(7) ? BTN.RIGHT : 0) | (on(2) ? BTN.A1 : 0) | (on(3) ? BTN.A2 : 0) | (on(11) ? BTN.BUTT : 0) | (on(1) ? BTN.LAY : 0) | (on(10) ? BTN.LIFT : 0);
   }
   const side = view.camSide; // controls are camera-relative: up on the stick is away from the camera
-  return { x: Math.round(x * side * 100) / 100, z: Math.round(z * side * 100) / 100, b };
+  const a = game && cursor ? view.aimYaw(...cursor, game.mySlot) : null; // abilities aim at the cursor
+  return { x: Math.round(x * side * 100) / 100, z: Math.round(z * side * 100) / 100, b, a: a == null ? null : Math.round(a * 100) / 100 };
+}
+// my skillshot strip: shown while an aimed ability's key is held, if it was ready when pressed (sim.js casts the same way)
+const aiming = [false, false];
+function showAim(inp) {
+  const abs = CHAMPS[game.setup.players[game.mySlot].champ].abilities, mine = game.cur?.p[game.mySlot];
+  let shown = null;
+  [BTN.A1, BTN.A2].forEach((btn, i) => {
+    if (!(inp.b & btn)) aiming[i] = false;
+    else if (!aiming[i] && !(game.lastB & btn)) aiming[i] = !!abs[i].aim && !(mine?.[4 + i] > 0);
+    if (aiming[i] && inp.a != null) shown = { slot: game.mySlot, yaw: inp.a, range: abs[i].aim };
+  });
+  game.lastB = inp.b;
+  view.setAim(shown);
 }
 
 // ---------- loop ----------
@@ -350,7 +366,8 @@ function frame(now) {
   const dt = Math.min(0.1, (now - last) / 1000);
   last = now;
   if (!game) { runAttract(dt); return; }
-  const inp = $('escMenu').classList.contains('hidden') ? readInput() : { x: 0, z: 0, b: 0 };
+  const inp = $('escMenu').classList.contains('hidden') ? readInput() : { x: 0, z: 0, b: 0, a: null };
+  showAim(inp);
   if (game.sim) {
     acc += dt;
     while (acc >= DT) {
@@ -378,7 +395,7 @@ function frame(now) {
       const ev = local.takeEvents();
       if (ev.length) view.fx(ev);
       game.mine = [game.mine?.[1], local.snapshot().p[game.mySlot]];
-      game.inq.push([inp.x, inp.z, inp.b]); if (game.inq.length > 4) game.inq.shift();
+      game.inq.push([inp.x, inp.z, inp.b, inp.a]); if (game.inq.length > 4) game.inq.shift();
       if (local.tick % 2 === 0) conn.send({ t: 'in', n: local.tick, i: game.inq });
     }
     // everyone else plays back on the host's clock, far enough behind to ride out the jitter seen so far

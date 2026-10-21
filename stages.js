@@ -40,10 +40,13 @@ export async function prepareMap(id, { meshes = !isNode } = {}) {
   const bins = {}, tris = scene.trimeshes ?? [];
   const keys = new Set([...meshes ? Object.keys(scene.meshes) : [], ...tris.map(t => t.mesh)]);
   await Promise.all([...keys].map(async k => { bins[k] = await readBin(base + k + '.bin'); }));
+  // Incinerator's football-only colliders under and beside its conveyors would hold feet still between the rollers.
+  // (The stair ramps for the ball stay: they help ragdolls up the steps.)
+  const solid = c => !/Ball Only Collider|Convayor Collision Ball Proxy/.test(c.path);
   loaded[id] = MAPS[id] = {
     ...map,
-    boxes: scene.colliders.map(c => ({ p: c.p, q: c.q, s: c.h })),
-    caps: scene.capsules ?? [],
+    boxes: scene.colliders.filter(solid).map(c => ({ p: c.p, q: c.q, s: c.h })),
+    caps: (scene.capsules ?? []).filter(solid),
     tris: tris.map(t => meshTris(scene.meshes[t.mesh], bins[t.mesh], t.matrix)),
     rollers: [],
     kill: scene.kill.map(killBox),

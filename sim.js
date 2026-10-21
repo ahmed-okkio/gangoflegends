@@ -79,7 +79,24 @@ export function createSim({ mapId, players, practice = false, roundsToWin = 3, l
   const fixed = (desc, p = [0, 0, 0], q) => world.createCollider(desc.setTranslation(...p).setRotation(q ? { x: q[0], y: q[1], z: q[2], w: q[3] } : QI).setFriction(0.9).setCollisionGroups(WORLD_GROUPS), ground);
   for (const b of map.boxes) fixed(RAPIER.ColliderDesc.cuboid(...b.s), b.p, b.q);
   // imported stages also have capsules / balls and triangle meshes (world-space vertices, see stages.js)
-  for (const c of map.caps ?? []) fixed(c.hh ? RAPIER.ColliderDesc.capsule(c.hh, c.r) : RAPIER.ColliderDesc.ball(c.r), c.p, c.q);
+  // conveyors: the rollers under a belt become one flat frictionless slab at their top (feet wedge between real
+  // rollers); belts() below supplies the friction, toward the belt's surface velocity
+  const inBelt = (b, t) => t.x >= b.min[0] && t.x <= b.max[0] && t.z >= b.min[2] && t.z <= b.max[2];
+  const beltOf = new Map(); // collider handle -> belt
+  for (const c of map.caps ?? []) if (!(map.belts ?? []).some(b => inBelt(b, V(...c.p)) && c.p[1] < b.top)) fixed(c.hh ? RAPIER.ColliderDesc.capsule(c.hh, c.r) : RAPIER.ColliderDesc.ball(c.r), c.p, c.q);
+  for (const b of map.belts ?? []) {
+    const slab = fixed(RAPIER.ColliderDesc.cuboid((b.max[0] - b.min[0]) / 2, 0.1, (b.max[2] - b.min[2]) / 2), [(b.min[0] + b.max[0]) / 2, b.top - 0.1, (b.min[2] + b.max[2]) / 2]);
+    slab.setFriction(0); slab.setFrictionCombineRule(RAPIER.CoefficientCombineRule.Min);
+    beltOf.set(slab.handle, b);
+  }
+  function belts(p) {
+    for (const b of map.belts ?? []) for (const body of p.bodies) {
+      const t = body.translation();
+      if (!inBelt(b, t) || t.y > b.top + 0.25) continue;
+      const v = body.linvel(), dx = b.v[0] - v.x, dz = b.v[2] - v.z, d = Math.hypot(dx, dz), k = Math.min(1, 8 * DT / (d || 1)); // up to ~0.8 g, like the floor's friction
+      body.setLinvel(V(v.x + dx * k, v.y, v.z + dz * k), true);
+    }
+  }
   for (const t of map.tris ?? []) fixed(RAPIER.ColliderDesc.trimesh(t.v, t.i));
   const rollerRot = (r, t) => qmul(qaxis(X, r.spin * t), qaxis(Z, Math.PI / 2)); // cylinder is y-up; lay it along x
   const rollers = map.rollers.map(r => {
@@ -90,7 +107,7 @@ export function createSim({ mapId, players, practice = false, roundsToWin = 3, l
 
   const ps = players.map((pl, slot) => ({
     ...pl, slot, bit: 1 << (slot + 1), champ: CHAMPS[pl.champ] ? pl.champ : 'blitz',
-    alive: false, bodies: null, input: { x: 0, z: 0, b: 0 }, prevB: 0, respawn: 0, ack: 0, q: new Map(), next: null, newest: -1, slack: 99, win: 0,
+    alive: false, bodies: null, input: { x: 0, z: 0, b: 0, a: null }, prevB: 0, aimBtn: 0, respawn: 0, ack: 0, q: new Map(), next: null, newest: -1, slack: 99, win: 0,
   }));
   const teamCount = new Set(ps.map(p => p.team)).size;
   const scores = Array(Math.max(...ps.map(p => p.team)) + 1).fill(0);
@@ -344,6 +361,8 @@ export function createSim({ mapId, players, practice = false, roundsToWin = 3, l
     const tp = T.translation(), tv = T.linvel(), Hb = p.bodies[HIPS];
     const ray = world.castRay(new RAPIER.Ray(tp, DOWN), STAND + 0.3, true, undefined, worldAndOthers(p));
     p.grounded = !!ray && ctrl > 0 && !lying;
+    // walking is relative to what's underfoot, so standing still on a conveyor rides it
+    const gv = (ray && beltOf.get(ray.collider.handle))?.v ?? [0, 0, 0];
 
     let mx = inp.x, mz = inp.z;
     const m = Math.hypot(mx, mz);
@@ -352,10 +371,18 @@ export function createSim({ mapId, players, practice = false, roundsToWin = 3, l
     if (p.spin > 0) { p.spin -= DT; p.spinA += (2 * Math.PI / SPIN) * DT; } else p.spinA = 0; // one full turn
     if (move) {
       if (p.charge > 0) { if (m > 0.2) p.yaw = turnToward(p.yaw, Math.atan2(mx, mz), 3 * DT); }
-      else if (m > 0.2) p.yaw = Math.atan2(mx, mz);
-      if (pressed & BTN.A1) useAbility(p, 0);
-      if (pressed & BTN.A2) useAbility(p, 1);
-    }
+      else if (m > 0.2 && !p.dash) p.yaw = Math.atan2(mx, mz);
+      // aiming (input.a: the cursor's yaw, null = where you face): "release" abilities (hook, charge) go off when the
+      // key is let go; the held ones (Vi Q, Sett Q) start on press. Either way the champ turns to the cursor while held.
+      const aim = typeof inp.a === 'number' ? inp.a : null, abs = CHAMPS[p.champ].abilities;
+      for (const i of [0, 1]) {
+        const btn = i ? BTN.A2 : BTN.A1;
+        if (!abs[i].release || (abs[i].id === 'charge' && p.charge > 0)) { if (pressed & btn) useAbility(p, i); continue; }
+        if (pressed & btn && p.cd[i] <= 0) p.aimBtn |= btn;
+        if (p.aimBtn & btn && !(inp.b & btn)) { p.aimBtn &= ~btn; if (aim != null) p.yaw = aim; useAbility(p, i); }
+      }
+      if (aim != null && (p.aimBtn || p.vault > 0 || p.hay > 0)) p.yaw = aim;
+    } else p.aimBtn = 0;
     const f = facing(p); // travel direction
     const bf = V(Math.sin(p.yaw + p.spinA), 0, Math.cos(p.yaw + p.spinA)), side = V(bf.z, 0, -bf.x); // body facing; side = the beast's left
 
@@ -377,7 +404,7 @@ export function createSim({ mapId, players, practice = false, roundsToWin = 3, l
     p.fb -= DT;
     if (lying) speed = 1.2; // crawl
     const k = (p.grounded ? 0.2 : 0.04) * move;
-    const dv = V((mx * speed - tv.x) * k, 0, (mz * speed - tv.z) * k);
+    const dv = V((mx * speed + gv[0] - tv.x) * k, 0, (mz * speed + gv[2] - tv.z) * k);
     if (p.grounded && p.jumpT <= 0) dv.y = ((STAND - ray.timeOfImpact) * 12 - tv.y) * 0.35 + HOLD * DT;
     if (p.grounded && move && pressed & BTN.JUMP) { dv.y = 6.5 - tv.y; p.jumpT = 0.3; }
     // climbing: hanging off a ledge by the hands, hold jump to push yourself up until the hands are at your waist (arms
@@ -656,7 +683,7 @@ export function createSim({ mapId, players, practice = false, roundsToWin = 3, l
     mt += DT; tick++;
     for (const { r, body } of rollers) body.setNextKinematicRotation(rollerRot(r, mt));
     if (st === 'count' && (timer -= DT) <= 0) st = 'fight';
-    if (me.alive) control(me, st !== 'count');
+    if (me.alive) { control(me, st !== 'count'); belts(me); }
     world.step();
     if (me.alive) hist.set(tick, { pos: hips().translation(), vel: hips().linvel() });
     smooth = mul(smooth, 0.8);
@@ -671,7 +698,7 @@ export function createSim({ mapId, players, practice = false, roundsToWin = 3, l
     for (const { r, body } of rollers) body.setNextKinematicRotation(rollerRot(r, mt));
     if (st === 'count' && (timer -= DT) <= 0) st = 'fight';
     const active = st !== 'count';
-    for (const p of ps) { if (p.next != null) feed(p); if (p.alive) control(p, active); }
+    for (const p of ps) { if (p.next != null) feed(p); if (p.alive) { control(p, active); belts(p); } }
     stepHooks();
     world.step();
 
@@ -723,9 +750,10 @@ export function createSim({ mapId, players, practice = false, roundsToWin = 3, l
     setInput(slot, inp) {
       const p = ps[slot];
       if (!p) return;
-      if (!Array.isArray(inp.i)) { p.input = { x: +inp.x || 0, z: +inp.z || 0, b: inp.b | 0 }; return; }
+      const yaw = a => typeof a === 'number' && Number.isFinite(a) ? a : null;
+      if (!Array.isArray(inp.i)) { p.input = { x: +inp.x || 0, z: +inp.z || 0, b: inp.b | 0, a: yaw(inp.a) }; return; }
       const n = inp.n | 0;
-      inp.i.slice(-8).forEach(([x, z, b], k, all) => { const t = n - all.length + 1 + k; if (p.next == null || t >= p.next) p.q.set(t, { x: +x || 0, z: +z || 0, b: b | 0 }); });
+      inp.i.slice(-8).forEach(([x, z, b, a], k, all) => { const t = n - all.length + 1 + k; if (p.next == null || t >= p.next) p.q.set(t, { x: +x || 0, z: +z || 0, b: b | 0, a: yaw(a) }); });
       p.newest = Math.max(p.newest, n);
       // first input, or way behind after a lag spike (feed() only trims a tick every 2s): line up 2 ticks behind
       if (p.next == null || p.newest - p.next > 30) { p.next = p.newest - 2; for (const t of p.q.keys()) if (t < p.next) p.q.delete(t); }

@@ -38,6 +38,18 @@ export async function loadProps() {
 
 const std = (color, extra = {}) => new THREE.MeshStandardMaterial({ color, roughness: 0.5, ...extra });
 const glow = (color, k = 2.2) => new THREE.MeshStandardMaterial({ color, emissive: color, emissiveIntensity: k, roughness: 0.3 });
+// Gang Beasts' fire pit glow: the pit's mouth glows, red at the rim, hot orange (bright enough to bloom) in the middle
+// (their shader fades it by the pit's depth behind it; distance from the rim stands in). The pit's side faces stay clear.
+function pitGlow(lo, hi) {
+  return new THREE.ShaderMaterial({
+    uniforms: { lo: { value: lo }, hi: { value: hi } },
+    vertexShader: 'varying vec3 vP; void main() { vec4 w = modelMatrix * vec4(position, 1.0); vP = w.xyz; gl_Position = projectionMatrix * viewMatrix * w; }',
+    fragmentShader: `uniform vec2 lo, hi; varying vec3 vP;
+      void main() { vec2 e = min(vP.xz - lo, hi - vP.xz); float d = min(e.x, e.y);
+        gl_FragColor = vec4(mix(vec3(1.0, 0.196, 0.0), vec3(7.5, 2.5, 0.0), smoothstep(0.3, 3.0, d)), smoothstep(0.0, 0.6, d)); }`, // rim _NearColor, middle _EmissionColor (30, 10, 0) scaled: three.js bloom spreads further than URP's
+    transparent: true, depthWrite: false,
+  });
+}
 // Gang Beasts gummy: soft clearcoat sheen over a matte body
 const gummy = (color, extra = {}) => new THREE.MeshPhysicalMaterial({
   color, roughness: 0.55, clearcoat: 0.8, clearcoatRoughness: 0.3, sheen: 0.6, sheenRoughness: 0.5,
@@ -311,6 +323,20 @@ export function createRenderer(canvas) {
   }
 
   // a stage imported from Gang Beasts: original meshes, textures and baked bounce light
+  // the incinerator's pit: a glowing surface that blooms, and now and then a splash of lava blobs arcing up out of it
+  function pitFire(g, geo) {
+    geo.computeBoundingBox();
+    const { min, max } = geo.boundingBox;
+    g.add(new THREE.Mesh(geo, pitGlow(new THREE.Vector2(min.x, min.z), new THREE.Vector2(max.x, max.z))));
+    const lava = new THREE.Color(4, 1.1, 0.15); // over the bloom threshold
+    let next = 0;
+    animated.push(o => {
+      if (o.time < next) return;
+      next = o.time + rand(0.3, 1.2);
+      emit(new THREE.Vector3(rand(min.x + 0.5, max.x - 0.5), max.y, rand(min.z + 0.5, max.z - 0.5)), { color: lava, n: 3 + Math.floor(rand(0, 4)), speed: 7, size: 0.22, life: 1.4, grav: -14, spread: 0.25, up: 4 });
+    });
+  }
+
   function buildImported(g, { scene: sc, bins, base }, view = {}) {
     const loader = new THREE.TextureLoader(), texCache = {};
     const lightmapTex = sc.lightmaps.map(name => Object.assign(loader.load(base + name), { colorSpace: THREE.SRGBColorSpace, channel: 1 }));
@@ -348,18 +374,28 @@ export function createRenderer(canvas) {
     // static batching: every submesh is baked into world space (lightmap tiling into its uv1) and merged with the
     // others sharing its material, so the stage is a few dozen draw calls instead of ~1500
     const batches = {};
+    // a Unity light's culling mask also picks what casts its shadows (Incinerator's fire light shines in through walls
+    // left out of it). three.js shadows can't differ per light, so a layer any shadowed light leaves out casts none.
+    const shadowLayers = (sc.lights ?? []).filter(l => l.shadows).reduce((m, l) => m & (l.mask >>> 0), 0xffffffff) >>> 0;
     for (const r of sc.renderers) {
       const src = geos[r.mesh], meta = sc.meshes[r.mesh], li = r.lightmap >= 0 && meta.uv1 ? r.lightmap : -1;
       const M = r.matrix && new THREE.Matrix4().set(...r.matrix.flat()), city = r.path.includes('/City');
       r.subs.forEach((s, i) => {
         if (!meta.subs[s] || !r.mats.length) return;
         const geo = submesh(src, meta.subs[s], M, li >= 0 && r.lmso), key = r.mats[Math.min(i, r.mats.length - 1)];
-        (batches[[key, li, city, Object.keys(geo.attributes)].join('|')] ??= { key, li, city, geos: [] }).geos.push(geo);
+        const cast = r.layer != null && !(shadowLayers >>> r.layer & 1) ? 0 : r.cast ?? 1, recv = r.recv ?? true;
+        (batches[[key, li, city, cast, recv, Object.keys(geo.attributes)].join('|')] ??= { key, li, city, cast, recv, geos: [] }).geos.push(geo);
       });
     }
-    for (const { key, li, city, geos } of Object.values(batches)) {
-      const m = new THREE.Mesh(mergeGeometries(geos), material(key, li));
-      m.castShadow = !city; m.receiveShadow = !city;
+    for (const { key, li, city, cast, recv, geos } of Object.values(batches)) {
+      if (/^Firepit Glow/.test(sc.materials[key].name)) { pitFire(g, mergeGeometries(geos)); continue; }
+      // Unity's per-renderer shadow settings: "shadows only" draws nothing but still casts
+      // Unity draws "on" casters' shadows with their faces toward the light (back faces culled) and "two sided" with
+      // both; three.js defaults to the faces away from the light, which would let a room's walls shade light from outside
+      let mat = cast === 3 ? new THREE.MeshBasicMaterial({ colorWrite: false, depthWrite: false }) : material(key, li);
+      if (cast > 0) { mat = mat.clone(); mat.shadowSide = cast === 2 ? THREE.DoubleSide : THREE.FrontSide; }
+      const m = new THREE.Mesh(mergeGeometries(geos), mat);
+      m.castShadow = !city && cast > 0; m.receiveShadow = !city && recv;
       if (city) m.layers.set(1);
       g.add(m);
     }
@@ -374,12 +410,18 @@ export function createRenderer(canvas) {
         : l.type === 'point' ? new THREE.PointLight(col(l), I, l.range, 2)
         : new THREE.SpotLight(col(l), I, l.range, l.angle / 2 * Math.PI / 180, 1 - l.inner / l.angle, 2);
       L.position.set(...l.p);
+      // PositionalJitter: hops to a random offset within its range every so often (the fire light's flicker)
+      if (l.jitter) {
+        const { range: [rx, ry, rz], every: [lo, hi] } = l.jitter;
+        let next = 0;
+        animated.push(o => { if (o.time >= next) { next = o.time + rand(lo, hi); L.position.set(l.p[0] + rand(-rx, rx), l.p[1] + rand(-ry, ry), l.p[2] + rand(-rz, rz)); } });
+      }
       if (L.target) { L.target.position.set(l.p[0] + l.dir[0], l.p[1] + l.dir[1], l.p[2] + l.dir[2]); g.add(L.target); }
       if (l.type === 'spot' && l.shadows && spotShadows < 4) { spotShadows++; L.castShadow = true; L.shadow.mapSize.set(1024, 1024); L.shadow.bias = -0.0005; }
       g.add(L);
     }
-    // Gang Beasts' post profile: ACES, +1.4 EV, bloom over 2, contrast +6, saturation +4, darker shadows, vignette 0.2
-    bloom.strength = 0.3; bloom.threshold = 2; bloom.radius = 0.8; renderer.toneMappingExposure = 0.8; scene.environmentIntensity = 0.5; // exposure: by eye (three's ACES curve isn't URP's)
+    // Gang Beasts' post profile (every stage's Volume): ACES, +1.4 EV, bloom intensity 1 over 2 (scatter 0.8), contrast +6, saturation +4, darker shadows, vignette 0.2
+    bloom.strength = 0.6; bloom.threshold = 2; bloom.radius = 0.8; renderer.toneMappingExposure = 0.8; scene.environmentIntensity = 0.5; // exposure: by eye (three's ACES curve isn't URP's)
     Object.assign(grade.uniforms, { strength: { value: 0.2 }, contrast: { value: 1.06 }, saturation: { value: 1.04 }, shadows: { value: 0.3 } });
     scene.fog = null;
     g.add(sky(...view.sky ?? ['#6fb2ee', '#d8ecfa', '#b9c9d6']));
@@ -763,8 +805,27 @@ export function createRenderer(canvas) {
     }
   }
 
+  // aiming, mine only: the cursor's point on the floor under my champ -> a world yaw, and a League-style skillshot
+  // strip under my champ while an aimed ability is held (game.js)
+  const aimRay = new THREE.Raycaster(), aimPlane = new THREE.Plane(new THREE.Vector3(0, 1, 0), 0), aimHit = new THREE.Vector3();
+  const aimBar = new THREE.Mesh(new THREE.PlaneGeometry(1, 1).rotateX(-Math.PI / 2).translate(0, 0, 0.5),
+    new THREE.MeshBasicMaterial({ color: '#0ac8b9', transparent: true, opacity: 0.3, depthWrite: false, blending: THREE.AdditiveBlending }));
+  aimBar.renderOrder = 5; aimBar.visible = false; scene.add(aimBar);
+  let aim = null;
+  function aimYaw(cx, cy, slot) {
+    const av = avatars[slot];
+    if (!av) return null;
+    const r = canvas.getBoundingClientRect(), hp = av.parts[HIPS].position;
+    aimRay.setFromCamera(new THREE.Vector2((cx - r.left) / r.width * 2 - 1, 1 - (cy - r.top) / r.height * 2), camera);
+    aimPlane.constant = HIP_HEIGHT - hp.y;
+    return aimRay.ray.intersectPlane(aimPlane, aimHit) ? Math.atan2(aimHit.x - hp.x, aimHit.z - hp.z) : null;
+  }
+
   function render(dt) {
     time += dt;
+    const me = aim && avatars[aim.slot];
+    aimBar.visible = !!me;
+    if (me) { const hp = me.parts[HIPS].position; aimBar.position.set(hp.x, hp.y - HIP_HEIGHT + 0.05, hp.z); aimBar.rotation.y = aim.yaw; aimBar.scale.set(0.7, 1, aim.range); }
     for (const fn of animated) fn({ dt, time });
     stepParticles(dt);
     stepRings(dt);
@@ -786,5 +847,5 @@ export function createRenderer(canvas) {
     composer.render(dt);
   }
 
-  return { setMatch, apply, fx, render, avatars: () => avatars, get camSide() { return cam.side; } };
+  return { setMatch, apply, fx, render, aimYaw, setAim: a => { aim = a; }, avatars: () => avatars, get camSide() { return cam.side; } };
 }

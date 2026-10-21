@@ -1,6 +1,7 @@
 // Headless sim check: node test.js
 import assert from 'node:assert/strict';
 import { initPhysics, createSim, BTN, STAND } from './sim.js';
+import { prepareMap } from './stages.js';
 
 await initPhysics();
 Math.random = () => 0.9999; // spawn shuffle leaves the order alone, so spawns match what these checks were tuned on
@@ -264,5 +265,29 @@ function lineUp(sim, gap = 1.1) {
   console.log('8p snapshot bytes', bytes);
   assert.ok(bytes < 5000);
   assert.ok(sim.players.every(p => p.alive), 'nobody falls off at spawn');
+}
+
+// 15. aiming: Rocket Grab goes off on release, toward the cursor's yaw, and turns the champ to it while held
+{
+  const sim = near('blitz', 'hec');
+  run(sim, 90);
+  run(sim, 20, () => sim.setInput(0, { x: 0, z: 0, b: BTN.A1, a: 2 }));
+  const p = sim.players[0];
+  assert.ok(Math.abs(p.yaw - 2) < 1e-6 && p.cd[0] === 0, 'aims while held, not cast yet');
+  run(sim, 1, () => sim.setInput(0, { x: 0, z: 0, b: 0, a: 2 }));
+  assert.ok(p.cd[0] > 0, 'casts on release');
+  console.log('aim ok');
+}
+
+// 14. Incinerator (when imported): nobody spawns over the pit, the belts carry you into it
+if ((await prepareMap('incinerator')).imported) {
+  const sim = createSim({ mapId: 'incinerator', players: Array.from({ length: 8 }, (_, i) => ({ id: i, name: 'P', champ: 'blitz', team: i })) });
+  run(sim, 120);
+  assert.ok(sim.players.every(p => p.alive), 'nobody spawns over the pit');
+  const p = sim.players[0], t0 = torso(sim, 0);
+  for (const b of p.bodies) { const t = b.translation(); b.setTranslation({ x: t.x - t0.x + 9.5, y: t.y + 0.3, z: t.z - t0.z - 5 }, true); b.setLinvel({ x: 0, y: 0, z: 0 }, true); }
+  run(sim, 120);
+  console.log('belt carried', (9.5 - torso(sim, 0).x).toFixed(2));
+  assert.ok(torso(sim, 0).x < 8.5, 'belt rolls you toward the pit');
 }
 console.log('all ok');
