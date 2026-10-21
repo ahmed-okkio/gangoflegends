@@ -247,8 +247,9 @@ function renderLobby() {
 champCards($('lobbyChamps'), id => {
   if (isHost()) { lobby.players[0].champ = id; pushLobby(); } else conn?.send({ t: 'pick', champ: id });
 });
-for (const [id, key, num] of [['setMap', 'map'], ['setTeams', 'teams', 1], ['setRounds', 'rounds', 1]])
+for (const [id, key, num] of [['setMap', 'map'], ['setTeams', 'teams', 1]])
   $(id).onchange = e => { lobby.settings[key] = num ? +e.target.value : e.target.value; pushLobby(); };
+$('setRounds').onchange = e => { lobby.settings.rounds = Math.min(99, Math.max(1, Math.round(+e.target.value) || 1)); pushLobby(); }; // typed: kept to 1-99
 $('lobbyCode').onclick = () => { navigator.clipboard?.writeText(lobby.code); $('lobbyNote').textContent = 'Code copied.'; };
 $('leaveBtn').onclick = () => leave();
 $('startBtn').onclick = () => {
@@ -262,7 +263,7 @@ $('startBtn').onclick = () => {
 async function startGame(setup) {
   await Promise.all([prepareMap(setup.map), loadBeast(), loadProps(), loadSfx()]);
   const myId = conn ? conn.myId : 'me';
-  game = { setup, mySlot: setup.players.findIndex(p => p.id === myId), snaps: [], cur: null, fightAt: 0, sentEv: [], evN: 0, lastMt: -1, inq: [], offs: [], off: null, jit: 0, delay: 0.1 };
+  game = { setup, mySlot: setup.players.findIndex(p => p.id === myId), snaps: [], cur: null, fightAt: 0, sentEv: [], evN: 0, lastMt: -1, inq: [], offs: [], off: null, jit: 0, delay: 0.1, at: null };
   $('chatLog').replaceChildren();
   if (setup.practice || isHost()) game.sim = createSim({ mapId: setup.map, players: setup.players, practice: !!setup.practice, roundsToWin: setup.rounds });
   else game.local = createSim({ mapId: setup.map, players: setup.players, local: game.mySlot }); // my champ, predicted (sim.js)
@@ -514,11 +515,15 @@ function frame(now) {
       game.inq.push([inp.x, inp.z, inp.b, inp.a]); if (game.inq.length > 6) game.inq.shift(); // each tick goes out 3 times
       if (local.tick % 2 === 0) conn.sendFast({ t: 'in', n: local.tick, i: game.inq });
     }
-    // everyone else plays back on the host's clock, far enough behind to ride out the jitter seen so far
+    // everyone else plays back on the host's clock, far enough behind to ride out the jitter seen so far and a lost snapshot
     const s = game.snaps;
     if (!s.length || !game.mine) return;
-    game.delay += (Math.min(0.35, Math.max(0.06, 0.05 + 2.5 * game.jit)) - game.delay) * 0.02;
-    const at = now / 1000 + game.off - game.delay;
+    game.delay += (Math.min(0.35, Math.max(0.1, 0.05 + 4 * game.jit)) - game.delay) * 0.02;
+    // that clock runs at wall speed, nudged at most 5% fast or slow toward where it should be: the offset jumps a few ms
+    // whenever its quickest sample leaves the window, and jumping with it made everyone else stutter
+    const want = now / 1000 + game.off - game.delay;
+    game.at = game.at == null || Math.abs(want - game.at) > 0.25 ? want : game.at + dt * (1 + Math.max(-0.05, Math.min(0.05, (want - game.at) * 2)));
+    const at = game.at;
     while (s.length > 2 && s[1].mt <= at) s.shift();
     const a = s[0], b = s[1] ?? a, alpha = b === a ? 1 : Math.min(1, Math.max(0, (at - a.mt) / (b.mt - a.mt)));
     // me: between my last two local steps, unless knocked out, hooked or grabbing / grabbed by someone (then the host's

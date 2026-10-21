@@ -171,6 +171,8 @@ export function createSim({ mapId, players, practice = false, roundsToWin = 3, l
   }
 
   const addVel = (b, dv) => b.setLinvel(add(b.linvel(), dv), true);
+  // what a champ stands on: the world and other champs; on a prediction copy just the world (stand-ins hold nobody up)
+  const under = p => local >= 0 ? (1 << 16) | 1 : worldAndOthers(p);
   const handPos = (p, i) => { const b = p.bodies[FORE + i]; return add(b.translation(), qrot(b.rotation(), V(...HAND[i]))); };
   const facing = p => V(Math.sin(p.yaw), 0, Math.cos(p.yaw));
 
@@ -433,7 +435,7 @@ export function createSim({ mapId, players, practice = false, roundsToWin = 3, l
     p.punchCd -= DT; p.empower -= DT; p.jumpT -= DT; p.buttCd -= DT;
 
     const tp = T.translation(), tv = T.linvel(), Hb = p.bodies[HIPS];
-    const ray = world.castRay(new RAPIER.Ray(tp, DOWN), STAND + 0.3, true, undefined, worldAndOthers(p));
+    const ray = world.castRay(new RAPIER.Ray(tp, DOWN), STAND + 0.3, true, undefined, under(p));
     p.grounded = !!ray && ctrl > 0 && !lying;
     // walking is relative to what's underfoot, so standing still on a conveyor rides it
     const gv = (ray && beltOf.get(ray.collider.handle))?.v ?? [0, 0, 0];
@@ -504,7 +506,7 @@ export function createSim({ mapId, players, practice = false, roundsToWin = 3, l
       const held = p.grabs.map((g, i) => g?.target.isFixed() && handPos(p, i)).filter(Boolean), hx = held.reduce((a, h) => a + h.x, 0) / held.length, hz = held.reduce((a, h) => a + h.z, 0) / held.length;
       const to = norm(V(hx - tp.x, 0, hz - tp.z));
       // the hands may be on the wall face: the top is found by probing down just past them
-      const probe = world.castRay(new RAPIER.Ray(V(hx + to.x * 0.2, ledge + 1, hz + to.z * 0.2), DOWN), 1.2, true, undefined, worldAndOthers(p));
+      const probe = world.castRay(new RAPIER.Ray(V(hx + to.x * 0.2, ledge + 1, hz + to.z * 0.2), DOWN), 1.2, true, undefined, under(p));
       const top = probe ? Math.max(ledge, ledge + 1 - probe.timeOfImpact) : ledge;
       // and the hands work their way up the face to the lip
       for (const g of p.grabs) if (g?.target.isFixed()) {
@@ -750,9 +752,11 @@ export function createSim({ mapId, players, practice = false, roundsToWin = 3, l
   let tick = 0, err = 0; // err: last correction size (m), for tests
   let smooth = V(); // drawn offset that eases a correction in over ~0.1s instead of popping (added in snapshot())
   if (me) for (const q of ps) if (q !== me) {
-    // everyone else: a kinematic bean the size of a standing beast, so I bump into them and can grab them
+    // everyone else: a kinematic bean the size of a standing beast, so my dashes and charges stop on them. It doesn't push
+    // me (filter: world only): it trails the host by the ping plus the playback delay, and an unstoppable bean in the
+    // wrong place shoved me about, worse the higher the ping. Bumping into champs comes from the host (sync())
     const body = world.createRigidBody(RAPIER.RigidBodyDesc.kinematicPositionBased().setTranslation(0, -100, 0));
-    const col = world.createCollider(RAPIER.ColliderDesc.capsule(0.4, 0.35).setTranslation(0, 0.35, 0).setCollisionGroups(bodyGroups(q)), body);
+    const col = world.createCollider(RAPIER.ColliderDesc.capsule(0.4, 0.35).setTranslation(0, 0.35, 0).setCollisionGroups((q.bit << 16) | 1), body);
     owner.set(col.handle, { p: q, part: TORSO, proxy: true });
     q.bodies = PARTS.map(() => body);
   }
@@ -770,7 +774,8 @@ export function createSim({ mapId, players, practice = false, roundsToWin = 3, l
     if (!e[1]) { if (me.alive) removeRagdoll(me); return; }
     const x = SX, hp = V(e[6], e[7], e[8]), hv = V(e[x + 1], e[x + 2], e[x + 3]), ack = e[x + 4];
     // countdown: my inputs land on the host a round trip (tick - ack) after this snapshot's clock, so start moving that much early
-    if (st === 'count') { timer = s.t - (tick - ack) * DT; if (timer <= 0) st = 'fight'; }
+    const lag = (tick - ack) * DT; // this state is the host's me that long ago (a round trip, roughly)
+    if (st === 'count') { timer = s.t - lag; if (timer <= 0) st = 'fight'; }
     if (!me.alive) { // (re)spawned on the host: start from the spawn point it used
       const near = map.spawns.map(([sx, , sz], i) => [Math.hypot(sx - hp.x, sz - hp.z), i]).sort((a, b) => a[0] - b[0])[0][1];
       spawn(me, near); hist.clear();
@@ -778,7 +783,7 @@ export function createSim({ mapId, players, practice = false, roundsToWin = 3, l
     // status is the host's call
     me.daze = e[2];
     me.cd = me.cd.map((c, i) => Math.max(c, e[4 + i] / 10 - 0.2));
-    me.stun = Math.max(me.stun, e[x + 5]);
+    me.stun = Math.max(me.stun, e[x + 5] - lag); // what's left of it now (taken whole, I stayed stunned a round trip longer than the host's me)
     if (e[x + 6]) me.hooked = 0.1;
     if (e[3] & 16 && me.ko <= 0) { me.daze = 0; cancel(me); setLegGroups(me, bodyGroups(me)); }
     else if (!(e[3] & 16) && me.ko > 0) { me.ko = 0; wake(me); }
@@ -805,8 +810,25 @@ export function createSim({ mapId, players, practice = false, roundsToWin = 3, l
     if (Math.abs(dv.y) < 4) dv.y = 0;
     // ragdolls never match exactly and the stand-ins I bump into trail by the ping, so small drift (<10cm) is left alone,
     // a moderate one is pulled in a third per snapshot (eased in through `smooth`, no visible snap), and only a real
-    // gap (>0.5m: a hit I didn't see) is taken at once. Velocity only when it's well off.
-    const d = len(dp), kp = d > 0.5 ? 1 : d < 0.1 ? 0 : 0.35, kv = len(dv) > 3 ? 1 : len(dv) < 0.5 ? 0 : 0.2;
+    // gap (>0.5m) is taken at once. Velocity a fifth at a time when it's well off: it's a round trip old, and walking has
+    // mostly pulled it back since (taking it whole kicked me back and forth while shoving someone)
+    const d = len(dp), up = dv.y > 0; // launched: rising 4+ m/s faster than my copy was
+    if ((d > 0.5 || len(dv) > 3) && e[x + 5] > 0 && (up || e[x + 5] > lag)) {
+      // a hit I didn't see, still flying or reeling from it (hits stun; a tangle with another ragdoll doesn't, and isn't a
+      // clean flight to carry on): the host's me has been coasting for `lag` since. Carry its state on that far (under
+      // gravity when launched up) and take it. Adding the launch to where I stood started the arc late and low, and left the
+      // hover spring on, which ate most of an Alistar Pulverize. Never below where it took off: by then it's landing
+      // (pushed into the floor, the ragdoll sprang out of it)
+      const rise = up ? (hv.y - 10 * lag) * lag : 0, vy = !up ? hv.y : rise > 0 ? hv.y - 20 * lag : 0;
+      const drag = Math.exp(-lag), go = 1 - drag; // sideways it slows down as the bodies' linear damping (1) has it
+      const cp = sub(add(hp, V(hv.x * go, Math.max(0, rise), hv.z * go)), hips().translation());
+      shift(cp, sub(V(hv.x * drag, vy, hv.z * drag), hips().linvel()));
+      if (up) me.jumpT = Math.max(me.jumpT, 0.3);
+      if (len(cp) < 4) smooth = sub(smooth, cp); // eased in on screen, unless it's respawn-sized
+      hist.clear(); // the ticks since were predicted without the hit
+      return;
+    }
+    const kp = d > 0.5 ? 1 : d < 0.1 ? 0 : 0.35, kv = len(dv) < 0.5 ? 0 : 0.2;
     const cp = mul(dp, kp), cv = mul(dv, kv);
     shift(cp, cv);
     if (d < 4) smooth = sub(smooth, cp); // not a respawn-sized jump

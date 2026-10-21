@@ -6,7 +6,7 @@ Gang Beasts-style ragdoll brawler with League of Legends champions. Free fan gam
 | Area | Decision |
 |---|---|
 | Stack | Electron + Three.js + PeerJS (WebRTC, lobby codes) + Rapier (WASM) |
-| Netcode | Host-authoritative. Only the host simulates; clients send inputs, host broadcasts snapshots at 30Hz, clients interpolate ~80ms behind |
+| Netcode | Host-authoritative. Only the host simulates; clients send inputs, host broadcasts snapshots at 30Hz, clients interpolate 100ms+ behind (more on jittery links) |
 | Players | Up to 8, star topology through the host |
 | Ragdoll | 6 bodies (torso, head, 2 arms, 2 legs). Torso hovers at standing height and is steered by velocity; limbs are aimed by angular-velocity control |
 | Combat | Hidden daze meter, full = ~3s limp (carry/throw window). Only elimination is falling off or hazards |

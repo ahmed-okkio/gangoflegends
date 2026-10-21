@@ -420,4 +420,27 @@ if ((await prepareMap('incinerator')).imported) {
   console.log('belt carried', (9.5 - torso(sim, 0).x).toFixed(2));
   assert.ok(torso(sim, 0).x < 8.5, 'belt rolls you toward the pit');
 }
+// 12c. a knock-up the client never saw coming (host Alistar's Pulverize, 200ms round trip) still lifts its own copy
+// nearly as high as the host's (it used to rise late and low, then the hover spring ate the rest)
+{
+  const players = [{ id: 'a', name: 'A', champ: 'ali', team: 0 }, { id: 'b', name: 'B', champ: 'hec', team: 1 }];
+  const host = createSim({ mapId: 'grind', players, practice: true }), cli = createSim({ mapId: 'grind', players, local: 1 });
+  const A = host.players[0], b0 = host.players[1].bodies[0].translation(), a0 = A.bodies[0].translation();
+  for (const b of A.bodies) { const t = b.translation(); b.setTranslation({ x: t.x + b0.x - 1.2 - a0.x, y: t.y, z: t.z + b0.z - a0.z }, true); }
+  const wire = [], q = [];
+  let hostPeak = 0, cliPeak = 0;
+  for (let i = 0; i < 300; i++) {
+    cli.setInput(1, { x: 0, z: 0, b: 0 }); cli.step();
+    q.push([0, 0, 0]); if (q.length > 6) q.shift();
+    if (cli.tick % 2 === 0) wire.push({ to: 'host', at: i + 6, inp: { n: cli.tick, i: [...q] } });
+    for (const m of wire.filter(m => m.at === i)) m.to === 'host' ? host.setInput(1, m.inp) : cli.sync(m.s, m.s.p[1]);
+    host.setInput(0, { x: 0, z: 0, b: i === 120 ? BTN.A1 : 0 });
+    host.step();
+    if (i % 2) wire.push({ to: 'cli', at: i + 6, s: JSON.parse(JSON.stringify(host.snapshot())) });
+    if (i >= 120) { hostPeak = Math.max(hostPeak, host.players[1].bodies[10].translation().y); cliPeak = Math.max(cliPeak, cli.snapshot().p[1][7]); }
+  }
+  console.log('pulverize peak host', hostPeak.toFixed(2), 'client', cliPeak.toFixed(2));
+  assert.ok(hostPeak > 1.5 && cliPeak - 0.41 > 0.8 * (hostPeak - 0.41), 'the client sees its own knock-up');
+}
+
 console.log('all ok');

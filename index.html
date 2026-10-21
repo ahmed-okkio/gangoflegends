@@ -41,7 +41,7 @@
   .btn.small { padding: 6px 14px; font-size: 13px; }
   input, select { background: var(--deep); border: 1px solid var(--gold-lo); border-radius: 0; padding: 10px 12px; outline: none; font-weight: 900; }
   input:focus, select:focus { border-color: var(--cyan); box-shadow: 0 0 8px rgba(10,200,185,.3); }
-  select:disabled { opacity: .6; }
+  select:disabled, input:disabled { opacity: .6; }
   input[type=range] { accent-color: var(--gold); padding: 0; border: 0; background: none; box-shadow: none; }
   input[type=checkbox] { accent-color: var(--cyan); width: 17px; height: 17px; }
   .err { min-height: 22px; margin-top: 14px; color: var(--bad); }
@@ -303,7 +303,7 @@
     <div class="settings" style="margin-top: 18px">
       <span>Stage</span><select id="setMap"></select>
       <span>Teams</span><select id="setTeams"><option value="0">Free for all</option><option value="2">2 teams</option><option value="3">3 teams</option><option value="4">4 teams</option></select>
-      <span>Rounds to win</span><select id="setRounds"><option>2</option><option>3</option><option>5</option></select>
+      <span>Rounds to win</span><input id="setRounds" type="number" min="1" max="99" step="1">
     </div>
     <p id="mapBlurb"></p>
     <h3>Your champion</h3>
