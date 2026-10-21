@@ -33,7 +33,10 @@ function duo(mapId, players, slot, ow, extra = {}) {
     wire.push({ to: 'host', at: d.i + ow, inp: { n: cli.tick, i: [...q] } });
     for (const m of wire.filter(m => m.at === d.i)) {
       if (m.to === 'host') host.setInput(slot, m.inp);
-      else { cli.sync(m.s, m.s.p[slot]); d.snaps.push(m.s); d.events.push(...m.ev); }
+      else {
+        cli.sync(m.s, m.s.p[slot]); d.snaps.push(m.s); d.events.push(...m.ev.map(e => [...e, d.i]));
+        for (const e of m.s.p) cli.place(e[0], ...(e[1] ? [e[6], e[7], e[8]] : [0, -100, 0])); // stand-ins: as of arrival, no playback delay
+      }
     }
     hostSide?.(host);
     host.step();
@@ -488,6 +491,24 @@ function duo(mapId, players, slot, ow, extra = {}) {
   console.log('cooldown back after', ((ready - 100) / 60).toFixed(2), 's');
   assert.ok(d.host.players[0].empower > 0 || d.host.players[0].cd[1] < 5, 'the host cast it too');
   assert.ok(ready > 0 && (ready - 100) / 60 < 5.1, 'cooldown not held up by the ping');
+}
+
+// 12e. a client's own punch shows its hit at once; the host's copy says who hit whom (game.js skips it, having played it)
+{
+  const d = duo('grind', [{ id: 'a', name: 'A', champ: 'blitz', team: 0 }, { id: 'b', name: 'B', champ: 'hec', team: 1 }], 0, 12, { practice: true });
+  const mine = [];
+  for (let i = 0; i < 320; i++) {
+    if (i === 150) for (const [slot, x] of [[0, -4], [1, -3]]) {
+      const p = d.host.players[slot], t0 = p.bodies[0].translation();
+      for (const b of p.bodies) { const t = b.translation(); b.setTranslation({ x: t.x + x - t0.x, y: t.y, z: t.z + 3 - t0.z }, true); b.setLinvel({ x: 0, y: 0, z: 0 }, true); }
+    }
+    d.step({ x: i >= 190 && i < 196 ? 1 : 0, z: 0, b: i >= 200 && i < 203 ? BTN.LEFT : 0 });
+    mine.push(...d.cli.takeEvents().filter(e => e[0] === 'hit').map(e => [...e, i]));
+  }
+  const host = d.events.find(e => e[0] === 'hit');
+  console.log('own hit shown at tick', mine[0]?.[7], 'host copy arrives', host?.[7]);
+  assert.ok(mine.length && mine[0][5] === 0 && mine[0][6] === 1, 'my copy plays my hit on the stand-in');
+  assert.ok(host && host[5] === 0 && host[6] === 1 && host[7] - mine[0][7] >= 20, 'the host saw it too, a round trip later');
 }
 
 // 13. snapshot is small

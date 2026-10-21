@@ -234,11 +234,22 @@ function onSnap(m) {
   game.off = Math.max(...offs.slice(-150));
   game.jit = offs.map(o => Math.max(0, game.off - o)).sort((a, b) => a - b)[Math.floor(0.99 * (offs.length - 1))];
   game.local.sync(m.s, m.s.p[game.mySlot]);
-  // events ride along on several snapshots (any one can be lost); e[6] numbers them so each plays once.
-  // My own swings already played when I made them
-  const ev = m.ev?.filter(e => e[6] > game.evN && e[5] !== game.mySlot);
-  for (const e of m.ev ?? []) game.evN = Math.max(game.evN, e[6]);
-  if (ev?.length) setTimeout(() => view.fx(ev), game.delay * 1000); // in step with the playback delay
+  // events ride along on several snapshots (any one can be lost); e[7] numbers them so each plays once (sim.js fx() for
+  // the rest). Mine that my copy already played are skipped; one it didn't see coming (a hit it didn't predict) still plays.
+  // What happens to me plays now (my ragdoll took it as this arrived, sync()), the rest in step with the playback delay
+  const ev = m.ev?.filter(e => e[7] > game.evN && !(e[5] === game.mySlot && claim(e, t))) ?? [];
+  for (const e of m.ev ?? []) game.evN = Math.max(game.evN, e[7]);
+  const now = ev.filter(e => e[6] === game.mySlot), later = ev.filter(e => e[6] !== game.mySlot);
+  if (now.length) view.fx(now);
+  if (later.length) setTimeout(() => view.fx(later), game.delay * 1000);
+}
+// one of the effects my copy played (game.played: [...event, time]) standing in for the host's e: same kind, same victim.
+// Each stands in for one, so two punches that both landed don't cover a third the host saw and I didn't
+function claim(e, t) {
+  game.played = game.played.filter(p => t - p[7] < (game.ping ?? 200) + 400);
+  const i = game.played.findIndex(p => p[0] === e[0] && p[6] === e[6]);
+  if (i >= 0) game.played.splice(i, 1);
+  return i >= 0;
 }
 
 // ping (top left): round trip of a ping over the same channel as the game, once a second; the median of the last 5,
@@ -305,7 +316,7 @@ $('startBtn').onclick = () => {
 async function startGame(setup) {
   await Promise.all([prepareMap(setup.map), loadBeast(), loadProps(), loadSfx()]);
   const myId = conn ? conn.myId : 'me';
-  game = { setup, mySlot: setup.players.findIndex(p => p.id === myId), snaps: [], cur: null, fightAt: 0, sentEv: [], evN: 0, lastMt: -1, inq: [], offs: [], off: null, jit: 0, delay: 0.1, at: null };
+  game = { setup, mySlot: setup.players.findIndex(p => p.id === myId), snaps: [], cur: null, fightAt: 0, sentEv: [], evN: 0, played: [], lastMt: -1, inq: [], offs: [], off: null, jit: 0, delay: 0.1, at: null };
   $('chatLog').replaceChildren();
   $('ping').textContent = '';
   if (setup.practice || isHost()) game.sim = createSim({ mapId: setup.map, players: setup.players, practice: !!setup.practice, roundsToWin: setup.rounds });
@@ -551,8 +562,8 @@ function frame(now) {
       game.prev = game.cur; game.cur = game.sim.snapshot();
       // ponytail: full JSON snapshots at 30Hz over PeerJS's reliable channel (~2KB each); move to an unreliable binary channel if 8-player games stutter
       if (conn && ++tick % 2 === 0) {
-        game.sentEv = game.sentEv.filter(e => now - e[7] < 250); // each event goes out on ~7 snapshots
-        conn.broadcastFast({ t: 'snap', s: packSnap(game.cur), ev: game.sentEv.map(e => e.slice(0, 7)) });
+        game.sentEv = game.sentEv.filter(e => now - e[8] < 250); // each event goes out on ~7 snapshots
+        conn.broadcastFast({ t: 'snap', s: packSnap(game.cur), ev: game.sentEv.map(e => e.slice(0, 8)) });
       }
     }
     if (!game.cur) return;
@@ -569,7 +580,7 @@ function frame(now) {
       local.setInput(game.mySlot, inp);
       local.step();
       const ev = local.takeEvents();
-      if (ev.length) view.fx(ev);
+      if (ev.length) { view.fx(ev); for (const e of ev) if (e[5] === game.mySlot) game.played.push([...e, now]); }
       game.mine = [game.mine?.[1], local.snapshot().p[game.mySlot]];
       game.inq.push([inp.x, inp.z, inp.b, inp.a, inp.d]); if (game.inq.length > 6) game.inq.shift(); // each tick goes out 3-6 times
       // every tick on a steady link (my inputs reach the host up to a tick sooner, and it can keep fewer waiting); every
@@ -598,7 +609,10 @@ function frame(now) {
     const me = local.players[game.mySlot], limp = !me.alive || me.ko > 0 || me.hooked > 0 || me.tied;
     const shift = carryOn(a, b, alpha, s[s.length - 1], at, dt);
     if (!limp) shift[game.mySlot] = null;
-    view.apply(a, b, alpha, limp ? null : { slot: game.mySlot, a: game.mine[0] ?? game.mine[1], b: game.mine[1], alpha: acc / DT }, shift);
+    // my own glue puddles: drawn from my copy (cast at once) until the host's shows up on screen
+    const og = local.ownGlue.filter(g => !b.g?.some(h => h[5] === g.team && Math.hypot(h[0] - g.x, h[2] - g.z) < 1));
+    const drawn = og.length ? { ...b, g: [...b.g ?? [], ...og.map(g => [g.x, g.y, g.z, g.t, g.r, g.team])] } : b;
+    view.apply(a, drawn, alpha, limp ? null : { slot: game.mySlot, a: game.mine[0] ?? game.mine[1], b: game.mine[1], alpha: acc / DT }, shift);
     b.p.forEach((e, i) => { const o = a.p[i], d = shift[i]; local.place(i, ...(e[1] && o?.[1] ? [6, 7, 8].map((k, j) => o[k] + (e[k] - o[k]) * alpha + (d?.[j] ?? 0)) : [0, -100, 0])); });
     game.cur = { ...b, p: b.p.map((e, i) => i === game.mySlot && !limp ? game.mine[1] : e) };
   }
@@ -654,8 +668,8 @@ function fakeHost(dt, now) {
     game.sim.step();
     for (const e of game.sim.takeEvents()) h.ev.push([...e, ++h.n, now]);
     if (++h.t % 2) continue;
-    h.ev = h.ev.filter(e => now - e[7] < 250);
-    const m = JSON.parse(JSON.stringify({ t: 'snap', s: packSnap(game.sim.snapshot()), ev: h.ev.map(e => e.slice(0, 7)) }));
+    h.ev = h.ev.filter(e => now - e[8] < 250);
+    const m = JSON.parse(JSON.stringify({ t: 'snap', s: packSnap(game.sim.snapshot()), ev: h.ev.map(e => e.slice(0, 8)) }));
     lagged(() => onSnap(m), 'down');
   }
 }

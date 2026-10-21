@@ -113,9 +113,11 @@ export function createSim({ mapId, players, practice = false, roundsToWin = 3, l
   const teamCount = new Set(ps.map(p => p.team)).size;
   const scores = Array(Math.max(...ps.map(p => p.team)) + 1).fill(0);
   const events = []; // [kind, x, y, z, big] for the renderer's particles, drained by takeEvents()
-  // [kind, x, y, z, big, slot]: slot = who caused it, so a predicting client can skip the host's copy of its own swings
-  const fx = (kind, t, big = 0, slot = -1) => events.push([kind, r2(t.x), r2(t.y), r2(t.z), big, slot]);
-  let glue = []; // Singed Q puddles { x, y, z, t, r }; a predicting client copies them from the host's snapshots
+  // [kind, x, y, z, big, slot, vic]: slot = who caused it, vic = who it happened to. A predicting client plays its own
+  // straight away and skips the host's copy of each one it played (game.js), and plays what happens to it without delay
+  const fx = (kind, t, big = 0, slot = -1, vic = -1) => events.push([kind, r2(t.x), r2(t.y), r2(t.z), big, slot, vic]);
+  let by = -1; // whose move is landing hits (control(), stepHooks()), for the hit effects
+  let glue = [], ownGlue = []; // Singed Q puddles { x, y, z, t, r }; a predicting client copies them from the host's snapshots
   let hooks = [], st = practice ? 'fight' : 'count', timer = 2.5, round = 1, mt = 0, win = -1;
   // spawn points are dealt out at random every round
   const shuffle = a => { for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; };
@@ -204,11 +206,12 @@ export function createSim({ mapId, players, practice = false, roundsToWin = 3, l
   }
 
   function hit(vic, part, dv, daze) {
-    if (local >= 0) return; // a prediction copy only learns about hits from the host
+    // a prediction copy only learns about hits from the host, but shows my own landing on a stand-in (at its chest) right away
+    if (local >= 0) { if (by === local) fx('hit', add(vic.bodies[part].translation(), V(0, 0.45, 0)), daze >= 40 ? 1 : 0, by, vic.slot); return; }
     for (const b of vic.bodies) addVel(b, dv);
     addVel(vic.bodies[HEAD], mul(dv, 0.3)); // snap the head back a little
     vic.sinceHit = 0;
-    fx('hit', vic.bodies[part].translation(), daze >= 40 ? 1 : 0);
+    fx('hit', vic.bodies[part].translation(), daze >= 40 ? 1 : 0, by, vic.slot);
     if (dv.y > 2) vic.jumpT = Math.max(vic.jumpT, 0.3); // don't let the hover spring swallow a launch
     // knocked out, or just back up from it: still gets knocked around, but no stagger or daze, so no chain stuns
     if (vic.ko > 0 || vic.safe > 0) return;
@@ -220,7 +223,7 @@ export function createSim({ mapId, players, practice = false, roundsToWin = 3, l
   }
 
   function knockOut(p) {
-    fx('ko', p.bodies[HEAD].translation());
+    fx('ko', p.bodies[HEAD].translation(), 0, -1, p.slot);
     p.ko = 3.2; p.daze = 0;
     cancel(p);
     down(p);
@@ -314,7 +317,7 @@ export function createSim({ mapId, players, practice = false, roundsToWin = 3, l
   function relentless(p, vic, part, f) {
     const vt = vic.bodies[TORSO].translation();
     hit(vic, part, add(mul(f, 7), V(0, 2, 0)), 35);
-    fx('vi', vt, Math.atan2(f.x, f.z), p.slot); // big carries the cone's yaw
+    fx('vi', vt, Math.atan2(f.x, f.z), p.slot, vic.slot); // big carries the cone's yaw
     for (const o of ps) {
       if (o === p || o === vic || !o.alive) continue;
       const d = sub(o.bodies[TORSO].translation(), vt), along = d.x * f.x + d.z * f.z;
@@ -384,9 +387,10 @@ export function createSim({ mapId, players, practice = false, roundsToWin = 3, l
   function adhesive(p, f, t, ab) {
     const at = add(t, mul(f, Math.min(ab.aim, p.aimD ?? ab.aim - ab.radius))), ray = world.castRay(new RAPIER.Ray(V(at.x, t.y + 1, at.z), DOWN), 12, true, undefined, (1 << 16) | 1); // floor only
     fx('swing', t, 0, p.slot);
-    if (local >= 0 || !ray) return;
+    if (!ray) return;
     const g = { x: at.x, y: t.y + 1 - ray.timeOfImpact, z: at.z, t: GLUE_T, r: ab.radius, team: p.team };
-    glue.push(g);
+    // a prediction copy draws my puddle until the host's shows up on screen (game.js); my own glue never slows me anyway
+    (local >= 0 ? ownGlue : glue).push(g);
     fx('glue', V(g.x, g.y, g.z), 0, p.slot);
   }
   // in an enemy's glue (Singed and his team walk through their own)
@@ -394,12 +398,13 @@ export function createSim({ mapId, players, practice = false, roundsToWin = 3, l
   // Singed E: grab the nearest champ beside him and throw them over his head to the other side
   function fling(p, t) {
     p.fling = 0.3;
-    if (local >= 0) return;
-    const [o] = ps.filter(o => o !== p && o.alive).map(o => ({ o, d: sub(o.bodies[TORSO].translation(), t) }))
+    // a prediction copy picks from the stand-ins (placed at their hips) to show the throw at once
+    const [o] = ps.filter(o => o !== p && (o.alive || local >= 0 && o.bodies)).map(o => ({ o, d: sub(o.bodies[TORSO].translation(), t) }))
       .filter(({ d }) => Math.hypot(d.x, d.z) < 1.6 && Math.abs(d.y) < 1).sort((a, b) => len(a.d) - len(b.d));
     if (!o) return;
     const n = Math.hypot(o.d.x, o.d.z) || 1;
-    fx('fling', o.o.bodies[TORSO].translation(), 0, p.slot);
+    fx('fling', add(o.o.bodies[TORSO].translation(), V(0, local >= 0 ? 0.45 : 0, 0)), 0, p.slot, o.o.slot);
+    if (local >= 0) return;
     hit(o.o, TORSO, V(-o.d.x / n * 9, 10, -o.d.z / n * 9), 25);
     if (o.o.ko <= 0 && o.o.safe <= 0) o.o.stun = Math.max(o.o.stun, 0.7);
   }
@@ -438,6 +443,7 @@ export function createSim({ mapId, players, practice = false, roundsToWin = 3, l
 
   function control(p, active) {
     const [T, H] = p.bodies;
+    by = p.slot;
     const inp = active ? p.input : { x: 0, z: 0, b: 0 };
     const pressed = inp.b & ~p.prevB;
     p.prevB = inp.b;
@@ -692,7 +698,7 @@ export function createSim({ mapId, players, practice = false, roundsToWin = 3, l
       j.setContactsEnabled(false);
       const o = owner.get(c.handle);
       p.grabs[i] = { j, target, vic: o && !o.proxy ? o.p : null };
-      fx('grab', hp, 0, p.slot);
+      fx('grab', hp, 0, p.slot, p.grabs[i].vic?.slot ?? -1);
     }
 
     // lift (Gang Beasts' Shift): holding someone, carry them up over the head; let go of the hands mid-lift to throw
@@ -730,7 +736,7 @@ export function createSim({ mapId, players, practice = false, roundsToWin = 3, l
   function stepHooks() {
     if (local >= 0) { hooks = []; return; } // hooks are drawn from the host's snapshots
     hooks = hooks.filter(h => {
-      h.t += DT;
+      h.t += DT; by = h.o.slot;
       if (!h.vic) {
         h.pos = add(h.pos, mul(h.dir, 28 * DT));
         const [first] = playersNear(h.o, h.pos, 0.4);
@@ -864,6 +870,7 @@ export function createSim({ mapId, players, practice = false, roundsToWin = 3, l
     mt += DT; tick++;
     for (const { r, body } of rollers) body.setNextKinematicRotation(rollerRot(r, mt));
     glue = glue.filter(g => (g.t -= DT) > 0);
+    ownGlue = st === 'count' ? [] : ownGlue.filter(g => (g.t -= DT) > 0);
     if (st === 'count' && (timer -= DT) <= 0) st = 'fight';
     if (me.alive) { control(me, st !== 'count'); belts(me); }
     world.step();
@@ -893,7 +900,7 @@ export function createSim({ mapId, players, practice = false, roundsToWin = 3, l
     for (const bs of paused) for (const [b, t, r, v, w] of bs) { b.setTranslation(t, true); b.setRotation(r, true); b.setLinvel(v, true); b.setAngvel(w, true); }
 
     for (const p of ps) {
-      if (p.alive && inKill(p.bodies[TORSO].translation())) { fx('out', p.bodies[TORSO].translation()); removeRagdoll(p); p.respawn = 1.5; }
+      if (p.alive && inKill(p.bodies[TORSO].translation())) { fx('out', p.bodies[TORSO].translation(), 0, -1, p.slot); removeRagdoll(p); p.respawn = 1.5; }
       if (practice && !p.alive && !p.left && (p.respawn -= DT) <= 0) spawn(p, freeSpawn());
     }
     if (practice) return;
@@ -935,6 +942,7 @@ export function createSim({ mapId, players, practice = false, roundsToWin = 3, l
   if (!me) for (const p of ps) spawn(p);
   return {
     world, players: ps, step, snapshot, sync, place, takeEvents: () => events.splice(0),
+    get ownGlue() { return ownGlue; },
     get state() { return st; },
     get tick() { return tick; },
     get err() { return err; },
