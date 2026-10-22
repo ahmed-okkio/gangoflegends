@@ -1014,7 +1014,7 @@ export function createSim({ mapId, players, practice = false, roundsToWin = 3, l
         out.push(Math.round(hayK(p) * 100), r2(v.x), r2(v.y), r2(v.z), p.ack, r2(Math.max(0, p.stun)), p.hooked > 0 ? 1 : 0, r2(Math.max(0, p.ko)), r2(p.yaw));
         return out;
       }),
-      h: hooks.map(h => [h.o.slot, r2(h.pos.x), r2(h.pos.y), r2(h.pos.z), (h.thresh || h.lee) && h.vic ? h.vic.slot : -1, h.vic ? 1 : 0, (h.thresh || h.lee) && h.vic ? Math.ceil(((h.lee ? 3 : 2) - h.pull) * 10) : 0]), // ..., caught, recast time left (0.1s)
+      h: hooks.map(h => [h.o.slot, r2(h.pos.x), r2(h.pos.y), r2(h.pos.z), (h.thresh || h.lee) && h.vic ? h.vic.slot : -1, h.vic ? 1 : 0]), // ..., caught
       g: glue.map(g => [r2(g.x), r2(g.y), r2(g.z), r2(g.t), g.r, g.team]),
       ch: ps.map(p => p.champ),
     };

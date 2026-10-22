@@ -377,7 +377,7 @@ function duo(mapId, players, slot, ow, extra = {}) {
   tap(sim, BTN.A1, Math.PI / 2);
   run(sim, 30, idle(sim));
   assert.ok(lee.tether === 1 && b.daze === 0 && Math.abs(torso(sim, 1).x - x0) < 0.3, `marked, unhurt, not moved (${b.daze}, ${(torso(sim, 1).x - x0).toFixed(2)})`);
-  assert.ok(lee.cd[0] === 8 && sim.snapshot().h[0][6] > 0, 'Q cooldown waits on the mark, the HUD gets its time left');
+  assert.ok(lee.cd[0] === 8, 'Q cooldown waits on the mark');
   tap(sim, BTN.A1, Math.PI / 2);
   run(sim, 50, idle(sim));
   const gap = torso(sim, 1).x - torso(sim, 0).x;
