@@ -26,6 +26,8 @@ export function log(...a) {
   netLog.push(`${new Date().toISOString().slice(11, 23)} ${a.map(x => typeof x === 'string' ? x : JSON.stringify(x)).join(' ')}`);
   if (netLog.length > 500) netLog.shift();
 }
+const rv = typeof location !== 'undefined' && new URLSearchParams(location.search).get('rv');
+if (rv) log('relay address (main.cjs, China):', rv); // ip: the faster Cloudflare address in use, ms vs def: its handshake vs the normal one's
 // STUN finds each player's public address; several, since some are blocked in places (Google's in mainland China).
 const STUN = [
   { urls: 'stun:stun.l.google.com:19302' },
