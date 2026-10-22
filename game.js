@@ -615,14 +615,15 @@ function frame(now) {
     const me = local.players[game.mySlot], limp = !me.alive || me.ko > 0 || me.hooked > 0 || me.tied || me.hostOwned;
     const shift = carryOn(a, b, alpha, s[s.length - 1], at, dt), own = limp ? null : { slot: game.mySlot, a: game.mine[0] ?? game.mine[1], b: game.mine[1], alpha: acc / DT };
     if (!limp) shift[game.mySlot] = null;
-    // GB mode: my arms (punching, cocking, grabbing) as the host has them, on the same clock as everyone else
+    // GB mode: my arms (punching, cocking, grabbing) as the host has them, on the same clock as everyone else, and my
+    // fists' glow (4, 64: an empowered punch, a windup): my copy doesn't cast abilities, so it never lights them
     if (GB_MODE && own && a.p[game.mySlot]?.[1] && b.p[game.mySlot]?.[1]) {
       const ha = a.p[game.mySlot], hb = b.p[game.mySlot], qs = [ARM, ARM + 1, FORE, FORE + 1].map(i => {
         const o = 9 + i * 4, sg = [0, 1, 2, 3].reduce((d, k) => d + ha[o + k] * hb[o + k], 0) < 0 ? -1 : 1;
         const q = [0, 1, 2, 3].map(k => ha[o + k] + (sg * hb[o + k] - ha[o + k]) * alpha), n = Math.hypot(...q) || 1;
         return [o, q.map(c => c / n)];
       });
-      const put = e => { const out = [...e]; for (const [o, q] of qs) out.splice(o, 4, ...q); return out; };
+      const put = e => { const out = [...e]; for (const [o, q] of qs) out.splice(o, 4, ...q); out[3] = (out[3] & ~68) | (hb[3] & 68); return out; };
       own.a = put(own.a); own.b = put(own.b);
     }
     slideOver(limp, own, a, b, alpha, shift, dt);
