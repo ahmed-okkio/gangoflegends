@@ -388,6 +388,14 @@ function duo(mapId, players, slot, ow, extra = {}) {
   tap(sim, BTN.A1, Math.PI / 2);
   run(sim, 200, idle(sim));
   assert.ok(sim.players[0].tether == null && sim.players[0].cd[0] < 8 && sim.players[0].cd[0] > 7, 'the mark wears off, then Q cools');
+  sim = near('lee', 'blitz'); // aimed behind him: he turns round first, then the wave goes out behind
+  run(sim, 90);
+  lineUp(sim, 5);
+  tap(sim, BTN.A1, -Math.PI / 2);
+  const early = sim.snapshot().h.length;
+  run(sim, 25, idle(sim));
+  const [w] = sim.snapshot().h;
+  assert.ok(!early && w && w[1] < torso(sim, 0).x - 0.5, `turns first, then fires behind (${early}, ${w?.[1].toFixed(2)} vs ${torso(sim, 0).x.toFixed(2)})`);
   sim = createSim({ mapId: 'grind', practice: true, players: [
     { id: 'a', name: 'A', champ: 'lee', team: 0 }, { id: 'b', name: 'B', champ: 'hec', team: 1 }, { id: 'c', name: 'C', champ: 'blitz', team: 2 }] });
   run(sim, 90);

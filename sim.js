@@ -157,7 +157,7 @@ export function createSim({ mapId, players, practice = false, roundsToWin = 3, l
       alive: true, yaw, daze: 0, sinceHit: 9, ko: 0, cd: [0, 0], punch: null, punchCd: 0, grabs: [null, null], held: [0, 0],
       stun: 0, spin: 0, spinHit: null, charge: 0, empower: 0, jumpT: 0, phase: 0, grounded: false, prevB: p.input.b,
       butt: null, buttCd: 0, lying: false, safe: 0, hooked: 0, spinA: 0, chargeT: 0,
-      emp: null, dash: null, vault: 0, vaultBtn: 0, hay: 0, hayBtn: 0, fb: 0, pulv: 0, flay: 0, fling: 0, tether: null, leap: null, dizzy: 0, kick: null, kickA: 0, palm: 0,
+      emp: null, dash: null, vault: 0, vaultBtn: 0, hay: 0, hayBtn: 0, fb: 0, pulv: 0, flay: 0, fling: 0, tether: null, leap: null, dizzy: 0, kick: null, kickA: 0, palm: 0, qTurn: null,
     });
   }
 
@@ -181,6 +181,7 @@ export function createSim({ mapId, players, practice = false, roundsToWin = 3, l
   const under = p => local >= 0 ? (1 << 16) | 1 : worldAndOthers(p);
   const handPos = (p, i) => { const b = p.bodies[FORE + i]; return add(b.translation(), qrot(b.rotation(), V(...HAND[i]))); };
   const facing = p => V(Math.sin(p.yaw), 0, Math.cos(p.yaw));
+  const ahead = p => { const c = qrot(p.bodies[CHEST].rotation(), V(0, 0, 1)), f = facing(p); return (c.x * f.x + c.z * f.z) / (Math.hypot(c.x, c.z) || 1); }; // cos of the chest's angle off p.yaw
   const live = q => q.alive || q.seen; // seen: a prediction copy's stand-in for someone the host has in play (sync())
 
   // colliders overlapping a ball. Collected first: touching the world inside Rapier's query callback panics.
@@ -251,7 +252,7 @@ export function createSim({ mapId, players, practice = false, roundsToWin = 3, l
   }
   // drop whatever the player was doing: knocked out, or caught by a hook
   function cancel(p) {
-    p.spin = 0; p.charge = 0; p.punch = null; p.butt = null; p.dash = null; p.vault = 0; p.hay = 0; p.leap = null; p.kickA = 0;
+    p.spin = 0; p.charge = 0; p.punch = null; p.butt = null; p.dash = null; p.vault = 0; p.hay = 0; p.leap = null; p.kickA = 0; p.qTurn = null;
     releaseGrabs(p);
   }
   function wake(p) {
@@ -341,11 +342,12 @@ export function createSim({ mapId, players, practice = false, roundsToWin = 3, l
     }
   }
 
-  function useAbility(p, i) {
+  function useAbility(p, i, turned) {
     const ab = CHAMPS[p.champ].abilities[i];
     if (ab.id === 'charge' && p.charge > 0) { p.charge = 0; return; } // recast ends the charge early
     if (LEAPS.includes(ab.id) && p.tether != null) return leap(p); // recast while they're caught / marked: fly to them
     if (p.cd[i] > 0) return;
+    if (ab.id === 'sonic' && !turned && ahead(p) < -0.5) { p.qTurn = { yaw: p.yaw, t: 0.4 }; return; } // aimed over 120° round: turn first, then thrust (control())
     p.cd[i] = ab.cd;
     const f = facing(p), t = p.bodies[TORSO].translation(), btn = i ? BTN.A2 : BTN.A1;
     if (ab.id === 'sonic') { // a palm thrust: the wave leaves his right hand, out at arm's length
@@ -507,7 +509,7 @@ export function createSim({ mapId, players, practice = false, roundsToWin = 3, l
     if (p.spin > 0) { p.spin -= DT; p.spinA += (2 * Math.PI / SPIN) * DT; } else p.spinA = p.kickA > 0 ? 2 * Math.PI * (1 - p.kickA / KICK) : 0; // one full turn
     if (move) {
       if (p.charge > 0) { if (m > 0.2) p.yaw = turnToward(p.yaw, Math.atan2(mx, mz), 3 * DT); }
-      else if (m > 0.2 && !p.dash && !(p.hay > 0)) p.yaw = Math.atan2(mx, mz); // a Haymaker windup holds its aim
+      else if (m > 0.2 && !p.dash && !(p.hay > 0) && !p.qTurn) p.yaw = Math.atan2(mx, mz); // a Haymaker windup holds its aim
       // aiming (input.a: the cursor's yaw, null = where you face): "release" abilities (hook) go off when the
       // key is let go; the held ones (Vi Q) start on press. Either way the champ turns to the cursor while held.
       // "lock" ones (Sett Q) take the cursor's aim on press and keep it.
@@ -558,6 +560,7 @@ export function createSim({ mapId, players, practice = false, roundsToWin = 3, l
       else { if (move) haymaker(p, f, tp, hayK(p)); p.hay = 0; }
     }
     p.fb -= DT; p.pulv -= DT; p.flay -= DT; p.fling -= DT; p.palm -= DT;
+    if (p.qTurn && ((p.qTurn.t -= DT) <= 0 || ahead(p) > 0.5)) { p.yaw = p.qTurn.yaw; p.qTurn = null; useAbility(p, 0, true); }
     if (p.kickA > 0 && (p.kickA -= DT) <= 0) rage(p, facing(p), p.bodies[TORSO].translation());
     const stuck = glued(p, tp);
     if (stuck) speed *= 0.3;
