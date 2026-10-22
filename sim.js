@@ -44,14 +44,16 @@ const HOIST = [WAIST, CHEST]; // lifted by a hoist, carrying the whole core's we
 const HOIST_K = CORE.reduce((m, i) => m + PARTS[i].mass, 0) / HOIST.reduce((m, i) => m + PARTS[i].mass, 0);
 const HOLD = 20; // m/s^2 lift on the core (= gravity), so the hover spring only has to hold up the hanging arms
 const SAFE = 1; // seconds after getting up from a knockout that nothing can hit, grab or target you (drawn see-through)
-const CHARGE = 3, RAMP = 1.5; // Hecarim E: lasts 3s, speeds up evenly from walking to full gallop over the first 1.5s
+const CHARGE = 3, RAMP = 1; // Hecarim E: lasts 3s, speeds up evenly from walking to full gallop over the first 1s
 const FB_R = 2.4; // Sett E reach
 const PULV_R = 2.8; // Alistar Q reach
 const GLUE_T = 3; // Singed Q puddle lifetime, s
+const DRAW_T = 0.5; // the last ones out within this many seconds of each other draw the round
 const SPIN = 0.3; // Hecarim Q: seconds for its one turn
 const KICK = 0.35; // Lee Sin E: seconds for the roundhouse's turn; it lands as the leg comes round to the front
 const TWIST = 0.7; // how firmly arms hold their roll (aimPart)
 const TAP = 0.2; // a hand let go within this many seconds punches; held longer, it grabs
+const LATCH = 0.4, GRAB_LEAN = 0.9; // grab assist: how far a hand latches onto who it's going for; most it bends down for them
 const UPPER = [HEAD]; // turns rigidly with the chest; the arms don't, so they lag and swing out when the beast spins
 const isLeg = i => (i >= THIGH && i < THIGH + 2) || (i >= LEG && i < LEG + 2);
 const Q = a => ({ x: a[0], y: a[1], z: a[2], w: a[3] });
@@ -122,7 +124,7 @@ export function createSim({ mapId, players, practice = false, roundsToWin = 3, l
   const fx = (kind, t, big = 0, slot = -1, vic = -1) => events.push([kind, r2(t.x), r2(t.y), r2(t.z), big, slot, vic]);
   let by = -1; // whose move is landing hits (control(), stepHooks()), for the hit effects
   let glue = [], ownGlue = []; // Singed Q puddles { x, y, z, t, r }; a predicting client copies them from the host's snapshots
-  let hooks = [], st = practice ? 'fight' : 'count', timer = 2.5, round = 1, mt = 0, win = -1;
+  let hooks = [], st = practice ? 'fight' : 'count', timer = 2.5, round = 1, mt = 0, win = -1, grace = DRAW_T;
   // spawn points are dealt out at random every round
   const shuffle = a => { for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; };
   let order = shuffle(map.spawns.map((_, i) => i));
@@ -378,7 +380,7 @@ export function createSim({ mapId, players, practice = false, roundsToWin = 3, l
   // is knocked back too
   function rage(p, f, t) {
     const [o] = ps.filter(o => o !== p && live(o)).map(o => ({ o, d: sub(seen(p, o), t) }))
-      .filter(({ d }) => Math.hypot(d.x, d.z) < 1.8 && dot(d, f) > 0 && Math.abs(d.y) < 1).sort((a, b) => len(a.d) - len(b.d));
+      .filter(({ d }) => Math.hypot(d.x, d.z) < 2.4 && dot(d, f) > 0 && Math.abs(d.y) < 1).sort((a, b) => len(a.d) - len(b.d));
     if (!o) return;
     fx('rage', o.o.bodies[TORSO].translation(), Math.atan2(f.x, f.z), p.slot, o.o.slot);
     if (local >= 0) return;
@@ -475,8 +477,8 @@ export function createSim({ mapId, players, practice = false, roundsToWin = 3, l
       if (o === p || !o.alive) continue;
       const d = sub(seen(p, o), apex), dist = Math.hypot(d.x, d.z), along = (d.x * f.x + d.z * f.z);
       if (dist < back || dist > back + range || Math.abs(d.y) > 1.2 || along < dist * Math.cos(cone)) continue;
-      const centre = Math.abs(d.x * f.z - d.z * f.x) < core;
-      hit(o, TORSO, mul(add(mul(f, centre ? 5 + 9 * k : 4 + 6 * k), V(0, 1.5 + 2 * k, 0)), 1.125), (centre ? 25 + 75 * k : 15 + 45 * k) * 1.125);
+      const centre = Math.abs(d.x * f.z - d.z * f.x) < core; // knocked back and a little up
+      hit(o, TORSO, mul(add(mul(f, centre ? 5 + 9 * k : 4 + 6 * k), V(0, 3 + 3 * k, 0)), 1.125), (centre ? 25 + 75 * k : 15 + 45 * k) * 1.125);
     }
   }
 
@@ -609,7 +611,9 @@ export function createSim({ mapId, players, practice = false, roundsToWin = 3, l
     // posture: hips, waist, chest and head stay upright and face the stick direction (rigidly while hoisting: hanging off the
     // shoulders, the lifted chest would otherwise swing about them; barely while swinging the legs, which turns the body over)
     const fk = !!p.leap?.lee; // Sonic Wave's recast: a flying kick, foot first
-    const lean = fk ? -0.6 : p.kickA > 0 ? -0.25 : p.charge > 0 || p.dash ? 0.35 : p.butt ? 0.9 * Math.sin(Math.min(1, p.butt.t / 0.25) * Math.PI) : 0, yq = qyaw(p.yaw + p.spinA), up = (sw ? 0.05 : p.pushUp ? 1 : fk ? 0.5 : p.grounded ? 0.3 : 0.15) * ctrl;
+    // grab assist: a hand held out to grab goes for whoever a punch would track, bending down to someone on the floor
+    const gt = p.grounded && p.held.some((h, i) => h >= TAP && !p.grabs[i]) && punchTarget(p, f), gTo = gt && sub(gt.bodies[TORSO].translation(), tp);
+    const lean = fk ? -0.6 : p.kickA > 0 ? -0.25 : p.charge > 0 || p.dash ? 0.35 : p.butt ? 0.9 * Math.sin(Math.min(1, p.butt.t / 0.25) * Math.PI) : gTo ? Math.min(GRAB_LEAN, Math.max(0, -gTo.y - 0.05) * 4) : 0, yq = qyaw(p.yaw + p.spinA), up = (sw ? 0.05 : p.pushUp ? 1 : fk ? 0.5 : p.grounded ? 0.3 : 0.15) * ctrl;
     leak = V();
     orient(Hb, fk ? qmul(yq, qaxis(X, -0.4)) : yq, 10, up); // the flying kick tips the hips back too: the leg leads
     // punching turns the shoulders into it: wound back, then the punching side drives forward (that's the reach)
@@ -617,7 +621,7 @@ export function createSim({ mapId, players, practice = false, roundsToWin = 3, l
     const tw = p.punch ? (p.punch.arm ? 0.7 : -0.7) : p.palm > 0 ? 0.6 : cock >= 0 ? (cock ? -0.3 : 0.3) : 0;
     // a punch with a target tracks it: the shoulders turn to them and the fist (below) flies at them.
     // ponytail: on a prediction copy the target is a stand-in at hip height, so my own fist aims ~20cm low until the host corrects it
-    const aimTo = p.punch?.to?.bodies && sub(p.punch.to.bodies[TORSO].translation(), tp), ay = aimTo ? Math.atan2(aimTo.x, aimTo.z) : p.yaw + p.spinA;
+    const aimTo = (p.punch?.to?.bodies && sub(p.punch.to.bodies[TORSO].translation(), tp)) || gTo, ay = aimTo ? Math.atan2(aimTo.x, aimTo.z) : p.yaw + p.spinA;
     orient(p.bodies[WAIST], qmul(qyaw(ay + tw * 0.4), qaxis(X, lean * 0.5)), 10, up, [T, ...UPPER.map(i => p.bodies[i])]);
     orient(T, qmul(qyaw(ay + tw), qaxis(X, lean)), 20, up, UPPER.map(i => p.bodies[i]));
     orient(H, qmul(yq, qaxis(X, lean * 0.6)), 20, up);
@@ -656,7 +660,7 @@ export function createSim({ mapId, players, practice = false, roundsToWin = 3, l
       // `fs` scales the forearm: it lags the upper arm so swings whip instead of moving as one stick
       // poses follow the body facing (bf), which only differs from the travel direction mid-Rampage
       let ua = add(add(DOWN, mul(bf, 0.15 + swing * 0.4 * gait)), mul(side, s * 0.25)), fa = add(DOWN, mul(bf, 0.5 + swing * 0.3 * gait)), str = 0.1, fs = 1;
-      if (grabbing[i]) { ua = fa = add(add(bf, V(0, 0.35, 0)), mul(side, s * 0.1)); str = 0.8; }
+      if (grabbing[i]) { ua = fa = gt ? sub(gt.bodies[TORSO].translation(), p.bodies[ARM + i].translation()) : add(add(bf, V(0, 0.35, 0)), mul(side, s * 0.1)); str = 0.8; }
       if (p.charge > 0) { ua = fa = add(bf, V(0, -0.3, 0)); str = 0.6; }
       if (p.vault > 0) { ua = fa = add(mul(bf, -0.6), DOWN); str = 0.5; } // fists drawn back
       if (p.dash) { ua = fa = add(bf, V(0, 0.1, 0)); str = 0.8; } // both fists leading
@@ -756,10 +760,15 @@ export function createSim({ mapId, players, practice = false, roundsToWin = 3, l
       const arm = p.bodies[FORE + i], hp = handPos(p, i);
       // a prediction copy only grabs the world: another champ's stand-in trails the host by the ping, and a joint to it
       // dragged me around (holding each other floated and teleported). The host's grab reaches me through sync()
-      const c = overlap(hp, 0.16, worldAndOthers(p)).find(c => { const o = owner.get(c.handle); return !o?.proxy && !(o?.p.safe > 0); }), target = c?.parent();
+      // grab assist: in reach of whoever it's going for, the hand latches onto the nearest bit of them (pulled onto it by
+      // the joint) before anything else it touches, like the floor they lie on
+      const [near] = gt ? overlap(hp, LATCH, othersOnly(p)).filter(c => owner.get(c.handle)?.p === gt)
+        .map(c => ({ c, at: c.projectPoint(hp, true).point })).sort((a, b) => len(sub(a.at, hp)) - len(sub(b.at, hp))) : [];
+      if (near && local >= 0) continue; // a prediction copy leaves it to the host (above)
+      const c = near?.c ?? overlap(hp, 0.16, worldAndOthers(p)).find(c => { const o = owner.get(c.handle); return !o?.proxy && !(o?.p.safe > 0); }), target = c?.parent();
       if (!target) continue;
-      const local = qrot(qconj(target.rotation()), sub(hp, target.translation()));
-      const j = world.createImpulseJoint(RAPIER.JointData.spherical(V(...HAND[i]), local), arm, target, true);
+      const anchor = qrot(qconj(target.rotation()), sub(near?.at ?? hp, target.translation()));
+      const j = world.createImpulseJoint(RAPIER.JointData.spherical(V(...HAND[i]), anchor), arm, target, true);
       j.setContactsEnabled(false);
       const o = owner.get(c.handle);
       p.grabs[i] = { j, target, vic: o && !o.proxy ? o.p : null };
@@ -987,7 +996,9 @@ export function createSim({ mapId, players, practice = false, roundsToWin = 3, l
     if (practice) return;
     if (st === 'fight' && teamCount > 1) {
       const alive = new Set(ps.filter(p => p.alive).map(p => p.team));
-      if (alive.size <= 1) {
+      // the last team standing only wins once it has outlived the rest by DRAW_T: going out together is a draw
+      if (alive.size > 1) grace = DRAW_T;
+      else if (!alive.size || (grace -= DT) <= 0) {
         win = alive.size ? [...alive][0] : -1;
         if (win >= 0) scores[win]++;
         st = win >= 0 && scores[win] >= roundsToWin ? 'match' : 'round';

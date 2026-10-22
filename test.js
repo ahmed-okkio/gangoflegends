@@ -165,6 +165,18 @@ function duo(mapId, players, slot, ow, extra = {}) {
   assert.equal(sim.snapshot().sc[0], 1, 'survivor scores');
   console.log('grinder + scoring ok');
 }
+// 6a. the last two out within 0.5s of each other draw the round; 0.5s+ apart, the later one wins
+for (const [gap, draw] of [[0.3, true], [0.7, false]]) {
+  const sim = near('blitz', 'hec', { practice: false });
+  run(sim, 180);
+  const drop = slot => { for (const b of sim.players[slot].bodies) { const t = b.translation(); b.setTranslation({ x: t.x, y: t.y - 100, z: t.z }, true); } };
+  drop(0);
+  run(sim, Math.round(gap * 60));
+  if (sim.players[1].alive) drop(1);
+  run(sim, 40);
+  const s = sim.snapshot();
+  assert.ok(s.st === 'round' && (draw ? s.win === -1 && s.sc[1] === 0 : s.win === 1 && s.sc[1] === 1), `out ${gap}s apart: ${draw ? 'draw' : 'later one wins'} (${s.st}, win ${s.win})`);
+}
 
 // 7. grab sticks to a body and lets go
 {
@@ -184,6 +196,20 @@ function duo(mapId, players, slot, ow, extra = {}) {
   assert.ok(p.grabs.some(g => g?.target.isFixed()), 'grabs the wall');
   assert.ok(Math.abs(torso(sim, 0).y - STAND) < 0.12, `stays standing while holding the wall (${torso(sim, 0).y})`);
   console.log('grab ok');
+}
+// 7a. grab assist: someone knocked down on the floor 1.2m off gets grabbed (the hands go for them, not the floor)
+{
+  const sim = near('blitz', 'hec'), [a, b] = sim.players;
+  run(sim, 90);
+  lineUp(sim, 0.9);
+  b.daze = 99;
+  run(sim, 22, i => sim.setInput(0, { x: 0, z: 0, b: i < 3 ? BTN.LEFT : 0 }));
+  run(sim, 30, () => sim.setInput(0, { x: 0, z: 0, b: 0 }));
+  const at = torso(sim, 0), bt = torso(sim, 1);
+  for (const p of b.bodies) { const t = p.translation(); p.setTranslation({ x: t.x - bt.x + at.x + 1.2, y: t.y, z: t.z - bt.z + at.z }, true); p.setLinvel({ x: 0, y: 0, z: 0 }, true); }
+  run(sim, 10);
+  run(sim, 40, () => sim.setInput(0, { x: 0, z: 0, b: BTN.LEFT | BTN.RIGHT }));
+  assert.ok(b.ko > 0 && a.grabs.some(g => g?.vic === b), `grabs someone down on the floor (${a.grabs.map(g => g ? (g.vic ? 'P' : 'F') : '-').join('')})`);
 }
 
 // 7b. lift: grab, hold lift and B goes up over A's head; let go of the hands and B is thrown
