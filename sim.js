@@ -536,7 +536,7 @@ export function createSim({ mapId, players, practice = false, roundsToWin = 3, l
     const k = (p.grounded ? 0.2 : 0.04) * move;
     const dv = V((mx * speed + gv[0] - tv.x) * k, 0, (mz * speed + gv[2] - tv.z) * k);
     if (p.grounded && p.jumpT <= 0) dv.y = ((STAND - ray.timeOfImpact) * 12 - tv.y) * 0.35 + HOLD * DT;
-    if (p.grounded && move && pressed & BTN.JUMP && !stuck) { dv.y = 6.5 - tv.y; p.jumpT = 0.3; }
+    if (p.grounded && move && pressed & BTN.JUMP && !stuck) { dv.y = 7.3 - tv.y; p.jumpT = 0.3; } // 7.3: hips rise 0.57m, a quarter over the 6.5 it was
     // climbing: hanging off a ledge by the hands, hold jump to push yourself up until the hands are at your waist (arms
     // pushing down on the ledge) and stay up there; push the stick toward the ledge from the top to let go and roll over it
     const ledge = p.grabs.reduce((y, g, i) => g?.target.isFixed() ? Math.max(y, handPos(p, i).y) : y, -Infinity);
