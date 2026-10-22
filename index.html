@@ -48,7 +48,7 @@
   .err.ok { color: var(--dust); }
 
   /* ---------- shell: the rail on the left, the live arena behind, the chosen tab's panel ---------- */
-  .shell { position: fixed; inset: 0; display: grid; grid-template-columns: 380px minmax(0, 760px); gap: 44px; padding: 40px 48px;
+  .shell { position: fixed; inset: 0; display: grid; grid-template-columns: 380px minmax(0, 950px); gap: 44px; padding: 40px 48px;
     background: linear-gradient(90deg, rgba(6,16,20,.97) 0, rgba(6,16,20,.92) 380px, rgba(6,16,20,.5) 62%, rgba(6,16,20,.12)); }
   .rail { display: flex; flex-direction: column; min-height: 0; }
   .logo { display: block; width: 330px; height: auto; margin: 0 0 30px -6px; filter: drop-shadow(0 8px 18px rgba(0,0,0,.6)); animation: rise .6s ease-out both; }
@@ -115,6 +115,17 @@
   .volrow { display: grid; grid-template-columns: 90px 1fr 40px; align-items: center; gap: 14px; margin-top: 10px; font: 700 17px var(--display); color: var(--gold-hi); }
   .volrow output { color: var(--dust); font: 900 14px var(--body); text-align: right; }
 
+  /* patch notes */
+  .note { padding-bottom: 14px; border-bottom: 1px solid var(--line); }
+  .note h3 { display: flex; align-items: baseline; gap: 10px; margin: 20px 0 6px; font-size: 20px; color: var(--gold-hi); }
+  .note h3 small { margin-left: auto; font: 700 12px var(--body); color: var(--dust); }
+  .note em { align-self: center; font: normal 900 11px var(--body); color: var(--deep); background: var(--cyan); padding: 1px 7px; }
+  .note h4 { margin: 12px 0 2px; font: 900 14px var(--body); color: var(--gold); }
+  .note p, .note ul { margin: 6px 0; max-width: 70ch; color: #c4d0cd; font-size: 14px; }
+  .note ul { padding-left: 18px; }
+  .note li { margin: 3px 0; }
+  .note b { color: var(--text); }
+
   /* lobby */
   .code { display: grid; justify-items: start; gap: 6px; margin-bottom: 24px; }
   .code > span { color: var(--dust); font-size: 13px; }
@@ -128,7 +139,13 @@
   #lobbyPlayers em.me { background: var(--cyan); }
   #lobbyPlayers .pick { margin-left: auto; color: var(--dust); }
   #lobbyPlayers .team { color: var(--pc); min-width: 44px; text-align: right; font-weight: 900; }
+  #lobbyPlayers .kick { padding: 2px 8px; border: 1px solid var(--line); background: none; color: var(--dust); font: 900 11px var(--body); }
+  #lobbyPlayers .kick:hover { border-color: var(--bad); color: var(--bad); }
   #lobbyNote { color: var(--dust); margin: 14px 0; }
+  /* lobby chat: fills the rail between the players and the buttons */
+  #lobbyChatLog { flex: 1; min-height: 60px; overflow-y: auto; display: flex; flex-direction: column; gap: 3px; padding: 6px; border: 1px solid var(--line); border-bottom: 0; background: rgba(6,16,20,.6); }
+  #lobbyChatLog p:first-child { margin-top: auto; }
+  #lobbyChatIn { margin-bottom: 14px; font-weight: 700; font-size: 14px; }
   .lobbyacts { margin-top: auto; display: flex; gap: 10px; }
   .lobbyacts .btn { flex: 1; padding: 13px; font-size: 18px; }
   .settings { display: grid; grid-template-columns: 140px 1fr; gap: 10px 14px; align-items: center; max-width: 440px; }
@@ -153,8 +170,8 @@
   /* chat: newest at the bottom, each line fades after a while; all of them come back while typing */
   #chat { position: absolute; left: 20px; bottom: 150px; width: min(440px, 60vw); display: grid; gap: 3px; }
   #chatLog { display: grid; gap: 3px; justify-items: start; }
-  #chatLog p { margin: 0; padding: 3px 9px; background: rgba(1, 10, 19, .55); border-left: 2px solid var(--pc); font-size: 13.5px; color: var(--text); text-shadow: 0 1px 2px #000; overflow-wrap: anywhere; transition: opacity .6s; }
-  #chatLog p b { color: var(--pc); margin-right: 6px; }
+  #chatLog p, #lobbyChatLog p { margin: 0; padding: 3px 9px; background: rgba(1, 10, 19, .55); border-left: 2px solid var(--pc); font-size: 13.5px; color: var(--text); text-shadow: 0 1px 2px #000; overflow-wrap: anywhere; transition: opacity .6s; }
+  #chatLog p b, #lobbyChatLog p b { color: var(--pc); margin-right: 6px; }
   #chatLog p.old { opacity: 0; }
   #chat.open #chatLog p.old { opacity: 1; }
   #chatIn { padding: 7px 10px; background: rgba(1, 10, 19, .85); border: 1px solid var(--gold-lo); color: var(--text); font: 600 14px var(--body); }
@@ -247,6 +264,7 @@
       <button class="tab" data-tab="champion" data-sfx="open">Champion <small id="champName"></small></button>
       <button class="tab" data-tab="controls" data-sfx="open">Controls</button>
       <button class="tab" data-tab="settings" data-sfx="open">Settings</button>
+      <button class="tab" data-tab="notes" data-sfx="open">Patch notes</button>
     </nav>
     <label class="who">Summoner name<input id="nameIn" maxlength="14" placeholder="Summoner name"></label>
     <p class="legal"><span class="ver" id="verTxt"></span><br>Gang of Legends was created under Riot Games' "Legal Jibber Jabber" policy using assets owned by Riot Games. Riot Games does not endorse or sponsor this project. Free fan game, not for sale.</p>
@@ -303,6 +321,12 @@
     <label class="volrow">Volume <input class="vol" type="range" min="0" max="100"><output class="volOut"></output></label>
     <label class="relay" style="margin-top: 18px"><input id="devIn" type="checkbox"> Dev mode (adds a connection simulator to Practice)</label>
   </section>
+
+  <section class="panel hidden" data-panel="notes">
+    <h2>Patch notes</h2>
+    <p class="lede" id="notesLede">What changed in each version.</p>
+    <div id="notes"></div>
+  </section>
 </div>
 
 <div id="lobby" class="shell hidden">
@@ -310,6 +334,8 @@
     <div class="code"><span>Lobby code, click to copy</span><button id="lobbyCode" data-sfx="pick"></button></div>
     <ul id="lobbyPlayers"></ul>
     <p id="lobbyNote"></p>
+    <div id="lobbyChatLog"></div>
+    <input id="lobbyChatIn" maxlength="120" placeholder="Say something. Enter sends" aria-label="Lobby chat">
     <div class="lobbyacts"><button id="leaveBtn" class="btn" data-sfx="back">Leave</button><button id="startBtn" class="btn primary" data-sfx="start">Start match</button></div>
   </aside>
   <section class="panel">

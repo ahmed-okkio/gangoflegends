@@ -17,4 +17,4 @@ npm test           # physics, combat and netcode-size checks
 npm run release    # build the installer and publish it as a GitHub release (uses gh)
 ```
 
-Bump `version` in package.json before each release; installed copies pick it up on next launch, and lobbies only accept players on the host's version.
+Bump `version` in package.json before each release and add its entry at the top of `patchnotes.json` (the release notes, also shown in the game's Patch notes tab after the update); installed copies pick it up on next launch, and lobbies only accept players on the host's version.

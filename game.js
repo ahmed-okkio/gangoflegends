@@ -4,7 +4,7 @@ import { createRenderer, playerColor, loadProps } from './render.js';
 import { CHAMPS, TEAM_NAMES, TEAM_COLORS, FFA_COLORS } from './champs.js';
 import { MAPS } from './maps.js';
 import * as net from './net.js';
-import { prepareMap, loadBeast } from './stages.js';
+import { prepareMap, loadBeast, xhr } from './stages.js';
 import { PARTS, HIPS, ARM, FORE } from './beast.js';
 import { packSnap, unpackSnap } from './wire.js';
 import { loadSfx, play, ui, setVolume } from './sfx.js';
@@ -105,16 +105,33 @@ $('practiceMaps').onclick = e => { const id = e.target.closest('.map')?.dataset.
 $('practiceMaps').ondblclick = e => { if (e.target.closest('.map')) startPractice(practiceMap); };
 $('verTxt').textContent = VERSION === 'dev' ? 'Dev build' : `Version ${VERSION}`;
 // main menu tabs: the rail picks which panel shows
-document.querySelector('.tabs').onclick = e => {
-  const t = e.target.closest('.tab');
-  if (!t) return;
-  for (const b of document.querySelectorAll('.tabs .tab')) b.classList.toggle('on', b === t);
+function openTab(name) {
+  for (const b of document.querySelectorAll('.tabs .tab')) b.classList.toggle('on', b.dataset.tab === name);
   for (const p of document.querySelectorAll('#menu .panel')) {
-    const on = p.dataset.panel === t.dataset.tab;
+    const on = p.dataset.panel === name;
     p.classList.toggle('hidden', !on);
     if (on) { p.classList.remove('enter'); void p.offsetWidth; p.classList.add('enter'); }
   }
-};
+}
+document.querySelector('.tabs').onclick = e => { const t = e.target.closest('.tab'); if (t) openTab(t.dataset.tab); };
+
+// patch notes (patchnotes.json, newest first; release.cjs publishes the same text): the first launch on a new version opens
+// them, everything since the version played before marked new. Played before notes existed (no seenVersion, but a saved
+// volume, which every launch saves): just this version's
+const vnum = v => v.split('.').reduce((n, x) => n * 1000 + +x, 0);
+const seenVer = store.get('seenVersion', null), played = store.get('volume') != null;
+if (VERSION !== 'dev') store.set('seenVersion', VERSION);
+// their bit of Markdown: paragraphs, "- " lists (a line just above one is its heading), **bold**
+const md = s => s.split('\n').filter(Boolean).map((l, i, a) => {
+  const t = esc(l.replace(/^- /, '')).replace(/\*\*(.+?)\*\*/g, '<b>$1</b>');
+  return l.startsWith('- ') ? `<li>${t}</li>` : a[i + 1]?.startsWith('- ') ? `<h4>${t}</h4>` : `<p>${t}</p>`;
+}).join('').replace(/(<li>.*?<\/li>)+/g, m => `<ul>${m}</ul>`);
+xhr('patchnotes.json', 'json').then(notes => {
+  const since = VERSION === 'dev' ? null : seenVer ?? (played ? notes[notes.findIndex(n => n.v === VERSION) + 1]?.v : VERSION);
+  const isNew = n => since != null && vnum(n.v) > vnum(since) && vnum(n.v) <= vnum(VERSION);
+  $('notes').innerHTML = notes.map(n => `<article class="note"><h3>${n.v}${isNew(n) ? '<em>New</em>' : ''}<small>${n.date}</small></h3>${md(n.notes)}</article>`).join('');
+  if (notes.some(isNew)) { $('notesLede').textContent = `Updated from ${since}. Here's what changed.`; openTab('notes'); }
+}, () => {});
 
 function champCards(el, onPick) {
   el.innerHTML = Object.entries(CHAMPS).map(([id, c]) => `
@@ -179,7 +196,7 @@ $('hostBtn').onclick = async () => {
   lobby = { code: conn.code, players: [{ id: 'host', name: me.name, champ: me.champ }], settings: { map: 'girders', teams: 0, rounds: 3 } };
   conn.on('join', (id, name, v) => {
     const why = v !== VERSION ? `Version mismatch: the host is on v${VERSION}, you're on v${v}. Restart the game to update.` : game ? 'A match is in progress.' : lobby.players.length >= 8 ? 'Lobby is full.' : '';
-    if (why) { conn.send(id, { t: 'deny', msg: why }); setTimeout(() => conn.kick(id), 300); return; }
+    if (why) return deny(id, why);
     lobby.players.push({ id, name, champ: 'blitz' });
     pushLobby();
   });
@@ -210,7 +227,9 @@ async function joinLobby(raw) {
   menuError('Connecting…', true);
   try { conn = await net.join(code, me.name, VERSION); } catch (e) { conn = null; return menuError(e.message); }
   menuError();
+  const c = conn; // once I've left (kicked: the host's next lobby update still reaches me), this link is done
   conn.on('msg', m => {
+    if (conn !== c) return;
     if (m.t === 'lobby') { lobby = m.lobby; game = null; renderLobby(); show('lobby'); }
     else if (m.t === 'start') startGame(m.setup);
     else if (m.t === 'snap') onSnap(m);
@@ -218,7 +237,7 @@ async function joinLobby(raw) {
     else if (m.t === 'deny') leave(m.msg);
     else if (m.t === 'chat') showChat(m.slot, m.text);
   });
-  conn.on('close', () => leave('Lost connection to the host.'));
+  conn.on('close', () => conn === c && leave('Lost connection to the host.'));
   conn.send({ t: 'pick', champ: me.champ });
 }
 
@@ -256,24 +275,28 @@ function claim(e, t) {
   return i >= 0;
 }
 
-// ping (top left): round trip of a ping over the same channel as the game, once a second; the median of the last 5,
+// ping: round trip of a ping over the same channel as the game, once a second; the median of the last 5,
 // so one held up by a hitch (loading the match, a stall) doesn't show
 function onPong(m) {
   if (!game) return;
   const p = game.pings = [...game.pings ?? [], performance.now() - m.c].slice(-5);
   game.ping = [...p].sort((a, b) => a - b)[p.length >> 1];
-  const el = $('ping');
-  el.textContent = `${Math.round(game.ping)} ms`;
-  // dev mode: frames this second, the slowest one, and how far behind everyone else is drawn: a slow PC or a slow link
-  const fr = game.fr ?? { n: 0, worst: 0 };
-  if (devOn()) el.textContent += ` · ${fr.n} fps · worst frame ${Math.round(fr.worst * 1000)} ms · others ${Math.round(game.delay * 1000)} ms behind`;
+}
+// top left, once a second (frame()): ping (0 where the game runs: the host, practice) and fps. Dev mode adds the slowest
+// frame and, on a client, how far behind everyone else is drawn: a slow PC or a slow link
+function pingLine() {
+  const fr = game.fr ?? { n: 0, worst: 0 }, ping = game.local ? game.ping : 0, el = $('ping');
   game.fr = { n: 0, worst: 0 };
-  el.className = game.ping > 200 ? 'bad' : game.ping > 100 ? 'meh' : '';
+  if (ping == null) return;
+  el.textContent = `${Math.round(ping)} ms · ${fr.n} fps`;
+  if (devOn()) el.textContent += ` · worst frame ${Math.round(fr.worst * 1000)} ms${game.local ? ` · others ${Math.round(game.delay * 1000)} ms behind` : ''}`;
+  el.className = ping > 200 ? 'bad' : ping > 100 ? 'meh' : '';
 }
 
 function leave(msg) {
   conn?.close();
   conn = lobby = game = null;
+  $('lobbyChatLog').replaceChildren();
   show('menu');
   menuError(msg);
 }
@@ -287,14 +310,13 @@ function pushLobby() {
   renderLobby();
   show('lobby');
 }
+const lobbyColor = i => lobby.settings.teams ? TEAM_COLORS[i % lobby.settings.teams] : FFA_COLORS[i];
 function renderLobby() {
   const s = lobby.settings, myId = conn.myId;
   $('lobbyCode').textContent = lobby.code;
-  $('lobbyPlayers').innerHTML = lobby.players.map((p, i) => {
-    const color = s.teams ? TEAM_COLORS[i % s.teams] : FFA_COLORS[i];
-    return `<li style="--pc:${color}"><b>${esc(p.name)}</b>${p.id === myId ? ' <em class="me">you</em>' : ''}${p.id === 'host' ? ' <em>host</em>' : ''}
-      <span class="pick">${CHAMPS[p.champ].name}</span>${s.teams ? `<span class="team">${TEAM_NAMES[i % s.teams]}</span>` : ''}</li>`;
-  }).join('') + '<li class="empty">Open</li>'.repeat(8 - lobby.players.length);
+  $('lobbyPlayers').innerHTML = lobby.players.map((p, i) => `<li style="--pc:${lobbyColor(i)}"><b>${esc(p.name)}</b>${p.id === myId ? ' <em class="me">you</em>' : ''}${p.id === 'host' ? ' <em>host</em>' : ''}
+      <span class="pick">${CHAMPS[p.champ].name}</span>${s.teams ? `<span class="team">${TEAM_NAMES[i % s.teams]}</span>` : ''}${isHost() && p.id !== 'host' ? `<button class="kick" data-kick="${esc(p.id)}" data-sfx="back" title="Kick">Kick</button>` : ''}</li>`
+  ).join('') + '<li class="empty">Open</li>'.repeat(8 - lobby.players.length);
   $('setMap').value = s.map; $('setTeams').value = s.teams; $('setRounds').value = s.rounds;
   for (const id of ['setMap', 'setTeams', 'setRounds']) $(id).disabled = !isHost();
   $('startBtn').classList.toggle('hidden', !isHost());
@@ -308,6 +330,21 @@ for (const [id, key, num] of [['setMap', 'map'], ['setTeams', 'teams', 1]])
   $(id).onchange = e => { lobby.settings[key] = num ? +e.target.value : e.target.value; pushLobby(); };
 $('setRounds').onchange = e => { lobby.settings.rounds = Math.min(99, Math.max(1, Math.round(+e.target.value) || 1)); pushLobby(); }; // typed: kept to 1-99
 $('lobbyCode').onclick = () => { navigator.clipboard?.writeText(lobby.code); $('lobbyNote').textContent = 'Code copied.'; };
+// host: turn someone away (told why, then dropped). A kicked player can rejoin with the code
+function deny(id, msg) { conn.send(id, { t: 'deny', msg }); setTimeout(() => conn.kick(id), 300); }
+$('lobbyPlayers').onclick = e => {
+  const id = e.target.closest('.kick')?.dataset.kick;
+  if (!id || !isHost() || game) return;
+  deny(id, 'The host removed you from the lobby.');
+  lobby.players = lobby.players.filter(p => p.id !== id);
+  pushLobby();
+};
+$('lobbyChatIn').addEventListener('keydown', e => {
+  if (e.key !== 'Enter') return;
+  const text = e.target.value.trim();
+  if (text) sendChat(text);
+  e.target.value = '';
+});
 $('leaveBtn').onclick = () => leave();
 $('startBtn').onclick = () => {
   const { map, teams, rounds } = lobby.settings;
@@ -452,13 +489,15 @@ function closeChat() {
 }
 $('chatIn').addEventListener('keydown', e => {
   e.stopPropagation();
-  if (e.key === 'Enter') { const text = $('chatIn').value.trim(); if (text) isHost() ? hostChat('host', text) : conn?.send({ t: 'chat', text }); closeChat(); }
+  if (e.key === 'Enter') { const text = $('chatIn').value.trim(); if (text) sendChat(text); closeChat(); }
   else if (e.key === 'Escape') closeChat();
 });
-// host: a player's line, checked (text only, 120 chars, one line a second) and passed to everyone with their slot
+const sendChat = text => isHost() ? hostChat('host', text) : conn?.send({ t: 'chat', text });
+// host: a player's line, checked (text only, 120 chars, one line a second) and passed to everyone with their slot (in the
+// match, or in the lobby between matches)
 const chatAt = new Map();
 function hostChat(id, text) {
-  const slot = game?.setup.players.findIndex(p => p.id === id) ?? -1;
+  const slot = (game ? game.setup.players : lobby?.players)?.findIndex(p => p.id === id) ?? -1;
   if (slot < 0 || typeof text !== 'string' || performance.now() - (chatAt.get(id) ?? -1e4) < 1000) return;
   text = text.trim().slice(0, 120);
   if (!text) return;
@@ -467,11 +506,17 @@ function hostChat(id, text) {
   showChat(slot, text);
 }
 function showChat(slot, text) {
-  const p = game?.setup.players[slot];
+  const p = (game ? game.setup.players : lobby?.players)?.[slot];
   if (!p || typeof text !== 'string') return;
   const line = document.createElement('p'), who = document.createElement('b');
-  line.style.setProperty('--pc', playerColor(game.setup, slot));
+  line.style.setProperty('--pc', game ? playerColor(game.setup, slot) : lobbyColor(slot));
   who.textContent = p.name; line.append(who, text.slice(0, 120)); // text, never HTML
+  if (!game) { // the lobby keeps the last 50, scrolled to the newest
+    $('lobbyChatLog').append(line);
+    while ($('lobbyChatLog').children.length > 50) $('lobbyChatLog').firstChild.remove();
+    $('lobbyChatLog').scrollTop = 1e9;
+    return ui('pick');
+  }
   $('chatLog').append(line);
   while ($('chatLog').children.length > 8) $('chatLog').firstChild.remove();
   setTimeout(() => line.classList.add('old'), 10000);
@@ -554,7 +599,8 @@ function frame(now) {
   const dt = Math.min(0.1, (now - last) / 1000);
   last = now;
   if (!game) { runAttract(dt); return; }
-  const fr = game.fr ??= { n: 0, worst: 0 }; fr.n++; fr.worst = Math.max(fr.worst, dt); // for the ping line (onPong)
+  const fr = game.fr ??= { n: 0, worst: 0 }; fr.n++; fr.worst = Math.max(fr.worst, dt); // for the ping line
+  if (now - (game.lineAt ??= now) >= 1000) { game.lineAt = now; pingLine(); }
   const inp = $('escMenu').classList.contains('hidden') ? readInput() : { x: 0, z: 0, b: 0, a: null, d: null };
   showAim(inp, dt);
   if (game.sim && !game.local) {
