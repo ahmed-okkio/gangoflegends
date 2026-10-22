@@ -29,7 +29,7 @@ function duo(mapId, players, slot, ow, extra = {}) {
   const { gb, ...opts } = extra, host = createSim({ mapId, players, ...opts }), cli = createSim({ mapId, players, local: slot, gb });
   const wire = [], q = [], d = { host, cli, i: 0, snaps: [], events: [] };
   d.step = (inp, hostSide) => {
-    cli.setInput(slot, gb ? { ...inp, b: inp.b & (BTN.JUMP | BTN.RUN | BTN.LAY) } : inp); cli.step(); // as game.js GB_MODE
+    cli.setInput(slot, gb ? { ...inp, b: inp.b & (BTN.JUMP | BTN.RUN | BTN.LAY | BTN.A1 | BTN.A2) } : inp); cli.step(); // as game.js GB_MODE
     q.push([inp.x, inp.z, inp.b, inp.a, inp.d]); if (q.length > 6) q.shift();
     wire.push({ to: 'host', at: d.i + ow, inp: { n: cli.tick, i: [...q] } });
     for (const m of wire.filter(m => m.at === d.i)) {
@@ -632,6 +632,13 @@ function duo(mapId, players, slot, ow, extra = {}) {
   console.log('GB mode: host-owned for', owned, 'ticks');
   assert.ok(hostCharged && !charged, 'the host charged, my copy never did');
   assert.ok(owned > 20 && !d.cli.players[0].hostOwned, 'my body was the host\'s while it charged, mine again after');
+}
+{ // aiming turns my copy round too: my arms are drawn from the host, whose me turned to cast (Lee's Q tapped behind him)
+  const d = duo('grind', [{ id: 'a', name: 'A', champ: 'lee', team: 0 }, { id: 'b', name: 'B', champ: 'blitz', team: 1 }], 0, 12, { practice: true, gb: true });
+  for (let i = 0; i < 200; i++) d.step({ x: i > 100 && i < 115 ? 1 : 0, z: 0, b: i > 130 && i < 136 ? BTN.A1 : 0, a: -Math.PI / 2 });
+  const fwd = s => { const q = s.players[0].bodies[0].rotation(); return 2 * (q.x * q.z + q.w * q.y); }; // the chest's facing, along x
+  assert.ok(fwd(d.cli) < -0.7 && fwd(d.host) < -0.7 && !d.cli.snapshot().h.length && d.host.players[0].cd[0] > 0,
+    `both face the aim, only the host cast (${fwd(d.cli).toFixed(2)}, ${fwd(d.host).toFixed(2)})`);
 }
 
 // 13. snapshot is small

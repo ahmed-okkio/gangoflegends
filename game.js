@@ -583,7 +583,7 @@ function frame(now) {
     acc += dt;
     while (acc >= DT) {
       acc -= DT;
-      local.setInput(game.mySlot, GB_MODE ? { ...inp, b: inp.b & (BTN.JUMP | BTN.RUN | BTN.LAY) } : inp); // GB mode: my copy only walks
+      local.setInput(game.mySlot, GB_MODE ? { ...inp, b: inp.b & (BTN.JUMP | BTN.RUN | BTN.LAY | BTN.A1 | BTN.A2) } : inp); // GB mode: my copy only walks and aims
       local.step();
       const ev = local.takeEvents();
       if (ev.length) { view.fx(ev); for (const e of ev) if (e[5] === game.mySlot) game.played.push([...e, now]); }

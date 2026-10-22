@@ -343,6 +343,7 @@ export function createSim({ mapId, players, practice = false, roundsToWin = 3, l
   }
 
   function useAbility(p, i, turned) {
+    if (gb && local >= 0) return; // GB mode: my copy only aims (and so turns to face it, like the host's me); the host casts
     const ab = CHAMPS[p.champ].abilities[i];
     if (ab.id === 'charge' && p.charge > 0) { p.charge = 0; return; } // recast ends the charge early
     if (LEAPS.includes(ab.id) && p.tether != null) return leap(p); // recast while they're caught / marked: fly to them
