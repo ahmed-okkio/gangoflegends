@@ -9,7 +9,7 @@ TARGET = -24  # dB mean, about the GB laughs'
 TRIM = "silenceremove=start_periods=1:start_threshold=-50dB,areverse,silenceremove=start_periods=1:start_threshold=-50dB,areverse"
 VOICES = [  # pitch factor, tempo on top, tone
     (1.4, 1.08, "highpass=f=300,treble=g=5"),  # squeaky
-    (0.75, 0.95, "lowpass=f=4500,bass=g=5"),   # gruff
+    (0.88, 0.97, "lowpass=f=6000,bass=g=2"),   # gruff
 ]
 
 def ff(*args):
