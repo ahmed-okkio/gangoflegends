@@ -335,7 +335,7 @@ async function startGame(setup) {
 }
 function abilityHud() {
   const mine = CHAMPS[game.setup.players[game.mySlot]?.champ ?? 'blitz'];
-  $('abil').innerHTML = mine.abilities.map((a, i) => `<div class="slot"><kbd data-act="a${i + 1}"></kbd><b>${a.name}</b><i></i><span class="cd"></span></div>`).join('');
+  $('abil').innerHTML = mine.abilities.map((a, i) => `<div class="slot" style="--g:${mine.glow ?? mine.eyes}"><kbd data-act="a${i + 1}"></kbd><b>${a.name}</b><i></i><span class="cd"></span></div>`).join('');
   showKeys();
 }
 // Esc menu: switch champ for the next round (practice: right away)
@@ -385,10 +385,12 @@ function updateHud(s, now) {
 
   const mine = s.p[game.mySlot];
   $('out').classList.toggle('hidden', !!mine?.[1] || !!setup.practice || s.st !== 'fight');
+  const recast = s.h?.find(h => h[0] === game.mySlot && h[4] >= 0)?.[6] / 10; // Thresh's caught / Lee's marked: press Q again
   if (mine?.[1]) [...$('abil').children].forEach((el, i) => {
-    const cd = mine[4 + i] / 10;
+    const re = i === 0 && recast > 0, cd = re ? 0 : mine[4 + i] / 10;
     el.classList.toggle('cooling', cd > 0);
-    el.querySelector('.cd').textContent = cd > 0 ? Math.ceil(cd) : '';
+    el.classList.toggle('recast', re);
+    el.querySelector('.cd').innerHTML = re ? `<small>RECAST</small>${Math.ceil(recast)}` : cd > 0 ? Math.ceil(cd) : '';
     el.querySelector('i').style.height = `${Math.min(100, cd / CHAMPS[setup.players[game.mySlot].champ].abilities[i].cd * 100)}%`;
   });
 }

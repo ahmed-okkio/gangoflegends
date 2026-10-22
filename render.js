@@ -286,6 +286,9 @@ export function createRenderer(canvas) {
         emit(v, { color: '#7dff9a', n: 18, speed: 7, size: 0.22, life: 0.35, grav: 0, dir: dir.negate() });
         ring(v, '#7dff9a', 1.6);
         shake = Math.max(shake, 0.1);
+      } else if (kind === 'wave') { // Sonic Wave leaving Lee's palm
+        emit(v, { color: '#4fe3ff', n: 10, speed: 3, size: 0.22, life: 0.3, grav: 0 });
+        ring(v, '#4fe3ff', 0.7);
       } else if (kind === 'sonic') { // Lee Sin's Sonic Wave marking whoever it hit
         emit(v, { color: '#5fb8ff', n: 14, speed: 4, size: 0.25, life: 0.4, grav: 0 });
         ring(v, '#5fb8ff', 1.2);
@@ -826,26 +829,36 @@ export function createRenderer(canvas) {
       alive.push(torso);
     });
 
-    // Blitz hooks: a chain of links from the owner's right fist. Lee Sin's wave is just the glowing head, and it stays on
-    // whoever it marked, pulsing
+    // Blitz hooks: a chain of links from the owner's right fist. Lee Sin's wave: a hot yellow core in a cyan shell,
+    // trailing cyan; it stays on whoever it marked, a pulsing cyan glow
     while (hookPool.length < b.h.length) {
       const links = new THREE.InstancedMesh(new THREE.TorusGeometry(0.06, 0.02, 4, 8), std('#c9ced6', { metalness: 0.9, roughness: 0.3 }), 40);
       const head = mesh(new THREE.SphereGeometry(0.2, 16, 10), glow('#ffb347', 2.5), 0, 0, 0, false);
-      world.add(links, head);
-      hookPool.push({ links, head });
+      const shell = new THREE.Mesh(new THREE.SphereGeometry(0.2, 16, 10), new THREE.MeshBasicMaterial({ color: '#4fe3ff', transparent: true, opacity: 0.35, blending: THREE.AdditiveBlending, depthWrite: false }));
+      world.add(links, head, shell);
+      hookPool.push({ links, head, shell });
     }
     const m4 = new THREE.Matrix4(), q = new THREE.Quaternion();
     hookPool.forEach((h, i) => {
       const d = b.h[i], o = d && a.h?.find(e => e[0] === d[0]); // the same hook in the older snapshot (one per champ)
       const champ = d && setup.players[d[0]]?.champ;
-      h.head.visible = !!d && !!b.p[d[0]]?.[1]; h.links.visible = h.head.visible && champ !== 'lee';
+      h.head.visible = !!d && !!b.p[d[0]]?.[1]; h.links.visible = h.head.visible && champ !== 'lee'; h.shell.visible = false;
       if (!h.head.visible) return;
       // between the two snapshots like the bodies: it covers ~1m per snapshot, so drawn from the newer one it stepped
       if (o) h.head.position.set(o[1], o[2], o[3]).lerp(tmp2.set(d[1], d[2], d[3]), alpha); else h.head.position.set(d[1], d[2], d[3]);
-      const c = { thresh: '#7dff9a', lee: '#5fb8ff' }[champ] ?? '#ffb347'; // Thresh's hook glows green, Lee's wave blue
+      const c = champ === 'lee' ? (d[5] ? '#4fe3ff' : '#fff0a0') : champ === 'thresh' ? '#7dff9a' : '#ffb347'; // Thresh's hook glows green
       h.head.material.color.set(c); h.head.material.emissive.set(c);
       h.head.scale.setScalar(champ === 'lee' && d[5] ? 1.3 + 0.3 * Math.sin(time * 12) : 1);
-      if (champ === 'lee') return;
+      if (champ === 'lee') {
+        if (d[5] || !o) return;
+        // in flight: the shell stretched out along the way it's going, and a trail
+        h.shell.visible = true;
+        h.shell.position.copy(h.head.position);
+        h.shell.quaternion.setFromUnitVectors(tmp.set(0, 0, 1), tmp2.set(d[1] - o[1], d[2] - o[2], d[3] - o[3]).normalize());
+        h.shell.scale.set(1.8, 1.8, 2.8);
+        emit(h.head.position, { color: Math.random() < 0.7 ? '#4fe3ff' : '#fff0a0', n: 1, speed: 0.4, size: 0.3, life: 0.3, grav: 0 });
+        return;
+      }
       const arm = avatars[d[0]].parts[FORE + 1]; // avatar groups sit at the origin, so part-local -> world is just the part's own transform
       const from = tmp.fromArray(HAND[1]).applyQuaternion(arm.quaternion).add(arm.position), dir = tmp2.subVectors(h.head.position, from);
       const n = Math.min(40, Math.max(1, Math.floor(dir.length() / 0.1)));

@@ -253,10 +253,10 @@ CLOTH = lambda: mat("cloth_red", (0.72, 0.07, 0.06), 0.85)
 WRAPS = lambda: mat("wraps", (0.88, 0.84, 0.74), 0.9)
 
 def lee_blindfold():  # head frame (skull centre y .165, z .057, r .21): a band over the eyes, a knot at the back and two tails
-    cyl(CLOTH(), 0.218, 0.075, (0, 0.205, 0.057))
-    ball(CLOTH(), 0.035, (0, 0.205, -0.165), (1.4, 1, 0.8))
+    cyl(CLOTH(), 0.222, 0.1, (0, 0.155, 0.057))  # eyes span y .095-.216
+    ball(CLOTH(), 0.035, (0, 0.155, -0.17), (1.4, 1, 0.8))
     for s in (1, -1):  # tails hanging down and back, broad side to the back
-        box(CLOTH(), (0.06, 0.22, 0.014), (s * 0.04, 0.1, -0.24), 0.006, tilt=(26, 0, s * 12))
+        box(CLOTH(), (0.06, 0.22, 0.014), (s * 0.04, 0.05, -0.245), 0.006, tilt=(26, 0, s * 12))
 
 def lee_wrap():  # forearm frame (hand at y -.337): bandages wound round the wrist
     cyl(WRAPS(), 0.056, 0.14, (0, -0.25, 0))

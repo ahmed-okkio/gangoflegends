@@ -49,6 +49,7 @@ const FB_R = 2.4; // Sett E reach
 const PULV_R = 2.8; // Alistar Q reach
 const GLUE_T = 3; // Singed Q puddle lifetime, s
 const SPIN = 0.3; // Hecarim Q: seconds for its one turn
+const KICK = 0.35; // Lee Sin E: seconds for the roundhouse's turn; it lands as the leg comes round to the front
 const TWIST = 0.7; // how firmly arms hold their roll (aimPart)
 const TAP = 0.2; // a hand let go within this many seconds punches; held longer, it grabs
 const UPPER = [HEAD]; // turns rigidly with the chest; the arms don't, so they lag and swing out when the beast spins
@@ -156,7 +157,7 @@ export function createSim({ mapId, players, practice = false, roundsToWin = 3, l
       alive: true, yaw, daze: 0, sinceHit: 9, ko: 0, cd: [0, 0], punch: null, punchCd: 0, grabs: [null, null], held: [0, 0],
       stun: 0, spin: 0, spinHit: null, charge: 0, empower: 0, jumpT: 0, phase: 0, grounded: false, prevB: p.input.b,
       butt: null, buttCd: 0, lying: false, safe: 0, hooked: 0, spinA: 0, chargeT: 0,
-      emp: null, dash: null, vault: 0, vaultBtn: 0, hay: 0, hayBtn: 0, fb: 0, pulv: 0, flay: 0, fling: 0, tether: null, leap: null, dizzy: 0, kick: null, kickA: 0,
+      emp: null, dash: null, vault: 0, vaultBtn: 0, hay: 0, hayBtn: 0, fb: 0, pulv: 0, flay: 0, fling: 0, tether: null, leap: null, dizzy: 0, kick: null, kickA: 0, palm: 0,
     });
   }
 
@@ -250,7 +251,7 @@ export function createSim({ mapId, players, practice = false, roundsToWin = 3, l
   }
   // drop whatever the player was doing: knocked out, or caught by a hook
   function cancel(p) {
-    p.spin = 0; p.charge = 0; p.punch = null; p.butt = null; p.dash = null; p.vault = 0; p.hay = 0; p.leap = null;
+    p.spin = 0; p.charge = 0; p.punch = null; p.butt = null; p.dash = null; p.vault = 0; p.hay = 0; p.leap = null; p.kickA = 0;
     releaseGrabs(p);
   }
   function wake(p) {
@@ -347,7 +348,12 @@ export function createSim({ mapId, players, practice = false, roundsToWin = 3, l
     if (p.cd[i] > 0) return;
     p.cd[i] = ab.cd;
     const f = facing(p), t = p.bodies[TORSO].translation(), btn = i ? BTN.A2 : BTN.A1;
-    if (ab.id === 'hook' || LEAPS.includes(ab.id)) hooks.push({ o: p, pos: add(add(t, mul(f, 0.7)), V(0, 0.2, 0)), dir: f, t: 0, vic: null, pull: 0, thresh: ab.id === 'sentence', lee: ab.id === 'sonic' });
+    if (ab.id === 'sonic') { // a palm thrust: the wave leaves his right hand, out at arm's length
+      p.palm = 0.3;
+      const at = add(t, add(mul(f, 0.75), V(-f.z * 0.2, 0.3, f.x * 0.2)));
+      hooks.push({ o: p, pos: at, dir: f, t: 0, vic: null, pull: 0, lee: true });
+      fx('wave', at, 0, p.slot);
+    } else if (ab.id === 'hook' || ab.id === 'sentence') hooks.push({ o: p, pos: add(add(t, mul(f, 0.7)), V(0, 0.2, 0)), dir: f, t: 0, vic: null, pull: 0, thresh: ab.id === 'sentence' });
     else if (ab.id === 'fist') { p.empower = 4; p.emp = 'launch'; }
     else if (ab.id === 'rampage') { p.spin = SPIN; p.spinHit = new Set(); }
     else if (ab.id === 'charge') { p.charge = CHARGE; p.chargeT = 0; }
@@ -360,20 +366,19 @@ export function createSim({ mapId, players, practice = false, roundsToWin = 3, l
     else if (ab.id === 'adhesive') adhesive(p, f, t, ab);
     else if (ab.id === 'fling') fling(p, t);
     else if (ab.id === 'headbutt') { p.dash = { t: 0.25, power: 1, ali: true }; fx('swing', t, 0, p.slot); }
-    else if (ab.id === 'rage') rage(p, f, t);
+    else if (ab.id === 'rage') { p.kickA = KICK; fx('swing', t, 0, p.slot); } // the kick lands at the end of the turn (control())
   }
 
-  // Lee Sin E (his ult, Dragon's Rage, toned down to use often): kick the champ in front of him back. Whoever they crash
-  // into on the way is knocked back too (control())
+  // Lee Sin E (his ult, Dragon's Rage, toned down to use often): a roundhouse kick. One full turn with the right leg out
+  // (control()), and as it comes round to the front it kicks the champ there back. Whoever they crash into on the way
+  // is knocked back too
   function rage(p, f, t) {
-    p.kickA = 0.3;
-    fx('swing', t, 0, p.slot);
     const [o] = ps.filter(o => o !== p && live(o)).map(o => ({ o, d: sub(seen(p, o), t) }))
       .filter(({ d }) => Math.hypot(d.x, d.z) < 1.8 && dot(d, f) > 0 && Math.abs(d.y) < 1).sort((a, b) => len(a.d) - len(b.d));
     if (!o) return;
     fx('rage', o.o.bodies[TORSO].translation(), Math.atan2(f.x, f.z), p.slot, o.o.slot);
     if (local >= 0) return;
-    hit(o.o, TORSO, add(mul(f, 10), V(0, 4, 0)), 25);
+    hit(o.o, TORSO, add(mul(f, 5), V(0, 2, 0)), 12);
     p.kick = { vic: o.o, f, t: 0.8, hit: new Set([p, o.o]) };
   }
 
@@ -486,7 +491,7 @@ export function createSim({ mapId, players, practice = false, roundsToWin = 3, l
     const ctrl = p.ko > 0 || p.hooked > 0 ? 0 : lying ? 0.08 : 1; // hooked: limp, dragged along helpless
     const move = ctrl && (p.stun -= DT) <= 0 ? 1 : 0; // staggered: can't steer, jump or cast
     if ((p.sinceHit += DT) > 1.2) p.daze = Math.max(0, p.daze - 15 * DT);
-    p.cd = p.cd.map(c => Math.max(0, c - DT));
+    p.cd = p.cd.map((c, i) => i === 0 && p.champ === 'lee' && hooks.some(h => h.o === p) ? c : Math.max(0, c - DT)); // Sonic Wave cools once the wave missed, the mark wore off or he flew in
     p.punchCd -= DT; p.empower -= DT; p.jumpT -= DT; p.buttCd -= DT;
 
     const tp = T.translation(), tv = T.linvel(), Hb = p.bodies[HIPS];
@@ -499,7 +504,7 @@ export function createSim({ mapId, players, practice = false, roundsToWin = 3, l
     const m = Math.hypot(mx, mz);
     if (m > 1) { mx /= m; mz /= m; }
     // Rampage spins the body (spinA) on top of the travel direction, so it works while walking or charging
-    if (p.spin > 0) { p.spin -= DT; p.spinA += (2 * Math.PI / SPIN) * DT; } else p.spinA = 0; // one full turn
+    if (p.spin > 0) { p.spin -= DT; p.spinA += (2 * Math.PI / SPIN) * DT; } else p.spinA = p.kickA > 0 ? 2 * Math.PI * (1 - p.kickA / KICK) : 0; // one full turn
     if (move) {
       if (p.charge > 0) { if (m > 0.2) p.yaw = turnToward(p.yaw, Math.atan2(mx, mz), 3 * DT); }
       else if (m > 0.2 && !p.dash && !(p.hay > 0)) p.yaw = Math.atan2(mx, mz); // a Haymaker windup holds its aim
@@ -538,21 +543,22 @@ export function createSim({ mapId, players, practice = false, roundsToWin = 3, l
     }
     if (p.leap) { // Thresh's Death Sentence recast: reeled along the chain all the way to them. Lee Sin's knocks them back
       const q = ps[p.leap.slot], d = q && live(q) && sub(q.bodies[TORSO].translation(), tp);
-      if (p.leap.lee && d && len(d) < 1.2) hit(q, TORSO, add(mul(norm(V(d.x, 0, d.z)), 8), V(0, 3, 0)), 0);
+      if (p.leap.lee && d) { if (len(d) < 1.2) hit(q, TORSO, add(mul(norm(V(d.x, 0, d.z)), 8), V(0, 3, 0)), 0); else p.yaw = Math.atan2(d.x, d.z); }
       if (!d || len(d) < 1.2 || (p.leap.t += DT) > 1) p.leap = null;
       else { const v = add(mul(d, 14 / len(d)), V(0, 0.8, 0)); for (const b of p.bodies) b.setLinvel(v, true); p.jumpT = 0.1; }
     }
     if (p.dash) { speed = 11; mx = f.x; mz = f.z; if ((p.dash.t -= DT) <= 0) p.dash = null; }
     if (p.kick && (p.kick.t -= DT) > 0 && p.kick.vic.alive) { // Dragon's Rage: the champ he kicked bowls over whoever they hit
       const kt = p.kick.vic.bodies[TORSO].translation();
-      for (const o of ps) if (o.alive && !p.kick.hit.has(o) && len(sub(o.bodies[TORSO].translation(), kt)) < 0.9) { p.kick.hit.add(o); hit(o, TORSO, add(mul(p.kick.f, 8), V(0, 3, 0)), 20); }
+      for (const o of ps) if (o.alive && !p.kick.hit.has(o) && len(sub(o.bodies[TORSO].translation(), kt)) < 0.9) { p.kick.hit.add(o); hit(o, TORSO, add(mul(p.kick.f, 4), V(0, 1.5, 0)), 10); }
     } else p.kick = null;
     // Sett Q: hold to plant and wind up, let go (or hold past 3 s) to throw it
     if (p.hay > 0) {
       if (move && inp.b & p.hayBtn && p.hay < 3) { p.hay += DT; speed = 0; }
       else { if (move) haymaker(p, f, tp, hayK(p)); p.hay = 0; }
     }
-    p.fb -= DT; p.pulv -= DT; p.flay -= DT; p.fling -= DT; p.kickA -= DT;
+    p.fb -= DT; p.pulv -= DT; p.flay -= DT; p.fling -= DT; p.palm -= DT;
+    if (p.kickA > 0 && (p.kickA -= DT) <= 0) rage(p, facing(p), p.bodies[TORSO].translation());
     const stuck = glued(p, tp);
     if (stuck) speed *= 0.3;
     if (lying) speed = 1.2; // crawl
@@ -597,12 +603,13 @@ export function createSim({ mapId, players, practice = false, roundsToWin = 3, l
 
     // posture: hips, waist, chest and head stay upright and face the stick direction (rigidly while hoisting: hanging off the
     // shoulders, the lifted chest would otherwise swing about them; barely while swinging the legs, which turns the body over)
-    const lean = p.charge > 0 || p.dash ? 0.35 : p.butt ? 0.9 * Math.sin(Math.min(1, p.butt.t / 0.25) * Math.PI) : 0, yq = qyaw(p.yaw + p.spinA), up = (sw ? 0.05 : p.pushUp ? 1 : p.grounded ? 0.3 : 0.15) * ctrl;
+    const fk = !!p.leap?.lee; // Sonic Wave's recast: a flying kick, foot first
+    const lean = fk ? -0.6 : p.kickA > 0 ? -0.25 : p.charge > 0 || p.dash ? 0.35 : p.butt ? 0.9 * Math.sin(Math.min(1, p.butt.t / 0.25) * Math.PI) : 0, yq = qyaw(p.yaw + p.spinA), up = (sw ? 0.05 : p.pushUp ? 1 : fk ? 0.5 : p.grounded ? 0.3 : 0.15) * ctrl;
     leak = V();
-    orient(Hb, yq, 10, up);
+    orient(Hb, fk ? qmul(yq, qaxis(X, -0.4)) : yq, 10, up); // the flying kick tips the hips back too: the leg leads
     // punching turns the shoulders into it: wound back, then the punching side drives forward (that's the reach)
     const cock = p.held.findIndex(h => h > 0 && h < TAP && p.grounded);
-    const tw = p.punch ? (p.punch.arm ? 0.7 : -0.7) : cock >= 0 ? (cock ? -0.3 : 0.3) : 0;
+    const tw = p.punch ? (p.punch.arm ? 0.7 : -0.7) : p.palm > 0 ? 0.6 : cock >= 0 ? (cock ? -0.3 : 0.3) : 0;
     // a punch with a target tracks it: the shoulders turn to them and the fist (below) flies at them.
     // ponytail: on a prediction copy the target is a stand-in at hip height, so my own fist aims ~20cm low until the host corrects it
     const aimTo = p.punch?.to?.bodies && sub(p.punch.to.bodies[TORSO].translation(), tp), ay = aimTo ? Math.atan2(aimTo.x, aimTo.z) : p.yaw + p.spinA;
@@ -661,6 +668,8 @@ export function createSim({ mapId, players, practice = false, roundsToWin = 3, l
         ua = add(add(mul(sd, s * 0.9 * (1 - u)), mul(d, 0.3 + 0.7 * u)), V(0, 0.15, 0)); fa = add(d, V(0, 0.1, 0)); str = 0.9; fs = 0.8;
       }
       if (p.spin > 0) { ua = fa = add(mul(side, s), mul(bf, 0.1)); str = 0.5; fs = 0.4; }
+      if (p.kickA > 0 || fk) { ua = fa = add(mul(side, s), V(0, fk ? 0.3 : -0.2, 0)); str = 0.5; fs = 0.4; } // out wide for balance
+      if (p.palm > 0 && i === 1) { ua = fa = add(bf, V(0, 0.05, 0)); str = 0.9; fs = 0.9; } // Sonic Wave: the palm thrust out at the aim
       if (p.held[i] > 0 && !grabbing[i] && p.punch?.arm !== i) { ua = add(add(mul(bf, -0.5), mul(side, s * 0.7)), V(0, -0.3, 0)); fa = add(bf, V(0, 0.3, 0)); str = 0.6; fs = 0.7; } // cocked: elbow back and out
       // reach up for ledges; hanging on, a free hand reaches back up
       if (!p.grounded && (grabbing[i] || ledge > -Infinity)) { ua = fa = add(mul(bf, 0.5), V(0, 1, 0)); str = 0.8; }
@@ -671,9 +680,12 @@ export function createSim({ mapId, players, practice = false, roundsToWin = 3, l
       aimPart(p, ARM + i, ua, 14, str * ctrl, [p.bodies[FORE + i]], free, TWIST);
       aimPart(p, FORE + i, fa, 14, str * fs * ctrl, [], free, TWIST);
       // legs: thighs swing, shins fold back on the up-swing
-      const kick = i && p.kickA > 0 && add(bf, V(0, 0.4, 0)); // Dragon's Rage: the right leg snaps up in front
+      // Dragon's Rage: the right leg out at hip height, a little to the side, swept round by the turn. Flying kick: the right
+      // foot out at them, the left leg tucked
+      const kick = i && p.kickA > 0 ? add(add(bf, mul(side, -0.3)), V(0, 0.1, 0)) : fk ? (i ? add(bf, V(0, -0.15, 0)) : add(mul(bf, 0.7), DOWN)) : null;
+      const shin = fk && !i ? add(mul(bf, -0.8), DOWN) : kick;
       aimPart(p, THIGH + i, kick || sw || add(DOWN, mul(bf, swing * 0.7 * gait)), 14, (kick ? 1 : 0.5) * ctrl, [p.bodies[LEG + i]]);
-      aimPart(p, LEG + i, kick || sw || add(DOWN, mul(bf, (swing * 0.7 - Math.max(0, Math.cos(p.phase + i * Math.PI)) * 0.9) * gait)), 14, (kick ? 1 : 0.5) * ctrl);
+      aimPart(p, LEG + i, shin || sw || add(DOWN, mul(bf, (swing * 0.7 - Math.max(0, Math.cos(p.phase + i * Math.PI)) * 0.9) * gait)), 14, (kick ? 1 : 0.5) * ctrl);
     }
     tone(p, p.ko > 0 || p.hooked > 0);
     const back = mul(leak, -1 / p.bodies.reduce((m, b) => m + b.mass(), 0));
@@ -998,7 +1010,7 @@ export function createSim({ mapId, players, practice = false, roundsToWin = 3, l
         out.push(Math.round(hayK(p) * 100), r2(v.x), r2(v.y), r2(v.z), p.ack, r2(Math.max(0, p.stun)), p.hooked > 0 ? 1 : 0, r2(Math.max(0, p.ko)), r2(p.yaw));
         return out;
       }),
-      h: hooks.map(h => [h.o.slot, r2(h.pos.x), r2(h.pos.y), r2(h.pos.z), (h.thresh || h.lee) && h.vic ? h.vic.slot : -1, h.vic ? 1 : 0]), // ..., caught
+      h: hooks.map(h => [h.o.slot, r2(h.pos.x), r2(h.pos.y), r2(h.pos.z), (h.thresh || h.lee) && h.vic ? h.vic.slot : -1, h.vic ? 1 : 0, (h.thresh || h.lee) && h.vic ? Math.ceil(((h.lee ? 3 : 2) - h.pull) * 10) : 0]), // ..., caught, recast time left (0.1s)
       g: glue.map(g => [r2(g.x), r2(g.y), r2(g.z), r2(g.t), g.r, g.team]),
       ch: ps.map(p => p.champ),
     };
