@@ -148,7 +148,9 @@ export function createRenderer(canvas) {
   renderer.toneMappingExposure = 1.05;
   const scene = new THREE.Scene();
   const pmrem = new THREE.PMREMGenerator(renderer);
-  scene.environment = pmrem.fromScene(new RoomEnvironment(), 0.04).texture;
+  const roomEnv = pmrem.fromScene(new RoomEnvironment(), 0.04).texture;
+  scene.environment = roomEnv;
+  let skyEnv = null; // an imported stage's own sky, prefiltered (buildImported)
   scene.environmentIntensity = 0.55;
   const camera = new THREE.PerspectiveCamera(42, 1, 0.1, 600);
   camera.layers.enable(1); // layer 1: the imported far-off city
@@ -459,10 +461,23 @@ export function createRenderer(canvas) {
     bloom.strength = 0.4; bloom.threshold = 2; bloom.radius = 0; bloom.compositeMaterial.uniforms.bloomFactors.value = [1, 0.75, 0.35, 0.1, 0]; renderer.toneMappingExposure = 0.8; scene.environmentIntensity = 0.5 * (view.dim ?? 1); // exposure: by eye (three's ACES curve isn't URP's)
     Object.assign(grade.uniforms, { strength: { value: 0.2 }, contrast: { value: 1.06 }, saturation: { value: 1.04 }, shadows: { value: 0.3 } });
     scene.fog = null;
-    g.add(sky(...view.sky ?? ['#6fb2ee', '#d8ecfa', '#b9c9d6']));
-    // Trawler's sea is built at runtime by Gang Beasts' water script (nothing to import): a plain sea at its height
+    // the stage's own sky, as Unity bakes it (import_gb.py): the backdrop, and the light on everything without a lightmap,
+    // beasts included. Its mean is the stage's ambient probe, so it goes in at full strength. Unity's cube faces are in
+    // its left-handed frame: a half turn about y lines them up with ours (z flipped)
+    if (sc.env?.sky) {
+      const cube = new THREE.CubeTextureLoader().setPath(base).load(sc.env.sky, t => {
+        if (scene.background !== t) return; // left the map meanwhile
+        skyEnv?.dispose(); skyEnv = pmrem.fromCubemap(t); scene.environment = skyEnv.texture;
+      });
+      cube.colorSpace = THREE.SRGBColorSpace;
+      scene.background = cube; scene.backgroundRotation.set(0, Math.PI, 0); scene.environmentRotation.set(0, Math.PI, 0);
+      scene.environmentIntensity = view.dim ?? 1;
+      if (sc.env.fog) scene.fog = new THREE.FogExp2(new THREE.Color().setRGB(...sc.env.fogColor, THREE.SRGBColorSpace), sc.env.fogDensity); // Unity's exponential squared
+    } else g.add(sky(...view.sky ?? ['#6fb2ee', '#d8ecfa', '#b9c9d6']));
+    // Trawler's sea is built at runtime by Gang Beasts' water script (nothing to import): a plain sea at its height, in
+    // its material's horizon colour and opacity ("Water - Trawler"), glossy so it mirrors the sky like theirs
     if (view.sea != null) {
-      const sea = new THREE.Mesh(new THREE.PlaneGeometry(3000, 3000).rotateX(-Math.PI / 2), new THREE.MeshStandardMaterial({ color: '#1d5f8c', roughness: 0.55, transparent: true, opacity: 0.92 }));
+      const sea = new THREE.Mesh(new THREE.PlaneGeometry(3000, 3000).rotateX(-Math.PI / 2), new THREE.MeshStandardMaterial({ color: '#0e3e48', roughness: 0.15, transparent: true, opacity: 0.94 }));
       sea.position.y = view.sea; sea.receiveShadow = true; g.add(sea);
     }
     // like the stage's own camera: Girders' looks from -z at 27 degrees
@@ -473,6 +488,7 @@ export function createRenderer(canvas) {
 
   function buildMap(g, map, id) {
     sunOffset.set(8, 20, 6);
+    scene.environment = roomEnv; scene.background = null; scene.environmentRotation.set(0, 0, 0);
     Object.assign(grade.uniforms, { strength: { value: 0.35 }, contrast: { value: 1 }, saturation: { value: 1 }, shadows: { value: 0 } });
     bloom.radius = 0.55; bloom.highPassUniforms.smoothWidth.value = 0.01; bloom.compositeMaterial.uniforms.bloomFactors.value = [1, 0.8, 0.6, 0.4, 0.2]; rim.intensity = 0.9;
     cam = { side: 1, pitch: 0.63, min: 10, max: 24 };

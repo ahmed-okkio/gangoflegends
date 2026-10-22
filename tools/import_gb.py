@@ -172,7 +172,10 @@ for o in env.objects:
         except Exception as e: print("  mesh failed", p, e); continue
         sbi = c.m_StaticBatchInfo
         mats = [export_material(x) for x in c.m_Materials if x.path_id]
-        first, count = (sbi.firstSubMesh, sbi.subMeshCount) if sbi and sbi.subMeshCount else (0, len(meshes[mkey]["subs"]))
+        # unbatched, Unity draws submesh i with material i, no more: Subway's track pieces point at the stage's whole static-batch
+        # mesh with one material, and drawing all of it put a stray copy of the station over the track
+        if not (sbi and sbi.subMeshCount) and meshes[mkey]["name"].startswith("Combined Mesh"): continue  # a batch mesh without its batch: nothing of its own
+        first, count = (sbi.firstSubMesh, sbi.subMeshCount) if sbi and sbi.subMeshCount else (0, min(len(mats), len(meshes[mkey]["subs"])))
         renderers.append({
             "path": p, "mesh": mkey, "subs": list(range(first, first + count)), "mats": mats,
             # static-batched vertices are already in world space
@@ -231,6 +234,26 @@ for o in env.objects:
             dec = Image.new("RGB", im.size); dec.putdata(px); dec.save(os.path.join(out, name))
             lightmaps.append(name)
 
+# the stage's skybox as Unity bakes it for reflections: six faces (+x -x +y -y +z -z, Unity's left-handed frame) as sRGB PNGs,
+# and their mean linear colour over the sphere. BC6H decodes to 8 bits, so the sun and anything brighter than 1 clip:
+# render.js scales the environment to the ambient probe's average (sh[0], sh[9], sh[18]) rather than trusting these
+def export_sky(ptr):
+    if not ptr.path_id: return {}
+    from UnityPy.export.Texture2DConverter import parse_image_data
+    cube = ptr.read(); w = cube.m_Width; data = cube.get_image_data()
+    per = sum(((max(1, w >> m) + 3) // 4) ** 2 * 16 for m in range(cube.m_MipCount))
+    names, tot, wsum = [], [0, 0, 0], 0
+    for f in range(6):
+        im = parse_image_data(data[f * per:f * per + ((w + 3) // 4) ** 2 * 16], w, w, cube.m_TextureFormat, cube.object_reader.version, cube.object_reader.platform, flip=False).convert("RGB")  # faces are stored top-down
+        px = list(im.getdata())
+        for i, (r, g, b) in enumerate(px):  # texel solid angle ~ (1 + u^2 + v^2)^-1.5
+            u, v = (i % w + 0.5) / w * 2 - 1, (i // w + 0.5) / w * 2 - 1
+            k = (1 + u * u + v * v) ** -1.5; wsum += k
+            tot[0] += r / 255 * k; tot[1] += g / 255 * k; tot[2] += b / 255 * k
+        im.putdata([tuple(round(255 * (c / 255) ** (1 / 2.2)) for c in p) for p in px])
+        names.append(f"sky_{f}.png"); im.save(os.path.join(out, names[-1]))
+    return {"sky": names, "skyMean": rnd([c / wsum for c in tot])}
+
 # ambient + the lights that shine at runtime (realtime and mixed; baked-only ones are already in the lightmaps)
 env_light, lights = {}, []
 # PositionalJitter (Incinerator's fire lights): the light hops to a random offset within range every Min..MaxInterval s
@@ -248,7 +271,10 @@ for o in env.objects:
         t = o.read_typetree()
         col = lambda c: rnd([c["r"], c["g"], c["b"]])
         env_light.update(ambientSky=col(t["m_AmbientSkyColor"]), ambientEquator=col(t["m_AmbientEquatorColor"]), ambientGround=col(t["m_AmbientGroundColor"]),
-                         fog=t["m_Fog"], fogColor=col(t["m_FogColor"]), fogDensity=t["m_FogDensity"])
+                         fog=t["m_Fog"], fogColor=col(t["m_FogColor"]), fogDensity=t["m_FogDensity"],
+                         # the ambient probe Unity lights everything unlightmapped with (from the skybox): eval = sh0 + sh1 y + sh2 z + sh3 x + ...
+                         sh=[round(t["m_AmbientProbe"][f"sh[{i:2d}]"], 5) for i in range(27)])
+        env_light.update(export_sky(o.read().m_GeneratedSkyboxReflection))
     elif o.type.name == "Light":
         l = o.read()
         pid = tf_of_go.get(l.m_GameObject.path_id)
