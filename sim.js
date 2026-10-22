@@ -39,6 +39,8 @@ const turnToward = (a, b, max) => a + Math.max(-max, Math.min(max, wrap(b - a)))
 // --- ragdoll: the Gang Beasts beast (beast.js). Part index = body index everywhere; bodies[0] is the chest. ---
 const TORSO = CHEST;
 const CORE = [HIPS, WAIST, CHEST, HEAD, THIGH, THIGH + 1, LEG, LEG + 1]; // moved as one by the locomotion; arms hang off it
+const HOIST = [WAIST, CHEST]; // lifted by a hoist, carrying the whole core's weight; hips and legs hang off it
+const HOIST_K = CORE.reduce((m, i) => m + PARTS[i].mass, 0) / HOIST.reduce((m, i) => m + PARTS[i].mass, 0);
 const HOLD = 20; // m/s^2 lift on the core (= gravity), so the hover spring only has to hold up the hanging arms
 const SAFE = 2.5; // seconds of daze/stagger immunity after getting up from a knockout
 const CHARGE = 3, RAMP = 1.5; // Hecarim E: lasts 3s, speeds up evenly from walking to full gallop over the first 1.5s
@@ -537,35 +539,43 @@ export function createSim({ mapId, players, practice = false, roundsToWin = 3, l
     const dv = V((mx * speed + gv[0] - tv.x) * k, 0, (mz * speed + gv[2] - tv.z) * k);
     if (p.grounded && p.jumpT <= 0) dv.y = ((STAND - ray.timeOfImpact) * 12 - tv.y) * 0.35 + HOLD * DT;
     if (p.grounded && move && pressed & BTN.JUMP && !stuck) { dv.y = 7.3 - tv.y; p.jumpT = 0.3; } // 7.3: hips rise 0.57m, a quarter over the 6.5 it was
-    // climbing: hanging off a ledge by the hands, hold jump to push yourself up until the hands are at your waist (arms
-    // pushing down on the ledge) and stay up there; push the stick toward the ledge from the top to let go and roll over it
+    // climbing: hanging off a ledge by the hands, hold jump to hoist yourself up like Gang Beasts: a lever on the hands that
+    // lifts the chest to their height (arms out in front, legs hanging) and stops there; push the stick toward the ledge
+    // from the top to let go and roll over it
     const ledge = p.grabs.reduce((y, g, i) => g?.target.isFixed() ? Math.max(y, handPos(p, i).y) : y, -Infinity);
-    p.pushUp = move && !p.grounded && ledge > -Infinity && !!(inp.b & BTN.JUMP) && !p.over;
+    p.pushUp = move && !p.grounded && ledge > -Infinity && !!(inp.b & BTN.JUMP) && !p.over
+      // not with a hand on the underside of something (a beam, held from below): there's nothing to hoist onto
+      && !p.grabs.some((g, i) => g?.target.isFixed() && world.castRay(new RAPIER.Ray(handPos(p, i), V(0, 1, 0)), 0.4, true, undefined, under(p)));
     if (p.pushUp) {
       // held just behind the hands so the chest neither swings out nor jams under the lip
       const held = p.grabs.map((g, i) => g?.target.isFixed() && handPos(p, i)).filter(Boolean), hx = held.reduce((a, h) => a + h.x, 0) / held.length, hz = held.reduce((a, h) => a + h.z, 0) / held.length;
       const to = norm(V(hx - tp.x, 0, hz - tp.z));
-      // the hands may be on the wall face: the top is found by probing down just past them
-      const probe = world.castRay(new RAPIER.Ray(V(hx + to.x * 0.2, ledge + 1, hz + to.z * 0.2), DOWN), 1.2, true, undefined, under(p));
-      const top = probe ? Math.max(ledge, ledge + 1 - probe.timeOfImpact) : ledge;
-      // and the hands work their way up the face to the lip
+      // hands just under the lip, on the wall face, slip up onto it: the top is found by probing down just past them. A
+      // probe starting inside the wall (a face with no lip in reach) finds none, and the hands stay put (they used to
+      // crawl up any wall, carrying the beast with them)
+      const probe = world.castRay(new RAPIER.Ray(V(hx + to.x * 0.2, ledge + 0.7, hz + to.z * 0.2), DOWN), 0.9, true, undefined, under(p));
+      const top = probe?.timeOfImpact > 0 ? Math.max(ledge, ledge + 0.7 - probe.timeOfImpact) : ledge;
       for (const g of p.grabs) if (g?.target.isFixed()) {
         const R = g.target.rotation(), T = g.target.translation(), w = add(qrot(R, g.j.anchor2()), T);
-        if (w.y < top - 0.02) { w.y = Math.min(top, w.y + 2 * DT); g.j.setAnchor2(qrot(qconj(R), sub(w, T))); }
+        if (w.y < top - 0.02) { w.y = Math.min(top, w.y + DT); g.j.setAnchor2(qrot(qconj(R), sub(w, T))); }
       }
-      dv.y = ((top + 0.4 - tp.y) * 6 - tv.y) * 0.5 + HOLD * DT;
+      // the chest (its middle sits 0.25 above tp) rises to the hands, eased in and at most 1.5 m/s
+      dv.y = (Math.min(1.5, Math.max(-1, (top - 0.2 - tp.y) * 5)) - tv.y) * 0.3 + HOLD * DT * HOIST_K;
       dv.x = ((hx - to.x * 0.3 - tp.x) * 4 - tv.x) * 0.3; dv.z = ((hz - to.z * 0.3 - tp.z) * 4 - tv.z) * 0.3;
-      if (tp.y > top + 0.25 && m > 0.2 && mx * to.x + mz * to.z > 0) { p.over = true; p.climb = 0.4; p.overDir = to; releaseGrabs(p); }
+      if (tp.y > top - 0.3 && m > 0.2 && mx * to.x + mz * to.z > 0) { p.over = true; p.climb = 0.6; p.overDir = to; p.overTop = top; releaseGrabs(p); }
     }
     if (p.climb > 0) { // rolling over the edge
       p.climb -= DT;
-      dv.y = (1.5 - tv.y) * 0.3 + HOLD * DT;
-      dv.x = (p.overDir.x * 3 - tv.x) * 0.4; dv.z = (p.overDir.z * 3 - tv.z) * 0.4;
+      const clear = tp.y > p.overTop + 0.2; // up from hanging at the hands until the hips clear the lip, then over it
+      dv.y = ((clear ? 1 : 2.5) - tv.y) * 0.3 + HOLD * DT;
+      dv.x = (p.overDir.x * (clear ? 3 : 0.5) - tv.x) * 0.4; dv.z = (p.overDir.z * (clear ? 3 : 0.5) - tv.z) * 0.4;
     }
-    if (p.grounded || move) for (const i of CORE) addVel(p.bodies[i], dv);
+    // hoisting, only the upper body is lifted: hips and legs hang under it by their own weight
+    if (p.grounded || move) for (const i of p.pushUp ? HOIST : CORE) addVel(p.bodies[i], dv);
 
-    // posture: hips, waist, chest and head stay upright and face the stick direction
-    const lean = p.charge > 0 || p.dash ? 0.35 : p.butt ? 0.9 * Math.sin(Math.min(1, p.butt.t / 0.25) * Math.PI) : 0, yq = qyaw(p.yaw + p.spinA), up = (p.grounded ? 0.3 : 0.15) * ctrl;
+    // posture: hips, waist, chest and head stay upright and face the stick direction (rigidly while hoisting: hanging off the
+    // shoulders, the lifted chest would otherwise swing about them)
+    const lean = p.charge > 0 || p.dash ? 0.35 : p.butt ? 0.9 * Math.sin(Math.min(1, p.butt.t / 0.25) * Math.PI) : 0, yq = qyaw(p.yaw + p.spinA), up = (p.pushUp ? 1 : p.grounded ? 0.3 : 0.15) * ctrl;
     leak = V();
     orient(Hb, yq, 10, up);
     // punching turns the shoulders into it: wound back, then the punching side drives forward (that's the reach)
@@ -631,7 +641,8 @@ export function createSim({ mapId, players, practice = false, roundsToWin = 3, l
       if (p.spin > 0) { ua = fa = add(mul(side, s), mul(bf, 0.1)); str = 0.5; fs = 0.4; }
       if (p.held[i] > 0 && !grabbing[i] && p.punch?.arm !== i) { ua = add(add(mul(bf, -0.5), mul(side, s * 0.7)), V(0, -0.3, 0)); fa = add(bf, V(0, 0.3, 0)); str = 0.6; fs = 0.7; } // cocked: elbow back and out
       if (grabbing[i] && !p.grounded) { ua = fa = add(mul(bf, 0.5), V(0, 1, 0)); str = 0.8; } // reach up for ledges
-      if (p.pushUp || p.climb > 0) { ua = fa = add(mul(bf, 0.3), DOWN); str = 0.8; } // push down on the ledge
+      if (p.pushUp) { ua = fa = add(bf, mul(DOWN, 0.3)); str = 0.1; } // loosely out in front to the hands: driven harder, they flip the chest over
+      if (p.climb > 0) { ua = fa = add(mul(bf, 0.3), DOWN); str = 0.8; } // push down on the ledge, rolling over it
       if (lift && p.grabs[i]?.vic) { ua = fa = add(V(0, 1, 0), mul(bf, 0.3)); str = 0.9; } // overhead
       const free = !p.grabs[i]?.target.isFixed() || !p.grounded; // hanging or climbing, arm momentum is what lifts the beast
       aimPart(p, ARM + i, ua, 14, str * ctrl, [p.bodies[FORE + i]], free, TWIST);

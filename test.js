@@ -3,6 +3,7 @@ import assert from 'node:assert/strict';
 import { initPhysics, createSim, BTN, STAND } from './sim.js';
 import { prepareMap } from './stages.js';
 import { packSnap, unpackSnap } from './wire.js';
+import { HIPS } from './beast.js';
 
 await initPhysics();
 Math.random = () => 0.9999; // spawn shuffle leaves the order alone, so spawns match what these checks were tuned on
@@ -199,13 +200,14 @@ function duo(mapId, players, slot, ow, extra = {}) {
   // hang off the +z edge of the floor (top y 0, edge z 5) facing it, then climb (B moved out of the way)
   for (const b of sim.players[1].bodies) { const t = b.translation(); b.setTranslation({ x: t.x, y: t.y, z: t.z - 5 }, true); }
   const p = sim.players[0], t0 = torso(sim, 0);
-  for (const b of p.bodies) { const t = b.translation(); b.setTranslation({ x: t.x - t0.x - 3, y: t.y - t0.y - 0.45, z: t.z - t0.z + 5.35 }, true); b.setLinvel({ x: 0, y: 0, z: 0 }, true); }
+  for (const b of p.bodies) { const t = b.translation(); b.setTranslation({ x: t.x - t0.x - 3, y: t.y - t0.y, z: t.z - t0.z + 5.4 }, true); b.setLinvel({ x: 0, y: 0, z: 0 }, true); }
   p.yaw = Math.PI;
   run(sim, 40, () => sim.setInput(0, { x: 0, z: 0, b: (BTN.LEFT | BTN.RIGHT) }));
   assert.ok(p.grabs.every(Boolean), 'hangs by both hands');
-  // hold jump: pushes up until the hands are at the waist, and stays there
+  // hold jump: hoists the chest up to the hands (its middle sits 0.25 above torso()) and stops there, legs hanging
   run(sim, 60, () => sim.setInput(0, { x: 0, z: 0, b: BTN.LEFT | BTN.RIGHT | BTN.JUMP }));
-  assert.ok(p.grabs.every(Boolean) && torso(sim, 0).y > 0.3, `pushes up on the ledge ${torso(sim, 0).y.toFixed(2)}`);
+  const hipsY = p.bodies[HIPS].translation().y;
+  assert.ok(p.grabs.every(Boolean) && Math.abs(torso(sim, 0).y + 0.2) < 0.15 && hipsY < torso(sim, 0).y - 0.1, `hoists up to the hands ${torso(sim, 0).y.toFixed(2)} hips ${hipsY.toFixed(2)}`);
   // push toward the ledge (-z): rolls over it
   run(sim, 60, () => sim.setInput(0, { x: 0, z: -1, b: BTN.LEFT | BTN.RIGHT | BTN.JUMP }));
   assert.ok(p.alive && torso(sim, 0).y > 0.3 && torso(sim, 0).z < 5, `climbs onto the ledge ${JSON.stringify(torso(sim, 0))}`);
