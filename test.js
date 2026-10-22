@@ -208,8 +208,10 @@ function duo(mapId, players, slot, ow, extra = {}) {
   run(sim, 60, () => sim.setInput(0, { x: 0, z: 0, b: BTN.LEFT | BTN.RIGHT | BTN.JUMP }));
   const hipsY = p.bodies[HIPS].translation().y;
   assert.ok(p.grabs.every(Boolean) && Math.abs(torso(sim, 0).y + 0.2) < 0.15 && hipsY < torso(sim, 0).y - 0.1, `hoists up to the hands ${torso(sim, 0).y.toFixed(2)} hips ${hipsY.toFixed(2)}`);
-  // push toward the ledge (-z): rolls over it
-  run(sim, 60, () => sim.setInput(0, { x: 0, z: -1, b: BTN.LEFT | BTN.RIGHT | BTN.JUMP }));
+  // push toward the ledge (-z): still holding on, the legs swing up over it; then let go onto it
+  run(sim, 90, () => sim.setInput(0, { x: 0, z: -1, b: BTN.LEFT | BTN.RIGHT | BTN.JUMP }));
+  assert.ok(p.grabs.every(Boolean) && p.bodies[HIPS].translation().y > 0.1, `swings the legs up over the edge ${p.bodies[HIPS].translation().y.toFixed(2)}`);
+  run(sim, 60, () => sim.setInput(0, { x: 0, z: -1, b: 0 }));
   assert.ok(p.alive && torso(sim, 0).y > 0.3 && torso(sim, 0).z < 5, `climbs onto the ledge ${JSON.stringify(torso(sim, 0))}`);
   console.log('headbutt + lie down + climb ok');
 }
