@@ -382,7 +382,7 @@ export function createSim({ mapId, players, practice = false, roundsToWin = 3, l
     if (!o) return;
     fx('rage', o.o.bodies[TORSO].translation(), Math.atan2(f.x, f.z), p.slot, o.o.slot);
     if (local >= 0) return;
-    hit(o.o, TORSO, add(mul(f, 5), V(0, 2, 0)), 12);
+    hit(o.o, TORSO, add(mul(f, 7.5), V(0, 3, 0)), 12);
     p.kick = { vic: o.o, f, t: 0.8, hit: new Set([p, o.o]) };
   }
 
@@ -439,9 +439,9 @@ export function createSim({ mapId, players, practice = false, roundsToWin = 3, l
     p.fling = 0.3;
     // a prediction copy picks from the stand-ins (placed at their hips) to show the throw at once
     const [o] = ps.filter(o => o !== p && live(o)).map(o => ({ o, d: sub(seen(p, o), t) }))
-      .filter(({ d }) => Math.hypot(d.x, d.z) < 1.6 && Math.abs(d.y) < 1).sort((a, b) => len(a.d) - len(b.d));
+      .filter(({ d }) => Math.hypot(d.x, d.z) < 2 && Math.abs(d.y) < 1).sort((a, b) => len(a.d) - len(b.d));
     if (!o) return;
-    const n = Math.hypot(o.d.x, o.d.z) || 1;
+    const n =Math.hypot(o.d.x, o.d.z) || 1;
     fx('fling', add(o.o.bodies[TORSO].translation(), V(0, local >= 0 ? 0.45 : 0, 0)), 0, p.slot, o.o.slot);
     if (local >= 0) return;
     hit(o.o, TORSO, V(-o.d.x / n * 9, 10, -o.d.z / n * 9), 25);
@@ -547,14 +547,14 @@ export function createSim({ mapId, players, practice = false, roundsToWin = 3, l
     }
     if (p.leap) { // Thresh's Death Sentence recast: reeled along the chain all the way to them. Lee Sin's knocks them back
       const q = ps[p.leap.slot], d = q && live(q) && sub(q.bodies[TORSO].translation(), tp);
-      if (p.leap.lee && d) { if (len(d) < 1.2) hit(q, TORSO, add(mul(norm(V(d.x, 0, d.z)), 8), V(0, 3, 0)), 0); else p.yaw = Math.atan2(d.x, d.z); }
+      if (p.leap.lee && d) { if (len(d) < 1.2) hit(q, TORSO, add(mul(norm(V(d.x, 0, d.z)), 6), V(0, 2.25, 0)), 0); else p.yaw = Math.atan2(d.x, d.z); }
       if (!d || len(d) < 1.2 || (p.leap.t += DT) > 1) p.leap = null;
       else { const v = add(mul(d, 14 / len(d)), V(0, 0.8, 0)); for (const b of p.bodies) b.setLinvel(v, true); p.jumpT = 0.1; }
     }
     if (p.dash) { speed = 11; mx = f.x; mz = f.z; if ((p.dash.t -= DT) <= 0) p.dash = null; }
     if (p.kick && (p.kick.t -= DT) > 0 && p.kick.vic.alive) { // Dragon's Rage: the champ he kicked bowls over whoever they hit
       const kt = p.kick.vic.bodies[TORSO].translation();
-      for (const o of ps) if (o.alive && !p.kick.hit.has(o) && len(sub(o.bodies[TORSO].translation(), kt)) < 0.9) { p.kick.hit.add(o); hit(o, TORSO, add(mul(p.kick.f, 4), V(0, 1.5, 0)), 10); }
+      for (const o of ps) if (o.alive && !p.kick.hit.has(o) && len(sub(o.bodies[TORSO].translation(), kt)) < 0.9) { p.kick.hit.add(o); hit(o, TORSO, add(mul(p.kick.f, 6), V(0, 2.25, 0)), 10); }
     } else p.kick = null;
     // Sett Q: hold to plant and wind up, let go (or hold past 3 s) to throw it
     if (p.hay > 0) {
