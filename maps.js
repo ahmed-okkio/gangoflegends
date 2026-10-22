@@ -66,6 +66,7 @@ export const MAPS = {
     name: 'Subway',
     blurb: 'An underground platform between two tracks. Mind the gap.',
     gb: 'subway',
+    view: { cam: { pitch: 32, min: 11, max: 20 } }, // Gang Beasts' camera sits 5 up and 8 back (32 degrees); closer than Girders' by eye
     killY: -6,
     boxes: [box(3.5, -0.2, 0, 8, 0.2, 3, 'plate')],
     rollers: [], kill: [],
