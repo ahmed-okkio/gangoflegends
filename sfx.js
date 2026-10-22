@@ -3,6 +3,7 @@ import { xhr } from './stages.js';
 
 const ctx = typeof AudioContext !== 'undefined' ? new AudioContext() : null;
 const base = './gbcache/audio/';
+const LAUGHS = [0, 1, 2, 3, 4, 5].map(i => `./assets/sfx/laugh_${i}.wav`); // our own (tools/custom_laughs.py), mixed in with GB's
 const VOLUME = 0.3; // GB clips are mastered hot: the slider's 100% is this
 let volume = 1;
 export const setVolume = v => { volume = v; };
@@ -12,6 +13,7 @@ const buffers = {}; // file -> Promise<AudioBuffer>
 export async function loadSfx() {
   if (!ctx || Object.keys(index).length) return;
   try { index = JSON.parse(await xhr(base + 'index.json', 'text')); } catch { /* not imported */ }
+  for (const g of ['fall', 'win']) index[g] = [...index[g] ?? [], ...LAUGHS];
 }
 
 export function play(group, vol = 1, rate = 0.92 + Math.random() * 0.16) {
@@ -19,7 +21,7 @@ export function play(group, vol = 1, rate = 0.92 + Math.random() * 0.16) {
   if (!ctx || !list?.length) return;
   if (ctx.state === 'suspended') ctx.resume();
   const file = list[Math.floor(Math.random() * list.length)];
-  buffers[file] ??= xhr(base + file, 'arraybuffer').then(b => ctx.decodeAudioData(b));
+  buffers[file] ??= xhr(file.startsWith('./') ? file : base + file, 'arraybuffer').then(b => ctx.decodeAudioData(b));
   buffers[file].then(buf => {
     const src = ctx.createBufferSource(), g = ctx.createGain();
     src.buffer = buf; src.playbackRate.value = rate; g.gain.value = vol * VOLUME * volume;

@@ -5,3 +5,4 @@ release/
 dist/
 worker/secrets.json
 worker/.wrangler/
+assets/custom_sfx/
