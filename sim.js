@@ -39,6 +39,7 @@ const turnToward = (a, b, max) => a + Math.max(-max, Math.min(max, wrap(b - a)))
 // --- ragdoll: the Gang Beasts beast (beast.js). Part index = body index everywhere; bodies[0] is the chest. ---
 const TORSO = CHEST;
 const CORE = [HIPS, WAIST, CHEST, HEAD, THIGH, THIGH + 1, LEG, LEG + 1]; // moved as one by the locomotion; arms hang off it
+const LEAPS = ['sentence', 'sonic']; // abilities whose recast flies you to whoever they caught (Thresh Q, Lee Sin Q)
 const HOIST = [WAIST, CHEST]; // lifted by a hoist, carrying the whole core's weight; hips and legs hang off it
 const HOIST_K = CORE.reduce((m, i) => m + PARTS[i].mass, 0) / HOIST.reduce((m, i) => m + PARTS[i].mass, 0);
 const HOLD = 20; // m/s^2 lift on the core (= gravity), so the hover spring only has to hold up the hanging arms
@@ -155,7 +156,7 @@ export function createSim({ mapId, players, practice = false, roundsToWin = 3, l
       alive: true, yaw, daze: 0, sinceHit: 9, ko: 0, cd: [0, 0], punch: null, punchCd: 0, grabs: [null, null], held: [0, 0],
       stun: 0, spin: 0, spinHit: null, charge: 0, empower: 0, jumpT: 0, phase: 0, grounded: false, prevB: p.input.b,
       butt: null, buttCd: 0, lying: false, safe: 0, hooked: 0, spinA: 0, chargeT: 0,
-      emp: null, dash: null, vault: 0, vaultBtn: 0, hay: 0, hayBtn: 0, fb: 0, pulv: 0, flay: 0, fling: 0, tether: null, leap: null, dizzy: 0,
+      emp: null, dash: null, vault: 0, vaultBtn: 0, hay: 0, hayBtn: 0, fb: 0, pulv: 0, flay: 0, fling: 0, tether: null, leap: null, dizzy: 0, kick: null, kickA: 0,
     });
   }
 
@@ -342,11 +343,11 @@ export function createSim({ mapId, players, practice = false, roundsToWin = 3, l
   function useAbility(p, i) {
     const ab = CHAMPS[p.champ].abilities[i];
     if (ab.id === 'charge' && p.charge > 0) { p.charge = 0; return; } // recast ends the charge early
-    if (ab.id === 'sentence' && p.tether != null) return leap(p); // recast while chained: leap to them
+    if (LEAPS.includes(ab.id) && p.tether != null) return leap(p); // recast while they're caught / marked: fly to them
     if (p.cd[i] > 0) return;
     p.cd[i] = ab.cd;
     const f = facing(p), t = p.bodies[TORSO].translation(), btn = i ? BTN.A2 : BTN.A1;
-    if (ab.id === 'hook' || ab.id === 'sentence') hooks.push({ o: p, pos: add(add(t, mul(f, 0.7)), V(0, 0.2, 0)), dir: f, t: 0, vic: null, pull: 0, thresh: ab.id === 'sentence' });
+    if (ab.id === 'hook' || LEAPS.includes(ab.id)) hooks.push({ o: p, pos: add(add(t, mul(f, 0.7)), V(0, 0.2, 0)), dir: f, t: 0, vic: null, pull: 0, thresh: ab.id === 'sentence', lee: ab.id === 'sonic' });
     else if (ab.id === 'fist') { p.empower = 4; p.emp = 'launch'; }
     else if (ab.id === 'rampage') { p.spin = SPIN; p.spinHit = new Set(); }
     else if (ab.id === 'charge') { p.charge = CHARGE; p.chargeT = 0; }
@@ -359,6 +360,21 @@ export function createSim({ mapId, players, practice = false, roundsToWin = 3, l
     else if (ab.id === 'adhesive') adhesive(p, f, t, ab);
     else if (ab.id === 'fling') fling(p, t);
     else if (ab.id === 'headbutt') { p.dash = { t: 0.25, power: 1, ali: true }; fx('swing', t, 0, p.slot); }
+    else if (ab.id === 'rage') rage(p, f, t);
+  }
+
+  // Lee Sin E (his ult, Dragon's Rage, toned down to use often): kick the champ in front of him back. Whoever they crash
+  // into on the way is knocked back too (control())
+  function rage(p, f, t) {
+    p.kickA = 0.3;
+    fx('swing', t, 0, p.slot);
+    const [o] = ps.filter(o => o !== p && live(o)).map(o => ({ o, d: sub(seen(p, o), t) }))
+      .filter(({ d }) => Math.hypot(d.x, d.z) < 1.8 && dot(d, f) > 0 && Math.abs(d.y) < 1).sort((a, b) => len(a.d) - len(b.d));
+    if (!o) return;
+    fx('rage', o.o.bodies[TORSO].translation(), Math.atan2(f.x, f.z), p.slot, o.o.slot);
+    if (local >= 0) return;
+    hit(o.o, TORSO, add(mul(f, 10), V(0, 4, 0)), 25);
+    p.kick = { vic: o.o, f, t: 0.8, hit: new Set([p, o.o]) };
   }
 
   // Sett E: yank everyone close on both sides into him and stun them; caught from both sides at once stuns for longer
@@ -374,13 +390,13 @@ export function createSim({ mapId, players, practice = false, roundsToWin = 3, l
       if (o.ko <= 0 && o.safe <= 0) { o.stun = Math.max(o.stun, both ? 1.5 : 0.6); cancel(o); } // timed right, it stops a dash (Vi Q) mid-flight
     }
   }
-  // Thresh Q recast: fly at whoever the chain is on
+  // Thresh Q / Lee Sin Q recast: fly at whoever the chain is on (Lee: whoever the wave marked)
   function leap(p) {
     const q = ps[p.tether], t = p.bodies[TORSO].translation();
     p.tether = null;
     hooks = hooks.filter(h => h.o !== p);
     if (!q || !live(q)) return;
-    p.leap = { slot: q.slot, t: 0 }; // reeled in until he reaches them (control())
+    p.leap = { slot: q.slot, t: 0, lee: p.champ === 'lee' }; // reeled in until he reaches them (control())
     fx('swing', t, 0, p.slot);
   }
   // Thresh E: sweep the chain through a line on both sides of him, flinging everyone in it away from where he aimed:
@@ -499,8 +515,8 @@ export function createSim({ mapId, players, practice = false, roundsToWin = 3, l
           if (pressed & btn) { if (abs[i].lock && aim != null && p.cd[i] <= 0) p.yaw = aim; useAbility(p, i); }
           continue;
         }
-        if (pressed & btn && abs[i].id === 'sentence' && p.tether != null) { useAbility(p, i); continue; } // recast: no aiming
-        const flying = abs[i].id === 'sentence' && hooks.find(h => h.o === p && !h.vic);
+        if (pressed & btn && LEAPS.includes(abs[i].id) && p.tether != null) { useAbility(p, i); continue; } // recast: no aiming
+        const flying = LEAPS.includes(abs[i].id) && hooks.find(h => h.o === p && !h.vic);
         if (pressed & btn && flying) { flying.leap = true; continue; } // recast before it caught (a ping's worth early): leap when it does
         if (pressed & btn && p.cd[i] <= 0) p.aimBtn |= btn;
         if (p.aimBtn & btn && !(inp.b & btn)) { p.aimBtn &= ~btn; if (aim != null) p.yaw = aim; useAbility(p, i); }
@@ -520,18 +536,23 @@ export function createSim({ mapId, players, practice = false, roundsToWin = 3, l
       if (move && inp.b & p.vaultBtn && p.vault < 4.25) { p.vault += DT; speed *= 0.35; }
       else { const w = Math.min(p.vault, 1.25); p.dash = { t: 0.2 + w * 0.3, power: w / 1.25 }; p.vault = 0; }
     }
-    if (p.leap) { // Thresh's Death Sentence recast: reeled along the chain all the way to them
+    if (p.leap) { // Thresh's Death Sentence recast: reeled along the chain all the way to them. Lee Sin's knocks them back
       const q = ps[p.leap.slot], d = q && live(q) && sub(q.bodies[TORSO].translation(), tp);
+      if (p.leap.lee && d && len(d) < 1.2) hit(q, TORSO, add(mul(norm(V(d.x, 0, d.z)), 8), V(0, 3, 0)), 0);
       if (!d || len(d) < 1.2 || (p.leap.t += DT) > 1) p.leap = null;
       else { const v = add(mul(d, 14 / len(d)), V(0, 0.8, 0)); for (const b of p.bodies) b.setLinvel(v, true); p.jumpT = 0.1; }
     }
     if (p.dash) { speed = 11; mx = f.x; mz = f.z; if ((p.dash.t -= DT) <= 0) p.dash = null; }
+    if (p.kick && (p.kick.t -= DT) > 0 && p.kick.vic.alive) { // Dragon's Rage: the champ he kicked bowls over whoever they hit
+      const kt = p.kick.vic.bodies[TORSO].translation();
+      for (const o of ps) if (o.alive && !p.kick.hit.has(o) && len(sub(o.bodies[TORSO].translation(), kt)) < 0.9) { p.kick.hit.add(o); hit(o, TORSO, add(mul(p.kick.f, 8), V(0, 3, 0)), 20); }
+    } else p.kick = null;
     // Sett Q: hold to plant and wind up, let go (or hold past 3 s) to throw it
     if (p.hay > 0) {
       if (move && inp.b & p.hayBtn && p.hay < 3) { p.hay += DT; speed = 0; }
       else { if (move) haymaker(p, f, tp, hayK(p)); p.hay = 0; }
     }
-    p.fb -= DT; p.pulv -= DT; p.flay -= DT; p.fling -= DT;
+    p.fb -= DT; p.pulv -= DT; p.flay -= DT; p.fling -= DT; p.kickA -= DT;
     const stuck = glued(p, tp);
     if (stuck) speed *= 0.3;
     if (lying) speed = 1.2; // crawl
@@ -650,8 +671,9 @@ export function createSim({ mapId, players, practice = false, roundsToWin = 3, l
       aimPart(p, ARM + i, ua, 14, str * ctrl, [p.bodies[FORE + i]], free, TWIST);
       aimPart(p, FORE + i, fa, 14, str * fs * ctrl, [], free, TWIST);
       // legs: thighs swing, shins fold back on the up-swing
-      aimPart(p, THIGH + i, sw ?? add(DOWN, mul(bf, swing * 0.7 * gait)), 14, 0.5 * ctrl, [p.bodies[LEG + i]]);
-      aimPart(p, LEG + i, sw ?? add(DOWN, mul(bf, (swing * 0.7 - Math.max(0, Math.cos(p.phase + i * Math.PI)) * 0.9) * gait)), 14, 0.5 * ctrl);
+      const kick = i && p.kickA > 0 && add(bf, V(0, 0.4, 0)); // Dragon's Rage: the right leg snaps up in front
+      aimPart(p, THIGH + i, kick || sw || add(DOWN, mul(bf, swing * 0.7 * gait)), 14, (kick ? 1 : 0.5) * ctrl, [p.bodies[LEG + i]]);
+      aimPart(p, LEG + i, kick || sw || add(DOWN, mul(bf, (swing * 0.7 - Math.max(0, Math.cos(p.phase + i * Math.PI)) * 0.9) * gait)), 14, (kick ? 1 : 0.5) * ctrl);
     }
     tone(p, p.ko > 0 || p.hooked > 0);
     const back = mul(leak, -1 / p.bodies.reduce((m, b) => m + b.mass(), 0));
@@ -768,21 +790,23 @@ export function createSim({ mapId, players, practice = false, roundsToWin = 3, l
         h.pos = add(h.pos, mul(h.dir, 28 * DT));
         const [first] = playersNearSeen(h.o, h.pos, 0.4);
         if (first) {
-          h.vic = first.vic; hit(first.vic, first.part, V(), 25);
-          if (local < 0) cancel(h.vic);
+          h.vic = first.vic;
+          if (h.lee) fx('sonic', first.vic.bodies[TORSO].translation(), 0, h.o.slot, h.vic.slot); // marked: nothing else, till he recasts
+          else { hit(first.vic, first.part, V(), 25); if (local < 0) cancel(h.vic); }
           if (h.leap) { h.o.tether = h.vic.slot; leap(h.o); return false; } // recast while it flew: straight to them
         }
         return h.vic || h.t < 0.42;
       }
       // what my copy's hook caught is the host's call: it just stays on the stand-in until the host's catch is on screen
       // (game.js). ponytail: 0.6s, about the longest that takes; after a miss the host's sees it shown that long
-      if (local >= 0) { h.pos = add(h.vic.bodies[TORSO].translation(), V(0, 0.45, 0)); if (h.thresh) h.o.tether = h.vic.slot; return (h.pull += DT) < 0.6; }
+      if (local >= 0) { h.pos = add(h.vic.bodies[TORSO].translation(), V(0, 0.45, 0)); if (h.thresh || h.lee) h.o.tether = h.vic.slot; return (h.pull += DT) < (h.lee ? 3 : 0.6); }
       h.pull += DT;
-      if (h.thresh) { // a short tug toward Thresh, then just the chain until it times out or he leaps
-        if (!h.vic.alive || !h.o.alive || h.pull > 2) { h.o.tether = null; return false; }
+      if (h.thresh || h.lee) { // Thresh: a short tug toward him, then just the chain until it times out or he leaps. Lee: the mark
+        if (!h.vic.alive || !h.o.alive || h.pull > (h.lee ? 3 : 2)) { h.o.tether = null; return false; }
         h.o.tether = h.vic.slot;
         const vp = h.vic.bodies[TORSO].translation(), to = sub(h.o.bodies[TORSO].translation(), vp), d = len(to);
         h.pos = vp;
+        if (h.lee) return true;
         h.vic.hooked = 0.1; // limp and helpless for as long as the chain holds, like Blitzcrank's hook
         if (h.pull < 0.12 && d > 1.4) { const v = add(mul(to, 6 / d), V(0, 1, 0)); for (const b of h.vic.bodies) b.setLinvel(v, true); }
         return true;
@@ -834,7 +858,7 @@ export function createSim({ mapId, players, practice = false, roundsToWin = 3, l
   function sync(s, e) {
     st = s.st;
     glue = (s.g ?? []).map(([x, y, z, t, r, team]) => ({ x, y, z, t, r, team }));
-    me.tether = hooks.find(h => h.vic && h.thresh)?.vic.slot ?? null; // my copy's catch, until the host's own shows
+    me.tether = hooks.find(h => h.vic && (h.thresh || h.lee))?.vic.slot ?? null; // my copy's catch, until the host's own shows
     for (const h of s.h ?? []) if (h[0] === local && h[4] >= 0) me.tether = h[4];
     for (const e of s.p) if (ps[e[0]] && ps[e[0]] !== me) ps[e[0]].seen = !!e[1];
     s.ch?.forEach((c, i) => { if (CHAMPS[c]) ps[i].champ = c; });
@@ -964,7 +988,7 @@ export function createSim({ mapId, players, practice = false, roundsToWin = 3, l
         const flags = (p.spin > 0) | (p.charge > 0) << 1 | (p.empower > 0) << 2 | (p.grabs.some(Boolean)) << 3 | (p.ko > 0) << 4 | (p.safe > 0) << 5 | (p.vault > 0 || p.hay > 0) << 6
           | (p.grabs.some(g => g?.vic) || ps.some(q => q.grabs?.some(g => g?.vic === p))) << 7 // holding or held by a champ
           | (p.dizzy > 0) << 8 // stunned on their feet (stars)
-          | (!!p.dash || !!p.leap || !!p.butt || p.fb > 0 || p.pulv > 0 || p.flay > 0 || p.fling > 0 || !!p.lifted) << 9; // GB mode: a move only the host plays
+          | (!!p.dash || !!p.leap || !!p.butt || p.fb > 0 || p.pulv > 0 || p.flay > 0 || p.fling > 0 || p.kickA > 0 || !!p.lifted) << 9; // GB mode: a move only the host plays
         // hips position + every part's rotation; clients rebuild the other positions from the joint anchors (beast.js fk)
         const t = p === me ? add(p.bodies[HIPS].translation(), smooth) : p.bodies[HIPS].translation();
         const out = [p.slot, 1, Math.round(p.daze), flags, Math.ceil(p.cd[0] * 10), Math.ceil(p.cd[1] * 10), r2(t.x), r2(t.y), r2(t.z)];
@@ -974,7 +998,7 @@ export function createSim({ mapId, players, practice = false, roundsToWin = 3, l
         out.push(Math.round(hayK(p) * 100), r2(v.x), r2(v.y), r2(v.z), p.ack, r2(Math.max(0, p.stun)), p.hooked > 0 ? 1 : 0, r2(Math.max(0, p.ko)), r2(p.yaw));
         return out;
       }),
-      h: hooks.map(h => [h.o.slot, r2(h.pos.x), r2(h.pos.y), r2(h.pos.z), h.thresh && h.vic ? h.vic.slot : -1, h.vic ? 1 : 0]), // ..., caught
+      h: hooks.map(h => [h.o.slot, r2(h.pos.x), r2(h.pos.y), r2(h.pos.z), (h.thresh || h.lee) && h.vic ? h.vic.slot : -1, h.vic ? 1 : 0]), // ..., caught
       g: glue.map(g => [r2(g.x), r2(g.y), r2(g.z), r2(g.t), g.r, g.team]),
       ch: ps.map(p => p.champ),
     };

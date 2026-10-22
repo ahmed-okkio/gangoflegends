@@ -365,6 +365,42 @@ function duo(mapId, players, slot, ow, extra = {}) {
   console.log('thresh ok', gap0.toFixed(2), gap1.toFixed(2), gap2.toFixed(2));
 }
 
+// 10f. Lee Sin: the wave marks whoever it hits without hurting them; recast flies him to them and knocks them back.
+// Dragon's Rage kicks the champ in front back, and whoever they crash into goes too
+{
+  const tap = (sim, b, a) => run(sim, 2, i => sim.setInput(0, { x: 0, z: 0, b: i ? 0 : b, a }));
+  const idle = sim => () => sim.setInput(0, { x: 0, z: 0, b: 0 });
+  let sim = near('lee', 'blitz');
+  run(sim, 90);
+  lineUp(sim, 5);
+  const [lee, b] = sim.players, x0 = torso(sim, 1).x;
+  tap(sim, BTN.A1, Math.PI / 2);
+  run(sim, 30, idle(sim));
+  assert.ok(lee.tether === 1 && b.daze === 0 && Math.abs(torso(sim, 1).x - x0) < 0.3, `marked, unhurt, not moved (${b.daze}, ${(torso(sim, 1).x - x0).toFixed(2)})`);
+  tap(sim, BTN.A1, Math.PI / 2);
+  run(sim, 50, idle(sim));
+  const gap = torso(sim, 1).x - torso(sim, 0).x;
+  assert.ok(lee.tether == null && torso(sim, 1).x > x0 + 1 && torso(sim, 0).x > x0 - 3 && b.daze === 0, `flies to them, knocks them back (${(torso(sim, 1).x - x0).toFixed(2)}, gap ${gap.toFixed(2)})`);
+  sim = near('lee', 'blitz'); // left marked, it wears off after 3s
+  run(sim, 90);
+  lineUp(sim, 5);
+  tap(sim, BTN.A1, Math.PI / 2);
+  run(sim, 200, idle(sim));
+  assert.ok(sim.players[0].tether == null, 'the mark wears off');
+  sim = createSim({ mapId: 'grind', practice: true, players: [
+    { id: 'a', name: 'A', champ: 'lee', team: 0 }, { id: 'b', name: 'B', champ: 'hec', team: 1 }, { id: 'c', name: 'C', champ: 'blitz', team: 2 }] });
+  run(sim, 90);
+  lineUp(sim, 1.2);
+  const c = sim.players[2], bt = torso(sim, 1), ct = c.bodies[0].translation(), bx = bt.x, cx = bt.x + 1.5;
+  for (const p of c.bodies) { const t = p.translation(); p.setTranslation({ x: t.x - ct.x + cx, y: t.y, z: t.z - ct.z + bt.z }, true); }
+  run(sim, 20, idle(sim));
+  tap(sim, BTN.A2);
+  run(sim, 40, idle(sim));
+  assert.ok(sim.players[1].daze > 0 && torso(sim, 1).x > bx + 1.5, `kicks them back (${(torso(sim, 1).x - bx).toFixed(2)})`);
+  assert.ok(c.daze > 0 && torso(sim, 2).x > cx + 0.5, `and whoever they crash into (${c.daze}, ${(torso(sim, 2).x - cx).toFixed(2)})`);
+  console.log('lee ok', gap.toFixed(2));
+}
+
 // 10f. Singed: glue slows and grounds whoever's in it; Fling throws the champ beside him over to his other side
 {
   let sim = near('singed', 'blitz');

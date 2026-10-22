@@ -248,7 +248,22 @@ def singed_goggles():  # head frame: a strap round the head and two big round le
     for x in (-0.08, 0.08):
         cyl(BRONZE(), 0.06, 0.05, (x, 0.22, 0.25), (0, 0, 1)); cyl(CHEM(), 0.045, 0.055, (x, 0.22, 0.255), (0, 0, 1))
 
+# ---------------- Lee Sin: the Blind Monk, a red blindfold knotted at the back, wrapped hands ----------------
+CLOTH = lambda: mat("cloth_red", (0.72, 0.07, 0.06), 0.85)
+WRAPS = lambda: mat("wraps", (0.88, 0.84, 0.74), 0.9)
+
+def lee_blindfold():  # head frame (skull centre y .165, z .057, r .21): a band over the eyes, a knot at the back and two tails
+    cyl(CLOTH(), 0.218, 0.075, (0, 0.205, 0.057))
+    ball(CLOTH(), 0.035, (0, 0.205, -0.165), (1.4, 1, 0.8))
+    for s in (1, -1):  # tails hanging down and back, broad side to the back
+        box(CLOTH(), (0.06, 0.22, 0.014), (s * 0.04, 0.1, -0.24), 0.006, tilt=(26, 0, s * 12))
+
+def lee_wrap():  # forearm frame (hand at y -.337): bandages wound round the wrist
+    cyl(WRAPS(), 0.056, 0.14, (0, -0.25, 0))
+    for k, y in enumerate((-0.2, -0.25, -0.3)): ring(WRAPS(), 0.058, 0.009, (0, y, 0), ((-1) ** k * 0.25, 1, 0))
+
 PROPS = {
+    "leesin_blindfold": lee_blindfold, "leesin_wrap": lee_wrap,
     "thresh_crown": thresh_crown, "thresh_pauldrons": thresh_pauldrons, "thresh_lantern": thresh_lantern, "singed_tank": singed_tank, "singed_goggles": singed_goggles,
     "alistar_horns": ali_horns, "alistar_cuff": ali_cuff,
     "blitzcrank_core": blitz_core, "blitzcrank_gauntletL": lambda: blitz_gauntlet(1), "blitzcrank_gauntletR": lambda: blitz_gauntlet(-1),
@@ -264,7 +279,8 @@ PIVOT = {"core": (0, 0.6347, -0.0101), "blade": (0, 1.0693, 0.0247), "tail": (0,
          "hoofHand": (0.2015, 0.6711, -0.0433), "hoofFoot": (0.239, 0.1201, 0.0057),
          "hair": (0, 1.0693, 0.0247), "jacket": (0, 0.6347, -0.0101), "sleeve": (0.2015, 0.9447, -0.0425), "fist": (0.2015, 0.6711, -0.0433),
          "horns": (0, 1.0693, 0.0247), "cuff": (0.2015, 0.6711, -0.0433), "crown": (0, 1.0693, 0.0247), "pauldrons": (0, 0.6347, -0.0101), "lantern": (0.2015, 0.6711, -0.0433),
-         "tank": (0, 0.6347, -0.0101), "goggles": (0, 1.0693, 0.0247)}
+         "tank": (0, 0.6347, -0.0101), "goggles": (0, 1.0693, 0.0247),
+         "blindfold": (0, 1.0693, 0.0247), "wrap": (0.2015, 0.6711, -0.0433)}
 
 def mannequin(dx):
     grey = mat("beast", (0.62, 0.6, 0.58), 0.6)
@@ -290,13 +306,13 @@ if preview:
     sc.render.engine = "BLENDER_WORKBENCH"; sc.display.shading.light = "STUDIO"; sc.display.shading.color_type = "MATERIAL"
     sc.display.shading.show_cavity = True; sc.display.shading.show_shadows = True
     sc.render.resolution_x, sc.render.resolution_y = 1800, 900
-    for champ, dx in (("blitzcrank", -2.2), ("hecarim", -1.1), ("vi", 0), ("sett", 1.1), ("alistar", 2.2), ("thresh", 3.3), ("singed", 4.4)):
+    for champ, dx in (("blitzcrank", -2.2), ("hecarim", -1.1), ("vi", 0), ("sett", 1.1), ("alistar", 2.2), ("thresh", 3.3), ("singed", 4.4), ("leesin", 5.5)):
         mannequin(dx)
         for name, ob in built.items():
             if name.startswith(champ): ob.location = B(Vector(PIVOT[name.split("_")[1]]) + Vector((dx, 0, 0)))
     cam = bpy.data.objects.new("cam", bpy.data.cameras.new("cam")); sc.collection.objects.link(cam); sc.camera = cam
-    cam.data.type = "ORTHO"; cam.data.ortho_scale = 8
+    cam.data.type = "ORTHO"; cam.data.ortho_scale = 9
     for view, d in (("front", (0.0, 0.25, 1)), ("three_quarter", (0.8, 0.35, 0.9)), ("back", (-0.5, 0.3, -1))):
-        target = B((1.1, 0.75, 0)); cam.location = target + B(Vector(d).normalized() * 6)
+        target = B((1.65, 0.75, 0)); cam.location = target + B(Vector(d).normalized() * 6)
         cam.rotation_euler = (target - cam.location).to_track_quat("-Z", "Y").to_euler()
         sc.render.filepath = os.path.join(out, f"preview_{view}.png"); bpy.ops.render.render(write_still=True)

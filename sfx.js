@@ -64,5 +64,7 @@ export function playEvents(events) {
     else if (kind === 'flay') { play('swing', 0.9); play('grab', 0.5); }
     else if (kind === 'glue') play('body', 0.7);
     else if (kind === 'fling') { play('grab', 0.7); play('swing', 0.8); }
+    else if (kind === 'sonic') { play('swing', 0.6); play('hit', 0.4); }
+    else if (kind === 'rage') play('swing', 0.9);
   }
 }

@@ -49,6 +49,13 @@ export const CHAMPS = {
       { id: 'fling', name: 'Fling', cd: 7, desc: 'Grab the champ next to you and hurl them over your head behind you.' },
     ],
   },
+  lee: {
+    name: 'Lee Sin', title: 'The Blind Monk', body: '#e0ad7e', limb: '#b8845a', eyes: '#ffd27a', glow: '#5fb8ff',
+    abilities: [
+      { id: 'sonic', name: 'Sonic Wave', cd: 8, aim: 12.5, release: true, desc: 'Hold to aim at your cursor, let go to send out a wave. It marks the first champ it hits for 3s: press again to fly to them and knock them back.' },
+      { id: 'rage', name: "Dragon's Rage", cd: 6, desc: 'Kick the champ in front of you back. Anyone they crash into gets knocked back too.' },
+    ],
+  },
 };
 
 export const TEAM_COLORS = ['#ff4d5e', '#3d8bff', '#2ecc71', '#ffc93c'];
