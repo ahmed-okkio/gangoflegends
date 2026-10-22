@@ -3,7 +3,7 @@ import { xhr } from './stages.js';
 
 const ctx = typeof AudioContext !== 'undefined' ? new AudioContext() : null;
 const base = './gbcache/audio/';
-const LAUGHS = [0, 1, 2, 3, 4, 5].map(i => `./assets/sfx/laugh_${i}.wav`); // our own (tools/custom_laughs.py), mixed in with GB's
+const LAUGHS = [0, 1, 2].map(i => `./assets/sfx/laugh_${i}.wav`); // our own (tools/custom_laughs.py), mixed in with GB's
 const VOLUME = 0.3; // GB clips are mastered hot: the slider's 100% is this
 let volume = 1;
 export const setVolume = v => { volume = v; };

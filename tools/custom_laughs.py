@@ -1,5 +1,5 @@
 # Custom laughs: assets/custom_sfx/*.wav (raw recordings, git-ignored, not shipped) -> assets/sfx/laugh_N.wav, each
-# recording pitched up and down (same length) with a matching tone, trimmed and brought up to the Gang Beasts laughs' loudness.
+# recording pitched up (same length) with a brighter tone, trimmed and brought up to the Gang Beasts laughs' loudness.
 # sfx.js mixes them into the 'fall' and 'win' laughs.  usage: python tools/custom_laughs.py [path to ffmpeg]
 import glob, os, re, subprocess, sys
 
@@ -9,7 +9,6 @@ TARGET = -24  # dB mean, about the GB laughs'
 TRIM = "silenceremove=start_periods=1:start_threshold=-50dB,areverse,silenceremove=start_periods=1:start_threshold=-50dB,areverse"
 VOICES = [  # pitch factor, tempo on top, tone
     (1.4, 1.08, "highpass=f=300,treble=g=5"),  # squeaky
-    (0.88, 0.97, "lowpass=f=6000,bass=g=2"),   # gruff
 ]
 
 def ff(*args):
