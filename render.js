@@ -720,10 +720,12 @@ export function createRenderer(canvas) {
     for (const [n, part, tag] of PROPS[champId]) {
       const o = propScenes[`${champId}/${n}`]?.clone();
       if (!o) continue;
-      o.traverse(m => { if (m.isMesh) { m.castShadow = m.receiveShadow = true; if (tag) m.material = m.material.clone(); } });
+      o.traverse(m => { if (m.isMesh) { m.castShadow = m.receiveShadow = true; m.material = m.material.clone(); } }); // own copy: to light up, and to fade
       parts[part].add(o);
       if (tag === 'fist') fists.push(o);
     }
+    const skin = new Set(); // everything that fades see-through after a KO
+    group.traverse(m => { if (m.isMesh) [].concat(m.material).forEach(x => skin.add(x)); });
 
     const tag = new THREE.Sprite(new THREE.SpriteMaterial({ depthTest: false, map: canvasTex(512, 96, (x) => {
       x.font = '900 64px Nunito, sans-serif'; x.textAlign = 'center'; x.lineWidth = 12; x.lineJoin = 'round';
@@ -759,7 +761,7 @@ export function createRenderer(canvas) {
       hay.visible = false;
       group.add(hay);
     }
-    return { group, parts, tag, stars, fists, swirl, hay, champId, glow: c.glow ?? '#ff8a00', torsoMat: body, glowBase: body.emissive.clone(), eyes: c.eyes, q: PARTS.map(() => [0, 0, 0, 1]), pos: PARTS.map(() => [0, 0, 0]) };
+    return { group, parts, tag, stars, fists, swirl, hay, skin: [...skin], ghost: false, champId, glow: c.glow ?? '#ff8a00', torsoMat: body, glowBase: body.emissive.clone(), eyes: c.eyes, q: PARTS.map(() => [0, 0, 0, 1]), pos: PARTS.map(() => [0, 0, 0]) };
   }
 
   const qa = new THREE.Quaternion(), qb = new THREE.Quaternion(), tmp = new THREE.Vector3(), tmp2 = new THREE.Vector3();
@@ -823,7 +825,8 @@ export function createRenderer(canvas) {
         emit(tmp.copy(torso).add(tmp2.set(rand(-0.3, 0.3), rand(-0.6, 0.2), rand(-0.3, 0.3))), { color: av.eyes, n: 2, speed: 0.3, size: 0.45, life: 0.45, grav: 0.5 });
       }
       av.swirl.visible = !!(flags & 1);
-      av.group.visible = !(flags & 32) || Math.sin(time * 28) > -0.6; // flicker while stun-immune after a KO
+      const ghost = !!(flags & 32); // just up from a KO, untouchable: see-through
+      if (ghost !== av.ghost) { av.ghost = ghost; for (const m of av.skin) { m.transparent = ghost; m.opacity = ghost ? 0.35 : 1; m.depthWrite = !ghost; m.needsUpdate = true; } }
       if (flags & 1) { av.swirl.position.copy(torso); av.swirl.rotation.y = time * 25; av.swirl.material.opacity = 0.4 + Math.random() * 0.3; }
       centre.add(torso);
       alive.push(torso);

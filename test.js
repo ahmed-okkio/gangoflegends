@@ -78,6 +78,22 @@ function duo(mapId, players, slot, ow, extra = {}) {
   assert.ok(sim.players[1].ko <= 0 || kos > 0, 'KO does not last forever under punches');
   assert.ok(kos <= 1, `no chain KO right after waking (${kos})`);
 }
+// 2a. just up from a KO (safe): punches and hooks go through them, nothing heard; after 1s they land again
+{
+  const sim = near('blitz', 'hec'), hits = () => sim.takeEvents().filter(e => e[0] === 'hit').length;
+  run(sim, 90);
+  lineUp(sim, 0.9);
+  sim.takeEvents();
+  sim.players[1].safe = 1;
+  run(sim, 22, i => sim.setInput(0, { x: 0, z: 0, b: i < 3 ? BTN.LEFT : 0 }));
+  lineUp(sim, 4);
+  run(sim, 30, i => sim.setInput(0, { x: 0, z: 0, b: i < 1 ? BTN.A1 : 0, a: Math.PI / 2 }));
+  assert.ok(!hits() && sim.players[1].daze === 0 && !sim.snapshot().h.some(h => h[5]), 'safe: not hit, not hooked');
+  run(sim, 20);
+  lineUp(sim, 0.9);
+  run(sim, 22, i => sim.setInput(0, { x: 0, z: 0, b: i < 3 ? BTN.LEFT : 0 }));
+  assert.ok(hits() && sim.players[1].daze > 0, 'hit again once it wears off');
+}
 
 // 2b. punch aim assist: someone off to the side, but in front, still gets hit
 {

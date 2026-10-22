@@ -43,7 +43,7 @@ const LEAPS = ['sentence', 'sonic']; // abilities whose recast flies you to whoe
 const HOIST = [WAIST, CHEST]; // lifted by a hoist, carrying the whole core's weight; hips and legs hang off it
 const HOIST_K = CORE.reduce((m, i) => m + PARTS[i].mass, 0) / HOIST.reduce((m, i) => m + PARTS[i].mass, 0);
 const HOLD = 20; // m/s^2 lift on the core (= gravity), so the hover spring only has to hold up the hanging arms
-const SAFE = 2.5; // seconds of daze/stagger immunity after getting up from a knockout
+const SAFE = 1; // seconds after getting up from a knockout that nothing can hit, grab or target you (drawn see-through)
 const CHARGE = 3, RAMP = 1.5; // Hecarim E: lasts 3s, speeds up evenly from walking to full gallop over the first 1.5s
 const FB_R = 2.4; // Sett E reach
 const PULV_R = 2.8; // Alistar Q reach
@@ -182,7 +182,7 @@ export function createSim({ mapId, players, practice = false, roundsToWin = 3, l
   const handPos = (p, i) => { const b = p.bodies[FORE + i]; return add(b.translation(), qrot(b.rotation(), V(...HAND[i]))); };
   const facing = p => V(Math.sin(p.yaw), 0, Math.cos(p.yaw));
   const ahead = p => { const c = qrot(p.bodies[CHEST].rotation(), V(0, 0, 1)), f = facing(p); return (c.x * f.x + c.z * f.z) / (Math.hypot(c.x, c.z) || 1); }; // cos of the chest's angle off p.yaw
-  const live = q => q.alive || q.seen; // seen: a prediction copy's stand-in for someone the host has in play (sync())
+  const live = q => (q.alive || q.seen) && !(q.safe > 0); // seen: a prediction copy's stand-in for someone the host has in play (sync())
 
   // colliders overlapping a ball. Collected first: touching the world inside Rapier's query callback panics.
   function overlap(pos, r, groups) {
@@ -195,7 +195,7 @@ export function createSim({ mapId, players, practice = false, roundsToWin = 3, l
     const seen = new Map();
     for (const c of overlap(pos, r, othersOnly(p))) {
       const o = owner.get(c.handle);
-      if ((o?.p.alive || o?.proxy) && !seen.has(o.p)) seen.set(o.p, { vic: o.p, part: o.part });
+      if ((o?.p.alive || o?.proxy) && !(o.p.safe > 0) && !seen.has(o.p)) seen.set(o.p, { vic: o.p, part: o.part });
     }
     return [...seen.values()];
   }
@@ -215,7 +215,7 @@ export function createSim({ mapId, players, practice = false, roundsToWin = 3, l
     const tp = p.bodies[TORSO].translation();
     let best = null, bd = 1.6;
     for (const q of ps) {
-      if (q.team === p.team || !q.bodies) continue;
+      if (q.team === p.team || !q.bodies || q.safe > 0) continue;
       const d = sub(q.bodies[TORSO].translation(), tp), h = Math.hypot(d.x, d.z);
       if (h < bd && d.x * f.x + d.z * f.z > h * 0.5) { best = q; bd = h; }
     }
@@ -223,6 +223,7 @@ export function createSim({ mapId, players, practice = false, roundsToWin = 3, l
   }
 
   function hit(vic, part, dv, daze) {
+    if (vic.safe > 0) return; // just up from a knockout: untouchable
     // a prediction copy only learns about hits from the host, but shows my own landing on a stand-in (at its chest) right away
     if (local >= 0) { if (by === local) fx('hit', add(vic.bodies[part].translation(), V(0, 0.45, 0)), daze >= 40 ? 1 : 0, by, vic.slot); return; }
     for (const b of vic.bodies) addVel(b, dv);
@@ -230,8 +231,8 @@ export function createSim({ mapId, players, practice = false, roundsToWin = 3, l
     vic.sinceHit = 0;
     fx('hit', vic.bodies[part].translation(), daze >= 40 ? 1 : 0, by, vic.slot);
     if (dv.y > 2) vic.jumpT = Math.max(vic.jumpT, 0.3); // don't let the hover spring swallow a launch
-    // knocked out, or just back up from it: still gets knocked around, but no stagger or daze, so no chain stuns
-    if (vic.ko > 0 || vic.safe > 0) return;
+    // knocked out: still gets knocked around, but no stagger or daze, so no chain stuns
+    if (vic.ko > 0) return;
     // let the knockback play out before control returns. Sett's Haymaker windup doesn't flinch (only a knockout stops it)
     // and shrugs off half the daze
     if (!(vic.hay > 0)) vic.stun = Math.max(vic.stun, 0.15 + len(dv) * 0.04);
@@ -755,7 +756,7 @@ export function createSim({ mapId, players, practice = false, roundsToWin = 3, l
       const arm = p.bodies[FORE + i], hp = handPos(p, i);
       // a prediction copy only grabs the world: another champ's stand-in trails the host by the ping, and a joint to it
       // dragged me around (holding each other floated and teleported). The host's grab reaches me through sync()
-      const c = overlap(hp, 0.16, worldAndOthers(p)).find(c => !owner.get(c.handle)?.proxy), target = c?.parent();
+      const c = overlap(hp, 0.16, worldAndOthers(p)).find(c => { const o = owner.get(c.handle); return !o?.proxy && !(o?.p.safe > 0); }), target = c?.parent();
       if (!target) continue;
       const local = qrot(qconj(target.rotation()), sub(hp, target.translation()));
       const j = world.createImpulseJoint(RAPIER.JointData.spherical(V(...HAND[i]), local), arm, target, true);
@@ -876,7 +877,7 @@ export function createSim({ mapId, players, practice = false, roundsToWin = 3, l
     glue = (s.g ?? []).map(([x, y, z, t, r, team]) => ({ x, y, z, t, r, team }));
     me.tether = hooks.find(h => h.vic && (h.thresh || h.lee))?.vic.slot ?? null; // my copy's catch, until the host's own shows
     for (const h of s.h ?? []) if (h[0] === local && h[4] >= 0) me.tether = h[4];
-    for (const e of s.p) if (ps[e[0]] && ps[e[0]] !== me) ps[e[0]].seen = !!e[1];
+    for (const e of s.p) if (ps[e[0]] && ps[e[0]] !== me) { ps[e[0]].seen = !!e[1]; ps[e[0]].safe = e[3] & 32 ? 1 : 0; } // safe: stand-ins can't be hit either
     s.ch?.forEach((c, i) => { if (CHAMPS[c]) ps[i].champ = c; });
     if (!e[1]) { if (me.alive) removeRagdoll(me); return; }
     const x = SX, hp = V(e[6], e[7], e[8]), hv = V(e[x + 1], e[x + 2], e[x + 3]), ack = e[x + 4];
