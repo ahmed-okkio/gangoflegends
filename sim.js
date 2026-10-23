@@ -246,7 +246,7 @@ export function createSim({ mapId, players, practice = false, roundsToWin = 3, l
 
   function knockOut(p) {
     fx('ko', p.bodies[HEAD].translation(), 0, -1, p.slot);
-    p.ko = 3.2; p.daze = 0;
+    p.ko = 2.4; p.daze = 0;
     cancel(p);
     down(p);
   }
@@ -338,12 +338,12 @@ export function createSim({ mapId, players, practice = false, roundsToWin = 3, l
   // Vi E punch: smash the target and everyone standing in a cone behind it
   function relentless(p, vic, part, f) {
     const vt = vic.bodies[TORSO].translation();
-    hit(vic, part, add(mul(f, 7), V(0, 2, 0)), 35);
+    hit(vic, part, add(mul(f, 8.75), V(0, 2.5, 0)), 35);
     fx('vi', vt, Math.atan2(f.x, f.z), p.slot, vic.slot); // big carries the cone's yaw
     for (const o of ps) {
       if (o === p || o === vic || !o.alive) continue;
       const d = sub(o.bodies[TORSO].translation(), vt), along = d.x * f.x + d.z * f.z;
-      if (along > 0 && along < 1.8 && Math.abs(d.x * f.z - d.z * f.x) < 0.5 + along * 0.4 && Math.abs(d.y) < 1) hit(o, TORSO, add(mul(f, 5), V(0, 1.5, 0)), 20);
+      if (along > 0 && along < 1.8 && Math.abs(d.x * f.z - d.z * f.x) < 0.5 + along * 0.4 && Math.abs(d.y) < 1) hit(o, TORSO, add(mul(f, 6.25), V(0, 1.88, 0)), 20);
     }
   }
 
@@ -382,11 +382,11 @@ export function createSim({ mapId, players, practice = false, roundsToWin = 3, l
   // is knocked back too
   function rage(p, f, t) {
     const [o] = ps.filter(o => o !== p && live(o)).map(o => ({ o, d: sub(seen(p, o), t) }))
-      .filter(({ d }) => Math.hypot(d.x, d.z) < 2.4 && dot(d, f) > 0 && Math.abs(d.y) < 1).sort((a, b) => len(a.d) - len(b.d));
+      .filter(({ d }) => Math.hypot(d.x, d.z) < 2.76 && dot(d, f) > 0 && Math.abs(d.y) < 1).sort((a, b) => len(a.d) - len(b.d));
     if (!o) return;
     fx('rage', o.o.bodies[TORSO].translation(), Math.atan2(f.x, f.z), p.slot, o.o.slot);
     if (local >= 0) return;
-    hit(o.o, TORSO, add(mul(f, 7.5), V(0, 3, 0)), 12);
+    hit(o.o, TORSO, add(mul(f, 9.4), V(0, 3.75, 0)), 12);
     p.kick = { vic: o.o, f, t: 0.8, hit: new Set([p, o.o]) };
   }
 
@@ -546,12 +546,12 @@ export function createSim({ mapId, players, practice = false, roundsToWin = 3, l
     // Vi Q: hold to wind up (slowed), let go to dash; a longer windup (up to 1.25s) dashes further and hits harder.
     // Fully wound up it can be held 3s more, then goes by itself
     if (p.vault > 0) {
-      if (move && inp.b & p.vaultBtn && p.vault < 4.25) { p.vault += DT; speed *= 0.35; }
-      else { const w = Math.min(p.vault, 1.25); p.dash = { t: 0.2 + w * 0.3, power: w / 1.25 }; p.vault = 0; }
+      if (move && inp.b & p.vaultBtn && p.vault < 3.94) { p.vault += DT; speed *= 0.35; }
+      else { const w = Math.min(p.vault, 0.94); p.dash = { t: 0.27 + w * 0.54, power: w / 0.94 }; p.vault = 0; }
     }
     if (p.leap) { // Thresh's Death Sentence recast: reeled along the chain all the way to them. Lee Sin's knocks them back
       const q = ps[p.leap.slot], d = q && live(q) && sub(q.bodies[TORSO].translation(), tp);
-      if (p.leap.lee && d) { if (len(d) < 1.2) hit(q, TORSO, add(mul(norm(V(d.x, 0, d.z)), 6), V(0, 2.25, 0)), 0); else p.yaw = Math.atan2(d.x, d.z); }
+      if (p.leap.lee && d) { if (len(d) < 1.2) hit(q, TORSO, add(mul(norm(V(d.x, 0, d.z)), 6.9), V(0, 2.59, 0)), 0); else p.yaw = Math.atan2(d.x, d.z); }
       if (!d || len(d) < 1.2 || (p.leap.t += DT) > 1) p.leap = null;
       else { const v = add(mul(d, 14 / len(d)), V(0, 0.8, 0)); for (const b of p.bodies) b.setLinvel(v, true); p.jumpT = 0.1; }
     }

@@ -17,8 +17,8 @@ export const CHAMPS = {
   vi: {
     name: 'Vi', title: 'The Piltover Enforcer', body: '#5b6b8c', limb: '#45526d', eyes: '#7fd3ff', glow: '#ff5fae',
     abilities: [
-      { id: 'vault', name: 'Vault Breaker', cd: 6, aim: 5.95, aimMin: 2.2, windup: 1.25, desc: 'Hold to wind up (aimed at your cursor), let go to dash and punch the first champ you hit. Longer windup, bigger hit; fully wound up you can hold it 3s more.' },
-      { id: 'relentless', name: 'Relentless Force', cd: 4, desc: 'Your next punch smashes through its target into everyone behind it.' },
+      { id: 'vault', name: 'Vault Breaker', cd: 6, aim: 8.03, aimMin: 2.97, windup: 0.94, desc: 'Hold to wind up (aimed at your cursor), let go to dash and punch the first champ you hit. Longer windup, bigger hit; fully wound up you can hold it 3s more.' },
+      { id: 'relentless', name: 'Relentless Force', cd: 3, desc: 'Your next punch smashes through its target into everyone behind it.' },
     ],
   },
   sett: {
@@ -52,7 +52,7 @@ export const CHAMPS = {
   lee: {
     name: 'Lee Sin', title: 'The Blind Monk', body: '#e0ad7e', limb: '#b8845a', eyes: '#ffd27a', glow: '#5fb8ff',
     abilities: [
-      { id: 'sonic', name: 'Sonic Wave', cd: 8, aim: 12.5, release: true, desc: 'Hold to aim at your cursor, let go to send out a wave. It marks the first champ it hits for 3s: press again to fly to them and knock them back.' },
+      { id: 'sonic', name: 'Sonic Wave', cd: 6, aim: 12.5, release: true, desc: 'Hold to aim at your cursor, let go to send out a wave. It marks the first champ it hits for 3s: press again to fly to them and knock them back.' },
       { id: 'rage', name: "Dragon's Rage", cd: 6, desc: 'Kick the champ in front of you back. Anyone they crash into gets knocked back too.' },
     ],
   },

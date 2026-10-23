@@ -419,7 +419,7 @@ for (const [gap, draw] of [[0.3, true], [0.7, false]]) {
   tap(sim, BTN.A1, Math.PI / 2);
   run(sim, 30, idle(sim));
   assert.ok(lee.tether === 1 && b.daze === 0 && Math.abs(torso(sim, 1).x - x0) < 0.3, `marked, unhurt, not moved (${b.daze}, ${(torso(sim, 1).x - x0).toFixed(2)})`);
-  assert.ok(lee.cd[0] === 8, 'Q cooldown waits on the mark');
+  assert.ok(lee.cd[0] === 6, 'Q cooldown waits on the mark');
   tap(sim, BTN.A1, Math.PI / 2);
   run(sim, 50, idle(sim));
   const gap = torso(sim, 1).x - torso(sim, 0).x;
@@ -429,7 +429,7 @@ for (const [gap, draw] of [[0.3, true], [0.7, false]]) {
   lineUp(sim, 5);
   tap(sim, BTN.A1, Math.PI / 2);
   run(sim, 200, idle(sim));
-  assert.ok(sim.players[0].tether == null && sim.players[0].cd[0] < 8 && sim.players[0].cd[0] > 7, 'the mark wears off, then Q cools');
+  assert.ok(sim.players[0].tether == null && sim.players[0].cd[0] < 6 && sim.players[0].cd[0] > 5, 'the mark wears off, then Q cools');
   sim = near('lee', 'blitz'); // aimed behind him: he turns round first, then the wave goes out behind
   run(sim, 90);
   lineUp(sim, 5);

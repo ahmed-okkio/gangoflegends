@@ -805,9 +805,7 @@ export function createRenderer(canvas) {
           av.hay.reach(rangeMin + (range - rangeMin) * k);
         }
       }
-      const dizzy = flags & 16 ? 3 : flags & 256 || pb[2] >= 60 ? 2 : 0;
-      av.stars.visible = dizzy > 0;
-      av.stars.children.forEach((s, i) => { s.visible = i < dizzy; });
+      av.stars.visible = !!(flags & 16); // stars only while knocked out
       av.stars.position.copy(head).y += 0.45;
       av.stars.rotation.y = time * 6;
       // empowered punch (4) or winding up an ability (64): fists glow in the champ's colour; otherwise their own glow comes back
