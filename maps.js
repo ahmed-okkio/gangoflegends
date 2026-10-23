@@ -7,6 +7,16 @@
 const box = (x, y, z, hx, hy, hz, m = 'girder') => ({ p: [x, y, z], s: [hx, hy, hz], m });
 
 export const MAPS = {
+  // Gang Beasts stages (gb); without an import each is a stand-in: Girders its own beams, the rest a plain floor
+  rooftop: {
+    name: 'Rooftop',
+    blurb: 'A city rooftop in the rain. The edge is closer than it looks.',
+    gb: 'rooftop',
+    killY: -6,
+    boxes: [box(0, -0.2, -3, 8, 0.2, 5, 'plate')],
+    rollers: [], kill: [],
+    spawns: [[-6, 0, -3], [6, 0, -3], [0, 0, -7], [0, 0, 1], [-3, 0, -5], [3, 0, -1], [-3, 0, -1], [3, 0, -5]],
+  },
   girders: {
     name: 'Girders',
     blurb: 'A half-built tower high above the city. Mind the drop.',
@@ -26,16 +36,6 @@ export const MAPS = {
     rollers: [],
     kill: [],
     spawns: [[-6, 0, 0], [6, 0, 0], [0, 0, -5.5], [0, 0, 5.5], [-1.6, 0, 1.6], [1.6, 0, -1.6], [-5.5, 0, -4.5], [5.5, 0, 4.5]],
-  },
-  // more Gang Beasts stages; without an import each is just a plain floor
-  rooftop: {
-    name: 'Rooftop',
-    blurb: 'A city rooftop in the rain. The edge is closer than it looks.',
-    gb: 'rooftop',
-    killY: -6,
-    boxes: [box(0, -0.2, -3, 8, 0.2, 5, 'plate')],
-    rollers: [], kill: [],
-    spawns: [[-6, 0, -3], [6, 0, -3], [0, 0, -7], [0, 0, 1], [-3, 0, -5], [3, 0, -1], [-3, 0, -1], [3, 0, -5]],
   },
   incinerator: {
     name: 'Incinerator',

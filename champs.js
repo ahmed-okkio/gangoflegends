@@ -24,7 +24,7 @@ export const CHAMPS = {
   sett: {
     name: 'Sett', title: 'The Boss', body: '#c97a52', limb: '#9a5a3a', eyes: '#ffd166', glow: '#ffb000',
     abilities: [
-      { id: 'haymaker', name: 'Haymaker', cd: 8, lock: true, rangeMin: 2, range: 5, windup: 1.2, cone: 0.4, base: 0.6, core: 0.175, desc: 'Hold to plant and wind up toward your cursor: punches can not stop it (only a knockout can) and deal half daze. Everyone sees it coming. Let go for a cone punch: the longer the windup, the further and harder it hits.' },
+      { id: 'haymaker', name: 'Haymaker', cd: 8, lock: true, rangeMin: 2, range: 5, windup: 1.2, cone: 0.4, base: 0.6, core: 0.21875, desc: 'Hold to plant and wind up toward your cursor: punches can not stop it (only a knockout can) and deal half daze. Everyone sees it coming. Let go for a cone punch: the longer the windup, the further and harder it hits.' },
       { id: 'facebreaker', name: 'Facebreaker', cd: 7, desc: 'Yank everyone close into you and stun them. Catch champs on both sides for a long stun.' },
     ],
   },

@@ -193,7 +193,7 @@ $('hostBtn').onclick = async () => {
   menuError('Opening lobby…', true);
   try { conn = await net.host(); } catch (e) { return menuError(e.message); }
   menuError();
-  lobby = { code: conn.code, players: [{ id: 'host', name: me.name, champ: me.champ }], settings: { map: 'girders', teams: 0, rounds: 3 } };
+  lobby = { code: conn.code, players: [{ id: 'host', name: me.name, champ: me.champ }], settings: { map: 'rooftop', teams: 0, rounds: 3 } };
   conn.on('join', (id, name, v) => {
     const why = v !== VERSION ? `Version mismatch: the host is on v${VERSION}, you're on v${v}. Restart the game to update.` : game ? 'A match is in progress.' : lobby.players.length >= 8 ? 'Lobby is full.' : '';
     if (why) return deny(id, why);
