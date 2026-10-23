@@ -203,10 +203,12 @@ export function createSim({ mapId, players, practice = false, roundsToWin = 3, l
   }
   // lag compensation: a client's abilities go off against everyone where that client saw them. Its playback of the others
   // (game.js) was p.view steps behind the host when it pressed (each input says what it was showing), capped at 0.25s: from
-  // further back than that, whoever dodged on their own screen was robbed. trail: everyone's torso over the last VIEW steps
-  const VIEW = 15;
+  // further back than that, whoever dodged on their own screen was robbed. trail: everyone's torso over the last VIEW steps.
+  // 0.4s: the view lag is the round trip plus the playback delay plus the input buffer, so 0.25 robbed anyone over ~150ms ping
+  const VIEW = 24;
   let trail = [];
-  const seen = (p, q) => (p.view && trail.at(-1 - Math.min(p.view, trail.length - 1))?.[q.slot]) || q.bodies[TORSO].translation();
+  // trail.at(-1) is the state after the last step, i.e. the snapshot stamped mt - DT
+  const seen = (p, q) => (p.view && trail.at(-Math.min(p.view, trail.length))?.[q.slot]) || q.bodies[TORSO].translation();
   // playersNear as p saw them: the ball moved along by however far each one has gone since, tested against them now
   function playersNearSeen(p, pos, r) {
     if (!p.view) return playersNear(p, pos, r);
@@ -702,19 +704,19 @@ export function createSim({ mapId, players, practice = false, roundsToWin = 3, l
 
     // headbutt hits: the skull, a little ahead of the head pivot
     if (p.butt && p.butt.t > 0.03 && p.butt.t < 0.22) {
-      for (const { vic, part } of playersNear(p, add(H.translation(), qrot(H.rotation(), V(0, 0.17, 0.08))), 0.24)) {
+      for (const { vic, part } of playersNearSeen(p, add(H.translation(), qrot(H.rotation(), V(0, 0.17, 0.08))), 0.24)) {
         if (p.butt.hit.has(vic)) continue;
         p.butt.hit.add(vic);
         hit(vic, part, add(mul(f, 4), V(0, 1.5, 0)), 30);
       }
     }
 
-    // punch hits
+    // punch hits (and every melee hit below: playersNearSeen, as the client saw them, like abilities)
     // punch hits land as hard as the fist is moving, so a spinning or running punch carries the body's momentum
     if (p.punch && p.punch.t > 0.01) {
       const arm = p.bodies[FORE + p.punch.arm], hp = handPos(p, p.punch.arm);
       const fv = add(arm.linvel(), cross(arm.angvel(), sub(hp, arm.worldCom()))), pf = aimTo ? norm(V(aimTo.x, 0, aimTo.z)) : f;
-      for (const { vic, part } of playersNear(p, hp, 0.2)) {
+      for (const { vic, part } of playersNearSeen(p, hp, 0.2)) {
         if (p.punch.hit.has(vic)) continue;
         const sp = len(sub(fv, vic.bodies[part].linvel()));
         if (sp < 2.5) continue; // a resting fist just pushes
@@ -725,7 +727,7 @@ export function createSim({ mapId, players, practice = false, roundsToWin = 3, l
       }
     }
     if (p.spin > 0) for (let i = 0; i < 2; i++) {
-      for (const { vic, part } of playersNear(p, handPos(p, i), 0.25)) {
+      for (const { vic, part } of playersNearSeen(p, handPos(p, i), 0.25)) {
         if (p.spinHit.has(vic)) continue;
         p.spinHit.add(vic);
         const vt = vic.bodies[TORSO].translation();
@@ -734,7 +736,7 @@ export function createSim({ mapId, players, practice = false, roundsToWin = 3, l
     }
     if (p.dash) {
       // Alistar's Headbutt also catches someone above him (launched by Pulverize), up to ~2m over his head
-      const [first] = [0, ...(p.dash.ali ? [0.9, 1.8] : [])].flatMap(h => playersNear(p, add(tp, add(mul(f, 0.45), V(0, h, 0))), 0.6));
+      const [first] = [0, ...(p.dash.ali ? [0.9, 1.8] : [])].flatMap(h => playersNearSeen(p, add(tp, add(mul(f, 0.45), V(0, h, 0))), 0.6));
       if (first) {
         const k = p.dash.power, air = !first.vic.grounded; // Alistar's Headbutt sends someone already airborne much further
         if (p.dash.ali) hit(first.vic, first.part, add(mul(f, air ? 11.2 : 7.8), V(0, air ? 4 : 3, 0)), air ? 40 : 30);
@@ -744,7 +746,7 @@ export function createSim({ mapId, players, practice = false, roundsToWin = 3, l
       }
     }
     if (p.charge > 0) {
-      const [first] = playersNear(p, add(tp, mul(f, 0.45)), 0.6);
+      const [first] = playersNearSeen(p, add(tp, mul(f, 0.45)), 0.6);
       if (first) { // hits as hard as the gallop has built up
         const r = Math.min(1, p.chargeT / RAMP);
         p.charge = 0;
@@ -798,7 +800,7 @@ export function createSim({ mapId, players, practice = false, roundsToWin = 3, l
       p.next = Math.min(...p.q.keys()); // a gap that's never coming (every message repeats the last 6 ticks): carry on from what did arrive
     }
     p.input = p.q.get(p.next); p.q.delete(p.next); p.ack = p.next++;
-    p.view = p.input.v == null ? 0 : Math.max(0, Math.min(VIEW, Math.round((mt - p.input.v) / DT))); // see seen()
+    p.view = p.input.v == null ? 0 : Math.max(0, Math.min(VIEW, Math.round((mt - DT - p.input.v) / DT) + 1)); // see seen()
     let ready = 0; while (p.q.has(p.next + ready)) ready++; // the unbroken run waiting (newest - ack overstates it when they come out of order)
     p.slack = Math.min(p.slack, ready);
     if (++p.win >= 120) {
@@ -865,7 +867,9 @@ export function createSim({ mapId, players, practice = false, roundsToWin = 3, l
 
   // ---------- client prediction (local >= 0) ----------
   const me = ps[local], hist = new Map(); // local tick -> my hips { pos, vel } after that step
+  const sent = new Map(); // local tick -> my input that step (outlives hist.clear(): replayed when the host hands me back)
   let tick = 0, err = 0; // err: last correction size (m), for tests
+  let held = false; // was drawn from the host's state last snapshot (knocked out, hooked, tied, host-owned)
   let smooth = V(); // drawn offset that eases a correction in over ~0.1s instead of popping (added in snapshot())
   if (me) for (const q of ps) if (q !== me) {
     // everyone else: a kinematic bean the size of a standing beast, so my dashes and charges stop on them. It doesn't push
@@ -915,6 +919,19 @@ export function createSim({ mapId, players, practice = false, roundsToWin = 3, l
     if (me.ko > 0 || me.hooked > 0 || me.tied || me.hostOwned) {
       err = len(sub(hp, hips().translation()));
       shift(sub(hp, hips().translation()), sub(hv, hips().linvel()));
+      hist.clear(); smooth = V(); held = true;
+      return;
+    }
+    if (held) {
+      // handed back: the host's state is `lag` old, and the host's me goes on to play the inputs still in flight. Start from
+      // it and replay those here too, or my copy never got them and the first correction a round trip later yanked me
+      // (measured: 1.2m walking out of a charge at 400ms). Effects from the replay were already shown, or are the host's
+      held = false;
+      shift(sub(hp, hips().translation()), sub(hv, hips().linvel()));
+      const keep = me.input, n = events.length;
+      me.prevB = sent.get(ack)?.b ?? me.prevB;
+      for (let t = ack + 1; t <= tick; t++) { me.input = sent.get(t) ?? me.input; control(me, st !== 'count'); belts(me); world.step(); }
+      me.input = keep; events.length = n;
       hist.clear(); smooth = V();
       return;
     }
@@ -963,8 +980,9 @@ export function createSim({ mapId, players, practice = false, roundsToWin = 3, l
     stepHooks();
     world.step();
     if (me.alive) hist.set(tick, { pos: hips().translation(), vel: hips().linvel() });
+    sent.set(tick, me.input);
     smooth = mul(smooth, 0.88);
-    hist.delete(tick - 240);
+    hist.delete(tick - 240); sent.delete(tick - 240);
   }
   // others' stand-ins go where the screen shows them (hips position from the interpolated snapshot). ponytail: tried
   // extrapolating them to where they'll be when my input reaches the host; overshooting into me shoved me off ledges

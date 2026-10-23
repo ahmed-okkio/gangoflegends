@@ -672,6 +672,14 @@ for (const [gap, draw] of [[0.3, true], [0.7, false]]) {
     owned += !!d.cli.players[0].hostOwned; charged += d.cli.players[0].charge > 0; hostCharged += d.host.players[0].charge > 0;
   }
   console.log('GB mode: host-owned for', owned, 'ticks');
+  // walking on after it hands my body back: no rubber band (my copy was left a round trip behind the host's me)
+  let worst = 0;
+  for (let i = 0; i < 300; i++) {
+    d.step({ x: 0, z: 1, b: i === 20 ? BTN.A2 : 0 });
+    if (i > 20 && !d.cli.players[0].hostOwned && d.cli.players[0].hooked <= 0) worst = Math.max(worst, d.cli.err);
+  }
+  console.log('GB mode: worst correction walking after a charge', worst.toFixed(2));
+  assert.ok(worst < 0.3, 'handed back, my copy picks up where the host has me');
   assert.ok(hostCharged && !charged, 'the host charged, my copy never did');
   assert.ok(owned > 20 && !d.cli.players[0].hostOwned, 'my body was the host\'s while it charged, mine again after');
 }
