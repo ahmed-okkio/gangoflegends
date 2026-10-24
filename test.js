@@ -367,8 +367,8 @@ for (const [gap, draw] of [[0.3, true], [0.7, false]]) {
   assert.ok(combo.dist > solo.dist * 1.3, 'Headbutt after Pulverize knocks much further');
 }
 
-// 10e. Thresh: the hook tugs its target a little toward him and chains them; recast leaps him to them. Flay throws
-// whoever's in front over and behind him
+// 10e. Thresh: the hook tugs its target a little toward him and chains them; recast leaps him to them. Flay knocks
+// whoever's in the line the way he aimed: away in front, toward him behind
 {
   const tap = (sim, b, a) => run(sim, 2, i => sim.setInput(0, { x: 0, z: 0, b: i ? 0 : b, a }));
   let sim = near('thresh', 'blitz');
@@ -397,14 +397,14 @@ for (const [gap, draw] of [[0.3, true], [0.7, false]]) {
   const far = torso(sim, 1).x - torso(sim, 0).x;
   tap(sim, BTN.A2, Math.PI / 2);
   run(sim, 40, () => sim.setInput(0, { x: 0, z: 0, b: 0 }));
-  assert.ok(torso(sim, 1).x - torso(sim, 0).x < far - 0.5 && torso(sim, 1).y < 2, 'Flay aimed at them pulls them in, low, not thrown over');
+  assert.ok(torso(sim, 1).x - torso(sim, 0).x > far + 0.5, 'Flay aimed at them pushes them away');
   sim = near('thresh', 'blitz');
   run(sim, 90);
   lineUp(sim, 1.5);
   const before = torso(sim, 1).x;
   tap(sim, BTN.A2, -Math.PI / 2); // aimed away from them
   run(sim, 40, () => sim.setInput(0, { x: 0, z: 0, b: 0 }));
-  assert.ok(torso(sim, 1).x > before + 1, 'Flay aimed away pushes them off');
+  assert.ok(torso(sim, 1).x < before - 0.3, 'Flay aimed away draws them toward him');
   console.log('thresh ok', gap0.toFixed(2), gap1.toFixed(2), gap2.toFixed(2));
 }
 

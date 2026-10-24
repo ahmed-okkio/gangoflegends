@@ -416,8 +416,7 @@ export function createSim({ mapId, players, practice = false, roundsToWin = 3, l
     p.leap = { slot: q.slot, t: 0, lee: p.champ === 'lee' }; // reeled in until he reaches them (control())
     fx('swing', t, 0, p.slot);
   }
-  // Thresh E: sweep the chain through a line on both sides of him, flinging everyone in it away from where he aimed:
-  // aimed at them, they go over and behind him; aimed away, they're pushed off
+  // Thresh E: sweep the chain through a line on both sides of him, knocking everyone in it up and along the way he aimed
   function flay(p, f, t) {
     p.flay = 0.3;
     fx('flay', add(t, mul(f, 1.5)), Math.atan2(f.x, f.z), p.slot);
@@ -426,7 +425,7 @@ export function createSim({ mapId, players, practice = false, roundsToWin = 3, l
       if (o === p || !o.alive) continue;
       const d = sub(seen(p, o), t), along = d.x * f.x + d.z * f.z;
       if (Math.abs(along) > 3.2 || Math.abs(d.x * f.z - d.z * f.x) > 0.8 || Math.abs(d.y) > 1.2) continue;
-      hit(o, TORSO, add(mul(f, -6), V(0, 2, 0)), 20); // knocked a short way along the line, back toward the side behind him (League's Flay)
+      hit(o, TORSO, add(mul(f, 3.86), V(0, 5.85, 0)), 20); // popped up and a short way the way he aimed: away in front, toward him behind
       if (o.ko <= 0 && o.safe <= 0) o.stun = Math.max(o.stun, 0.5);
     }
   }
@@ -833,14 +832,14 @@ export function createSim({ mapId, players, practice = false, roundsToWin = 3, l
       // (game.js). ponytail: 0.6s, about the longest that takes; after a miss the host's sees it shown that long
       if (local >= 0) { h.pos = add(h.vic.bodies[TORSO].translation(), V(0, 0.45, 0)); if (h.thresh || h.lee) h.o.tether = h.vic.slot; return (h.pull += DT) < (h.lee ? 3 : 0.6); }
       h.pull += DT;
-      if (h.thresh || h.lee) { // Thresh: a short tug toward him, then just the chain until it times out or he leaps. Lee: the mark
+      if (h.thresh || h.lee) { // Thresh: a short tug toward him, a 0.5s pause, a second tug, then just the chain until it times out or he leaps. Lee: the mark
         if (!h.vic.alive || !h.o.alive || h.pull > (h.lee ? 3 : 2)) { h.o.tether = null; return false; }
         h.o.tether = h.vic.slot;
         const vp = h.vic.bodies[TORSO].translation(), to = sub(h.o.bodies[TORSO].translation(), vp), d = len(to);
         h.pos = vp;
         if (h.lee) return true;
         h.vic.hooked = 0.1; // limp and helpless for as long as the chain holds, like Blitzcrank's hook
-        if (h.pull < 0.12 && d > 1.4) { const v = add(mul(to, 6 / d), V(0, 1, 0)); for (const b of h.vic.bodies) b.setLinvel(v, true); }
+        if ((h.pull < 0.12 || (h.pull > 0.62 && h.pull < 0.74)) && d > 1.4) { const v = add(mul(to, 6 / d), V(0, 1, 0)); for (const b of h.vic.bodies) b.setLinvel(v, true); }
         return true;
       }
       h.vic.hooked = 0.1; // limp for as long as the pull lasts

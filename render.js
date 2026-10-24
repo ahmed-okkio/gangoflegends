@@ -23,7 +23,7 @@ const PROPS = {
   vi: [['hair', HEAD], ['gauntletL', FORE, 'fist'], ['gauntletR', FORE + 1, 'fist']],
   sett: [['jacket', CHEST], ['fist', FORE, 'fist'], ['fist', FORE + 1, 'fist']],
   ali: [['horns', HEAD], ['cuff', FORE], ['cuff', FORE + 1]],
-  thresh: [['crown', HEAD], ['pauldrons', CHEST], ['lantern', FORE]],
+  thresh: [['crown', HEAD], ['mantle', CHEST], ['lantern', HIPS], ['hook', -1]], // hook: drawn on his Q, not worn
   singed: [['tank', CHEST], ['goggles', HEAD]],
   lee: [['blindfold', HEAD], ['wrap', FORE], ['wrap', FORE + 1]],
 };
@@ -718,7 +718,7 @@ export function createRenderer(canvas) {
     if (belt) parts[HIPS].add(mesh(new THREE.TorusGeometry(0.2, 0.035, 10, 32).rotateX(Math.PI / 2), gummy(color), 0, 0.04, 0)); // team belt
     const fists = [];
     for (const [n, part, tag] of PROPS[champId]) {
-      const o = propScenes[`${champId}/${n}`]?.clone();
+      const o = part >= 0 && propScenes[`${champId}/${n}`]?.clone();
       if (!o) continue;
       o.traverse(m => { if (m.isMesh) { m.castShadow = m.receiveShadow = true; m.material = m.material.clone(); } }); // own copy: to light up, and to fade
       parts[part].add(o);
@@ -836,14 +836,16 @@ export function createRenderer(canvas) {
       const links = new THREE.InstancedMesh(new THREE.TorusGeometry(0.06, 0.02, 4, 8), std('#c9ced6', { metalness: 0.9, roughness: 0.3 }), 40);
       const head = mesh(new THREE.SphereGeometry(0.2, 16, 10), glow('#ffb347', 2.5), 0, 0, 0, false);
       const shell = new THREE.Mesh(new THREE.SphereGeometry(0.2, 16, 10), new THREE.MeshBasicMaterial({ color: '#4fe3ff', transparent: true, opacity: 0.35, blending: THREE.AdditiveBlending, depthWrite: false }));
-      world.add(links, head, shell);
-      hookPool.push({ links, head, shell });
+      const scythe = propScenes['thresh/hook']?.clone() ?? new THREE.Group(); // Thresh's hook: the chain ties on at its origin, the blade points down +z
+      world.add(links, head, shell, scythe);
+      hookPool.push({ links, head, shell, scythe });
     }
     const m4 = new THREE.Matrix4(), q = new THREE.Quaternion();
     hookPool.forEach((h, i) => {
       const d = b.h[i], o = d && a.h?.find(e => e[0] === d[0]); // the same hook in the older snapshot (one per champ)
       const champ = d && setup.players[d[0]]?.champ;
       h.head.visible = !!d && !!b.p[d[0]]?.[1]; h.links.visible = h.head.visible && champ !== 'lee'; h.shell.visible = false;
+      h.scythe.visible = h.head.visible && champ === 'thresh' && h.scythe.children.length > 0;
       if (!h.head.visible) return;
       // between the two snapshots like the bodies: it covers ~1m per snapshot, so drawn from the newer one it stepped
       if (o) h.head.position.set(o[1], o[2], o[3]).lerp(tmp2.set(d[1], d[2], d[3]), alpha); else h.head.position.set(d[1], d[2], d[3]);
@@ -862,8 +864,14 @@ export function createRenderer(canvas) {
       }
       const arm = avatars[d[0]].parts[FORE + 1]; // avatar groups sit at the origin, so part-local -> world is just the part's own transform
       const from = tmp.fromArray(HAND[1]).applyQuaternion(arm.quaternion).add(arm.position), dir = tmp2.subVectors(h.head.position, from);
-      const n = Math.min(40, Math.max(1, Math.floor(dir.length() / 0.1)));
       q.setFromUnitVectors(new THREE.Vector3(0, 0, 1), dir.clone().normalize());
+      h.links.material.color.set(champ === 'thresh' ? '#4f6b5c' : '#c9ced6');
+      if (h.scythe.visible) { // the scythe in place of the ball, centred on where the hook is; the chain ties to its tail
+        h.head.visible = false;
+        dir.addScaledVector(dir.clone().normalize(), -0.25);
+        h.scythe.position.copy(from).add(dir); h.scythe.quaternion.copy(q);
+      }
+      const n = Math.min(40, Math.max(1, Math.floor(dir.length() / 0.1)));
       for (let k = 0; k < n; k++) {
         const twist = new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(0, 0, 1), k % 2 ? Math.PI / 2 : 0);
         m4.compose(from.clone().addScaledVector(dir, (k + 0.5) / n), q.clone().multiply(twist).multiply(new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(1, 0, 0), Math.PI / 2)), new THREE.Vector3(1, 1, 1));

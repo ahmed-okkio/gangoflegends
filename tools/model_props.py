@@ -200,37 +200,52 @@ def ali_cuff():  # forearm frame (hand at y -.337): a heavy bronze shackle on th
     cyl(BRONZE(), 0.075, 0.1, (0, -0.22, 0)); ring(IRON(), 0.078, 0.014, (0, -0.17, 0)); ring(IRON(), 0.078, 0.014, (0, -0.27, 0))
     for k, (y, z) in enumerate(((-0.28, -0.09), (-0.33, -0.12), (-0.38, -0.12))): ring(IRON(), 0.03, 0.01, (0, y, z), (k % 2, 0, (k + 1) % 2))
 
-# ---------------- Thresh: the Chain Warden, a head of green soul-fire in an iron crown, plated shoulders draped in chain, his lantern ----------------
-CLOAK = lambda: mat("cloak", (0.12, 0.14, 0.13), 0.8)
+# ---------------- Thresh: the Chain Warden, a green skull in a spiked hood with three bone antlers, a high spiked mantle, his lantern on his hip ----------------
+CLOAK = lambda: mat("cloak", (0.1, 0.11, 0.12), 0.8)
+TRIM = lambda: mat("trim", (0.22, 0.5, 0.38), 0.5)
+BONE = lambda: mat("bone", (0.3, 0.26, 0.22), 0.6)
 SOUL = lambda: mat("soul", (0.45, 1.0, 0.6), 0.3, 0, glow=3)
 
-def thresh_crown():  # head frame (skull centre y .165, z .057, r .21): iron jaw-cage and crown, soul-fire streaming up and back
-    ring(IRON(), 0.205, 0.03, (0, 0.27, 0.05), (0, 1, 0.15))  # crown band
-    for a in range(7):  # spikes round the crown, tallest at the front
-        ang = (a - 3) * 0.45; x, z = math.sin(ang) * 0.2, 0.05 + math.cos(ang) * 0.2
-        cyl(IRON(), 0.03, 0.12 - abs(a - 3) * 0.015, (x, 0.33, z), (x * 0.6, 1, (z - 0.05) * 0.6), r2=0.004)
-    for x in (-0.12, 0.12): box(IRON(), (0.05, 0.16, 0.06), (x, 0.08, 0.2), 0.02)  # cheek plates
-    box(IRON(), (0.2, 0.05, 0.06), (0, 0.0, 0.22), 0.02)  # jaw bar
-    for x in (-0.07, 0.07): ball(SOUL(), 0.04, (x, 0.19, 0.255))  # eyes
-    for x, lean, h in ((0, -0.5, 0.42), (-0.1, -0.6, 0.34), (0.1, -0.6, 0.34), (-0.05, -0.8, 0.3), (0.05, -0.8, 0.3)):  # flames
-        tube(SOUL(), [(x, 0.3, 0.02), (x * 1.2, 0.3 + h * 0.5, lean * 0.15), (x * 1.3, 0.3 + h, lean * 0.4)], [0.07, 0.045, 0.003])
+def thresh_crown():  # head frame (skull centre y .165, z .057, r .21): three thin dreads off the crown, in sections, flowing up then back
+    for x, side, h in ((0, 0, 0.36), (-0.09, -1, 0.28), (0.09, 1, 0.28)):
+        pts = [(x + side * 0.1 * t * t, 0.33 + h * math.sin(t * 1.9) * 0.9, 0.04 - 0.3 * t * t) for t in (k / 6 for k in range(7))]  # rises, then bends back
+        for k in range(6):  # a thin segment and a knuckle at each joint
+            r = 0.016 - k * 0.002
+            tube(BONE(), [pts[k], tuple((pts[k][i] + pts[k + 1][i]) / 2 for i in range(3)), pts[k + 1]], [r, r * 0.8, r * 0.7])
+            ball(TRIM(), r * 1.15, pts[k + 1])
 
-def thresh_pauldrons():  # chest frame (capsule r .193, centre y .254): heavy iron shoulder plates, chain slung across the chest
-    for s in (1, -1):
-        ball(CLOAK(), 0.15, (s * 0.25, 0.4, -0.02), (1, 0.6, 1.1))
-        for k in range(3): box(IRON(), (0.2 - k * 0.03, 0.04, 0.26 - k * 0.04), (s * (0.27 + k * 0.02), 0.47 - k * 0.07, -0.02), 0.015, tilt=(0, 0, s * (25 + k * 10)))
-    for k in range(9):  # a sash of chain from the left shoulder to the right hip
-        u = k / 8; x, y = 0.22 - u * 0.4, 0.42 - u * 0.3
-        ring(IRON(), 0.03, 0.01, (x, y, 0.2 + 0.03 * math.sin(u * math.pi)), (k % 2, 0, (k + 1) % 2))
+def thresh_mantle():  # chest frame (capsule along x: r .193, half length .082, centre y .254 z -.013): a plain black jacket open at the throat, a key hanging in the middle
+    ob = shell(CLOAK(), JR, JC, lambda x, y, z: (z + JC[2] > 0 and abs(x) < 0.03 + (y + JC[1] - 0.3) * 0.25 and y + JC[1] > 0.3) or y + JC[1] < 0.06, seg=72)
+    for v in ob.data.vertices:  # V-shaped: broad at the shoulders, tapering in to the waist (Blender z = our y)
+        v.co.x *= 0.72 + 0.5 * min(1, max(0, (v.co.z + JC[1] - 0.06) / 0.4))  # co is relative to the shell centre
+    for a in range(-3, 4):  # sharp collar: flat pointed iron-dark blades standing round the back and sides of the neck, flaring out
+        ang = math.pi + a * 0.42; out = (math.sin(ang), 0, math.cos(ang))
+        at = (out[0] * 0.27, 0.52 - abs(a) * 0.02, -0.03 + out[2] * 0.2)
+        bpy.ops.mesh.primitive_cone_add(vertices=4, radius1=0.09, radius2=0, depth=0.3 - abs(a) * 0.02, location=B(at)); ob = bpy.context.object
+        ob.scale = (1, 0.18, 1); bake(ob)  # a flat pyramid: a blade, edge-on to the neck
+        ob.rotation_mode = "QUATERNION"; ob.rotation_quaternion = B((out[0] * 0.9, 1, out[2] * 0.7)).to_track_quat("Z", "Y") @ ob.rotation_quaternion
+        bake(ob); done(ob, CLOAK())
+        tube(TRIM(), [(out[0] * 0.18, 0.4, -0.03 + out[2] * 0.15), (out[0] * 0.21, 0.5, -0.03 + out[2] * 0.18)], [0.01, 0.006])  # green at its root
+    for k in range(6): ring(IRON(), 0.02, 0.006, on_vest(0, 0.34 - k * 0.035, 1.07), (k % 2, 0, (k + 1) % 2))  # chain from the collar
+    kx, ky, kz = on_vest(0, 0.13, 1.12)
+    ring(TRIM(), 0.035, 0.009, (kx, ky + 0.02, kz), (0, 0, 1))  # the key: a bow, a shaft, teeth
+    cyl(TRIM(), 0.01, 0.11, (kx, ky - 0.07, kz), (0, 1, 0))
+    for y in (-0.11, -0.085): box(TRIM(), (0.03, 0.014, 0.012), (kx + 0.018, ky + y, kz), 0.003)
 
-def thresh_lantern():  # forearm frame (hand at y -.337): the lantern hanging on a short chain under the hand
-    for k in range(3): ring(IRON(), 0.025, 0.008, (0, -0.39 - k * 0.045, 0), (k % 2, 0, (k + 1) % 2))
-    cyl(IRON(), 0.07, 0.03, (0, -0.52, 0), r2=0.03)  # cap
-    ball(SOUL(), 0.075, (0, -0.6, 0), (1, 1.2, 1))  # the trapped souls
-    for a in range(4):
-        x, z = math.cos(a * math.pi / 2) * 0.08, math.sin(a * math.pi / 2) * 0.08
-        cyl(IRON(), 0.012, 0.18, (x, -0.6, z))
-    cyl(IRON(), 0.08, 0.025, (0, -0.69, 0))  # base
+def thresh_lantern():  # hips frame (capsule r .178 along x, ends at x ±.245): the lantern hanging from his belt at his left hip, no lower than the knee
+    for k in range(2): ring(IRON(), 0.022, 0.008, (0.27, 0.06 - k * 0.04, 0), (k % 2, 0, (k + 1) % 2))
+    box(IRON(), (0.14, 0.035, 0.14), (0.27, -0.01, 0), 0.01)  # cap, spiked corners
+    for sx in (-1, 1):
+        for sz in (-1, 1): cyl(IRON(), 0.016, 0.06, (0.27 + sx * 0.065, 0.03, sz * 0.065), (sx, 1.2, sz), r2=0.002)
+    ball(SOUL(), 0.055, (0.27, -0.09, 0), (1, 1.25, 1))  # the trapped souls
+    for a in range(4): cyl(IRON(), 0.01, 0.15, (0.27 + math.cos(a * math.pi / 2 + 0.785) * 0.06, -0.09, math.sin(a * math.pi / 2 + 0.785) * 0.06))
+    box(IRON(), (0.13, 0.03, 0.13), (0.27, -0.17, 0), 0.01)  # base
+
+def thresh_hook():  # hook frame: the chain ties on at the origin, the hook flies down +z: an iron socket and a curved green scythe blade
+    ring(IRON(), 0.03, 0.009, (0, 0, -0.01), (1, 0, 0))  # eye the chain ties to
+    cyl(IRON(), 0.025, 0.14, (0, 0, 0.07), (0, 0, 1), r2=0.03)  # shank
+    tube(TRIM(), [(0, 0, 0.13), (0, 0.12, 0.2), (0, 0.18, 0.34), (0, 0.12, 0.46), (0, 0.0, 0.47), (0, -0.07, 0.4)], [0.035, 0.035, 0.028, 0.018, 0.01, 0.002], flat=0.3)  # thin blade, curling back
+    tube(SOUL(), [(0, 0.04, 0.16), (0, 0.13, 0.28), (0, 0.1, 0.4)], [0.008, 0.008, 0.002], flat=0.6)  # glowing edge
 
 # ---------------- Singed: the Mad Chemist, a chem tank on his back and green-lensed goggles ----------------
 TANK = lambda: mat("tank", (0.45, 0.47, 0.4), 0.35, 0.6)
@@ -264,7 +279,7 @@ def lee_wrap():  # forearm frame (hand at y -.337): bandages wound round the wri
 
 PROPS = {
     "leesin_blindfold": lee_blindfold, "leesin_wrap": lee_wrap,
-    "thresh_crown": thresh_crown, "thresh_pauldrons": thresh_pauldrons, "thresh_lantern": thresh_lantern, "singed_tank": singed_tank, "singed_goggles": singed_goggles,
+    "thresh_crown": thresh_crown, "thresh_mantle": thresh_mantle, "thresh_lantern": thresh_lantern, "thresh_hook": thresh_hook, "singed_tank": singed_tank, "singed_goggles": singed_goggles,
     "alistar_horns": ali_horns, "alistar_cuff": ali_cuff,
     "blitzcrank_core": blitz_core, "blitzcrank_gauntletL": lambda: blitz_gauntlet(1), "blitzcrank_gauntletR": lambda: blitz_gauntlet(-1),
     "hecarim_blade": hec_blade, "hecarim_tail": hec_tail,
@@ -278,7 +293,7 @@ PIVOT = {"core": (0, 0.6347, -0.0101), "blade": (0, 1.0693, 0.0247), "tail": (0,
          "gauntletL": (0.2015, 0.6711, -0.0433), "gauntletR": (-0.2015, 0.6711, -0.0433),
          "hoofHand": (0.2015, 0.6711, -0.0433), "hoofFoot": (0.239, 0.1201, 0.0057),
          "hair": (0, 1.0693, 0.0247), "jacket": (0, 0.6347, -0.0101), "sleeve": (0.2015, 0.9447, -0.0425), "fist": (0.2015, 0.6711, -0.0433),
-         "horns": (0, 1.0693, 0.0247), "cuff": (0.2015, 0.6711, -0.0433), "crown": (0, 1.0693, 0.0247), "pauldrons": (0, 0.6347, -0.0101), "lantern": (0.2015, 0.6711, -0.0433),
+         "horns": (0, 1.0693, 0.0247), "cuff": (0.2015, 0.6711, -0.0433), "crown": (0, 1.0693, 0.0247), "mantle": (0, 0.6347, -0.0101), "lantern": (0, 0.4223, 0.0002), "hook": (1.1, 1.0, 0.3),
          "tank": (0, 0.6347, -0.0101), "goggles": (0, 1.0693, 0.0247),
          "blindfold": (0, 1.0693, 0.0247), "wrap": (0.2015, 0.6711, -0.0433)}
 

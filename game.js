@@ -442,14 +442,14 @@ addEventListener('keydown', e => {
   if (e.code === 'Escape' && game) escape();
   else if (conn && game && binds.chat.includes(e.code) && $('escMenu').classList.contains('hidden')) openChat();
 });
-// Esc in a match: practice ends, a real match toggles the pause menu. Chromium also drops the mouse lock on Esc, and may
+// Esc in a match (practice too) toggles the pause menu: switch champ, leave. Chromium also drops the mouse lock on Esc, and may
 // or may not pass the key on, so a lost lock counts as Esc too; one press within 300 ms is the same press
 let escAt = 0;
 function escape() {
   if (performance.now() - escAt < 300) return;
   escAt = performance.now();
-  if (game.setup.practice) { game = null; show('menu'); }
-  else { $('escMenu').classList.toggle('hidden'); ui($('escMenu').classList.contains('hidden') ? 'close' : 'open'); }
+  $('quitBtn').textContent = game.setup.practice ? 'Leave practice' : 'Leave match';
+  $('escMenu').classList.toggle('hidden'); ui($('escMenu').classList.contains('hidden') ? 'close' : 'open');
   if (!$('escMenu').classList.contains('hidden') || !game) document.exitPointerLock(); else lockMouse();
 }
 addEventListener('keyup', e => keys.delete(e.code));
