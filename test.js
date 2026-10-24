@@ -29,7 +29,7 @@ function duo(mapId, players, slot, ow, extra = {}) {
   const { gb, ...opts } = extra, host = createSim({ mapId, players, ...opts }), cli = createSim({ mapId, players, local: slot, gb });
   const wire = [], q = [], d = { host, cli, i: 0, snaps: [], events: [] };
   d.step = (inp, hostSide) => {
-    cli.setInput(slot, gb ? { ...inp, b: inp.b & (BTN.JUMP | BTN.RUN | BTN.LAY | BTN.A1 | BTN.A2) } : inp); cli.step(); // as game.js GB_MODE
+    cli.setInput(slot, gb ? { ...inp, b: inp.b & ~BTN.LIFT } : inp); cli.step(); // as game.js GB_MODE
     q.push([inp.x, inp.z, inp.b, inp.a, inp.d]); if (q.length > 6) q.shift();
     wire.push({ to: 'host', at: d.i + ow, inp: { n: cli.tick, i: [...q] } });
     for (const m of wire.filter(m => m.at === d.i)) {
@@ -393,10 +393,11 @@ for (const [gap, draw] of [[0.3, true], [0.7, false]]) {
   assert.ok(torso(sim, 1).x - torso(sim, 0).x < 2, `an early recast still leaps (${(torso(sim, 1).x - torso(sim, 0).x).toFixed(2)})`);
   sim = near('thresh', 'blitz');
   run(sim, 90);
-  lineUp(sim, 1.5);
+  lineUp(sim, 2.5);
+  const far = torso(sim, 1).x - torso(sim, 0).x;
   tap(sim, BTN.A2, Math.PI / 2);
   run(sim, 40, () => sim.setInput(0, { x: 0, z: 0, b: 0 }));
-  assert.ok(torso(sim, 1).x < torso(sim, 0).x, 'Flay throws them behind Thresh');
+  assert.ok(torso(sim, 1).x - torso(sim, 0).x < far - 0.5 && torso(sim, 1).y < 2, 'Flay aimed at them pulls them in, low, not thrown over');
   sim = near('thresh', 'blitz');
   run(sim, 90);
   lineUp(sim, 1.5);
@@ -735,3 +736,15 @@ if ((await prepareMap('incinerator')).imported) {
   assert.ok(torso(sim, 0).x < 8.5, 'belt rolls you toward the pit');
 }
 console.log('all ok');
+
+// 12j. GB mode: my copy plays my own punch and Vi's windup at once (for show); the host still does the hitting
+{
+  const d = duo('grind', [{ id: 'a', name: 'A', champ: 'vi', team: 0 }, { id: 'b', name: 'B', champ: 'blitz', team: 1 }], 0, 12, { practice: true, gb: true });
+  let punched = false, wound = false;
+  for (let i = 0; i < 200; i++) {
+    d.step({ x: 0, z: 0, b: i === 60 ? BTN.LEFT : i >= 120 && i < 150 ? BTN.A1 : 0 });
+    punched ||= !!d.cli.players[0].punch; wound ||= d.cli.players[0].vault > 0 && !d.cli.players[0].hostOwned;
+  }
+  assert.ok(punched && wound, 'my copy punched and wound up Vault Breaker itself');
+  console.log('GB mode: own punch and windup predicted');
+}

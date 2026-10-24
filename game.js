@@ -629,7 +629,7 @@ function frame(now) {
     acc += dt;
     while (acc >= DT) {
       acc -= DT;
-      local.setInput(game.mySlot, GB_MODE ? { ...inp, b: inp.b & (BTN.JUMP | BTN.RUN | BTN.LAY | BTN.A1 | BTN.A2) } : inp); // GB mode: my copy only walks and aims
+      local.setInput(game.mySlot, GB_MODE ? { ...inp, b: inp.b & ~BTN.LIFT } : inp); // GB mode: my copy plays all but lifting (sim.js: what it leaves the host)
       local.step();
       const ev = local.takeEvents();
       if (ev.length) { view.fx(ev); for (const e of ev) if (e[5] === game.mySlot) game.played.push([...e, now]); }
@@ -663,19 +663,6 @@ function frame(now) {
     const me = local.players[game.mySlot], limp = !me.alive || me.ko > 0 || me.hooked > 0 || me.tied || me.hostOwned;
     const shift = carryOn(a, b, alpha, s[s.length - 1], at, dt), own = limp ? null : { slot: game.mySlot, a: game.mine[0] ?? game.mine[1], b: game.mine[1], alpha: acc / DT };
     if (!limp) shift[game.mySlot] = null;
-    // GB mode: my arms (punching, cocking, grabbing) as the host has them, and my fists' glow (4, 64: an empowered punch,
-    // a windup): my copy doesn't cast abilities, so it never lights them. From the newest two snapshots, not the playback
-    // clock: that added the playback delay on top of the round trip to everything I did
-    const fa = s.at(-2) ?? s.at(-1), fb = s.at(-1);
-    if (GB_MODE && own && fa.p[game.mySlot]?.[1] && fb.p[game.mySlot]?.[1]) {
-      const ha = fa.p[game.mySlot], hb = fb.p[game.mySlot], qs = [ARM, ARM + 1, FORE, FORE + 1].map(i => {
-        const o = 9 + i * 4, sg = [0, 1, 2, 3].reduce((d, k) => d + ha[o + k] * hb[o + k], 0) < 0 ? -1 : 1;
-        const q = [0, 1, 2, 3].map(k => ha[o + k] + (sg * hb[o + k] - ha[o + k]) * alpha), n = Math.hypot(...q) || 1;
-        return [o, q.map(c => c / n)];
-      });
-      const put = e => { const out = [...e]; for (const [o, q] of qs) out.splice(o, 4, ...q); out[3] = (out[3] & ~68) | (hb[3] & 68); return out; };
-      own.a = put(own.a); own.b = put(own.b);
-    }
     slideOver(limp, own, a, b, alpha, shift, dt);
     // my own hook and glue: drawn from my copy (cast at once) until the host's catch / puddle shows up on screen
     const og = local.ownGlue.filter(g => !b.g?.some(h => h[5] === g.team && Math.hypot(h[0] - g.x, h[2] - g.z) < 1));

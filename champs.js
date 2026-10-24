@@ -39,7 +39,7 @@ export const CHAMPS = {
     name: 'Thresh', title: 'The Chain Warden', body: '#3d4a3f', limb: '#2b352d', eyes: '#7dff9a', glow: '#7dff9a',
     abilities: [
       { id: 'sentence', name: 'Death Sentence', cd: 10, aim: 9, release: true, desc: 'Hold to aim at your cursor, let go to throw your hook. It drags the first champ it hits a little toward you and holds them helpless on the chain for 2s: press again to fly all the way to them.' },
-      { id: 'flay', name: 'Flay', cd: 7, aim: 3, back: true, release: true, desc: 'Hold to aim, let go to sweep your chain through a line on both sides of you. Everyone in it is flung away from your cursor: aim at them to throw them over and behind you, aim away to push them off.' },
+      { id: 'flay', name: 'Flay', cd: 7, aim: 3, back: true, release: true, desc: 'Hold to aim, let go to sweep your chain through a line on both sides of you. Everyone in it is knocked back away from your cursor: aim at them to pull them in toward you, aim away from them to push them off.' },
     ],
   },
   singed: {

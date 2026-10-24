@@ -39,6 +39,7 @@ const turnToward = (a, b, max) => a + Math.max(-max, Math.min(max, wrap(b - a)))
 // --- ragdoll: the Gang Beasts beast (beast.js). Part index = body index everywhere; bodies[0] is the chest. ---
 const TORSO = CHEST;
 const CORE = [HIPS, WAIST, CHEST, HEAD, THIGH, THIGH + 1, LEG, LEG + 1]; // moved as one by the locomotion; arms hang off it
+const HOST_CASTS = ['hook', 'sentence', 'charge', 'rampage', 'headbutt', 'adhesive']; // GB mode: a client's copy never plays these (useAbility)
 const LEAPS = ['sentence', 'sonic']; // abilities whose recast flies you to whoever they caught (Thresh Q, Lee Sin Q)
 const HOIST = [WAIST, CHEST]; // lifted by a hoist, carrying the whole core's weight; hips and legs hang off it
 const HOIST_K = CORE.reduce((m, i) => m + PARTS[i].mass, 0) / HOIST.reduce((m, i) => m + PARTS[i].mass, 0);
@@ -348,8 +349,11 @@ export function createSim({ mapId, players, practice = false, roundsToWin = 3, l
   }
 
   function useAbility(p, i, turned) {
-    if (gb && local >= 0) return; // GB mode: my copy only aims (and so turns to face it, like the host's me); the host casts
+    // GB mode: my copy plays my casts at once for show (pose, windup, glow, effects; hits are the host's, see hit()). Not the
+    // ones that throw my body about or put something in the world (dashes, charges, spins, leaps, hooks, glue): the host plays
+    // those, drawn from its state (sync hostOwned)
     const ab = CHAMPS[p.champ].abilities[i];
+    if (gb && local >= 0 && (HOST_CASTS.includes(ab.id) || LEAPS.includes(ab.id) && p.tether != null)) return;
     if (ab.id === 'charge' && p.charge > 0) { p.charge = 0; return; } // recast ends the charge early
     if (LEAPS.includes(ab.id) && p.tether != null) return leap(p); // recast while they're caught / marked: fly to them
     if (p.cd[i] > 0) return;
@@ -359,7 +363,7 @@ export function createSim({ mapId, players, practice = false, roundsToWin = 3, l
     if (ab.id === 'sonic') { // a palm thrust: the wave leaves his right hand, out at arm's length
       p.palm = 0.3;
       const at = add(t, add(mul(f, 0.75), V(-f.z * 0.2, 0.3, f.x * 0.2)));
-      hooks.push({ o: p, pos: at, dir: f, t: 0, vic: null, pull: 0, lee: true });
+      if (!(gb && local >= 0)) hooks.push({ o: p, pos: at, dir: f, t: 0, vic: null, pull: 0, lee: true });
       fx('wave', at, 0, p.slot);
     } else if (ab.id === 'hook' || ab.id === 'sentence') hooks.push({ o: p, pos: add(add(t, mul(f, 0.7)), V(0, 0.2, 0)), dir: f, t: 0, vic: null, pull: 0, thresh: ab.id === 'sentence' });
     else if (ab.id === 'fist') { p.empower = 4; p.emp = 'launch'; }
@@ -386,7 +390,7 @@ export function createSim({ mapId, players, practice = false, roundsToWin = 3, l
     if (!o) return;
     fx('rage', o.o.bodies[TORSO].translation(), Math.atan2(f.x, f.z), p.slot, o.o.slot);
     if (local >= 0) return;
-    hit(o.o, TORSO, add(mul(f, 9.4), V(0, 3.75, 0)), 12);
+    hit(o.o, TORSO, add(mul(f, 9.4), V(0, 5.5, 0)), 12);
     p.kick = { vic: o.o, f, t: 0.8, hit: new Set([p, o.o]) };
   }
 
@@ -422,7 +426,7 @@ export function createSim({ mapId, players, practice = false, roundsToWin = 3, l
       if (o === p || !o.alive) continue;
       const d = sub(seen(p, o), t), along = d.x * f.x + d.z * f.z;
       if (Math.abs(along) > 3.2 || Math.abs(d.x * f.z - d.z * f.x) > 0.8 || Math.abs(d.y) > 1.2) continue;
-      hit(o, TORSO, add(mul(f, -7), V(0, along > 0 ? 10 : 5, 0)), 20); // the ones in front have to clear him
+      hit(o, TORSO, add(mul(f, -6), V(0, 2, 0)), 20); // knocked a short way along the line, back toward the side behind him (League's Flay)
       if (o.ko <= 0 && o.safe <= 0) o.stun = Math.max(o.stun, 0.5);
     }
   }
@@ -547,7 +551,7 @@ export function createSim({ mapId, players, practice = false, roundsToWin = 3, l
     // Fully wound up it can be held 3s more, then goes by itself
     if (p.vault > 0) {
       if (move && inp.b & p.vaultBtn && p.vault < 3.94) { p.vault += DT; speed *= 0.35; }
-      else { const w = Math.min(p.vault, 0.94); p.dash = { t: 0.27 + w * 0.54, power: w / 0.94 }; p.vault = 0; }
+      else { const w = Math.min(p.vault, 0.94); if (!(gb && local >= 0)) p.dash = { t: 0.27 + w * 0.54, power: w / 0.94 }; p.vault = 0; } // the dash is the host's
     }
     if (p.leap) { // Thresh's Death Sentence recast: reeled along the chain all the way to them. Lee Sin's knocks them back
       const q = ps[p.leap.slot], d = q && live(q) && sub(q.bodies[TORSO].translation(), tp);
@@ -563,7 +567,7 @@ export function createSim({ mapId, players, practice = false, roundsToWin = 3, l
     // Sett Q: hold to plant and wind up, let go (or hold past 3 s) to throw it
     if (p.hay > 0) {
       if (move && inp.b & p.hayBtn && p.hay < 3) { p.hay += DT; speed = 0; }
-      else { if (move) haymaker(p, f, tp, hayK(p)); p.hay = 0; }
+      else { if (move && !(gb && local >= 0)) haymaker(p, f, tp, hayK(p)); p.hay = 0; } // the punch is the host's
     }
     p.fb -= DT; p.pulv -= DT; p.flay -= DT; p.fling -= DT; p.palm -= DT;
     if (p.qTurn && ((p.qTurn.t -= DT) <= 0 || ahead(p) > 0.5)) { p.yaw = p.qTurn.yaw; p.qTurn = null; useAbility(p, 0, true); }
@@ -766,7 +770,7 @@ export function createSim({ mapId, players, practice = false, roundsToWin = 3, l
       // the joint) before anything else it touches, like the floor they lie on
       const [near] = gt ? overlap(hp, LATCH, othersOnly(p)).filter(c => owner.get(c.handle)?.p === gt)
         .map(c => ({ c, at: c.projectPoint(hp, true).point })).sort((a, b) => len(sub(a.at, hp)) - len(sub(b.at, hp))) : [];
-      if (near && local >= 0) continue; // a prediction copy leaves it to the host (above)
+      if (near && local >= 0 || gb && local >= 0) continue; // a prediction copy leaves it to the host (above); in GB mode every grab
       const c = near?.c ?? overlap(hp, 0.16, worldAndOthers(p)).find(c => { const o = owner.get(c.handle); return !o?.proxy && !(o?.p.safe > 0); }), target = c?.parent();
       if (!target) continue;
       const anchor = qrot(qconj(target.rotation()), sub(near?.at ?? hp, target.translation()));
@@ -912,7 +916,10 @@ export function createSim({ mapId, players, practice = false, roundsToWin = 3, l
     me.safe = e[3] & 32 ? Math.max(me.safe, 0.1) : 0;
     me.tied = !!(e[3] & 128); // holding / held by a champ: two ragdolls tied together only the host can simulate
     // GB mode (gb, game.js GB_MODE): my copy only walks; whatever moves me otherwise (abilities, headbutt, holding on) is the host's
-    me.hostOwned = gb && !!(e[3] & (1 | 2 | 8 | 64 | 512));
+    me.hostOwned = gb && !!(e[3] & (1 | 2 | 8 | 512)); // not 64 (a windup): my copy charges it too (useAbility)
+    // stunned (every hit stuns): flung or reeling with no control, so nothing of mine to predict. The host's flight is the truth,
+    // drawn as is, instead of guessing it on and correcting every snapshot (teleporting about mid-air)
+    if (e[x + 5] > lag) me.hostOwned = true;
     // knocked out, hooked or tied to another champ: I'm drawn from the host's state (game.js) and can't predict it, so
     // the ragdoll is just kept on it, ready to predict from there once I'm free. (Correcting the prediction instead
     // overshot every snapshot and grew: holding each other and jumping flung me metres up and down.)

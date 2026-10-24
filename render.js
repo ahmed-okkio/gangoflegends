@@ -905,6 +905,13 @@ export function createRenderer(canvas) {
   aimBar.renderOrder = 5; aimBar.visible = false; scene.add(aimBar);
   const aimBack = new THREE.Mesh(aimBar.geometry, aimBar.material.clone()); // the other half of a two-sided strip (Flay), dimmer
   aimBack.material.opacity = 0.15; aimBack.renderOrder = 5; aimBack.visible = false; scene.add(aimBack);
+  // Flay: chevrons along the strip pointing the way it knocks everyone (away from the cursor), like League's
+  const aimArrows = new THREE.Group(), chevMat = aimBar.material.clone(); chevMat.opacity = 0.6;
+  for (let k = 0; k < 4; k++) for (const s of [-1, 1]) {
+    const m = new THREE.Mesh(new THREE.PlaneGeometry(0.08, 0.5).rotateX(-Math.PI / 2), chevMat);
+    m.rotation.y = -s * 0.8; m.position.set(s * 0.17, 0.01, 0.75 - k * 0.5); m.renderOrder = 6; aimArrows.add(m);
+  }
+  aimArrows.visible = false; scene.add(aimArrows);
   // a spot-targeted ability (Singed Q): its range round my champ and the puddle where the cursor is
   const ringMat = aimBar.material.clone(); ringMat.side = THREE.DoubleSide;
   const aimRange = new THREE.Mesh(new THREE.RingGeometry(0.97, 1, 64).rotateX(-Math.PI / 2), ringMat);
@@ -933,10 +940,11 @@ export function createRenderer(canvas) {
     }
     const me = !spot && aim?.range && avatars[aim.slot];
     aimBar.visible = !!me;
-    aimBack.visible = !!me && !!aim.back;
+    aimBack.visible = aimArrows.visible = !!me && !!aim.back;
     if (me) {
       const hp = me.parts[HIPS].position;
-      for (const [bar, yaw] of [[aimBar, aim.yaw], [aimBack, aim.yaw + Math.PI]]) { bar.position.set(hp.x, hp.y - HIP_HEIGHT + 0.05, hp.z); bar.rotation.y = yaw; bar.scale.set(0.7, 1, aim.range); }
+      for (const [bar, yaw] of [[aimBar, aim.yaw], [aimBack, aim.yaw + Math.PI]]) { bar.position.set(hp.x, hp.y - HIP_HEIGHT + 0.05, hp.z); bar.rotation.y = yaw; bar.scale.set(aim.back ? 1.6 : 0.7, 1, aim.range); } // Flay's strip is as wide as it hits (sim.js flay)
+      if (aim.back) { aimArrows.position.set(hp.x, hp.y - HIP_HEIGHT + 0.05, hp.z); aimArrows.rotation.y = aim.yaw + Math.PI; aimArrows.scale.setScalar(aim.range / 3); }
     }
     for (const fn of animated) fn({ dt, time });
     stepParticles(dt);
