@@ -328,6 +328,17 @@ export function createRenderer(canvas) {
     avatars = s.players.map((p, slot) => { const a = makeAvatar(p.champ, playerColor(s, slot), p.name, !!s.teams); world.add(a.group); return a; });
     hookPool = []; gluePool = [];
     camAt.set(0, 0, 0); camDist = 14;
+    // compile the new map's shaders off the main thread (KHR_parallel_shader_compile) before drawing it: compiling them
+    // in the first frame froze the game for ~2.5s. After the stage's sky is in: its environment map changes every
+    // material's program
+    const sky = skyReady; skyReady = null;
+    const mark = compiling = (sky ?? Promise.resolve()).then(() => {
+      renderer.setRenderTarget(composer.readBuffer); // the RenderPass draws into this (linear, no tone mapping): compile those variants
+      const job = renderer.compileAsync(scene, camera);
+      renderer.setRenderTarget(null);
+      return job;
+    }).catch(() => {}).then(() => { if (compiling === mark) compiling = null; });
+    return mark;
   }
 
   function sky(top, horizon, bottom) {
@@ -491,10 +502,12 @@ export function createRenderer(canvas) {
     // beasts included. Its mean is the stage's ambient probe, so it goes in at full strength. Unity's cube faces are in
     // its left-handed frame: a half turn about y lines them up with ours (z flipped)
     if (sc.env?.sky) {
+      let done; skyReady = new Promise(res => { done = res; });
       const cube = new THREE.CubeTextureLoader().setPath(base).load(sc.env.sky, t => {
+        done();
         if (scene.background !== t) return; // left the map meanwhile
         skyEnv?.dispose(); skyEnv = pmrem.fromCubemap(t); scene.environment = skyEnv.texture;
-      });
+      }, undefined, () => done());
       cube.colorSpace = THREE.SRGBColorSpace;
       scene.background = cube; scene.backgroundRotation.set(0, Math.PI, 0); scene.environmentRotation.set(0, Math.PI, 0);
       scene.environmentIntensity = view.dim ?? 1;
@@ -963,7 +976,9 @@ export function createRenderer(canvas) {
     return Math.atan2(aimHit.x - hp.x, aimHit.z - hp.z);
   }
 
+  let compiling = null, skyReady = null; // setMatch's shader compile, until it's done (nothing drawn meanwhile)
   function render(dt) {
+    if (compiling) return;
     time += dt;
     const spot = aim?.point && avatars[aim.slot];
     aimRange.visible = aimSpot.visible = !!spot;
