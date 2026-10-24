@@ -735,6 +735,19 @@ if ((await prepareMap('incinerator')).imported) {
   console.log('belt carried', (9.5 - torso(sim, 0).x).toFixed(2));
   assert.ok(torso(sim, 0).x < 8.5, 'belt rolls you toward the pit');
 }
+// 15. Subway (when imported): a train comes down the track, carries whoever's on it into the tunnel and they're out
+if ((await prepareMap('subway')).imported) {
+  const { trainsAt, MAPS } = await import('./maps.js');
+  const sim = createSim({ mapId: 'subway', players: [0, 1].map(i => ({ id: i, name: 'P', champ: 'blitz', team: i })) });
+  let t = 0; while (!trainsAt(MAPS.subway, t).some(o => o.k === 0)) t += 1 / 60; // the first train on the back track (z 6, running +x)
+  run(sim, Math.ceil((t + 1.5) * 60) - 1);
+  const p = sim.players[0], t0 = torso(sim, 0);
+  for (const b of p.bodies) { const q = b.translation(); b.setTranslation({ x: q.x - t0.x, y: q.y - t0.y - 0.6, z: q.z - t0.z + 6 }, true); b.setLinvel({ x: 0, y: 0, z: 0 }, true); }
+  let out = false;
+  for (let i = 0; i < 240 && !out; i++) { sim.step(); out = !p.alive; }
+  assert.ok(out, 'a train carries you into the tunnel');
+  console.log('subway train ok');
+}
 console.log('all ok');
 
 // 12j. GB mode: my copy plays my own punch and Vi's windup at once (for show); the host still does the hitting

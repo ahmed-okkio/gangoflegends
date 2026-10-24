@@ -23,6 +23,7 @@ GROUPS = {
     "win": r"^GB VO [A-Z]{3} WIN LAUGH",
     "star": r"^GB SFX WIN STAR",
     "count": r"^GB SFX CountDown",
+    "train": r"^GB SFX TRAIN ENGINE LOOP",  # Subway's trains (core-audio-stages)
 }
 
 os.makedirs(OUT, exist_ok=True)

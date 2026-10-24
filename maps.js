@@ -4,7 +4,28 @@
 // rollers: kinematic cylinders along x that spin at `spin` rad/s; render reads the same data.
 // belts: conveyors { min, max, top, v }: the imported rollers in that x/z area become a slab at height top whose surface moves at v.
 
+// trains: { tracks: [{ z, dir }], y, reach, speed, delay: [min, max] }: a car (the imported stage's `train`) runs each track
+// from x = -dir * reach to dir * reach, then waits a delay before the next. Kill boxes deep in the tunnels do the rest.
+
 const box = (x, y, z, hx, hy, hz, m = 'girder') => ({ p: [x, y, z], s: [hx, hy, hz], m });
+
+// where the trains are at match time t: [{ x, z, dir }] for the ones out on the line. A pure function of t, so the host,
+// the clients' predicted worlds and the renderer all agree without sending anything
+export function trainsAt(map, t) {
+  const T = map.trains;
+  if (!T) return [];
+  const out = [], run = 2 * T.reach / T.speed;
+  T.tracks.forEach(({ z, dir }, k) => {
+    for (let n = 0, at = 0; ; n++) { // ponytail: walks the schedule from 0 each call; ~t / 20s steps, cache if matches run for hours
+      const r = Math.sin(n * 12.9898 + k * 78.233) * 43758.5453;
+      at += T.delay[0] + (r - Math.floor(r)) * (T.delay[1] - T.delay[0]); // Gang Beasts' TrainSpawn: a random 4-30s between trains
+      if (t < at) break;
+      if (t < at + run) { out.push({ x: dir * (T.speed * (t - at) - T.reach), z, dir, k }); break; }
+      at += run;
+    }
+  });
+  return out;
+}
 
 export const MAPS = {
   // Gang Beasts stages (gb); without an import each is a stand-in: Girders its own beams, the rest a plain floor
@@ -70,6 +91,8 @@ export const MAPS = {
     killY: -6,
     boxes: [box(3.5, -0.2, 0, 8, 0.2, 3, 'plate')],
     rollers: [], kill: [],
+    // Gang Beasts' trains: the back track runs +x, the front -x. Speed by eye; the tunnels' kill boxes start at |x| 17
+    trains: { tracks: [{ z: 6, dir: 1 }, { z: -6, dir: -1 }], y: -1.5, reach: 60, speed: 25, delay: [4, 30] },
     spawns: [[9.5, 0, 1.5], [2.3, 0, -2.5], [5.2, 0, 2.5], [-2.5, 0, 1.5], [-2.5, 0, -1.5], [9.5, 0, -1.5], [2.3, 0, 2.5], [5.3, 0, -2.5]],
   },
   grind: {

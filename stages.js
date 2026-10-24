@@ -50,6 +50,7 @@ export async function prepareMap(id, { meshes = !isNode } = {}) {
     tris: tris.map(t => meshTris(scene.meshes[t.mesh], bins[t.mesh], t.matrix)),
     rollers: [],
     kill: scene.kill.map(killBox),
+    train: scene.train ?? null, // Subway's car: its renderers and solid box (maps.js trains)
     // stages that place players from code (Ring) have no markers; maps.js has those
     spawns: scene.spawns.length >= 4 ? scene.spawns : map.spawns,
     imported: { scene, bins, base },

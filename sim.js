@@ -1,7 +1,7 @@
 // Host-authoritative game simulation: Rapier world, active ragdolls, abilities, rounds.
 // Runs on the host only (and in Node for tests); clients just render snapshots of it.
 import RAPIER from '@dimforge/rapier3d-compat';
-import { MAPS } from './maps.js';
+import { MAPS, trainsAt } from './maps.js';
 import { CHAMPS } from './champs.js';
 import { PARTS, ANCHOR, HAND, HIP_HEIGHT, CHEST, HEAD, ARM, THIGH, FORE, LEG, HIPS, WAIST } from './beast.js';
 
@@ -112,6 +112,24 @@ export function createSim({ mapId, players, practice = false, roundsToWin = 3, l
     world.createCollider(RAPIER.ColliderDesc.cylinder(r.hx, r.r).setFriction(1.5).setCollisionGroups(WORLD_GROUPS), body);
     return { r, body };
   });
+  // trains: one kinematic car per track, parked far below until trainsAt() has it out on the line
+  const PARK = V(0, -100, 0);
+  const trains = map.train?.box && map.trains ? map.trains.tracks.map(() => {
+    const body = world.createRigidBody(RAPIER.RigidBodyDesc.kinematicPositionBased().setTranslation(PARK.x, PARK.y, PARK.z));
+    const { c, h } = map.train.box;
+    world.createCollider(RAPIER.ColliderDesc.cuboid(...h).setTranslation(...c).setCollisionGroups(WORLD_GROUPS), body);
+    return { body, out: false };
+  }) : [];
+  function moveTrains(t) {
+    const on = trainsAt(map, t);
+    trains.forEach((tr, k) => {
+      const now = on.find(o => o.k === k);
+      if (!now) { if (tr.out) tr.body.setTranslation(PARK, true); tr.out = false; return; }
+      const at = V(now.x, map.trains.y, now.z);
+      if (tr.out) tr.body.setNextKinematicTranslation(at); else tr.body.setTranslation(at, true); // first frame: appear there, don't sweep from the park
+      tr.out = true;
+    });
+  }
 
   const ps = players.map((pl, slot) => ({
     ...pl, slot, bit: 1 << (slot + 1), champ: CHAMPS[pl.champ] ? pl.champ : 'blitz',
@@ -898,6 +916,7 @@ export function createSim({ mapId, players, practice = false, roundsToWin = 3, l
     if (!e[1]) { if (me.alive) removeRagdoll(me); return; }
     const x = SX, hp = V(e[6], e[7], e[8]), hv = V(e[x + 1], e[x + 2], e[x + 3]), ack = e[x + 4];
     const lag = (tick - ack) * DT; // this state is the host's me that long ago (a round trip, roughly)
+    mt = s.mt + lag; // the host's clock, run on to now: trains are where they'll be when my inputs land
     // countdown: my inputs land on the host a round trip (tick - ack) after this snapshot's clock, so start moving that much early
     if (st === 'count') { timer = s.t - lag; if (timer <= 0) st = 'fight'; }
     if (!me.alive) { // (re)spawned on the host: start from the spawn point it used
@@ -979,6 +998,7 @@ export function createSim({ mapId, players, practice = false, roundsToWin = 3, l
   function stepLocal() {
     mt += DT; tick++;
     for (const { r, body } of rollers) body.setNextKinematicRotation(rollerRot(r, mt));
+    moveTrains(mt);
     glue = glue.filter(g => (g.t -= DT) > 0);
     ownGlue = st === 'count' ? [] : ownGlue.filter(g => (g.t -= DT) > 0);
     if (st === 'count' && (timer -= DT) <= 0) st = 'fight';
@@ -998,6 +1018,7 @@ export function createSim({ mapId, players, practice = false, roundsToWin = 3, l
     if (me) return stepLocal();
     mt += DT;
     for (const { r, body } of rollers) body.setNextKinematicRotation(rollerRot(r, mt));
+    moveTrains(mt);
     glue = glue.filter(g => (g.t -= DT) > 0);
     if (st === 'count' && (timer -= DT) <= 0) st = 'fight';
     const active = st !== 'count';

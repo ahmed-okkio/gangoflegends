@@ -207,6 +207,31 @@ for o in env.objects:
         try: trimeshes.append({"path": p, "mesh": export_mesh(c.m_Mesh), "matrix": [rnd(r, 5) for r in flipz(m)]})
         except Exception as e: print("  collider mesh failed", p, e)
 
+# Subway's train: one car, saved inactive in the scene (the game pools and spawns it). Its renderers go in "train", placed
+# relative to the car's root, and its solid box; maps.js runs it along the tracks
+MOVER = {"subway": "Train A(Clone)"}
+train = None
+if stage in MOVER:
+    root = next(pid for pid in transforms if gos[go_of[pid]].m_Name == MOVER[stage] and in_scene(transforms[pid]))
+    rt = wm(root)  # rigid: its inverse is the transposed rotation and the translation turned back
+    inv = [[rt[j][i] for j in range(3)] + [-sum(rt[j][i] * rt[j][3] for j in range(3))] for i in range(3)] + [[0, 0, 0, 1]]
+    under = lambda pid: pid == root or (parent_of[pid] in transforms and under(parent_of[pid]))
+    train = {"renderers": [], "box": None}
+    for o in env.objects:
+        if o.type.name not in ("MeshRenderer", "BoxCollider") or not in_scene(o): continue
+        c = o.read(); pid = tf_of_go.get(c.m_GameObject.path_id)
+        if pid is None or not under(pid) or not (gos[go_of[pid]].m_IsActive or pid == root): continue
+        m = mmul(inv, wm(pid))
+        if o.type.name == "BoxCollider":
+            if not c.m_IsTrigger and pid == root: train["box"] = {"c": rnd([c.m_Center.x, c.m_Center.y, -c.m_Center.z]), "h": rnd([c.m_Size.x / 2, c.m_Size.y / 2, c.m_Size.z / 2])}
+            continue
+        go = gos[go_of[pid]]
+        mf = next((comp for comp in (x.component.read() if hasattr(x, "component") else x.read() for x in go.m_Component) if comp.object_reader.type.name == "MeshFilter"), None)
+        if not mf or not mf.m_Mesh.path_id or not c.m_Enabled: continue
+        mkey = export_mesh(mf.m_Mesh); mats = [export_material(x) for x in c.m_Materials if x.path_id]
+        train["renderers"].append({"path": path(pid), "mesh": mkey, "subs": list(range(min(len(mats), len(meshes[mkey]["subs"])))), "mats": mats,
+                                   "matrix": [rnd(r, 5) for r in flipz(m)], "lightmap": -1, "lmso": [1, 1, 0, 0], "cast": 1, "recv": True, "layer": go.m_Layer})
+
 # free-for-all spawn points: named "Player Spawnpoint" (Girders), or the children of the single-player group
 # ("SingleSpawns", "1-8", "StartSpawns") elsewhere. Stages that place players from code (Ring) get none; maps.js supplies those.
 def spawn_point(pid):
@@ -288,5 +313,5 @@ for o in env.objects:
                            "shadows": t["m_Shadows"]["m_Type"] > 0, "mask": t["m_CullingMask"]["m_Bits"], "name": gos[l.m_GameObject.path_id].m_Name, "jitter": jitter.get(l.m_GameObject.path_id)})
 
 json.dump({"stage": stage, "meshes": meshes, "materials": materials, "renderers": renderers, "colliders": colliders, "capsules": capsules, "trimeshes": trimeshes,
-           "spawns": spawns, "kill": kills, "lightmaps": lightmaps, "env": env_light, "lights": lights}, open(os.path.join(out, "scene.json"), "w"), indent=0)
+           "spawns": spawns, "kill": kills, "train": train, "lightmaps": lightmaps, "env": env_light, "lights": lights}, open(os.path.join(out, "scene.json"), "w"), indent=0)
 print(f"{stage}: {len(renderers)} renderers, {len(meshes)} meshes, {len(materials)} materials, {len(colliders)} boxes, {len(capsules)} capsules, {len(trimeshes)} mesh colliders, {len(spawns)} spawns, {len(kills)} kill boxes, lightmaps {lightmaps}, lights {[(x["type"], x["name"], x["intensity"], x["mask"]) for x in lights]}")

@@ -30,6 +30,21 @@ export function play(group, vol = 1, rate = 0.92 + Math.random() * 0.16) {
   }, () => {});
 }
 
+// a looping sound held at `vol` (0 silences it), set every frame: Subway's train engines
+const loops = {}; // group -> { gain } once started
+export function loop(group, vol) {
+  const list = index[group];
+  if (!ctx || !list?.length) return;
+  if (!loops[group]) {
+    if (vol <= 0) return;
+    loops[group] = { gain: ctx.createGain() };
+    loops[group].gain.connect(ctx.destination);
+    buffers[list[0]] ??= xhr(base + list[0], 'arraybuffer').then(b => ctx.decodeAudioData(b));
+    buffers[list[0]].then(buf => { const src = ctx.createBufferSource(); src.buffer = buf; src.loop = true; src.connect(loops[group].gain); src.start(); }, () => {});
+  }
+  loops[group].gain.gain.setTargetAtTime(vol * VOLUME * volume, ctx.currentTime, 0.05);
+}
+
 // menu sounds: short synthesized ticks, quiet and clean. [from Hz, to Hz, seconds, gain, wave, delay]
 const UI = {
   hover: [[2600, 2600, 0.016, 0.012, 'sine']],
