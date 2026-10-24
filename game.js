@@ -121,10 +121,11 @@ document.querySelector('.tabs').onclick = e => { const t = e.target.closest('.ta
 const vnum = v => v.split('.').reduce((n, x) => n * 1000 + +x, 0);
 const seenVer = store.get('seenVersion', null), played = store.get('volume') != null;
 if (VERSION !== 'dev') store.set('seenVersion', VERSION);
-// their bit of Markdown: paragraphs, "- " lists (a line just above one is its heading), **bold**
-const md = s => s.split('\n').filter(Boolean).map((l, i, a) => {
-  const t = esc(l.replace(/^- /, '')).replace(/\*\*(.+?)\*\*/g, '<b>$1</b>');
-  return l.startsWith('- ') ? `<li>${t}</li>` : a[i + 1]?.startsWith('- ') ? `<h4>${t}</h4>` : `<p>${t}</p>`;
+// their bit of Markdown (the format release.cjs documents): "## " sections, "### " a champion in one, "- " bullets,
+// *italic* (the closing who-needs-it line), **bold**
+const md = s => s.split('\n').filter(Boolean).map(l => {
+  const t = esc(l.replace(/^(#{2,3}|-) /, '')).replace(/\*\*(.+?)\*\*/g, '<b>$1</b>').replace(/\*(.+?)\*/g, '<i>$1</i>');
+  return l.startsWith('### ') ? `<h5>${t}</h5>` : l.startsWith('## ') ? `<h4>${t}</h4>` : l.startsWith('- ') ? `<li>${t}</li>` : `<p>${t}</p>`;
 }).join('').replace(/(<li>.*?<\/li>)+/g, m => `<ul>${m}</ul>`);
 xhr('patchnotes.json', 'json').then(notes => {
   const since = VERSION === 'dev' ? null : seenVer ?? (played ? notes[notes.findIndex(n => n.v === VERSION) + 1]?.v : VERSION);
@@ -664,6 +665,7 @@ function frame(now) {
     const shift = carryOn(a, b, alpha, s[s.length - 1], at, dt), own = limp ? null : { slot: game.mySlot, a: game.mine[0] ?? game.mine[1], b: game.mine[1], alpha: acc / DT };
     if (!limp) shift[game.mySlot] = null;
     slideOver(limp, own, a, b, alpha, shift, dt);
+    const fa = s.at(-2) ?? s.at(-1), fb = s.at(-1); // the newest two snapshots (my hooks from the host, below)
     // my own hook and glue: drawn from my copy (cast at once) until the host's catch / puddle shows up on screen
     const og = local.ownGlue.filter(g => !b.g?.some(h => h[5] === g.team && Math.hypot(h[0] - g.x, h[2] - g.z) < 1));
     // GB mode: my hook as the host has it, from the newest snapshots like my arms
