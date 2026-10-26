@@ -69,7 +69,7 @@ function duo(mapId, players, slot, ow, extra = {}) {
   run(sim, 90);
   lineUp(sim);
   let k = 0;
-  for (; k < 10 && sim.players[1].ko <= 0; k++) { lineUp(sim); run(sim, 22, i => sim.setInput(0, { x: 0, z: 0, b: i < 3 ? BTN.LEFT : 0 })); }
+  for (; k < 10 && sim.players[1].ko <= 0; k++) { lineUp(sim); run(sim, 36, i => sim.setInput(0, { x: 0, z: 0, b: i < 3 ? (k % 2 ? BTN.RIGHT : BTN.LEFT) : 0 })); }
   console.log('punches to KO', k, 'daze', sim.players[1].daze.toFixed(0));
   assert.ok(sim.players[1].ko > 0, 'punches knock out');
   // KO length is fixed and getting up gives a safe window: punching through it doesn't chain another KO

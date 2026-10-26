@@ -690,7 +690,7 @@ export function createSim({ mapId, players, practice = false, roundsToWin = 3, l
       if ((p.queued[arm] -= DT) > 0 && move && p.punchCd <= 0 && p.armCd[arm] <= 0 && p.spin <= 0 && !p.grabs[arm]) {
         const to = punchTarget(p, f), d = to && sub(to.bodies[TORSO].translation(), tp);
         p.punch = { arm, t: 0, hit: new Set(), to };
-        p.punchCd = 0.25; p.armCd[arm] = 0.5; p.queued[arm] = 0; // alternate hands for 4 a second; one hand alone throws 2
+        p.punchCd = 0.25; p.armCd[arm] = 1; p.queued[arm] = 0; // one a second per hand; alternating, 2 a second
         fx('swing', handPos(p, arm), 0, p.slot);
         addVel(T, mul(d ? norm(V(d.x, 0, d.z)) : f, 1.5)); // lunge into it
       }
