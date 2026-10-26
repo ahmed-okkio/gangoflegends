@@ -182,7 +182,7 @@ export function createSim({ mapId, players, practice = false, roundsToWin = 3, l
       alive: true, yaw, daze: 0, sinceHit: 9, ko: 0, cd: [0, 0], punch: null, punchCd: 0, armCd: [0, 0], queued: [0, 0], grabs: [null, null], held: [0, 0],
       stun: 0, spin: 0, spinHit: null, stole: null, charge: 0, empower: 0, jumpT: 0, phase: 0, grounded: false, prevB: p.input.b,
       butt: null, buttCd: 0, lying: false, safe: 0, hooked: 0, spinA: 0, chargeT: 0,
-      emp: null, dash: null, vault: 0, vaultBtn: 0, hay: 0, hayBtn: 0, fb: 0, pulv: 0, flay: 0, fling: 0, tether: null, leap: null, dizzy: 0, kick: null, kickA: 0, palm: 0, qTurn: null,
+      emp: null, dash: null, vault: 0, vaultBtn: 0, hay: 0, hayBtn: 0, fb: 0, pulv: 0, flay: 0, fling: 0, tether: null, leap: null, dizzy: 0, kick: null, kickA: 0, palm: 0, qTurn: null, abduct: 0,
     });
   }
 
@@ -395,6 +395,7 @@ export function createSim({ mapId, players, practice = false, roundsToWin = 3, l
     if (gb && local >= 0 && (HOST_CASTS.includes(ab.id) || LEAPS.includes(ab.id) && p.tether != null)) return;
     if (ab.id === 'charge' && p.charge > 0) { p.charge = 0; return; } // recast ends the charge early
     if (LEAPS.includes(ab.id) && p.tether != null) return leap(p); // recast while they're caught / marked: fly to them
+    if (ab.id === 'abscond' && p.abduct > 0) { if (gb && local >= 0) { p.abduct = 0; return; } return abduct(p); } // the chains tie him to someone: the host's
     if (p.cd[i] > 0) return;
     if (ab.id === 'hijack') return hijack(p, ab);
     if (ab.id === 'sonic' && !turned && ahead(p) < -0.5) { p.qTurn = { yaw: p.yaw, t: 0.4 }; return; } // aimed over 120° round: turn first, then thrust (control())
@@ -408,7 +409,7 @@ export function createSim({ mapId, players, practice = false, roundsToWin = 3, l
     } else if (ab.id === 'hook' || ab.id === 'sentence') hooks.push({ o: p, pos: add(add(t, mul(f, 0.7)), V(0, 0.2, 0)), dir: f, t: 0, vic: null, pull: 0, thresh: ab.id === 'sentence' });
     else if (ab.id === 'fist') { p.empower = 4; p.emp = 'launch'; }
     else if (ab.id === 'rampage') { p.spin = SPIN; p.spinHit = new Set(); }
-    else if (ab.id === 'abscond') { p.dash = { t: 0.2, power: 0, sylas: true }; p.empower = 4; p.emp = 'aoe'; fx('swing', t, 0, p.slot); }
+    else if (ab.id === 'abscond') { p.dash = { t: 0.2, power: 0, sylas: true }; p.empower = 4; p.emp = 'aoe'; p.abduct = ab.recast; fx('swing', t, 0, p.slot); }
     else if (ab.id === 'charge') { p.charge = CHARGE; p.chargeT = 0; }
     else if (ab.id === 'vault') { p.vault = DT; p.vaultBtn = btn; } // charges while held, see control()
     else if (ab.id === 'relentless') { p.empower = 4; p.emp = 'through'; }
@@ -462,13 +463,23 @@ export function createSim({ mapId, players, practice = false, roundsToWin = 3, l
       if (o.ko <= 0 && o.safe <= 0) { o.stun = Math.max(o.stun, both ? 1.5 : 0.6); cancel(o); } // timed right, it stops a dash (Vi Q) mid-flight
     }
   }
-  // Thresh Q / Lee Sin Q recast: fly at whoever the chain is on (Lee: whoever the wave marked)
+  // Sylas E recast (Abduct): within 3s of Abscond, both hands throw a chain at the cursor. The first champ they hit is
+  // stopped dead, and he flies to them and knocks them back like Lee Sin's Q recast (stepHooks, leap)
+  function abduct(p) {
+    p.abduct = 0;
+    if (typeof p.input.a === 'number') p.yaw = p.input.a;
+    const f = facing(p), t = p.bodies[TORSO].translation();
+    hooks.push({ o: p, pos: add(add(t, mul(f, 0.6)), V(0, 0.2, 0)), dir: f, t: 0, vic: null, pull: 0, sylas: true });
+    fx('swing', t, 0, p.slot);
+  }
+  // Thresh Q / Lee Sin Q recast: fly at whoever the chain is on (Lee: whoever the wave marked). Abduct's chains stay on
+  // them while he flies
   function leap(p) {
-    const q = ps[p.tether], t = p.bodies[TORSO].translation(), lee = hooks.some(h => h.o === p && h.lee);
+    const q = ps[p.tether], t = p.bodies[TORSO].translation(), sy = hooks.some(h => h.o === p && h.sylas), lee = sy || hooks.some(h => h.o === p && h.lee);
     p.tether = null;
-    hooks = hooks.filter(h => h.o !== p);
+    hooks = hooks.filter(h => h.o !== p || h.sylas);
     if (!q || !live(q)) return;
-    p.leap = { slot: q.slot, t: 0, lee }; // reeled in until he reaches them (control())
+    p.leap = { slot: q.slot, t: 0, lee, sy }; // reeled in until he reaches them (control())
     fx('swing', t, 0, p.slot);
   }
   // Thresh E: sweep the chain through a line on both sides of him, knocking everyone in it up and along the way he aimed
@@ -558,7 +569,7 @@ export function createSim({ mapId, players, practice = false, roundsToWin = 3, l
     const move = ctrl && (p.stun -= DT) <= 0 ? 1 : 0; // staggered: can't steer, jump or cast
     if ((p.sinceHit += DT) > 1.2) p.daze = Math.max(0, p.daze - 15 * DT);
     p.cd = p.cd.map((c, i) => i === 0 && hooks.some(h => h.o === p && h.lee) ? c : Math.max(0, c - DT)); // Sonic Wave cools once the wave missed, the mark wore off or he flew in
-    p.punchCd -= DT; p.armCd[0] -= DT; p.armCd[1] -= DT; p.empower -= DT; p.jumpT -= DT; p.buttCd -= DT;
+    p.abduct -= DT; p.punchCd -= DT; p.armCd[0] -= DT; p.armCd[1] -= DT; p.empower -= DT; p.jumpT -= DT; p.buttCd -= DT;
 
     const tp = T.translation(), tv = T.linvel(), Hb = p.bodies[HIPS];
     const ray = world.castRay(new RAPIER.Ray(tp, DOWN), STAND + 0.3, true, undefined, under(p));
@@ -683,7 +694,7 @@ export function createSim({ mapId, players, practice = false, roundsToWin = 3, l
 
     // posture: hips, waist, chest and head stay upright and face the stick direction (rigidly while hoisting: hanging off the
     // shoulders, the lifted chest would otherwise swing about them; barely while swinging the legs, which turns the body over)
-    const fk = !!p.leap?.lee; // Sonic Wave's recast: a flying kick, foot first
+    const fk = !!p.leap?.lee && !p.leap.sy; // Sonic Wave's recast: a flying kick, foot first
     // grab assist: a hand held out to grab goes for whoever a punch would track, bending down to someone on the floor
     const gt = p.grounded && p.held.some((h, i) => h >= TAP && !p.grabs[i]) && punchTarget(p, f), gTo = gt && sub(gt.bodies[TORSO].translation(), tp);
     const lean = fk ? -0.6 : p.kickA > 0 ? -0.25 : p.charge > 0 || p.dash ? 0.35 : p.butt ? 0.9 * Math.sin(Math.min(1, p.butt.t / 0.25) * Math.PI) : gTo ? Math.min(GRAB_LEAN, Math.max(0, -gTo.y - 0.05) * 4) : 0, yq = qyaw(p.yaw + p.spinA), up = (sw ? 0.05 : p.pushUp ? 1 : fk ? 0.5 : p.grounded ? 0.3 : 0.15) * ctrl;
@@ -830,13 +841,12 @@ export function createSim({ mapId, players, practice = false, roundsToWin = 3, l
         hit(vic, part, add(mul(norm(V(vt.x - tp.x, 0, vt.z - tp.z)), 7.5), V(0, 2.5, 0)), 24);
       }
     }
-    if (p.dash) {
+    if (p.dash && !p.dash.sylas) { // Abscond is just a dash: it doesn't stop on champs or bump them
       // Alistar's Headbutt also catches someone above him (launched by Pulverize), up to ~2m over his head
       const [first] = [0, ...(p.dash.ali ? [0.9, 1.8] : [])].flatMap(h => playersNearSeen(p, add(tp, add(mul(f, 0.45), V(0, h, 0))), 0.6));
       if (first) {
         const k = p.dash.power, air = !first.vic.grounded; // Alistar's Headbutt sends someone already airborne much further
-        if (p.dash.sylas) hit(first.vic, first.part, add(mul(f, 3), V(0, 1, 0)), 10); // Abscond: just a bump
-        else if (p.dash.ali) hit(first.vic, first.part, add(mul(f, air ? 11.2 : 7.8), V(0, air ? 4 : 3, 0)), air ? 40 : 30);
+        if (p.dash.ali) hit(first.vic, first.part, add(mul(f, air ? 11.2 : 7.8), V(0, air ? 4 : 3, 0)), air ? 40 : 30);
         else hit(first.vic, first.part, mul(add(mul(f, 6 + k * 6), V(0, 2 + k * 2, 0)), 0.85), (25 + k * 20) * 0.85); // Vi Q
         p.dash = null;
         addVel(T, mul(f, -2));
@@ -923,11 +933,17 @@ export function createSim({ mapId, players, practice = false, roundsToWin = 3, l
         if (first) {
           h.vic = first.vic;
           if (h.lee) fx('sonic', first.vic.bodies[TORSO].translation(), 0, h.o.slot, h.vic.slot); // marked: nothing else, till he recasts
+          else if (h.sylas) { // Abduct: stopped dead, held there till he lands, and he flies in
+            hit(first.vic, first.part, V(), 10);
+            if (local < 0 && h.vic.safe <= 0) { cancel(h.vic); for (const b of h.vic.bodies) b.setLinvel(V(), true); if (h.vic.ko <= 0) h.vic.stun = Math.max(h.vic.stun, 1); }
+            h.o.tether = h.vic.slot; leap(h.o); return true;
+          }
           else { hit(first.vic, first.part, V(), 25); if (local < 0) cancel(h.vic); }
           if (h.leap) { h.o.tether = h.vic.slot; leap(h.o); return false; } // recast while it flew: straight to them
         }
-        return h.vic || h.t < 0.42;
+        return h.vic || h.t < (h.sylas ? 0.3 : 0.42); // Abduct's chains reach ~8m
       }
+      if (h.sylas) { h.pos = h.vic.bodies[TORSO].translation(); return !!h.o.leap && h.vic.alive && h.o.alive; } // drawn on them till he lands
       // what my copy's hook caught is the host's call: it just stays on the stand-in until the host's catch is on screen
       // (game.js). ponytail: 0.6s, about the longest that takes; after a miss the host's sees it shown that long
       if (local >= 0) { h.pos = add(h.vic.bodies[TORSO].translation(), V(0, 0.45, 0)); if (h.thresh || h.lee) h.o.tether = h.vic.slot; return (h.pull += DT) < (h.lee ? 3 : 0.6); }
@@ -1163,7 +1179,7 @@ export function createSim({ mapId, players, practice = false, roundsToWin = 3, l
         out.push(Math.round(hayK(p) * 100), r2(v.x), r2(v.y), r2(v.z), p.ack, r2(Math.max(0, p.stun)), p.hooked > 0 ? 1 : 0, r2(Math.max(0, p.ko)), r2(p.yaw));
         return out;
       }),
-      h: hooks.map(h => [h.o.slot, r2(h.pos.x), r2(h.pos.y), r2(h.pos.z), (h.thresh || h.lee) && h.vic ? h.vic.slot : -1, h.vic ? 1 : 0]), // ..., caught
+      h: hooks.map(h => [h.o.slot, r2(h.pos.x), r2(h.pos.y), r2(h.pos.z), (h.thresh || h.lee) && h.vic ? h.vic.slot : -1, h.vic ? 1 : 0, h.sylas ? 1 : 0]), // ..., caught, Abduct's chains
       g: glue.map(g => [r2(g.x), r2(g.y), r2(g.z), r2(g.t), g.r, g.team]),
       ch: ps.map(p => p.champ),
       sl: ps.map(p => p.stole ?? 0), // Sylas: whose Q he stole

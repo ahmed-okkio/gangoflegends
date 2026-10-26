@@ -153,6 +153,20 @@ function duo(mapId, players, slot, ow, extra = {}) {
   assert.equal(sim.snapshot().sl[0], 'blitz', 'steal in snapshot');
   run(sim, 10, i => sim.setInput(0, { x: 0, z: 0, b: i < 2 ? BTN.A2 : 0 }));
   assert.ok(sim.players[0].empower > 0 && sim.players[0].emp === 'aoe' && sim.players[0].cd[1] > 6, 'abscond: dash, empowered, cooling at once');
+  // Abduct: Abscond's recast throws the chains; the champ hit is stopped and Sylas flies in and knocks them back
+  const s2 = near('sylas', 'blitz');
+  run(s2, 90);
+  lineUp(s2, 7);
+  const bx = torso(s2, 1).x;
+  let stopped = false, flew = false;
+  run(s2, 90, i => {
+    s2.setInput(0, { x: 0, z: 0, b: i < 2 || (i > 20 && i < 23) ? BTN.A2 : 0, a: Math.PI / 2 });
+    if (s2.players[1].stun > 0.5) stopped = true;
+    if (s2.players[0].leap?.sy) flew = true;
+  });
+  console.log('abduct shove', (torso(s2, 1).x - bx).toFixed(2), 'gap', (torso(s2, 1).x - torso(s2, 0).x).toFixed(2));
+  assert.ok(stopped && flew, 'abduct: chains stop them and he flies in');
+  assert.ok(torso(s2, 1).x - bx > 1, 'abduct knocks them back');
   console.log('sylas ok');
 }
 
