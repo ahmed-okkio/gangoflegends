@@ -24,7 +24,7 @@ function lineUp(sim, gap = 1.1) {
 }
 
 // a host and a client predicting `slot`, `ow` ticks apart each way. step(inp, hostSide) runs one tick of both; the client's
-// inputs go up every tick (the last 6), snapshots and the host's events come down every other tick
+// inputs go up every tick (the last 6), snapshots and the host's events come down every tick (60Hz, like game.js)
 function duo(mapId, players, slot, ow, extra = {}) {
   const { gb, ...opts } = extra, host = createSim({ mapId, players, ...opts }), cli = createSim({ mapId, players, local: slot, gb });
   const wire = [], q = [], d = { host, cli, i: 0, snaps: [], events: [] };
@@ -41,7 +41,7 @@ function duo(mapId, players, slot, ow, extra = {}) {
     }
     hostSide?.(host);
     host.step();
-    if (d.i % 2) wire.push({ to: 'cli', at: d.i + ow, s: JSON.parse(JSON.stringify(host.snapshot())), ev: host.takeEvents() });
+    wire.push({ to: 'cli', at: d.i + ow, s: JSON.parse(JSON.stringify(host.snapshot())), ev: host.takeEvents() });
     d.i++;
   };
   return d;
@@ -710,7 +710,7 @@ for (const [gap, draw] of [[0.3, true], [0.7, false]]) {
   const sim = createSim({ mapId: 'girders', players: Array.from({ length: 8 }, (_, i) => ({ id: i, name: 'P', champ: i % 2 ? 'hec' : 'blitz', team: i })) });
   run(sim, 120);
   const bytes = JSON.stringify(sim.snapshot()).length;
-  // on the wire (wire.js): rotations packed, and back turned the same to within 0.1 degree
+  // on the wire (wire.js): packed binary, every field back as sim.js rounded it, rotations turned the same to within 0.1 degree
   const snap = sim.snapshot(), wire = JSON.stringify(packSnap(snap)), back = unpackSnap(JSON.parse(wire));
   console.log('8p snapshot bytes', bytes, 'on the wire', wire.length);
   assert.ok(bytes < 5000 && wire.length < bytes * 0.55);

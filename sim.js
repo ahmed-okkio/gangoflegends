@@ -1001,8 +1001,8 @@ export function createSim({ mapId, players, practice = false, roundsToWin = 3, l
     if (Math.abs(dp.y) < 0.3) dp.y = 0;
     if (Math.abs(dv.y) < 4) dv.y = 0;
     // ragdolls never match exactly and the stand-ins I bump into trail by the ping, so small drift (<10cm) is left alone,
-    // a moderate one is pulled in a third per snapshot (eased in through `smooth`, no visible snap), and only a real
-    // gap (>0.5m) is taken at once. Velocity a fifth at a time when it's well off: it's a round trip old, and walking has
+    // a moderate one is pulled in a fifth per snapshot (60 a second: about a third per 30Hz one, as it was tuned; eased in
+    // through `smooth`, no visible snap), and only a real gap (>0.5m) is taken at once. Velocity a tenth at a time when it's well off: it's a round trip old, and walking has
     // mostly pulled it back since (taking it whole kicked me back and forth while shoving someone)
     const d = len(dp), up = dv.y > 0; // launched: rising 4+ m/s faster than my copy was
     if ((d > 0.5 || len(dv) > 3) && e[x + 5] > 0 && (up || e[x + 5] > lag)) {
@@ -1020,7 +1020,7 @@ export function createSim({ mapId, players, practice = false, roundsToWin = 3, l
       hist.clear(); // the ticks since were predicted without the hit
       return;
     }
-    const kp = d > 0.5 ? 1 : d < 0.1 ? 0 : 0.35, kv = len(dv) < 0.5 ? 0 : 0.2;
+    const kp = d > 0.5 ? 1 : d < 0.1 ? 0 : 0.2, kv = len(dv) < 0.5 ? 0 : 0.1;
     const cp = mul(dp, kp), cv = mul(dv, kv);
     shift(cp, cv);
     if (d < 4) smooth = sub(smooth, cp); // not a respawn-sized jump

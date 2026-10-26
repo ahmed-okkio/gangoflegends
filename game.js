@@ -272,8 +272,8 @@ function onSnap(m) {
   // a short window, the delay shrank and the next stall froze them again (media players remember about as long). One
   // that arrives right after a long frame of mine (loading the match, GC) waited on me, not the network: not counted
   const offs = game.offs, t = performance.now();
-  if (!offs.length || t - last < 50) { offs.push(m.s.mt - t / 1000); if (offs.length > 900) offs.shift(); }
-  game.off = Math.max(...offs.slice(-150));
+  if (!offs.length || t - last < 50) { offs.push(m.s.mt - t / 1000); if (offs.length > 1800) offs.shift(); } // 60 a second
+  game.off = Math.max(...offs.slice(-300));
   game.jit = offs.map(o => Math.max(0, game.off - o)).sort((a, b) => a - b)[Math.floor(0.99 * (offs.length - 1))];
   game.local.sync(m.s, m.s.p[game.mySlot]);
   // events ride along on several snapshots (any one can be lost); e[7] numbers them so each plays once (sim.js fx() for
@@ -382,7 +382,7 @@ async function startGame(setup) {
   if (setup.practice || isHost()) game.sim = createSim({ mapId: setup.map, players: setup.players, practice: !!setup.practice, roundsToWin: setup.rounds });
   // my champ, predicted (sim.js). Practice behind a simulated connection has both: game.sim is the host
   if (!game.sim || setup.lag) game.local = createSim({ mapId: setup.map, players: setup.players, local: game.mySlot, gb: GB_MODE });
-  game.fake = setup.lag && { acc: 0, t: 0, n: 0, ev: [] };
+  game.fake = setup.lag && { acc: 0, n: 0, ev: [] };
   game.bots = setup.practice ? setup.players.map(() => ({ t: 0, x: 0, z: 0, hold: 0, hand: 0, ab: 0 })) : null;
   $('escBots').classList.toggle('hidden', !setup.practice);
   attract = null;
@@ -624,8 +624,8 @@ function showAim(inp, dt) {
 }
 
 // ---------- loop ----------
-let last = performance.now(), acc = 0, tick = 0;
-// host: the sim steps on its own timer, not the screen's frames, so snapshots go out every 33ms however the frames fall
+let last = performance.now(), acc = 0;
+// host: the sim steps on its own timer, not the screen's frames, so snapshots go out every tick (60Hz) however the frames fall
 // (a slow or uneven frame rate on the host made everyone's snapshots bursty, and so their playback delay longer). frame()
 // steps it too, so what it draws is up to date. ponytail: same thread as rendering, so a long frame still holds it up; a Worker if that shows
 let hostAt = 0, hostInp = null;
@@ -641,9 +641,10 @@ function hostSteps() {
     const ev = game.sim.takeEvents();
     if (ev.length) { view.fx(ev); if (conn) for (const e of ev) game.sentEv.push([...e, ++game.evN, now]); }
     game.prev = game.cur; game.cur = game.sim.snapshot();
-    // ponytail: full JSON snapshots at 30Hz over PeerJS's reliable channel (~2KB each); move to an unreliable binary channel if 8-player games stutter
-    if (conn && ++tick % 2 === 0) {
-      game.sentEv = game.sentEv.filter(e => now - e[8] < 250); // each event goes out on ~7 snapshots
+    // a snapshot every tick: half the wait for the next one, and the playback delay can be half as long (frame()). 8 players
+    // ~1.2KB each (wire.js) over the unreliable 'fast' channel: ~70KB/s up per client
+    if (conn) {
+      game.sentEv = game.sentEv.filter(e => now - e[8] < 120); // each event goes out on ~7 snapshots
       conn.broadcastFast({ t: 'snap', s: packSnap(game.cur), ev: game.sentEv.map(e => e.slice(0, 8)) });
     }
   }
@@ -692,7 +693,7 @@ function frame(now) {
     if (!s.length || !game.mine) return;
     // the margin over that lateness grows with it: a steady link plays as little as 2 snapshots behind (a good ping gets
     // others as fresh as it can), a bursty one keeps more spare (a gap past it carries on, see carryOn)
-    game.delay += (Math.min(0.7, Math.max(0.067, game.jit * 1.2 + 0.05)) - game.delay) * 0.02;
+    game.delay += (Math.min(0.7, Math.max(0.034, game.jit * 1.2 + 0.025)) - game.delay) * 0.02; // 0.034: 2 snapshots at 60Hz; 0.025: a lost one and a bit
     // that clock runs at wall speed, nudged toward where it should be: at most 5% fast or 15% slow (slower shows as slow
     // motion; engines stay within 0.85-1.1x). The offset jumps a few ms whenever its quickest sample leaves the window,
     // and jumping with it made everyone else stutter
@@ -708,7 +709,7 @@ function frame(now) {
     // knocked out, host-owned or server only, but not tied to anyone: the host's ragdoll on a clock up to 50ms fresher than
     // everyone else's (only my own snapshots' jitter to ride out, not the spare a stall needs; past the newest it holds)
     if (limp && !tied && me.alive) {
-      const t = at + Math.max(0, Math.min(0.05, game.delay - 0.034)), k = Math.max(0, s.findLastIndex(x => x.mt <= t)), p = s[k], q = s[k + 1] ?? p;
+      const t = at + Math.max(0, Math.min(0.05, game.delay - 0.017)), k = Math.max(0, s.findLastIndex(x => x.mt <= t)), p = s[k], q = s[k + 1] ?? p;
       own = { slot: game.mySlot, a: p.p[game.mySlot], b: q.p[game.mySlot], alpha: q === p ? 1 : Math.min(1, Math.max(0, (t - p.mt) / (q.mt - p.mt))) };
     }
     const shift = carryOn(a, b, alpha, s[s.length - 1], at, dt);
@@ -794,8 +795,7 @@ function fakeHost(dt, now) {
     driveBots();
     game.sim.step();
     for (const e of game.sim.takeEvents()) h.ev.push([...e, ++h.n, now]);
-    if (++h.t % 2) continue;
-    h.ev = h.ev.filter(e => now - e[8] < 250);
+    h.ev = h.ev.filter(e => now - e[8] < 120);
     const m = JSON.parse(JSON.stringify({ t: 'snap', s: packSnap(game.sim.snapshot()), ev: h.ev.map(e => e.slice(0, 8)) }));
     lagged(() => onSnap(m), 'down');
   }
