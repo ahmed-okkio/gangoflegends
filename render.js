@@ -528,7 +528,7 @@ export function createRenderer(canvas) {
     // fine mips only: the glow hugs what blooms instead of washing the screen. Soft knee: things just over the threshold
     // (eyes, champion glows, glossy highlights) bloom faintly, the pit and lava fully
     bloom.highPassUniforms.smoothWidth.value = 2.5;
-    bloom.strength = 0.4; bloom.threshold = 2; bloom.radius = 0; bloom.compositeMaterial.uniforms.bloomFactors.value = [1, 0.75, 0.35, 0.1, 0]; renderer.toneMappingExposure = 0.8; scene.environmentIntensity = 0.5 * (view.dim ?? 1); // exposure: by eye (three's ACES curve isn't URP's)
+    bloom.strength = 0.4; bloom.threshold = 2; bloom.radius = 0; bloom.compositeMaterial.uniforms.bloomFactors.value = [1, 0.75, 0.35, 0.1, 0]; renderer.toneMappingExposure = view.exposure ?? 0.8; scene.environmentIntensity = 0.5 * (view.dim ?? 1); // exposure: by eye (three's ACES curve isn't URP's)
     Object.assign(grade.uniforms, { strength: { value: 0.2 }, contrast: { value: 1.06 }, saturation: { value: 1.04 }, shadows: { value: 0.3 } });
     scene.fog = null;
     // the stage's own sky, as Unity bakes it (import_gb.py): the backdrop, and the light on everything without a lightmap,

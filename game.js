@@ -455,7 +455,7 @@ function updateHud(s, now) {
   $('out').classList.toggle('hidden', !!mine?.[1] || !!setup.practice || s.st !== 'fight');
   const recast = s.h?.some(h => h[0] === game.mySlot && h[4] >= 0); // Thresh's caught / Lee's marked: press Q again
   if (mine?.[1]) [...$('abil').children].forEach((el, i) => {
-    const re = i === 0 && recast, cd = re ? 0 : mine[4 + i] / 10;
+    const re = i === 0 ? recast : !!(mine[3] & 1024), cd = re ? 0 : mine[4 + i] / 10; // E: Abscond's Abduct window
     el.classList.toggle('cooling', cd > 0);
     el.classList.toggle('recast', re);
     el.querySelector('.cd').textContent = cd > 0 ? Math.ceil(cd) : '';

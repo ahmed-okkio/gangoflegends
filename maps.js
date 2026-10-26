@@ -36,7 +36,7 @@ export const MAPS = {
     killY: -20, // the street is ~23.5m down, sheer walls: ~2s of falling to grab the edge, a wall or a friend before you're out (not -24: you'd land and be stuck)
     gbKill: false, // GB's own kill volumes start 2m under the roof: out the moment you slip off. killY does it instead
     boxes: [box(0, -0.2, -3, 8, 0.2, 5, 'plate')],
-    rollers: [], kill: [],
+    rollers: [], kill: [{ min: [-5.5, -24, -0.5], max: [-1.5, -2, 5.5] }], // through the skylight: its pit floor is only 3m down
     spawns: [[-6, 0, -3], [6, 0, -3], [0, 0, -7], [0, 0, 1], [-3, 0, -5], [3, 0, -1], [-3, 0, -1], [3, 0, -5]],
   },
   girders: {
@@ -71,7 +71,7 @@ export const MAPS = {
     // both conveyors roll toward the pit, like Gang Beasts'
     // by eye: ambient (lightmap, environment) turned down so the pit's light carries the room. That light is brighter,
     // wider and longer than Gang Beasts' (2000, 65 degrees, 37.9) to reach the whole stage
-    view: { dim: 0.4, lights: { 'Fire Pit Light long': { intensity: 5000, angle: 120, inner: 90, range: 60 } } },
+    view: { dim: 0.55, exposure: 0.95, lights: { 'Fire Pit Light long': { intensity: 5000, angle: 120, inner: 90, range: 60 } } },
     belts: [{ min: [4.6, 0, -6.8], max: [15, 0, -3.2], top: 0.2, v: [-1, 0, 0] }, { min: [-15, 0, -6.8], max: [-2.6, 0, -3.2], top: 0.2, v: [1, 0, 0] }],
   },
   trawler: {

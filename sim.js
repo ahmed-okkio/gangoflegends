@@ -753,7 +753,7 @@ export function createSim({ mapId, players, practice = false, roundsToWin = 3, l
       if (grabbing[i]) { ua = fa = gt ? sub(gt.bodies[TORSO].translation(), p.bodies[ARM + i].translation()) : add(add(bf, V(0, 0.35, 0)), mul(side, s * 0.1)); str = 0.8; }
       if (p.charge > 0) { ua = fa = add(bf, V(0, -0.3, 0)); str = 0.6; }
       if (p.vault > 0) { ua = fa = add(mul(bf, -0.6), DOWN); str = 0.5; } // fists drawn back
-      if (p.dash) { ua = fa = add(bf, V(0, 0.1, 0)); str = 0.8; } // both fists leading
+      if (p.dash) { ua = fa = p.dash.sylas ? add(mul(bf, -0.8), V(0, 0.1, 0)) : add(bf, V(0, 0.1, 0)); str = 0.8; } // both fists leading; Abscond: trailing behind
       if (p.hay > 0 && i === 1) { ua = add(mul(bf, -0.8), V(0, 0.4, 0)); fa = add(bf, V(0, 0.6, 0)); str = 0.6; } // cocked back
       if (p.hay > 0 && i === 0) { ua = fa = add(bf, V(0, 0.2, 0)); str = 0.5; } // guard hand out front
       // Facebreaker: arms fling wide, then slam together in front
@@ -1169,7 +1169,8 @@ export function createSim({ mapId, players, practice = false, roundsToWin = 3, l
         const flags = (p.spin > 0) | (p.charge > 0) << 1 | (p.empower > 0) << 2 | (p.grabs.some(Boolean)) << 3 | (p.ko > 0) << 4 | (p.safe > 0) << 5 | (p.vault > 0 || p.hay > 0) << 6
           | (p.grabs.some(g => g?.vic) || ps.some(q => q.grabs?.some(g => g?.vic === p))) << 7 // holding or held by a champ
           | (p.dizzy > 0) << 8 // stunned on their feet (stars)
-          | (!!p.leap || !!p.lifted) << 9; // GB mode: a move only the host plays (it ties me to someone)
+          | (!!p.leap || !!p.lifted) << 9 // GB mode: a move only the host plays (it ties me to someone)
+          | (p.abduct > 0) << 10; // Abscond's recast window: E shows Abduct ready
         // hips position + every part's rotation; clients rebuild the other positions from the joint anchors (beast.js fk)
         const t = p === me ? add(p.bodies[HIPS].translation(), smooth) : p.bodies[HIPS].translation();
         const out = [p.slot, 1, Math.round(p.daze), flags, Math.ceil(p.cd[0] * 10), Math.ceil(p.cd[1] * 10), r2(t.x), r2(t.y), r2(t.z)];
