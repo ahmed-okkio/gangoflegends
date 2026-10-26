@@ -269,7 +269,7 @@ export function createSim({ mapId, players, practice = false, roundsToWin = 3, l
     // let the knockback play out before control returns. Sett's Haymaker windup doesn't flinch (only a knockout stops it)
     // and shrugs off half the daze
     if (!(vic.hay > 0)) vic.stun = Math.max(vic.stun, 0.15 + len(dv) * 0.04);
-    vic.daze += daze * (part === HEAD ? 1.5 : 1) * (vic.hay > 0 ? 0.5 : 1);
+    vic.daze += daze * (vic.hay > 0 ? 0.5 : 1); // no head bonus: where it lands doesn't make a hit stronger
     if (vic.daze >= 100) knockOut(vic);
   }
 
@@ -365,9 +365,9 @@ export function createSim({ mapId, players, practice = false, roundsToWin = 3, l
   }
 
   // Vi E punch: smash the target and everyone standing in a cone behind it
-  function relentless(p, vic, part, f) {
+  function relentless(p, vic, part, f, daze) {
     const vt = vic.bodies[TORSO].translation();
-    hit(vic, part, add(mul(f, 8.75), V(0, 2.5, 0)), 35);
+    hit(vic, part, add(mul(f, 8.75), V(0, 2.5, 0)), daze);
     fx('vi', vt, Math.atan2(f.x, f.z), p.slot, vic.slot); // big carries the cone's yaw
     for (const o of ps) {
       if (o === p || o === vic || !o.alive) continue;
@@ -770,17 +770,21 @@ export function createSim({ mapId, players, practice = false, roundsToWin = 3, l
         const sp = len(sub(fv, p.view ? seenVel(p, vic) : vic.bodies[part].linvel()));
         if (sp < 2.5) continue; // a resting fist just pushes
         p.punch.hit.add(vic);
-        if (p.empower > 0 && p.emp === 'through') { p.empower = 0; relentless(p, vic, part, pf); }
+        // daze: 20 for any punch (5 to knock out), the same for every champ and for empowered ones (theirs is the launch).
+        // A standing punch's fist does 10-15m/s, running barely adds; only past 16m/s (a big spin, say) does speed add,
+        // up to 30 at 26m/s: never fewer than 4 punches
+        const dz = 20 * (1 + 0.5 * Math.min(1, Math.max(0, (sp - 16) / 10)));
+        if (p.empower > 0 && p.emp === 'through') { p.empower = 0; relentless(p, vic, part, pf, dz); }
         else if (p.empower > 0 && p.emp === 'aoe') { // Sylas E: the punch bursts out round him, everyone close knocked away
           p.empower = 0; p.spin = SPIN; p.spinHit = new Set(ps); // one whirl round, arms out like Hecarim Q (League's chains spinning round him); the burst below does the hitting
           fx('pulv', tp, 0, p.slot);
           for (const o of ps) {
             if (o === p || !o.alive) continue;
             const d = sub(o === vic ? vic.bodies[TORSO].translation() : seen(p, o), tp);
-            if (o === vic || (Math.hypot(d.x, d.z) < 2.4 && Math.abs(d.y) < 1.2)) hit(o, o === vic ? part : TORSO, add(mul(norm(V(d.x, 0, d.z)), 5.4), V(0, 1.8, 0)), 30);
+            if (o === vic || (Math.hypot(d.x, d.z) < 2.4 && Math.abs(d.y) < 1.2)) hit(o, o === vic ? part : TORSO, add(mul(norm(V(d.x, 0, d.z)), 5.4), V(0, 1.8, 0)), dz);
           }
-        } else if (p.empower > 0) { p.empower = 0; hit(vic, part, add(mul(pf, 2), V(0, 10, 0)), 45); }
-        else { const k = Math.min(sp, 12) / 6; hit(vic, part, add(mul(norm(add(norm(fv), pf)), 0.44 * k), V(0, 0.12, 0)), 20 * k); } // knockback 2.2/0.6 -> 0.44/0.12 (-80%): trading punches toe to toe, not batting each other out of reach
+        } else if (p.empower > 0) { p.empower = 0; hit(vic, part, add(mul(pf, 2), V(0, 10, 0)), dz); }
+        else { const k = Math.min(sp, 12) / 6; hit(vic, part, add(mul(norm(add(norm(fv), pf)), 0.44 * k), V(0, 0.12, 0)), dz); } // knockback 2.2/0.6 -> 0.44/0.12 (-80%): trading punches toe to toe, not batting each other out of reach
       }
     }
     if (p.spin > 0) for (let i = 0; i < 2; i++) {
