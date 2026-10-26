@@ -44,6 +44,7 @@ const LEAPS = ['sentence', 'sonic']; // abilities whose recast flies you to whoe
 const HOIST = [WAIST, CHEST]; // lifted by a hoist, carrying the whole core's weight; hips and legs hang off it
 const HOIST_K = CORE.reduce((m, i) => m + PARTS[i].mass, 0) / HOIST.reduce((m, i) => m + PARTS[i].mass, 0);
 const RECOIL = 0.5, RECOIL_STR = 0.4; // s: how long a punching arm takes to come back down; how firmly it's held meanwhile
+const LEAD = 1.2; // rad: the most the facing (p.yaw) leads the hips while turning on the ground
 const TURN = 12; // rad/s: the fastest orient() spins a body part (hips, waist, chest, head)
 const THROW = [5, 3.5]; // m/s forward, up: a lift throw's launch (see lift below)
 const HOLD = 20; // m/s^2 lift on the core (= gravity), so the hover spring only has to hold up the hanging arms
@@ -571,7 +572,20 @@ export function createSim({ mapId, players, practice = false, roundsToWin = 3, l
     if (p.spin > 0) { p.spin -= DT; p.spinA += (2 * Math.PI / SPIN) * DT; } else p.spinA = p.kickA > 0 ? 2 * Math.PI * (1 - p.kickA / KICK) : 0; // one full turn
     if (move) {
       if (p.charge > 0) { if (m > 0.2) p.yaw = turnToward(p.yaw, Math.atan2(mx, mz), 3 * DT); }
-      else if (m > 0.2 && !p.dash && !(p.hay > 0) && !p.qTurn) p.yaw = Math.atan2(mx, mz); // a Haymaker windup holds its aim
+      else if (m > 0.2 && !p.dash && !(p.hay > 0) && !p.qTurn) p.want = Math.atan2(mx, mz); // a Haymaker windup holds its aim
+      // the facing turns to where the keys last pointed (p.want, kept after a tap), on the ground at most LEAD ahead of
+      // where the hips point, and a straight reversal (A/D) goes back round through the front (yaw 0, p.yaw kept within
+      // ±π). Set straight to the keys, a half turn was a coin toss for the hips: alternating A/D while punching spun the
+      // beast right round, legs wrung 180° off the hips. Anything else that sets the facing (an aim) drops p.want
+      if (p.want != null && (p.wantAt === undefined || p.yaw === p.wantAt) && p.charge <= 0) {
+        let d = wrap(p.want - p.yaw);
+        if (Math.abs(d) > 2.8 && Math.abs(p.yaw + d - Math.sign(d) * 2 * Math.PI) < Math.abs(p.yaw + d)) d -= Math.sign(d) * 2 * Math.PI;
+        const hf = qrot(Hb.rotation(), V(0, 0, 1)), lag = wrap(p.yaw - Math.atan2(hf.x, hf.z));
+        if (p.grounded && Math.abs(lag + d) > LEAD) d = Math.abs(lag) < LEAD ? Math.sign(lag + d) * LEAD - lag : 0; // waits for them; never dragged round after the hips are knocked spinning
+        p.yaw = wrap(p.yaw + d);
+        if (Math.abs(wrap(p.want - p.yaw)) < 1e-3) p.want = null;
+      } else p.want = null;
+      p.wantAt = p.yaw;
       // aiming (input.a: the cursor's yaw, null = where you face): "release" abilities (hook) go off when the
       // key is let go; the held ones (Vi Q) start on press. Either way the champ turns to the cursor while held.
       // "lock" ones (Sett Q) take the cursor's aim on press and keep it.
