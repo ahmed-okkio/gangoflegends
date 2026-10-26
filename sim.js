@@ -43,6 +43,7 @@ const HOST_CASTS = ['hook', 'sentence', 'charge', 'rampage', 'headbutt', 'adhesi
 const LEAPS = ['sentence', 'sonic']; // abilities whose recast flies you to whoever they caught (Thresh Q, Lee Sin Q)
 const HOIST = [WAIST, CHEST]; // lifted by a hoist, carrying the whole core's weight; hips and legs hang off it
 const HOIST_K = CORE.reduce((m, i) => m + PARTS[i].mass, 0) / HOIST.reduce((m, i) => m + PARTS[i].mass, 0);
+const TURN = 12; // rad/s: the fastest orient() spins a body part (hips, waist, chest, head)
 const THROW = [5, 3.5]; // m/s forward, up: a lift throw's launch (see lift below)
 const HOLD = 20; // m/s^2 lift on the core (= gravity), so the hover spring only has to hold up the hanging arms
 const SAFE = 1; // seconds after getting up from a knockout that nothing can hit, grab or target you (drawn see-through)
@@ -361,6 +362,9 @@ export function createSim({ mapId, players, practice = false, roundsToWin = 3, l
     if (e.w < 0) e = { x: -e.x, y: -e.y, z: -e.z, w: -e.w };
     const s = Math.sqrt(e.x * e.x + e.y * e.y + e.z * e.z);
     const target = s < 1e-5 ? V() : mul(V(e.x, e.y, e.z), 2 * Math.atan2(s, e.w) * k / s);
+    // turning (about the vertical) at most TURN rad/s: a half turn (yaw reversed, a target behind) no longer whips the
+    // body round. Only the turn: capping the whole spin starved the righting with it and the beast toppled
+    target.y = Math.max(-TURN, Math.min(TURN, target.y));
     turn(b, mul(sub(target, b.angvel()), strength), carry);
   }
 
@@ -670,8 +674,11 @@ export function createSim({ mapId, players, practice = false, roundsToWin = 3, l
     const tw = p.punch ? (p.punch.arm ? 0.7 : -0.7) : p.palm > 0 ? 0.6 : cock >= 0 ? (cock ? -0.3 : 0.3) : 0;
     // a punch with a target tracks it: the shoulders turn to them and the fist (below) flies from the shoulder at their head, hit or miss
     const aimTo = (p.punch?.to?.bodies && sub(skull(p.punch.to), p.bodies[ARM + p.punch.arm].translation())) || gTo, ay = aimTo ? Math.atan2(aimTo.x, aimTo.z) : p.yaw + p.spinA;
-    orient(p.bodies[WAIST], qmul(qyaw(ay + tw * 0.4), qaxis(X, lean * 0.5)), 10, up, [T, ...UPPER.map(i => p.bodies[i])]);
-    orient(T, qmul(qyaw(ay + tw), qaxis(X, lean)), 20, up, UPPER.map(i => p.bodies[i]));
+    // the upper body turns relative to where the hips point now, at most ~63° off them: aimed absolutely, a target (or
+    // a new heading) behind turned the chest one way round and the hips the other, legs facing opposite ways
+    const hf = qrot(Hb.rotation(), V(0, 0, 1)), hy = Math.atan2(hf.x, hf.z), off = a => hy + Math.max(-1.1, Math.min(1.1, wrap(a - hy)));
+    orient(p.bodies[WAIST], qmul(qyaw(off(ay + tw * 0.4)), qaxis(X, lean * 0.5)), 10, up, [T, ...UPPER.map(i => p.bodies[i])]);
+    orient(T, qmul(qyaw(off(ay + tw)), qaxis(X, lean)), 20, up, UPPER.map(i => p.bodies[i]));
     orient(H, qmul(yq, qaxis(X, lean * 0.6)), 20, up);
 
     const hspeed = Math.hypot(tv.x, tv.z), gait = Math.min(1, hspeed / 2);
