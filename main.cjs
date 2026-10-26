@@ -1,4 +1,4 @@
-const { app, BrowserWindow, Menu } = require('electron');
+const { app, BrowserWindow, Menu, dialog, shell } = require('electron');
 const path = require('path');
 const fs = require('fs');
 const tls = require('tls');
@@ -51,6 +51,7 @@ app.whenReady().then(() => {
   win.loadFile(path.join(__dirname, 'index.html'), { query: { v: app.getVersion(), u: updates ? '1' : '0', rv: via ? JSON.stringify(via) : '' }, hash: smoke ? (process.env.SMOKE_HASH ?? 'practice-girders') : dev ? `practice-${process.env.DEV_MAP || 'girders'}` : '' });
   if (dev) win.webContents.openDevTools({ mode: 'detach' });
   if (updates) checkForUpdates(win);
+  if (app.isPackaged && !smoke && process.platform === 'darwin') offerMacUpdate(win);
   if (china) setTimeout(() => probeRelay().catch(() => {}), 5000); // after startup's own traffic
   if (!smoke) return;
   win.webContents.setAudioMuted(true);
@@ -81,6 +82,19 @@ function checkForUpdates(win) {
     setTimeout(() => autoUpdater.quitAndInstall(true, true), 300); // long enough to paint "Installing…"; silent install, then reopen
   });
   win.webContents.once('did-finish-load', () => autoUpdater.checkForUpdates().catch(() => {}));
+}
+
+// Unsigned Mac builds can't install updates themselves (macOS refuses), so at launch they ask GitHub for the latest
+// release and, when it's newer, offer to open its .dmg (CI attaches it, .github/workflows/mac.yml).
+async function offerMacUpdate(win) {
+  try {
+    const r = await (await fetch('https://api.github.com/repos/ahmed-okkio/gangoflegends/releases/latest')).json();
+    const dmg = r.assets?.find(a => a.name.endsWith('.dmg'));
+    if (!dmg || r.tag_name === `v${app.getVersion()}`) return; // the dmg lands a few minutes after the release: until then, nothing to offer
+    const { response } = await dialog.showMessageBox(win, { message: `Gang of Legends ${r.tag_name.slice(1)} is out`,
+      detail: 'Lobbies only accept players on the host’s version. Download it, then drag it into Applications over this one.', buttons: ['Download', 'Later'] });
+    if (response === 0) shell.openExternal(dmg.browser_download_url);
+  } catch { /* offline: play this version */ }
 }
 
 app.on('window-all-closed', () => app.quit());
