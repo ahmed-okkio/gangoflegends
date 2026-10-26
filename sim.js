@@ -43,6 +43,7 @@ const HOST_CASTS = ['hook', 'sentence', 'charge', 'rampage', 'headbutt', 'adhesi
 const LEAPS = ['sentence', 'sonic']; // abilities whose recast flies you to whoever they caught (Thresh Q, Lee Sin Q)
 const HOIST = [WAIST, CHEST]; // lifted by a hoist, carrying the whole core's weight; hips and legs hang off it
 const HOIST_K = CORE.reduce((m, i) => m + PARTS[i].mass, 0) / HOIST.reduce((m, i) => m + PARTS[i].mass, 0);
+const RECOIL = 0.5, RECOIL_STR = 0.4; // s: how long a punching arm takes to come back down; how firmly it's held meanwhile
 const TURN = 12; // rad/s: the fastest orient() spins a body part (hips, waist, chest, head)
 const THROW = [5, 3.5]; // m/s forward, up: a lift throw's launch (see lift below)
 const HOLD = 20; // m/s^2 lift on the core (= gravity), so the hover spring only has to hold up the hanging arms
@@ -324,6 +325,8 @@ export function createSim({ mapId, players, practice = false, roundsToWin = 3, l
     const n = Math.hypot(c.x, c.y, c.z, w);
     return { x: c.x / n, y: c.y / n, z: c.z / n, w: w / n };
   };
+  // direction a turned toward b by fraction t of the angle between them, at an even rate
+  const turnTo = (a, b, t) => { a = norm(a); b = norm(b); const th = Math.acos(Math.max(-1, Math.min(1, dot(a, b)))); return th < 1e-3 ? b : add(mul(a, Math.sin((1 - t) * th)), mul(b, Math.sin(t * th))); };
   // spin body part i so its "down" axis points along dir, at the given strength (0 = limp, 1 = snap). Its twist about
   // that axis is held where it sits at rest relative to its parent, at least as firmly as `twist` even when the swing is
   // loose (arms: left free they roll and wring the skinned shoulders; legs stay loose, holding them spoils climbing).
@@ -341,17 +344,19 @@ export function createSim({ mapId, players, practice = false, roundsToWin = 3, l
   // joint tone. Rapier's ball joints have no angle limits, so a part bent past `lim` from its rest pose (relative to its
   // parent) is pushed back, and a limp beast keeps a weak pull toward its rest pose: Gang Beasts' knocked-out beasts
   // still have their joint drives, which is what keeps the upper body in one piece when they flop.
-  const TONE = [[WAIST, 0.9, 0.3], [CHEST, 0.9, 0.3], [HEAD, 0.7, 0.2], [ARM, 2.2, 0.04], [ARM + 1, 2.2, 0.04], [THIGH, 1.6, 0.06], [THIGH + 1, 1.6, 0.06]]; // [part, limit (rad), limp pull]
-  function tone(p, limp) {
-    for (const [i, lim, pull] of TONE) {
+  const TONE = [[WAIST, 0.9, 0.3, true], [CHEST, 0.9, 0.3, true], [HEAD, 0.7, 0.2], [ARM, 2.2, 0.04], [ARM + 1, 2.2, 0.04], [THIGH, 1.6, 0.06], [THIGH + 1, 1.6, 0.06]]; // [part, limit (rad), limp pull, spine]
+  function tone(p, limp, steady = false) {
+    for (const [i, lim, pull, spine] of TONE) {
       const b = p.bodies[i], par = p.bodies[PARTS[i].parent];
       let e = qmul(qmul(par.rotation(), REST[i]), qconj(b.rotation()));
       if (e.w < 0) e = { x: -e.x, y: -e.y, z: -e.z, w: -e.w };
       const s = Math.hypot(e.x, e.y, e.z), ang = 2 * Math.atan2(s, e.w);
-      if (s < 1e-5 || (!limp && (ang <= lim || i === ARM || i === ARM + 1))) continue; // awake, the arms pose freely
+      if (s < 1e-5 || (!limp && !(spine && steady) && (ang <= lim || i === ARM || i === ARM + 1))) continue; // awake, the arms pose freely
       const axis = mul(V(e.x, e.y, e.z), 1 / s), rel = sub(b.angvel(), par.angvel());
       let dw = limp ? mul(sub(mul(axis, ang * 10), rel), pull) : V();
       if (ang > lim) dw = add(dw, mul(sub(mul(axis, (ang - lim) * 15), mul(rel, 0.5)), 0.6));
+      // the spine damped hard relative to its parent, like Gang Beasts' drives: a punch's turn no longer rings on (only after a punch, when the ring happens: always on, it held the spine off upright; climbing and lifting need it free to heave)
+      if (spine && steady && !limp) dw = sub(dw, mul(rel, 0.4));
       turn(b, dw, []);
     }
   }
@@ -671,7 +676,8 @@ export function createSim({ mapId, players, practice = false, roundsToWin = 3, l
     orient(Hb, fk ? qmul(yq, qaxis(X, -0.4)) : yq, 10, up); // the flying kick tips the hips back too: the leg leads
     // punching turns the shoulders into it: wound back, then the punching side drives forward (that's the reach)
     const cock = p.held.findIndex(h => h > 0 && h < TAP && p.grounded);
-    const tw = p.punch ? (p.punch.arm ? 0.7 : -0.7) : p.palm > 0 ? 0.6 : cock >= 0 ? (cock ? -0.3 : 0.3) : 0;
+    const backOf = i => p.punch?.arm !== i && p.armCd[i] > 0.75 - RECOIL ? Math.min(1, (p.armCd[i] - 0.75 + RECOIL) / RECOIL) : 0; // coming back from a punch: 1 down to 0
+    const tw = p.punch ? (p.punch.arm ? 0.7 : -0.7) : p.palm > 0 ? 0.6 : cock >= 0 ? (cock ? -0.3 : 0.3) : (backOf(1) - backOf(0)) * 0.7;
     // a punch with a target tracks it: the shoulders turn to them and the fist (below) flies from the shoulder at their head, hit or miss
     const aimTo = (p.punch?.to?.bodies && sub(skull(p.punch.to), p.bodies[ARM + p.punch.arm].translation())) || gTo, ay = aimTo ? Math.atan2(aimTo.x, aimTo.z) : p.yaw + p.spinA;
     // the upper body turns relative to where the hips point now, at most ~63° off them: aimed absolutely, a target (or
@@ -737,6 +743,10 @@ export function createSim({ mapId, players, practice = false, roundsToWin = 3, l
         const a = 0.25 + 1.25 * u, b = 1.4 * (1 - u) + 0.1; // upper arm: from out to the side round to the front; elbow bend
         ua = add(add(mul(sd, Math.cos(a)), mul(d, Math.sin(a))), V(0, 0.15, 0)); fa = add(add(mul(d, Math.cos(b)), mul(sd, -Math.sin(b))), V(0, 0.1, 0)); str = 0.9; fs = 0.8;
       }
+      // after it, the arm (and the shoulders' turn, tw) is lowered back over RECOIL s (armCd counts down from 1), held
+      // firmly from where the punch left it: let go at once, it dropped from head height like a pendulum and jerked the whole body as it swung through
+      const back = backOf(i);
+      if (back && !grabbing[i]) { const e = back * back * (3 - 2 * back); ua = turnTo(add(bf, V(0, 0.15, 0)), ua, 1 - e); fa = turnTo(bf, fa, 1 - e); str = Math.max(str, RECOIL_STR); }
       if (p.spin > 0) { ua = fa = add(mul(side, s), mul(bf, 0.1)); str = 0.5; fs = 0.4; }
       if (p.kickA > 0 || fk) { ua = fa = add(mul(side, s), V(0, fk ? 0.3 : -0.2, 0)); str = 0.5; fs = 0.4; } // out wide for balance
       if (p.palm > 0 && i === 1) { ua = fa = add(bf, V(0, 0.05, 0)); str = 0.9; fs = 0.9; } // Sonic Wave: the palm thrust out at the aim
@@ -757,7 +767,7 @@ export function createSim({ mapId, players, practice = false, roundsToWin = 3, l
       aimPart(p, THIGH + i, kick || sw || add(DOWN, mul(bf, swing * 0.7 * gait)), 14, (kick ? 1 : 0.5) * ctrl, [p.bodies[LEG + i]]);
       aimPart(p, LEG + i, shin || sw || add(DOWN, mul(bf, (swing * 0.7 - Math.max(0, Math.cos(p.phase + i * Math.PI)) * 0.9) * gait)), 14, (kick ? 1 : 0.5) * ctrl);
     }
-    tone(p, p.ko > 0 || p.hooked > 0);
+    tone(p, p.ko > 0 || p.hooked > 0, ctrl && p.grounded && !lift && !p.grabs.some(g => g) && p.armCd.some(c => c > 0));
     const back = mul(leak, -1 / p.bodies.reduce((m, b) => m + b.mass(), 0));
     for (const b of p.bodies) addVel(b, back);
 
