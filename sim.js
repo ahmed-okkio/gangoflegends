@@ -1093,9 +1093,10 @@ export function createSim({ mapId, players, practice = false, roundsToWin = 3, l
     me.hostOwned = gb && !!(e[3] & (8 | 512));
     // stunned (every hit stuns): flung or reeling with no control, so nothing of mine to predict. The host's flight is the truth,
     // drawn as is, instead of guessing it on and correcting every snapshot (teleporting about mid-air)
-    // Not a punch's micro-stun (0.15-0.2s, longer than a good ping's lag): snapping to the host's ragdoll and replaying on every
-    // punch taken rubber-banded; those are carried (below) like any hit I didn't see
-    if (e[x + 5] > Math.max(lag, 0.3)) me.hostOwned = true;
+    // Punches don't stun, so this is only real hits. Kept until the host's me is back on the floor: handed back at the top of a
+    // knock-up (stun < 0.3s), my copy guessed the fall wrong and got snapped ~1m a round trip later, then dragged till it landed
+    const airborne = held && !world.castRay(new RAPIER.Ray(hp, DOWN), 0.9, true, undefined, (1 << 16) | 1);
+    if (e[x + 5] > 0 || airborne) me.hostOwned = true;
     // knocked out, hooked or tied to another champ: I'm drawn from the host's state (game.js) and can't predict it, so
     // the ragdoll is just kept on it, ready to predict from there once I'm free. (Correcting the prediction instead
     // overshot every snapshot and grew: holding each other and jumping flung me metres up and down.)

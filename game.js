@@ -282,7 +282,7 @@ function onSnap(m) {
   game.off = Math.max(...offs.slice(-300));
   game.jit = offs.map(o => Math.max(0, game.off - o)).sort((a, b) => a - b)[Math.floor(0.99 * (offs.length - 1))];
   if (game.fresh) { game.delay = wantDelay(); game.fresh = false; } // straight there, not eased down over seconds
-  if (devOn()) { telSnap.push([t, m.s.mt]); if (telSnap.length > 36000) telSnap.splice(0, 6000); }
+  telSnap.push([t, m.s.mt]); if (telSnap.length > 18000) telSnap.splice(0, 3000);
   game.local.sync(m.s, m.s.p[game.mySlot]);
   // events ride along on several snapshots (any one can be lost); e[7] numbers them so each plays once (sim.js fx() for
   // the rest). Mine that my copy already played are skipped; one it didn't see coming (a hit it didn't predict) still plays.
@@ -290,7 +290,7 @@ function onSnap(m) {
   const ev = m.ev?.filter(e => e[7] > game.evN && !(e[5] === game.mySlot && claim(e, t))) ?? [];
   for (const e of m.ev ?? []) game.evN = Math.max(game.evN, e[7]);
   const mine = e => e[6] === game.mySlot || e[5] === game.mySlot, now = ev.filter(mine), later = ev.filter(e => !mine(e));
-  if (devOn()) telEv.push([t, now.map(e => [e[0], e[5], e[6], e[7]]), later.map(e => [e[0], e[5], e[6], e[7]])]);
+  telEv.push([t, now.map(e => [e[0], e[5], e[6], e[7]]), later.map(e => [e[0], e[5], e[6], e[7]])]);
   if (now.length) view.fx(now);
   if (later.length) setTimeout(() => view.fx(later), game.delay * 1000);
 }
@@ -506,6 +506,13 @@ document.addEventListener('pointerlockchange', () => {
   else if (game && $('escMenu').classList.contains('hidden') && !chatting() && document.hasFocus()) escape(); // Esc released it (not alt-tab)
 });
 addEventListener('contextmenu', e => { if (game || rebinding) e.preventDefault(); });
+// Esc menu: everything the netcode traces (last ~5 min) plus the connection log, as a file to send whoever is chasing a glitch
+$('debugLogBtn').onclick = () => {
+  const data = { v: VERSION, at: new Date().toString(), ua: navigator.userAgent, mode: conn?.mode ?? 'practice', setup: game?.setup, slot: game?.mySlot,
+    ping: game?.ping, netLog: net.netLog, tel, telSnap, telEv, telHost };
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(new Blob([JSON.stringify(data)])); a.download = `gangoflegends-debug-${Date.now()}.json`; a.click();
+};
 $('resumeBtn').onclick = () => { $('escMenu').classList.add('hidden'); lockMouse(); };
 
 // ---------- chat (matches only): T opens it; the host relays every line to everyone ----------
@@ -649,7 +656,7 @@ function hostSteps() {
     acc -= DT;
     game.sim.setInput(game.mySlot, hostInp);
     driveBots();
-    game.sim.step();
+    game.sim.step(); if (conn) hostTel(now);
     const ev = game.sim.takeEvents();
     if (ev.length) { view.fx(ev); if (conn) for (const e of ev) game.sentEv.push([...e, ++game.evN, now]); }
     game.prev = game.cur; game.cur = game.sim.snapshot();
@@ -688,7 +695,7 @@ function frame(now) {
       local.setInput(game.mySlot, GB_MODE ? { ...inp, b: inp.b & ~BTN.LIFT } : inp); // GB mode: my copy plays all but lifting (sim.js: what it leaves the host)
       local.step();
       const ev = local.takeEvents();
-      if (ev.length && devOn()) telEv.push([now, ev.map(e => [e[0], e[5], e[6], 'local'])]);
+      if (ev.length) telEv.push([now, ev.map(e => [e[0], e[5], e[6], 'local'])]);
       if (ev.length && !pure) { view.fx(ev); for (const e of ev) if (e[5] === game.mySlot) game.played.push([...e, now]); } // server only: the host's effects play instead
       const mine = local.snapshot();
       game.mine = [game.mine?.[1], mine.p[game.mySlot]]; game.myHooks = mine.h;
@@ -720,9 +727,10 @@ function frame(now) {
     const me = local.players[game.mySlot], tied = me.hooked > 0 || me.tied, limp = pure || !me.alive || me.ko > 0 || tied || me.hostOwned;
     let own = limp ? null : { slot: game.mySlot, a: game.mine[0] ?? game.mine[1], b: game.mine[1], alpha: acc / DT };
     // knocked out, host-owned or server only, but not tied to anyone: the host's ragdoll on a clock up to 50ms fresher than
-    // everyone else's (only my own snapshots' jitter to ride out, not the spare a stall needs; past the newest it holds)
+    // everyone else's, but still the jitter behind the newest (17ms behind, 10ms jitter and a lost one ran it past the newest
+    // every few frames: held, then jumped, all through a knock-up)
     if (limp && !tied && me.alive) {
-      const t = at + Math.max(0, Math.min(0.05, game.delay - 0.017)), k = Math.max(0, s.findLastIndex(x => x.mt <= t)), p = s[k], q = s[k + 1] ?? p;
+      const t = at + Math.max(0, Math.min(0.05, game.delay - game.jit - 0.017)), k = Math.max(0, s.findLastIndex(x => x.mt <= t)), p = s[k], q = s[k + 1] ?? p;
       own = { slot: game.mySlot, a: p.p[game.mySlot], b: q.p[game.mySlot], alpha: q === p ? 1 : Math.min(1, Math.max(0, (t - p.mt) / (q.mt - p.mt))) };
     }
     const shift = carryOn(a, b, alpha, s[s.length - 1], at, dt);
@@ -739,7 +747,7 @@ function frame(now) {
     game.drawnHips = b.p[game.mySlot]?.[1] ? [...view.avatars()[game.mySlot].pos[HIPS]] : null;
     b.p.forEach((e, i) => { const o = a.p[i], d = shift[i]; local.place(i, ...(e[1] && o?.[1] ? [6, 7, 8].map((k, j) => o[k] + (e[k] - o[k]) * alpha + (d?.[j] ?? 0)) : [0, -100, 0])); });
     game.cur = { ...b, p: b.p.map((e, i) => i === game.mySlot && own ? own.b : e) };
-    if (devOn()) telemetry(now, dt, inp, s, at, own, limp, shift, local);
+    telemetry(now, dt, inp, s, at, own, limp, shift, local);
   }
   updateHud(game.cur, now);
   view.render(dt);
@@ -811,7 +819,7 @@ function fakeHost(dt, now) {
   while (h.acc >= DT) {
     h.acc -= DT;
     driveBots();
-    game.sim.step();
+    game.sim.step(); hostTel(now);
     for (const e of game.sim.takeEvents()) h.ev.push([...e, ++h.n, now]);
     h.ev = h.ev.filter(e => now - e[8] < 120);
     const m = JSON.parse(JSON.stringify({ t: 'snap', s: packSnap(game.sim.snapshot()), ev: h.ev.map(e => e.slice(0, 8)) }, b64));
@@ -819,17 +827,22 @@ function fakeHost(dt, now) {
   }
 }
 
-// dev mode: a per-frame trace of the client's view (window.tel, last ~10 min at 60fps) for chasing netcode glitches over CDP
+// a per-frame trace (always on: Save debug log in the Esc menu sends it from live games) of the client's view (window.tel, last ~10 min at 60fps) for chasing netcode glitches over CDP
 // (npm run dev -- --remote-debugging-port=9222). Each row: time, frame dt, how far behind the newest snapshot the playback
 // clock is, snapshots queued, delay, jitter, ping, carrying on, my prediction error, limp, every drawn hips and my input
-const tel = window.tel = [], telSnap = window.telSnap = [], telEv = window.telEv = []; // telSnap: [arrived, host clock] per snapshot
+const tel = window.tel = [], telSnap = window.telSnap = [], telEv = window.telEv = [], telHost = window.telHost = []; // telSnap: [arrived, host clock] per snapshot
 function telemetry(now, dt, inp, s, at, own, limp, shift, local) {
   const av = view.avatars();
   tel.push({ t: now, dt, behind: s.at(-1).mt - at, q: s.length, delay: game.delay, jit: game.jit, ping: game.ping, carry: !!game.carry,
     err: local.err, limp: !!limp, own: !!own, slide: game.slide ? Math.hypot(...game.slide) : 0, st: game.cur.st,
     shift: shift.map(d => d ? Math.hypot(...d) : 0), hips: av.map(a => a?.pos?.[HIPS] ? [...a.pos[HIPS]].map(v => Math.round(v * 1000) / 1000) : null),
     inp: [inp.x, inp.z, inp.b, inp.a, inp.d] });
-  if (tel.length > 36000) tel.splice(0, 6000);
+  if (tel.length > 18000) tel.splice(0, 3000);
+}
+// host side (the host, practice's simulated one), every tick: each client's waiting inputs, whether they ran dry, last played
+function hostTel(now) {
+  telHost.push([Math.round(now), ...game.sim.players.map(p => p.next == null ? null : [p.q.size, p.dry ? 1 : 0, p.ack])]);
+  if (telHost.length > 18000) telHost.splice(0, 3000);
 }
 
 // ---------- menu backdrop: bots brawling on a stage behind the menus ----------
