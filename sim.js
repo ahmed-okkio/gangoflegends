@@ -176,7 +176,7 @@ export function createSim({ mapId, players, practice = false, roundsToWin = 3, l
       if (part.hinge) j.setLimits(...part.hinge);
     });
     Object.assign(p, {
-      alive: true, yaw, daze: 0, sinceHit: 9, ko: 0, cd: [0, 0], punch: null, punchCd: 0, armCd: [0, 0], grabs: [null, null], held: [0, 0],
+      alive: true, yaw, daze: 0, sinceHit: 9, ko: 0, cd: [0, 0], punch: null, punchCd: 0, armCd: [0, 0], queued: [0, 0], grabs: [null, null], held: [0, 0],
       stun: 0, spin: 0, spinHit: null, stole: null, charge: 0, empower: 0, jumpT: 0, phase: 0, grounded: false, prevB: p.input.b,
       butt: null, buttCd: 0, lying: false, safe: 0, hooked: 0, spinA: 0, chargeT: 0,
       emp: null, dash: null, vault: 0, vaultBtn: 0, hay: 0, hayBtn: 0, fb: 0, pulv: 0, flay: 0, fling: 0, tether: null, leap: null, dizzy: 0, kick: null, kickA: 0, palm: 0, qTurn: null,
@@ -677,19 +677,22 @@ export function createSim({ mapId, players, practice = false, roundsToWin = 3, l
     const hspeed = Math.hypot(tv.x, tv.z), gait = Math.min(1, hspeed / 2);
     p.phase += hspeed * DT * 4.5;
     // hands, Gang Beasts style: pressing one cocks that arm back; let go quickly (a tap) and it throws the punch,
-    // keep holding and it reaches out and grabs instead
+    // keep holding and it reaches out and grabs instead. A tap while that hand is still busy (punching, or its cooldown)
+    // is kept for a moment and thrown the moment it's free, like Gang Beasts' timed punches: spam-clicking gives a steady
+    // rhythm instead of the arm being yanked back mid-swing
     const grabbing = [false, false], lift = ctrl && inp.b & BTN.LIFT;
     for (const arm of [0, 1]) {
       if (ctrl && inp.b & HANDS[arm]) p.held[arm] += DT;
       else if (p.held[arm] > 0) {
-        if (p.held[arm] < TAP && !p.grabs[arm] && move && p.punchCd <= 0 && p.armCd[arm] <= 0 && p.spin <= 0) {
-          const to = punchTarget(p, f), d = to && sub(to.bodies[TORSO].translation(), tp);
-          p.punch = { arm, t: 0, hit: new Set(), to }; // already drawn back while the button was down
-          p.punchCd = 0.25; p.armCd[arm] = 0.5; // alternate hands for 4 a second; one hand alone throws 2
-          fx('swing', handPos(p, arm), 0, p.slot);
-          addVel(T, mul(d ? norm(V(d.x, 0, d.z)) : f, 1.5)); // lunge into it
-        }
+        if (p.held[arm] < TAP && !p.grabs[arm]) p.queued[arm] = 0.3;
         p.held[arm] = 0;
+      }
+      if ((p.queued[arm] -= DT) > 0 && move && p.punchCd <= 0 && p.armCd[arm] <= 0 && p.spin <= 0 && !p.grabs[arm]) {
+        const to = punchTarget(p, f), d = to && sub(to.bodies[TORSO].translation(), tp);
+        p.punch = { arm, t: 0, hit: new Set(), to };
+        p.punchCd = 0.25; p.armCd[arm] = 0.5; p.queued[arm] = 0; // alternate hands for 4 a second; one hand alone throws 2
+        fx('swing', handPos(p, arm), 0, p.slot);
+        addVel(T, mul(d ? norm(V(d.x, 0, d.z)) : f, 1.5)); // lunge into it
       }
       grabbing[arm] = p.held[arm] >= TAP || (p.held[arm] > 0 && !p.grounded); // in the air, grab at once: ledges go by fast
     }
@@ -727,7 +730,7 @@ export function createSim({ mapId, players, practice = false, roundsToWin = 3, l
       if (p.spin > 0) { ua = fa = add(mul(side, s), mul(bf, 0.1)); str = 0.5; fs = 0.4; }
       if (p.kickA > 0 || fk) { ua = fa = add(mul(side, s), V(0, fk ? 0.3 : -0.2, 0)); str = 0.5; fs = 0.4; } // out wide for balance
       if (p.palm > 0 && i === 1) { ua = fa = add(bf, V(0, 0.05, 0)); str = 0.9; fs = 0.9; } // Sonic Wave: the palm thrust out at the aim
-      if (p.held[i] > 0 && !grabbing[i] && p.punch?.arm !== i) { ua = add(add(mul(bf, -0.5), mul(side, s * 0.7)), V(0, -0.3, 0)); fa = add(bf, V(0, 0.3, 0)); str = 0.6; fs = 0.7; } // cocked: elbow back and out
+      if (p.held[i] > 0 && !grabbing[i] && p.punch?.arm !== i && p.armCd[i] <= 0) { ua = add(add(mul(bf, -0.5), mul(side, s * 0.7)), V(0, -0.3, 0)); fa = add(bf, V(0, 0.3, 0)); str = 0.6; fs = 0.7; } // cocked: elbow back and out
       // reach up for ledges; hanging on, a free hand reaches back up
       if (!p.grounded && (grabbing[i] || ledge > -Infinity)) { ua = fa = add(mul(bf, 0.5), V(0, 1, 0)); str = 0.8; }
       if (p.pushUp && grabbing[i] && !p.grabs[i]) { ua = fa = sub(p.reach, p.bodies[ARM + i].translation()); str = 0.8; } // hoisting: for the next hold
