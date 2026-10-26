@@ -458,6 +458,8 @@ function updateHud(s, now) {
     const re = i === 0 ? recast : !!(mine[3] & 1024), cd = re ? 0 : mine[4 + i] / 10; // E: Abscond's Abduct window
     el.classList.toggle('cooling', cd > 0);
     el.classList.toggle('recast', re);
+    const ab = kit(setup.players[game.mySlot].champ, game.stole)[i];
+    if (ab.recastName) el.querySelector('b').textContent = re ? ab.recastName : ab.name;
     el.querySelector('.cd').textContent = cd > 0 ? Math.ceil(cd) : '';
     el.querySelector('i').style.height = `${Math.min(100, cd / kit(setup.players[game.mySlot].champ, game.stole)[i].cd * 100)}%`;
   });
@@ -619,11 +621,12 @@ function showAim(inp, dt) {
   const sim = game.sim ?? game.local, stuck = sim.stuck(game.mySlot);
   [BTN.A1, BTN.A2].forEach((btn, i) => {
     const ab = abs[i];
+    const re = ab.recastAim && mine?.[3] & 1024; // Abscond's Abduct window: aim the chains
     if (!(inp.b & btn)) aiming[i] = false;
-    else if (!aiming[i] && !(game.lastB & btn)) { aiming[i] = !!ab.aim && !(mine?.[4 + i] > 0) && !stuck; held[i] = 0; }
+    else if (!aiming[i] && !(game.lastB & btn)) { aiming[i] = (re || !!ab.aim && !(mine?.[4 + i] > 0)) && !stuck; held[i] = 0; }
     if (!aiming[i]) return;
     held[i] += dt;
-    range = ab.aimMin ? ab.aimMin + (ab.aim - ab.aimMin) * Math.min(1, held[i] / ab.windup) : ab.aim;
+    range = ab.aimMin ? ab.aimMin + (ab.aim - ab.aimMin) * Math.min(1, held[i] / ab.windup) : ab.aim ?? ab.recastAim;
     back = !!ab.back;
     if (ab.point) point = { max: ab.aim, r: ab.target ? 0 : ab.radius, pick: ab.target ? ab.radius : 0 }; // target: click a champ, no spot (just the range ring, and a border on who you'd get)
   });

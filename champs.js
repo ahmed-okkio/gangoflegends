@@ -60,7 +60,7 @@ export const CHAMPS = {
     name: 'Sylas', title: 'The Unshackled', body: '#c48f6c', limb: '#a0704f', eyes: '#c9a8ff', glow: '#5fa8ff',
     abilities: [
       { id: 'hijack', name: 'Hijack', cd: 8, aim: 7, point: true, release: true, radius: 0.9, target: true, desc: "Hold to aim at a champ in range, let go to steal their Q: it's yours in place of Hijack for the rest of the round." },
-      { id: 'abscond', name: 'Abscond / Abduct', cd: 7, recast: 3, desc: 'Dash the way you face (it no longer bumps anyone). For 4s your next punch is empowered: it smacks everyone around you, not just who it hits. Within 3s press again to throw both chains at your cursor: the first champ they hit is stopped dead, and you fly to them and knock them back.' },
+      { id: 'abscond', name: 'Abscond', recastName: 'Abduct', recastAim: 8, cd: 7, recast: 3, desc: 'Dash the way you face (it no longer bumps anyone). For 4s your next punch is empowered: it smacks everyone around you, not just who it hits. Within 3s it becomes Abduct: hold to aim at your cursor, let go to throw both chains: the first champ they hit is stopped dead, and you fly to them and knock them back.' },
     ],
   },
 };

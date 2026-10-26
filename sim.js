@@ -601,7 +601,7 @@ export function createSim({ mapId, players, practice = false, roundsToWin = 3, l
     const move = ctrl && (p.stun -= DT) <= 0 ? 1 : 0; // staggered: can't steer, jump or cast
     if ((p.sinceHit += DT) > 1.2) p.daze = Math.max(0, p.daze - 15 * DT);
     p.cd = p.cd.map((c, i) => i === 0 && hooks.some(h => h.o === p && h.lee) ? c : Math.max(0, c - DT)); // Sonic Wave cools once the wave missed, the mark wore off or he flew in
-    p.abduct -= DT; p.punchCd -= DT; p.armCd[0] -= DT; p.armCd[1] -= DT; p.empower -= DT; p.jumpT -= DT; p.buttCd -= DT;
+    if (!(p.aimBtn & BTN.A2)) p.abduct -= DT; p.punchCd -= DT; p.armCd[0] -= DT; p.armCd[1] -= DT; p.empower -= DT; p.jumpT -= DT; p.buttCd -= DT;
 
     const tp = T.translation(), tv = T.linvel(), Hb = p.bodies[HIPS];
     const ray = world.castRay(new RAPIER.Ray(tp, DOWN), STAND + 0.3, true, undefined, under(p));
@@ -642,14 +642,15 @@ export function createSim({ mapId, players, practice = false, roundsToWin = 3, l
       else for (const i of [0, 1]) {
         const btn = i ? BTN.A2 : BTN.A1, pr = pressed & btn || p.abQ[i] > 0; // pressed now, or buffered through a stun
         p.abQ[i] = 0;
-        if (!abs[i].release) {
+        const abducting = abs[i].id === 'abscond' && p.abduct > 0; // Abduct aims like a release ability: hold, let go to throw
+        if (!abs[i].release && !abducting && !(p.aimBtn & btn)) {
           if (pr) { if (abs[i].lock && aim != null && p.cd[i] <= 0) p.yaw = aim; useAbility(p, i); }
           continue;
         }
         if (pr && LEAPS.includes(abs[i].id) && p.tether != null) { useAbility(p, i); continue; } // recast: no aiming
         const flying = LEAPS.includes(abs[i].id) && hooks.find(h => h.o === p && !h.vic);
         if (pr && flying) { flying.leap = true; continue; } // recast before it caught (a ping's worth early): leap when it does
-        if (pr && p.cd[i] <= 0) p.aimBtn |= btn;
+        if (pr && (p.cd[i] <= 0 || abducting)) p.aimBtn |= btn;
         if (p.aimBtn & btn && !(inp.b & btn)) { p.aimBtn &= ~btn; if (aim != null) p.yaw = aim; useAbility(p, i); }
       }
       if (aim != null && (p.aimBtn || p.vault > 0)) p.yaw = aim;

@@ -65,8 +65,8 @@
       "target": "nsis"
     },
     "nsis": {
-      "oneClick": false,
-      "allowToChangeInstallationDirectory": true,
+      "oneClick": true,
+      "perMachine": false,
       "artifactName": "GangOfLegends-Setup-${version}.${ext}"
     },
     "mac": {
@@ -88,7 +88,7 @@
       "repo": "gangoflegends",
       "releaseType": "release"
     },
-    "asar": true,
+    "asar": false,
     "electronLanguages": [
       "en-US"
     ]
