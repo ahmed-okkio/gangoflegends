@@ -297,7 +297,7 @@ export function createRenderer(canvas) {
     for (const [kind, x, y, z, big, slot, vic] of events) {
       v.set(x, y, z);
       if (kind === 'hijack') lashes.push({ from: slot, to: vic, t: 0 }); // Sylas's Hijack: his chain out to them (stepLashes)
-      if (kind === 'hit') {
+      if (kind === 'hit' || kind === 'hitq') {
         emit(v, { color: big ? '#ffb347' : '#fff3b0', n: big ? 18 : 9, speed: big ? 7 : 4.5, size: big ? 0.35 : 0.22, life: 0.35, grav: 0 });
         ring(v, big ? '#ffb347' : '#ffffff', big ? 1.4 : 0.8);
         shake = Math.max(shake, big ? 0.25 : 0.08);

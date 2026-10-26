@@ -39,7 +39,7 @@ const turnToward = (a, b, max) => a + Math.max(-max, Math.min(max, wrap(b - a)))
 // --- ragdoll: the Gang Beasts beast (beast.js). Part index = body index everywhere; bodies[0] is the chest. ---
 const TORSO = CHEST;
 const CORE = [HIPS, WAIST, CHEST, HEAD, THIGH, THIGH + 1, LEG, LEG + 1]; // moved as one by the locomotion; arms hang off it
-const HOST_CASTS = ['hook', 'sentence', 'charge', 'rampage', 'headbutt', 'adhesive', 'hijack', 'abscond']; // GB mode: a client's copy never plays these (useAbility)
+const HOST_CASTS = ['hook', 'sentence', 'adhesive', 'hijack']; // GB mode: a client's copy never plays these (useAbility): they tie me to someone or put something in the world
 const LEAPS = ['sentence', 'sonic']; // abilities whose recast flies you to whoever they caught (Thresh Q, Lee Sin Q)
 const HOIST = [WAIST, CHEST]; // lifted by a hoist, carrying the whole core's weight; hips and legs hang off it
 const HOIST_K = CORE.reduce((m, i) => m + PARTS[i].mass, 0) / HOIST.reduce((m, i) => m + PARTS[i].mass, 0);
@@ -258,14 +258,15 @@ export function createSim({ mapId, players, practice = false, roundsToWin = 3, l
     return best;
   }
 
-  function hit(vic, part, dv, daze) {
+  // quiet: no hit sound (hitq: the sparks only), when the cast makes its own (Pulverize's slam)
+  function hit(vic, part, dv, daze, quiet) {
     if (vic.safe > 0) return; // just up from a knockout: untouchable
     // a prediction copy only learns about hits from the host, but shows my own landing on a stand-in (at its chest) right away
     if (local >= 0) { if (by === local) fx('hit', add(vic.bodies[part].translation(), V(0, 0.45, 0)), daze >= 40 ? 1 : 0, by, vic.slot); return; }
     for (const b of vic.bodies) addVel(b, dv);
     addVel(vic.bodies[HEAD], mul(dv, 0.3)); // snap the head back a little
     vic.sinceHit = 0;
-    fx('hit', vic.bodies[part].translation(), daze >= 40 ? 1 : 0, by, vic.slot);
+    fx(quiet ? 'hitq' : 'hit', vic.bodies[part].translation(), daze >= 40 ? 1 : 0, by, vic.slot);
     if (dv.y > 2) vic.jumpT = Math.max(vic.jumpT, 0.3); // don't let the hover spring swallow a launch
     // knocked out: still gets knocked around, but no stagger or daze, so no chain stuns
     if (vic.ko > 0) return;
@@ -387,9 +388,9 @@ export function createSim({ mapId, players, practice = false, roundsToWin = 3, l
   }
 
   function useAbility(p, i, turned) {
-    // GB mode: my copy plays my casts at once for show (pose, windup, glow, effects; hits are the host's, see hit()). Not the
-    // ones that throw my body about or put something in the world (dashes, charges, spins, leaps, hooks, glue): the host plays
-    // those, drawn from its state (sync hostOwned)
+    // GB mode: whatever only moves or poses me plays on my copy at once (poses, dashes, charges, spins, slams; hits on others
+    // are the host's, see hit()), so my casts play in the order I pressed them. What ties me to someone or puts something in
+    // the world (hooks, leaps, glue, Hijack) is the host's, drawn from its state (sync hostOwned)
     const ab = kit(p.champ, p.stole)[i];
     if (gb && local >= 0 && (HOST_CASTS.includes(ab.id) || LEAPS.includes(ab.id) && p.tether != null)) return;
     if (ab.id === 'charge' && p.charge > 0) { p.charge = 0; return; } // recast ends the charge early
@@ -517,7 +518,7 @@ export function createSim({ mapId, players, practice = false, roundsToWin = 3, l
       if (o === p || !o.alive) continue;
       const d = sub(seen(p, o), t);
       if (Math.hypot(d.x, d.z) > PULV_R || Math.abs(d.y) > 1.2) continue;
-      hit(o, TORSO, add(mul(norm(V(d.x, 0, d.z)), 1.5), V(0, 9, 0)), 20);
+      hit(o, TORSO, add(mul(norm(V(d.x, 0, d.z)), 1.5), V(0, 9, 0)), 20, true);
       if (o.ko <= 0 && o.safe <= 0) o.stun = Math.max(o.stun, 1);
     }
   }
@@ -617,7 +618,7 @@ export function createSim({ mapId, players, practice = false, roundsToWin = 3, l
     // Fully wound up it can be held 3s more, then goes by itself
     if (p.vault > 0) {
       if (move && inp.b & p.vaultBtn && p.vault < 3.94) { p.vault += DT; speed *= 0.35; }
-      else { const w = Math.min(p.vault, 0.94); if (!(gb && local >= 0)) p.dash = { t: 0.27 + w * 0.54, power: w / 0.94 }; p.vault = 0; } // the dash is the host's
+      else { const w = Math.min(p.vault, 0.94); p.dash = { t: 0.27 + w * 0.54, power: w / 0.94 }; p.vault = 0; }
     }
     if (p.leap) { // Thresh's Death Sentence recast: reeled along the chain all the way to them. Lee Sin's knocks them back
       const q = ps[p.leap.slot], d = q && live(q) && sub(q.bodies[TORSO].translation(), tp);
@@ -633,7 +634,7 @@ export function createSim({ mapId, players, practice = false, roundsToWin = 3, l
     // Sett Q: hold to plant and wind up, let go (or hold past 3 s) to throw it
     if (p.hay > 0) {
       if (move && inp.b & p.hayBtn && p.hay < 3) { p.hay += DT; speed = 0; }
-      else { if (move && !(gb && local >= 0)) haymaker(p, f, tp, hayK(p)); p.hay = 0; } // the punch is the host's
+      else { if (move) haymaker(p, f, tp, hayK(p)); p.hay = 0; }
     }
     p.fb -= DT; p.pulv -= DT; p.flay -= DT; p.fling -= DT; p.palm -= DT;
     if (p.qTurn && ((p.qTurn.t -= DT) <= 0 || ahead(p) > 0.5)) { p.yaw = p.qTurn.yaw; p.qTurn = null; useAbility(p, 0, true); }
@@ -1020,8 +1021,8 @@ export function createSim({ mapId, players, practice = false, roundsToWin = 3, l
     if (emp !== me.hostEmp && kit(me.champ, me.stole)[1].id === 'abscond') { me.empower = emp ? 4 : 0; me.emp = 'aoe'; }
     me.hostEmp = emp;
     me.tied = !!(e[3] & 128); // holding / held by a champ: two ragdolls tied together only the host can simulate
-    // GB mode (gb, game.js GB_MODE): my copy only walks; whatever moves me otherwise (abilities, headbutt, holding on) is the host's
-    me.hostOwned = gb && !!(e[3] & (1 | 2 | 8 | 512)); // not 64 (a windup): my copy charges it too (useAbility)
+    // GB mode (gb, game.js GB_MODE): what ties me to someone (grabs, leaps, being lifted) is the host's; my own moves are mine (useAbility)
+    me.hostOwned = gb && !!(e[3] & (8 | 512));
     // stunned (every hit stuns): flung or reeling with no control, so nothing of mine to predict. The host's flight is the truth,
     // drawn as is, instead of guessing it on and correcting every snapshot (teleporting about mid-air)
     if (e[x + 5] > lag) me.hostOwned = true;
@@ -1039,12 +1040,16 @@ export function createSim({ mapId, players, practice = false, roundsToWin = 3, l
       // it and replay those here too, or my copy never got them and the first correction a round trip later yanked me
       // (measured: 1.2m walking out of a charge at 400ms). Effects from the replay were already shown, or are the host's
       held = false;
+      const was = hips().translation();
       shift(sub(hp, hips().translation()), sub(hv, hips().linvel()));
       const keep = me.input, n = events.length;
       me.prevB = sent.get(ack)?.b ?? me.prevB;
       for (let t = ack + 1; t <= tick; t++) { me.input = sent.get(t) ?? me.input; control(me, st !== 'count'); belts(me); world.step(); }
       me.input = keep; events.length = n;
-      hist.clear(); smooth = V();
+      // the replay carries me on a round trip's worth (a dash's end: ~0.5m at 200ms): drawn from where I was, eased in
+      // through smooth like any correction, or I jumped there the next frame
+      const d = sub(was, hips().translation());
+      hist.clear(); smooth = len(d) < 4 ? d : V();
       return;
     }
     const h = hist.get(ack);
@@ -1148,7 +1153,7 @@ export function createSim({ mapId, players, practice = false, roundsToWin = 3, l
         const flags = (p.spin > 0) | (p.charge > 0) << 1 | (p.empower > 0) << 2 | (p.grabs.some(Boolean)) << 3 | (p.ko > 0) << 4 | (p.safe > 0) << 5 | (p.vault > 0 || p.hay > 0) << 6
           | (p.grabs.some(g => g?.vic) || ps.some(q => q.grabs?.some(g => g?.vic === p))) << 7 // holding or held by a champ
           | (p.dizzy > 0) << 8 // stunned on their feet (stars)
-          | (!!p.dash || !!p.leap || !!p.butt || p.fb > 0 || p.pulv > 0 || p.flay > 0 || p.fling > 0 || p.kickA > 0 || !!p.lifted) << 9; // GB mode: a move only the host plays
+          | (!!p.leap || !!p.lifted) << 9; // GB mode: a move only the host plays (it ties me to someone)
         // hips position + every part's rotation; clients rebuild the other positions from the joint anchors (beast.js fk)
         const t = p === me ? add(p.bodies[HIPS].translation(), smooth) : p.bodies[HIPS].translation();
         const out = [p.slot, 1, Math.round(p.daze), flags, Math.ceil(p.cd[0] * 10), Math.ceil(p.cd[1] * 10), r2(t.x), r2(t.y), r2(t.z)];

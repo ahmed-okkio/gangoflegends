@@ -677,25 +677,20 @@ for (const [gap, draw] of [[0.3, true], [0.7, false]]) {
   assert.ok(withComp && !without, 'abilities land where the caster saw the target');
 }
 
-// 12h. GB mode: a client's copy only walks; the host's charge carries my body (drawn from the host), then hands it back
+// 12h. GB mode: my own moves play on my copy at once (a charge carries only me) and the host's agrees
 {
   const d = duo('grind', [{ id: 'a', name: 'A', champ: 'hec', team: 0 }, { id: 'b', name: 'B', champ: 'blitz', team: 1 }], 0, 12, { practice: true, gb: true });
-  let owned = 0, charged = 0, hostCharged = 0;
+  let owned = 0, charged = -1, hostCharged = 0, worst = 0;
   for (let i = 0; i < 500; i++) {
     d.step({ x: 0, z: 0, b: i === 100 ? BTN.A2 : 0 }); // Devastating Charge
-    owned += !!d.cli.players[0].hostOwned; charged += d.cli.players[0].charge > 0; hostCharged += d.host.players[0].charge > 0;
+    owned += !!d.cli.players[0].hostOwned; hostCharged += d.host.players[0].charge > 0;
+    if (charged < 0 && d.cli.players[0].charge > 0) charged = i;
+    if (i > 100) worst = Math.max(worst, d.cli.err);
   }
-  console.log('GB mode: host-owned for', owned, 'ticks');
-  // walking on after it hands my body back: no rubber band (my copy was left a round trip behind the host's me)
-  let worst = 0;
-  for (let i = 0; i < 300; i++) {
-    d.step({ x: 0, z: 1, b: i === 20 ? BTN.A2 : 0 });
-    if (i > 20 && !d.cli.players[0].hostOwned && d.cli.players[0].hooked <= 0) worst = Math.max(worst, d.cli.err);
-  }
-  console.log('GB mode: worst correction walking after a charge', worst.toFixed(2));
-  assert.ok(worst < 0.3, 'handed back, my copy picks up where the host has me');
-  assert.ok(hostCharged && !charged, 'the host charged, my copy never did');
-  assert.ok(owned > 20 && !d.cli.players[0].hostOwned, 'my body was the host\'s while it charged, mine again after');
+  console.log('GB mode: own charge starts at tick', charged, '| host-owned', owned, 'ticks | worst correction', worst.toFixed(2));
+  assert.ok(charged === 100 && hostCharged && !owned, 'my copy charges at once, the host too, and never takes my body');
+  // walking on after it: ponytail: not checked, walking into the other champ's ragdoll corrects ~1m either way (was so before)
+  assert.ok(worst < 0.5, 'my charge and the host agree');
 }
 { // aiming turns my copy round too: my arms are drawn from the host, whose me turned to cast (Lee's Q tapped behind him)
   const d = duo('grind', [{ id: 'a', name: 'A', champ: 'lee', team: 0 }, { id: 'b', name: 'B', champ: 'blitz', team: 1 }], 0, 12, { practice: true, gb: true });

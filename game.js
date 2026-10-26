@@ -282,6 +282,7 @@ function onSnap(m) {
   game.off = Math.max(...offs.slice(-300));
   game.jit = offs.map(o => Math.max(0, game.off - o)).sort((a, b) => a - b)[Math.floor(0.99 * (offs.length - 1))];
   if (game.fresh) { game.delay = wantDelay(); game.fresh = false; } // straight there, not eased down over seconds
+  if (devOn()) { telSnap.push([t, m.s.mt]); if (telSnap.length > 36000) telSnap.splice(0, 6000); }
   game.local.sync(m.s, m.s.p[game.mySlot]);
   // events ride along on several snapshots (any one can be lost); e[7] numbers them so each plays once (sim.js fx() for
   // the rest). Mine that my copy already played are skipped; one it didn't see coming (a hit it didn't predict) still plays.
@@ -289,6 +290,7 @@ function onSnap(m) {
   const ev = m.ev?.filter(e => e[7] > game.evN && !(e[5] === game.mySlot && claim(e, t))) ?? [];
   for (const e of m.ev ?? []) game.evN = Math.max(game.evN, e[7]);
   const mine = e => e[6] === game.mySlot || e[5] === game.mySlot, now = ev.filter(mine), later = ev.filter(e => !mine(e));
+  if (devOn()) telEv.push([t, now.map(e => [e[0], e[5], e[6], e[7]]), later.map(e => [e[0], e[5], e[6], e[7]])]);
   if (now.length) view.fx(now);
   if (later.length) setTimeout(() => view.fx(later), game.delay * 1000);
 }
@@ -683,6 +685,7 @@ function frame(now) {
       local.setInput(game.mySlot, GB_MODE ? { ...inp, b: inp.b & ~BTN.LIFT } : inp); // GB mode: my copy plays all but lifting (sim.js: what it leaves the host)
       local.step();
       const ev = local.takeEvents();
+      if (ev.length && devOn()) telEv.push([now, ev.map(e => [e[0], e[5], e[6], 'local'])]);
       if (ev.length && !pure) { view.fx(ev); for (const e of ev) if (e[5] === game.mySlot) game.played.push([...e, now]); } // server only: the host's effects play instead
       const mine = local.snapshot();
       game.mine = [game.mine?.[1], mine.p[game.mySlot]]; game.myHooks = mine.h;
@@ -733,6 +736,7 @@ function frame(now) {
     game.drawnHips = b.p[game.mySlot]?.[1] ? [...view.avatars()[game.mySlot].pos[HIPS]] : null;
     b.p.forEach((e, i) => { const o = a.p[i], d = shift[i]; local.place(i, ...(e[1] && o?.[1] ? [6, 7, 8].map((k, j) => o[k] + (e[k] - o[k]) * alpha + (d?.[j] ?? 0)) : [0, -100, 0])); });
     game.cur = { ...b, p: b.p.map((e, i) => i === game.mySlot && own ? own.b : e) };
+    if (devOn()) telemetry(now, dt, inp, s, at, own, limp, shift, local);
   }
   updateHud(game.cur, now);
   view.render(dt);
@@ -812,6 +816,19 @@ function fakeHost(dt, now) {
   }
 }
 
+// dev mode: a per-frame trace of the client's view (window.tel, last ~10 min at 60fps) for chasing netcode glitches over CDP
+// (npm run dev -- --remote-debugging-port=9222). Each row: time, frame dt, how far behind the newest snapshot the playback
+// clock is, snapshots queued, delay, jitter, ping, carrying on, my prediction error, limp, every drawn hips and my input
+const tel = window.tel = [], telSnap = window.telSnap = [], telEv = window.telEv = []; // telSnap: [arrived, host clock] per snapshot
+function telemetry(now, dt, inp, s, at, own, limp, shift, local) {
+  const av = view.avatars();
+  tel.push({ t: now, dt, behind: s.at(-1).mt - at, q: s.length, delay: game.delay, jit: game.jit, ping: game.ping, carry: !!game.carry,
+    err: local.err, limp: !!limp, own: !!own, slide: game.slide ? Math.hypot(...game.slide) : 0, st: game.cur.st,
+    shift: shift.map(d => d ? Math.hypot(...d) : 0), hips: av.map(a => a?.pos?.[HIPS] ? [...a.pos[HIPS]].map(v => Math.round(v * 1000) / 1000) : null),
+    inp: [inp.x, inp.z, inp.b, inp.a, inp.d] });
+  if (tel.length > 36000) tel.splice(0, 6000);
+}
+
 // ---------- menu backdrop: bots brawling on a stage behind the menus ----------
 let attract = null; // { sim, prev, cur, bots }
 async function startAttract() {
@@ -878,4 +895,4 @@ show('menu');
 // dev shortcuts: #practice-<map> starts straight into practice (used by the smoke test)
 const dev = location.hash.match(/^#practice-(\w+)/);
 if (dev && MAPS[dev[1]]) startPractice(dev[1]);
-if (dev) { Object.defineProperty(window, "game", { get: () => game }); window.view = view; } // smoke-test probes
+if (dev || devOn()) { Object.defineProperty(window, "game", { get: () => game }); window.view = view; } // smoke-test probes
