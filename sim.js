@@ -175,7 +175,7 @@ export function createSim({ mapId, players, practice = false, roundsToWin = 3, l
       if (part.hinge) j.setLimits(...part.hinge);
     });
     Object.assign(p, {
-      alive: true, yaw, daze: 0, sinceHit: 9, ko: 0, cd: [0, 0], punch: null, punchCd: 0, grabs: [null, null], held: [0, 0],
+      alive: true, yaw, daze: 0, sinceHit: 9, ko: 0, cd: [0, 0], punch: null, punchCd: 0, armCd: [0, 0], grabs: [null, null], held: [0, 0],
       stun: 0, spin: 0, spinHit: null, stole: null, charge: 0, empower: 0, jumpT: 0, phase: 0, grounded: false, prevB: p.input.b,
       butt: null, buttCd: 0, lying: false, safe: 0, hooked: 0, spinA: 0, chargeT: 0,
       emp: null, dash: null, vault: 0, vaultBtn: 0, hay: 0, hayBtn: 0, fb: 0, pulv: 0, flay: 0, fling: 0, tether: null, leap: null, dizzy: 0, kick: null, kickA: 0, palm: 0, qTurn: null,
@@ -228,6 +228,13 @@ export function createSim({ mapId, players, practice = false, roundsToWin = 3, l
   let trail = [];
   // trail.at(-1) is the state after the last step, i.e. the snapshot stamped mt - DT
   const seen = (p, q) => (p.view && trail.at(-Math.min(p.view, trail.length))?.[q.slot]) || q.bodies[TORSO].translation();
+  // how fast q was moving then, from the same trail: a punch lands as hard as the fist moves against what the client saw.
+  // Against q's velocity now, a second punch at a target the first had already knocked flying (on the host; still standing
+  // on the client's screen) was a fist chasing them at their own speed: under 2.5m/s, a push. Only the host chained punches
+  const seenVel = (p, q) => {
+    const k = Math.min(p.view, trail.length - 1), a = k > 0 && trail.at(-k)?.[q.slot], b = k > 0 && trail.at(-k - 1)?.[q.slot];
+    return a && b ? mul(sub(a, b), 1 / DT) : q.bodies[TORSO].linvel();
+  };
   // playersNear as p saw them: the ball moved along by however far each one has gone since, tested against them now
   function playersNearSeen(p, pos, r) {
     if (!p.view) return playersNear(p, pos, r);
@@ -537,7 +544,7 @@ export function createSim({ mapId, players, practice = false, roundsToWin = 3, l
     const move = ctrl && (p.stun -= DT) <= 0 ? 1 : 0; // staggered: can't steer, jump or cast
     if ((p.sinceHit += DT) > 1.2) p.daze = Math.max(0, p.daze - 15 * DT);
     p.cd = p.cd.map((c, i) => i === 0 && hooks.some(h => h.o === p && h.lee) ? c : Math.max(0, c - DT)); // Sonic Wave cools once the wave missed, the mark wore off or he flew in
-    p.punchCd -= DT; p.empower -= DT; p.jumpT -= DT; p.buttCd -= DT;
+    p.punchCd -= DT; p.armCd[0] -= DT; p.armCd[1] -= DT; p.empower -= DT; p.jumpT -= DT; p.buttCd -= DT;
 
     const tp = T.translation(), tv = T.linvel(), Hb = p.bodies[HIPS];
     const ray = world.castRay(new RAPIER.Ray(tp, DOWN), STAND + 0.3, true, undefined, under(p));
@@ -673,10 +680,10 @@ export function createSim({ mapId, players, practice = false, roundsToWin = 3, l
     for (const arm of [0, 1]) {
       if (ctrl && inp.b & HANDS[arm]) p.held[arm] += DT;
       else if (p.held[arm] > 0) {
-        if (p.held[arm] < TAP && !p.grabs[arm] && move && p.punchCd <= 0 && p.spin <= 0) {
+        if (p.held[arm] < TAP && !p.grabs[arm] && move && p.punchCd <= 0 && p.armCd[arm] <= 0 && p.spin <= 0) {
           const to = punchTarget(p, f), d = to && sub(to.bodies[TORSO].translation(), tp);
           p.punch = { arm, t: 0, hit: new Set(), to }; // already drawn back while the button was down
-          p.punchCd = 0.25;
+          p.punchCd = 0.25; p.armCd[arm] = 0.5; // alternate hands for 4 a second; one hand alone throws 2
           fx('swing', handPos(p, arm), 0, p.slot);
           addVel(T, mul(d ? norm(V(d.x, 0, d.z)) : f, 1.5)); // lunge into it
         }
@@ -755,7 +762,7 @@ export function createSim({ mapId, players, practice = false, roundsToWin = 3, l
       const fv = add(arm.linvel(), cross(arm.angvel(), sub(hp, arm.worldCom()))), pf = aimTo ? norm(V(aimTo.x, 0, aimTo.z)) : f;
       for (const { vic, part } of playersNearSeen(p, hp, 0.2)) {
         if (p.punch.hit.has(vic)) continue;
-        const sp = len(sub(fv, vic.bodies[part].linvel()));
+        const sp = len(sub(fv, p.view ? seenVel(p, vic) : vic.bodies[part].linvel()));
         if (sp < 2.5) continue; // a resting fist just pushes
         p.punch.hit.add(vic);
         if (p.empower > 0 && p.emp === 'through') { p.empower = 0; relentless(p, vic, part, pf); }
@@ -768,7 +775,7 @@ export function createSim({ mapId, players, practice = false, roundsToWin = 3, l
             if (o === vic || (Math.hypot(d.x, d.z) < 2.4 && Math.abs(d.y) < 1.2)) hit(o, o === vic ? part : TORSO, add(mul(norm(V(d.x, 0, d.z)), 5.4), V(0, 1.8, 0)), 30);
           }
         } else if (p.empower > 0) { p.empower = 0; hit(vic, part, add(mul(pf, 2), V(0, 10, 0)), 45); }
-        else { const k = Math.min(sp, 12) / 6; hit(vic, part, add(mul(norm(add(norm(fv), pf)), 2.2 * k), V(0, 0.6, 0)), 20 * k); }
+        else { const k = Math.min(sp, 12) / 6; hit(vic, part, add(mul(norm(add(norm(fv), pf)), 0.44 * k), V(0, 0.12, 0)), 20 * k); } // knockback 2.2/0.6 -> 0.44/0.12 (-80%): trading punches toe to toe, not batting each other out of reach
       }
     }
     if (p.spin > 0) for (let i = 0; i < 2; i++) {
