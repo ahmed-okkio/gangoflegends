@@ -8,7 +8,7 @@
     "dev": "electron . --dev",
     "test": "node test.js",
     "dist": "electron-builder --win",
-    "release": "electron-builder --win --publish never && node release.cjs",
+    "release": "node release.cjs",
     "dist:mac": "electron-builder --mac --publish never"
   },
   "type": "module",

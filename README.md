@@ -16,7 +16,7 @@ python tools/import_audio.py        # sounds -> gbcache/audio
 npm start          # run from source
 npm run dev        # straight into practice with DevTools
 npm test           # physics, combat and netcode-size checks
-npm run release    # build the Windows installer and publish it as a GitHub release (uses gh); CI then adds the Mac .dmg
+npm run release    # push main first: starts the Mac CI build, builds the Windows installer, publishes the GitHub release (uses gh)
 ```
 
 Bump `version` in package.json before each release and add its entry at the top of `patchnotes.json` (the release notes, also shown in the game's Patch notes tab after the update); installed copies pick it up on next launch, and lobbies only accept players on the host's version.
@@ -27,7 +27,8 @@ The game ships for **Windows and macOS**. Keep everything cross-platform: no Win
 assumptions in game or app code (`path.join`, not backslashes; `process.platform` checks where the platforms really differ).
 Dev tools (`tools/`) may assume Windows; anything that ships may not.
 
-Releasing: `npm run release` on Windows publishes the `.exe` and `latest.yml` (Windows auto-update). Publishing the release
-triggers `.github/workflows/mac.yml`, which builds the unsigned universal `.dmg` on a GitHub Mac runner (~5 min) and
-attaches it to the same release. Check that run went green. `gbcache/` is committed so CI has the game assets: re-commit
+Releasing: push main, then `npm run release` on Windows. It first starts `.github/workflows/mac.yml` (the unsigned universal
+`.dmg`, built from origin/main on a GitHub Mac runner), builds the Windows installer meanwhile, and publishes the release with
+the `.exe` and `latest.yml` (Windows auto-update); the Mac job attaches its `.dmg` once that release exists. Check that run
+went green. `gbcache/` is committed so CI has the game assets: re-commit
 it after re-importing.

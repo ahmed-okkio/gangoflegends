@@ -1,9 +1,12 @@
-# Builds the Mac .dmg (unsigned, universal) and attaches it to each GitHub release that release.cjs publishes.
+# Builds the Mac .dmg (unsigned, universal). release.cjs starts it with the release's tag, in parallel with the Windows
+# build; once release.cjs has published that release the dmg is attached to it. Started by hand without a tag: artifact only.
 name: mac
 on:
-  release:
-    types: [published]
   workflow_dispatch:
+    inputs:
+      tag:
+        description: release tag to attach the dmg to (e.g. v1.20.0), blank for none
+        required: false
 jobs:
   build:
     runs-on: macos-latest
@@ -17,10 +20,14 @@ jobs:
           cache: npm
       - run: npm ci
       - run: npm run dist:mac
-      - if: github.event_name == 'release'
-        run: gh release upload "${{ github.event.release.tag_name }}" release/*.dmg --clobber
+      - if: inputs.tag != ''
+        run: |
+          # the Windows build is usually still running: wait up to 40 min for release.cjs to publish the release
+          for i in $(seq 80); do gh release view "$TAG" >/dev/null 2>&1 && break; sleep 30; done
+          gh release upload "$TAG" release/*.dmg --clobber
         env:
           GH_TOKEN: ${{ github.token }}
+          TAG: ${{ inputs.tag }}
       - uses: actions/upload-artifact@v4
         with:
           name: mac
