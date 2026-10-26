@@ -60,7 +60,7 @@ const KICK = 0.35; // Lee Sin E: seconds for the roundhouse's turn; it lands as 
 // stamina (theirs: 100). Treading water and swimming wear it down, a head held under wears it down fast; tired, you sink to
 // the sea's kill volume (4m down). On deck it comes back
 const FLOAT = 1.25, SINK = 0.6; // buoyancy in g: fresh (floats about chest deep), spent
-const TREAD = 4, STROKE = 5, BREATH = 25, RECOVER = 15, LUNGE = 15; // stamina/s: in water, swimming on top, head under, back on deck; a jump in the water costs LUNGE
+const TREAD = 0.8, STROKE = 1, BREATH = 25, RECOVER = 15, LUNGE = 15; // stamina/s: in water, swimming on top, head under, back on deck; a jump in the water costs LUNGE
 const TWIST = 0.7; // how firmly arms hold their roll (aimPart)
 const TAP = 0.2; // a hand let go within this many seconds punches; held longer, it grabs
 const LATCH = 0.4, GRAB_LEAN = 0.9; // grab assist: how far a hand latches onto who it's going for; most it bends down for them
