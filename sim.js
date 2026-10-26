@@ -117,9 +117,11 @@ export function createSim({ mapId, players, practice = false, roundsToWin = 3, l
     // held by someone above (or level with) you: pushed under. A prediction copy's stand-ins hold nobody; that's the host's
     const dunk = ps.some(q => q !== p && q.alive && q.grabs?.some(g => g?.vic === p) && q.bodies[TORSO].translation().y > tp.y - 0.3);
     const drowning = skull(p).y < sea - 0.1;
-    // breath only runs out with the head under: up top you can tread water for as long as you like
-    p.stamina = drowning ? Math.max(0, p.stamina - (TREAD + (moving ? STROKE : 0) + BREATH) * DT) : Math.min(100, p.stamina + RECOVER * DT);
-    p.drowned = drowning && !p.stamina; // out (step()); held up by someone's hands, you'd never reach the kill volume
+    p.stamina = Math.max(0, p.stamina - (TREAD + (moving ? STROKE : 0) + (drowning ? BREATH : 0)) * DT);
+    // out (step()) once the head's been under 8s straight (by then the breath's spent): a bob under doesn't do it. Held up by
+    // someone's hands, you'd never reach the kill volume
+    p.under = drowning ? (p.under ?? 0) + DT : 0;
+    p.drowned = !p.stamina && p.under > 8;
     // holding someone under: kept up on top of them (Gang Beasts' beasts climb onto whoever they hold down)
     const top = p.grabs.some(g => g?.vic?.wet && g.vic.bodies[TORSO].translation().y < tp.y + 0.3);
     // held under, you lose your float to whoever holds you: they stay up, you hang off their hands below the surface

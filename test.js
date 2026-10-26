@@ -773,7 +773,7 @@ if ((await prepareMap('subway')).imported) {
   assert.ok(out, 'a train carries you into the tunnel');
   console.log('subway train ok');
 }
-// 16. Trawler (when imported): overboard you float and swim as long as your head stays up; held under, you drown
+// 16. Trawler (when imported): overboard you float and can swim a while, then tire and sink out; held under, sooner
 if ((await prepareMap('trawler')).imported) {
   const sea = (await import('./maps.js')).MAPS.trawler.view.sea;
   const sim = createSim({ mapId: 'trawler', practice: true, players: [0, 1].map(i => ({ id: i, name: 'P', champ: 'blitz', team: i })) });
@@ -784,9 +784,9 @@ if ((await prepareMap('trawler')).imported) {
   const a = sim.players[0];
   assert.ok(a.alive && Math.abs(torso(sim, 0).y - sea) < 0.6, `floats at the surface: ${torso(sim, 0).y.toFixed(2)}`);
   assert.ok(torso(sim, 0).x > 2, `swims: ${torso(sim, 0).x.toFixed(2)}`);
-  let t = 3; while (a.alive && t < 30) { sim.step(); t += 1 / 60; }
-  console.log('swam 30 s, stamina', a.stamina.toFixed(0));
-  assert.ok(a.alive, 'head up, you never drown');
+  let t = 3; while (a.alive && t < 80) { sim.step(); t += 1 / 60; }
+  console.log('swam, tired and sank out after', t.toFixed(1), 's');
+  assert.ok(!a.alive && t > 30 && t < 70, 'tires and sinks out');
   // B (fresh, treading water) held under by A from above
   run(sim, 100); // A back in practice
   dropAt(0, 3, 12.8); dropAt(1, 3, 12);
@@ -795,7 +795,7 @@ if ((await prepareMap('trawler')).imported) {
   a.yaw = Math.PI; sim.setInput(0, { x: 0, z: 0, b: BTN.LEFT | BTN.RIGHT }); // facing B, both hands out
   let u = 0; while (b.alive && u < 20) { sim.step(); u += 1 / 60; }
   console.log('held under: out after', u.toFixed(1), 's, grabbed', a.grabs.some(g => g?.vic === b));
-  assert.ok(!b.alive && u < 9, 'held under you drown quicker');
+  assert.ok(!b.alive && u > 7.5 && u < 10, 'held under, you drown in 8s');
 }
 // 12k. punched at a good ping (100ms round trip): a punch (no stun now, just its knockback) is predicted through on my copy, not handed to the host's
 // ragdoll (a snap there and a replay back on every punch taken). And a punch I throw back right after starts on my copy
