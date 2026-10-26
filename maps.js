@@ -33,7 +33,8 @@ export const MAPS = {
     name: 'Rooftop',
     blurb: 'A city rooftop in the rain. The edge is closer than it looks.',
     gb: 'rooftop',
-    killY: -6,
+    killY: -20, // the street is ~23.5m down, sheer walls: ~2s of falling to grab the edge, a wall or a friend before you're out (not -24: you'd land and be stuck)
+    gbKill: false, // GB's own kill volumes start 2m under the roof: out the moment you slip off. killY does it instead
     boxes: [box(0, -0.2, -3, 8, 0.2, 5, 'plate')],
     rollers: [], kill: [],
     spawns: [[-6, 0, -3], [6, 0, -3], [0, 0, -7], [0, 0, 1], [-3, 0, -5], [3, 0, -1], [-3, 0, -1], [3, 0, -5]],
