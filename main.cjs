@@ -7,6 +7,8 @@ const tls = require('tls');
 const smoke = process.env.SMOKE;
 const dev = process.argv.includes('--dev'); // npm run dev: straight into practice (DEV_MAP, default Girders) with DevTools open
 if (smoke) app.setPath('userData', path.join(app.getPath('temp'), `gangoflegends-test-${process.pid}`));
+// a throwaway profile per run: gone when it quits (hundreds of runs filled the temp drive). ponytail: best effort, a crash leaves one
+if (smoke) process.on('exit', () => { try { fs.rmSync(app.getPath('userData'), { recursive: true, force: true }); } catch {} });
 
 // Mainland China: ISPs there mostly reach Cloudflare's free plan through the US, but route some of its other IP ranges via
 // Hong Kong or Japan, and every range serves every Cloudflare site. So a player in China (by time zone; RELAY_PROBE=1 to

@@ -2,7 +2,7 @@
 import assert from 'node:assert/strict';
 import { initPhysics, createSim, BTN, STAND } from './sim.js';
 import { prepareMap } from './stages.js';
-import { packSnap, unpackSnap } from './wire.js';
+import { packSnap, unpackSnap, b64, frame, unframe } from './wire.js';
 import { HIPS } from './beast.js';
 
 await initPhysics();
@@ -710,16 +710,19 @@ for (const [gap, draw] of [[0.3, true], [0.7, false]]) {
   const sim = createSim({ mapId: 'girders', players: Array.from({ length: 8 }, (_, i) => ({ id: i, name: 'P', champ: i % 2 ? 'hec' : 'blitz', team: i })) });
   run(sim, 120);
   const bytes = JSON.stringify(sim.snapshot()).length;
-  // on the wire (wire.js): packed binary, every field back as sim.js rounded it, rotations turned the same to within 0.1 degree
-  const snap = sim.snapshot(), wire = JSON.stringify(packSnap(snap)), back = unpackSnap(JSON.parse(wire));
-  console.log('8p snapshot bytes', bytes, 'on the wire', wire.length);
-  assert.ok(bytes < 5000 && wire.length < bytes * 0.55);
+  // on the wire (wire.js): packed binary, every field back as sim.js rounded it, rotations turned the same to within half a degree (10 bits a component: ~0.1)
+  // two ways: as JSON with the block in base64 (the relay), and as one binary frame (the fast channel)
+  const snap = sim.snapshot(), wire = JSON.stringify(packSnap(snap), b64), back = unpackSnap(JSON.parse(wire)), fr = frame({ t: 'snap', s: packSnap(snap) });
+  console.log('8p snapshot bytes', bytes, 'as JSON', wire.length, 'as a frame', fr.byteLength);
+  assert.ok(bytes < 5000 && wire.length < bytes * 0.55 && fr.byteLength < wire.length * 0.85);
+  assert.deepEqual(unpackSnap(unframe(fr).s).p, back.p, 'frame and JSON agree');
+  assert.deepEqual(unframe(frame({ t: 'in', n: 3 })), { t: 'in', n: 3 }, 'plain messages go as JSON');
   assert.deepEqual(back.p.map(e => e.length), snap.p.map(e => e.length));
   for (const [i, e] of snap.p.entries()) for (let k = 0; k < e.length; k++) {
     if (k < 9 || k >= e.length - 9) assert.ok(back.p[i][k] === e[k], `field ${k}`); // (=== : JSON makes -0 a 0)
     else if ((k - 9) % 4 === 0) { // the same turn: the rounded original isn't quite unit length
       const q = [0, 1, 2, 3].map(j => e[k + j]), dot = q.reduce((t, c, j) => t + c * back.p[i][k + j], 0) / Math.hypot(...q);
-      assert.ok(Math.abs(dot) > 1 - 1e-6, `part ${(k - 9) / 4} turned`);
+      assert.ok(Math.abs(dot) > 1 - 1e-5, `part ${(k - 9) / 4} turned`);
     }
   }
   assert.ok(sim.players.every(p => p.alive), 'nobody falls off at spawn');

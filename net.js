@@ -1,5 +1,7 @@
 // Peer-to-peer transport over WebRTC (PeerJS, loaded as window.Peer).
 // The host's peer id is derived from a short lobby code; PeerJS's public server is only used to introduce peers.
+import { b64, frame, unframe } from './wire.js';
+
 const PREFIX = 'gangoflegends-v1-';
 const ALPHABET = 'ABCDEFGHJKMNPQRSTUVWXYZ23456789';
 const makeCode = () => [...Array(3)].map(() => ALPHABET[Math.floor(Math.random() * ALPHABET.length)]).join('');
@@ -141,18 +143,19 @@ export async function host() {
     peer.on('connection', conn => {
       if (conn.label === 'fast') {
         conn.on('open', () => { log('host: fast channel open', conn.peer); fast.set(conn.peer, conn); });
-        conn.on('data', msg => conns.has(conn.peer) && ev.emit('msg', conn.peer, msg));
+        conn.on('data', d => conns.has(conn.peer) && ev.emit('msg', conn.peer, unframe(d)));
         conn.on('close', () => fast.delete(conn.peer));
         return;
       }
       log('host: incoming connection', conn.peer);
       watch(conn);
+      conn.stringify = o => JSON.stringify(o, b64); // a snapshot's block as base64 (no fast channel yet, or none)
       conn.on('data', msg => data(conn.peer, conn, msg));
       conn.on('open', () => log('host: channel open', conn.peer));
       conn.on('close', () => gone(conn.peer)); conn.on('error', () => gone(conn.peer));
     });
     // ponytail: no reconnect; if the relay socket drops, relayed players lose the host like a dropped WebRTC link
-    const ws = new WebSocket(`${RELAY}${code}?role=host`), put = o => ws.readyState === 1 && ws.send(JSON.stringify(o));
+    const ws = new WebSocket(`${RELAY}${code}?role=host`), put = o => ws.readyState === 1 && ws.send(JSON.stringify(o, b64));
     ws.onopen = () => log('host: relay open');
     ws.onclose = e => log('host: relay closed', e.code, e.reason);
     ws.onmessage = e => {
@@ -169,7 +172,7 @@ export async function host() {
       broadcast(msg) { for (const c of conns.values()) if (c.open) c.send(msg); },
       // game state: the unreliable channel where there is one (relayed players: their only link)
       broadcastFast(msg) { for (const id of conns.keys()) this.sendFast(id, msg); },
-      sendFast(id, msg) { const c = conns.get(id), f = fast.get(id); if (f?.open) f.send(msg); else if (c?.open) c.send(msg); },
+      sendFast(id, msg) { const c = conns.get(id), f = fast.get(id); if (f?.open) f.send(frame(msg)); else if (c?.open) c.send(msg); },
       kick(id) { conns.get(id)?.close(); conns.delete(id); },
       close() { peer.destroy(); ws.close(); },
     };
@@ -224,11 +227,12 @@ async function joinDirect(code, name, v) {
     conn.on('data', msg => ev.emit('msg', msg));
     conn.on('close', () => { log('join: connection closed'); ev.emit('close'); });
     conn.send({ t: 'hello', name, v });
-    const fast = peer.connect(PREFIX + code, { reliable: false, serialization: 'json', label: 'fast' });
+    // raw: snapshots as bytes, not base64 inside JSON (wire.js frame)
+    const fast = peer.connect(PREFIX + code, { reliable: false, serialization: 'raw', label: 'fast' });
     fast.on('open', () => log('join: fast channel open'));
-    fast.on('data', msg => ev.emit('msg', msg));
+    fast.on('data', d => ev.emit('msg', unframe(d)));
     const send = msg => { if (conn.open) conn.send(msg); };
-    return { mode: 'client', myId: peer.id, on: ev.on, send, sendFast: msg => fast.open ? fast.send(msg) : send(msg), close() { peer.destroy(); } };
+    return { mode: 'client', myId: peer.id, on: ev.on, send, sendFast: msg => fast.open ? fast.send(frame(msg)) : send(msg), close() { peer.destroy(); } };
   } catch (e) {
     log('join: failed', e.type || '', e.message);
     peer.destroy();

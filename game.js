@@ -6,7 +6,7 @@ import { MAPS } from './maps.js';
 import * as net from './net.js';
 import { prepareMap, loadBeast, xhr } from './stages.js';
 import { PARTS, HIPS, ARM, FORE } from './beast.js';
-import { packSnap, unpackSnap } from './wire.js';
+import { packSnap, unpackSnap, b64 } from './wire.js';
 import { loadSfx, play, ui, setVolume } from './sfx.js';
 // Gang Beasts' split: a client predicts only walking (move, jump, run, lie down); punches, grabs, abilities and their
 // effects are the host's, drawn a round trip late like everyone else's. false revives full prediction (own punches,
@@ -807,7 +807,7 @@ function fakeHost(dt, now) {
     game.sim.step();
     for (const e of game.sim.takeEvents()) h.ev.push([...e, ++h.n, now]);
     h.ev = h.ev.filter(e => now - e[8] < 120);
-    const m = JSON.parse(JSON.stringify({ t: 'snap', s: packSnap(game.sim.snapshot()), ev: h.ev.map(e => e.slice(0, 8)) }));
+    const m = JSON.parse(JSON.stringify({ t: 'snap', s: packSnap(game.sim.snapshot()), ev: h.ev.map(e => e.slice(0, 8)) }, b64));
     lagged(() => onSnap(m), 'down');
   }
 }
