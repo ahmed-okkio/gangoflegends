@@ -863,6 +863,18 @@ export function createRenderer(canvas) {
         av.parts[i].position.fromArray(av.pos[i]);
         av.parts[i].quaternion.fromArray(av.q[i]);
       }
+      // bobble head, like Gang Beasts' loose neck (a free joint, ±40° each way, next to no spring): a point above the skull
+      // springs after where the head points, so it lags every lurch and wobbles back; the head is drawn turned toward it.
+      // Looks only: hits and the head the host simulates are untouched
+      const hd = av.parts[HEAD], bob = av.bob ??= { tip: null, prev: new THREE.Vector3(), v: new THREE.Vector3(), t: time };
+      const up = tmp.set(0, 0.4, 0).applyQuaternion(hd.quaternion), want = tmp2.copy(hd.position).add(up), bdt = Math.min(0.05, time - bob.t); bob.t = time;
+      if (!bob.tip || bob.tip.distanceTo(want) > 0.6) { bob.tip = want.clone(); bob.prev.copy(want); } // (re)spawned
+      else if (bdt > 0) {
+        bob.v.subVectors(bob.tip, bob.prev).multiplyScalar(Math.pow(0.88, bdt * 60)); bob.prev.copy(bob.tip);
+        bob.tip.add(bob.v).addScaledVector(want.sub(bob.tip), Math.min(1, 160 * bdt * bdt)); // ~2Hz wobble
+      }
+      const dir = want.subVectors(bob.tip, hd.position).normalize(), lean = Math.min(0.7, up.normalize().angleTo(dir));
+      if (lean > 1e-3) hd.quaternion.premultiply(qa.setFromAxisAngle(up.cross(dir).normalize(), lean));
       for (const c of av.chains) { // a pendulum: one tip point, pulled down by gravity and held at the chain's length from the cuff
         const fore = av.parts[FORE + c.arm], at = tmp.copy(c.at).applyQuaternion(fore.quaternion).add(fore.position);
         const dt = Math.min(0.05, time - c.t); c.t = time;

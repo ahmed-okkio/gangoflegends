@@ -43,6 +43,7 @@ const HOST_CASTS = ['hook', 'sentence', 'charge', 'rampage', 'headbutt', 'adhesi
 const LEAPS = ['sentence', 'sonic']; // abilities whose recast flies you to whoever they caught (Thresh Q, Lee Sin Q)
 const HOIST = [WAIST, CHEST]; // lifted by a hoist, carrying the whole core's weight; hips and legs hang off it
 const HOIST_K = CORE.reduce((m, i) => m + PARTS[i].mass, 0) / HOIST.reduce((m, i) => m + PARTS[i].mass, 0);
+const THROW = [5, 3.5]; // m/s forward, up: a lift throw's launch (see lift below)
 const HOLD = 20; // m/s^2 lift on the core (= gravity), so the hover spring only has to hold up the hanging arms
 const SAFE = 1; // seconds after getting up from a knockout that nothing can hit, grab or target you (drawn see-through)
 const CHARGE = 3, RAMP = 1; // Hecarim E: lasts 3s, speeds up evenly from walking to full gallop over the first 1s
@@ -240,10 +241,12 @@ export function createSim({ mapId, players, practice = false, roundsToWin = 3, l
     if (!p.view) return playersNear(p, pos, r);
     return ps.flatMap(q => q === p || !q.alive ? [] : playersNear(p, add(pos, sub(q.bodies[TORSO].translation(), seen(p, q))), r).filter(o => o.vic === q));
   }
+  // where q's skull is; a prediction copy's stand-in (one bean, placed at the hips) has it where a standing beast's would be
+  const skull = q => q.bodies[HEAD] === q.bodies[HIPS] ? add(q.bodies[HIPS].translation(), V(0, 0.81, 0)) : add(q.bodies[HEAD].translation(), qrot(q.bodies[HEAD].rotation(), V(0, 0.165, 0.057)));
   // Gang Beasts' punch targeting: the nearest beast of another team within reach and in front of me (a 120° cone)
   function punchTarget(p, f) {
     const tp = p.bodies[TORSO].translation();
-    let best = null, bd = 1.6;
+    let best = null, bd = 1.5; // reach: 1.25x the farthest a punch lands (~1.2m chest to chest)
     for (const q of ps) {
       if (q.team === p.team || !q.bodies || q.safe > 0) continue;
       const d = sub(q.bodies[TORSO].translation(), tp), h = Math.hypot(d.x, d.z);
@@ -665,9 +668,8 @@ export function createSim({ mapId, players, practice = false, roundsToWin = 3, l
     // punching turns the shoulders into it: wound back, then the punching side drives forward (that's the reach)
     const cock = p.held.findIndex(h => h > 0 && h < TAP && p.grounded);
     const tw = p.punch ? (p.punch.arm ? 0.7 : -0.7) : p.palm > 0 ? 0.6 : cock >= 0 ? (cock ? -0.3 : 0.3) : 0;
-    // a punch with a target tracks it: the shoulders turn to them and the fist (below) flies at them.
-    // ponytail: on a prediction copy the target is a stand-in at hip height, so my own fist aims ~20cm low until the host corrects it
-    const aimTo = (p.punch?.to?.bodies && sub(p.punch.to.bodies[TORSO].translation(), tp)) || gTo, ay = aimTo ? Math.atan2(aimTo.x, aimTo.z) : p.yaw + p.spinA;
+    // a punch with a target tracks it: the shoulders turn to them and the fist (below) flies from the shoulder at their head, hit or miss
+    const aimTo = (p.punch?.to?.bodies && sub(skull(p.punch.to), p.bodies[ARM + p.punch.arm].translation())) || gTo, ay = aimTo ? Math.atan2(aimTo.x, aimTo.z) : p.yaw + p.spinA;
     orient(p.bodies[WAIST], qmul(qyaw(ay + tw * 0.4), qaxis(X, lean * 0.5)), 10, up, [T, ...UPPER.map(i => p.bodies[i])]);
     orient(T, qmul(qyaw(ay + tw), qaxis(X, lean)), 20, up, UPPER.map(i => p.bodies[i]));
     orient(H, qmul(yq, qaxis(X, lean * 0.6)), 20, up);
@@ -838,7 +840,13 @@ export function createSim({ mapId, players, practice = false, roundsToWin = 3, l
       const d = V(((goal.x - vt.x) * 6 - vv.x) * 0.3, ((goal.y - vt.y) * 6 - vv.y) * 0.3 + HOLD * DT, ((goal.z - vt.z) * 6 - vv.z) * 0.3);
       for (const b of vic.bodies) addVel(b, d);
       vic.jumpT = Math.max(vic.jumpT, 0.1); // their hover spring would fight it
-    } else if (ctrl && p.lifted?.alive && !p.grabs.some(g => g?.vic === p.lifted)) for (const b of p.lifted.bodies) addVel(b, add(mul(f, 8), V(0, 4, 0)));
+    } else if (ctrl && p.lifted?.alive && !p.grabs.some(g => g?.vic === p.lifted)) {
+      // thrown: the whole body leaves at one launch, whatever the lift had going (timed perfectly, that flew ~4.3m; now ~2.2m every time)
+      let m = 0, mv = V();
+      for (const b of p.lifted.bodies) { m += b.mass(); mv = add(mv, mul(b.linvel(), b.mass())); }
+      const dv = sub(add(mul(f, THROW[0]), V(0, THROW[1], 0)), mul(mv, 1 / m));
+      for (const b of p.lifted.bodies) addVel(b, dv);
+    }
     p.lifted = vic || null;
   }
 

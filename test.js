@@ -237,7 +237,7 @@ for (const [gap, draw] of [[0.3, true], [0.7, false]]) {
   assert.ok(upright(sim, 0) > 0.8, `lifter stays up (${upright(sim, 0).toFixed(2)})`);
   const x = torso(sim, 1).x;
   run(sim, 20, () => sim.setInput(0, { x: 0, z: 0, b: BTN.LIFT }));
-  assert.ok(torso(sim, 1).x - x > 1, `thrown (${(torso(sim, 1).x - x).toFixed(2)})`);
+  assert.ok(torso(sim, 1).x - x > 0.5, `thrown (${(torso(sim, 1).x - x).toFixed(2)})`);
   console.log('lift ok');
 }
 
