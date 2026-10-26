@@ -117,7 +117,8 @@ export function createSim({ mapId, players, practice = false, roundsToWin = 3, l
     // held by someone above (or level with) you: pushed under. A prediction copy's stand-ins hold nobody; that's the host's
     const dunk = ps.some(q => q !== p && q.alive && q.grabs?.some(g => g?.vic === p) && q.bodies[TORSO].translation().y > tp.y - 0.3);
     const drowning = skull(p).y < sea - 0.1;
-    p.stamina = Math.max(0, p.stamina - (TREAD + (moving ? STROKE : 0) + (drowning ? BREATH : 0)) * DT);
+    // breath only runs out with the head under: up top you can tread water for as long as you like
+    p.stamina = drowning ? Math.max(0, p.stamina - (TREAD + (moving ? STROKE : 0) + BREATH) * DT) : Math.min(100, p.stamina + RECOVER * DT);
     p.drowned = drowning && !p.stamina; // out (step()); held up by someone's hands, you'd never reach the kill volume
     // holding someone under: kept up on top of them (Gang Beasts' beasts climb onto whoever they hold down)
     const top = p.grabs.some(g => g?.vic?.wet && g.vic.bodies[TORSO].translation().y < tp.y + 0.3);
@@ -160,6 +161,21 @@ export function createSim({ mapId, players, practice = false, roundsToWin = 3, l
       if (tr.out) tr.body.setNextKinematicTranslation(at); else tr.body.setTranslation(at, true); // first frame: appear there, don't sweep from the park
       tr.out = true;
     });
+  }
+  // a car's box sweeps 0.4m a step, so a limb could end up inside it and squeeze out the far side. Anything in or just
+  // ahead of a car is carried along at its speed instead, on into the tunnel's kill box
+  function trainHit(p) {
+    p.onTrain = false;
+    for (const o of trains.length ? trainsAt(map, mt) : []) {
+      const { c, h } = map.train.box, cx = o.x + c[0], top = map.trains.y + c[1] + h[1];
+      for (const b of p.bodies) {
+        const t = b.translation(), dx = (t.x - cx) * o.dir;
+        if (Math.abs(t.z - o.z - c[2]) > h[2] + 0.3 || t.y > top + 0.1 || dx < -h[0] || dx > h[0] + 0.6) continue;
+        p.onTrain = true;
+        for (const q of p.bodies) { const v = q.linvel(); q.setLinvel(V(o.dir * map.trains.speed, Math.max(v.y, 0), v.z), true); }
+        return;
+      }
+    }
   }
 
   const ps = players.map((pl, slot) => ({
@@ -696,7 +712,11 @@ export function createSim({ mapId, players, practice = false, roundsToWin = 3, l
     const dv = V((mx * speed + gv[0] - tv.x) * k, 0, (mz * speed + gv[2] - tv.z) * k);
     if (p.grounded && p.jumpT <= 0) dv.y = ((STAND - ray.timeOfImpact) * 12 - tv.y) * 0.35 + HOLD * DT;
     if (p.grounded && move && pressed & BTN.JUMP && !stuck) { dv.y = 7.3 - tv.y; p.jumpT = 0.3; } // 7.3: hips rise 0.57m, a quarter over the 6.5 it was
-    if (swim && move && pressed & BTN.JUMP && p.stamina > LUNGE) { dv.y = 5.5 - tv.y; p.stamina -= LUNGE; } // a lunge up out of the water, for a ledge to grab
+    // a lunge up out of the water, for a ledge to grab: high enough for the hands to reach a boat's rail when there's one ahead
+    if (swim && move && pressed & BTN.JUMP && p.stamina > LUNGE) {
+      const wall = m > 0.2 && world.castRay(new RAPIER.Ray(tp, V(mx / m, 0, mz / m)), 1.5, true, undefined, under(p));
+      dv.y = (wall ? 9.5 : 5.5) - tv.y; p.stamina -= LUNGE;
+    }
     // climbing, like Gang Beasts: hanging off a ledge by the hands, hold jump to hoist yourself up, a lever on the hands that
     // lifts the chest to their height (arms out in front, legs hanging) and stops there. The stick swings the legs (below);
     // let go of one hand and it reaches back up, to climb hand over hand
@@ -1166,7 +1186,7 @@ export function createSim({ mapId, players, practice = false, roundsToWin = 3, l
     glue = glue.filter(g => (g.t -= DT) > 0);
     ownGlue = st === 'count' ? [] : ownGlue.filter(g => (g.t -= DT) > 0);
     if (st === 'count' && (timer -= DT) <= 0) st = 'fight';
-    if (me.alive) { control(me, st !== 'count'); belts(me); water(me); }
+    if (me.alive) { control(me, st !== 'count'); belts(me); water(me); trainHit(me); }
     stepHooks();
     world.step();
     if (me.alive) hist.set(tick, { pos: hips().translation(), vel: hips().linvel() });
@@ -1186,12 +1206,12 @@ export function createSim({ mapId, players, practice = false, roundsToWin = 3, l
     glue = glue.filter(g => (g.t -= DT) > 0);
     if (st === 'count' && (timer -= DT) <= 0) st = 'fight';
     const active = st !== 'count';
-    for (const p of ps) { if (p.next != null) feed(p); if (p.alive && !p.dry) { control(p, active); belts(p); water(p); } }
+    for (const p of ps) { if (p.next != null) feed(p); if (p.alive && !p.dry) { control(p, active); belts(p); water(p); trainHit(p); } }
     stepHooks();
     // a client whose inputs ran dry (a stall: the relay, TURN over TCP) is paused for the step, unless something is
     // happening to them. Kept walking on the last input, they ran ahead of their own predicted copy by the whole stall,
     // then the late inputs played on top and they got yanked back (measured: no more >0.5m corrections walking over TCP)
-    const paused = ps.filter(p => p.dry && p.alive && p.stun <= 0 && p.ko <= 0 && !(p.hooked > 0) && p.sinceHit > 0.5
+    const paused = ps.filter(p => p.dry && p.alive && !p.onTrain && p.stun <= 0 && p.ko <= 0 && !(p.hooked > 0) && p.sinceHit > 0.5
       && !p.grabs.some(g => g?.vic) && !ps.some(q => q.grabs?.some(g => g?.vic === p))).map(p => p.bodies.map(b => [b, b.translation(), b.rotation(), b.linvel(), b.angvel()]));
     world.step();
     for (const bs of paused) for (const [b, t, r, v, w] of bs) { b.setTranslation(t, true); b.setRotation(r, true); b.setLinvel(v, true); b.setAngvel(w, true); }

@@ -45,7 +45,7 @@ export async function prepareMap(id, { meshes = !isNode } = {}) {
   const solid = c => !/Ball Only Collider|Convayor Collision Ball Proxy/.test(c.path);
   loaded[id] = MAPS[id] = {
     ...map,
-    boxes: scene.colliders.filter(solid).map(c => ({ p: c.p, q: c.q, s: c.h })),
+    boxes: [...scene.colliders.filter(solid).map(c => ({ p: c.p, q: c.q, s: c.h })), ...map.gbBoxes ?? []], // gbBoxes: our patches to the stage
     caps: (scene.capsules ?? []).filter(solid),
     tris: tris.map(t => meshTris(scene.meshes[t.mesh], bins[t.mesh], t.matrix)),
     rollers: [],

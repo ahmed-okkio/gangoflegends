@@ -14,17 +14,18 @@ const box = (x, y, z, hx, hy, hz, m = 'girder') => ({ p: [x, y, z], s: [hx, hy, 
 export function trainsAt(map, t) {
   const T = map.trains;
   if (!T) return [];
-  const out = [], run = 2 * T.reach / T.speed;
-  T.tracks.forEach(({ z, dir }, k) => {
-    for (let n = 0, at = 0; ; n++) { // ponytail: walks the schedule from 0 each call; ~t / 20s steps, cache if matches run for hours
-      const r = Math.sin(n * 12.9898 + k * 78.233) * 43758.5453;
-      at += T.delay[0] + (r - Math.floor(r)) * (T.delay[1] - T.delay[0]); // Gang Beasts' TrainSpawn: a random 4-30s between trains
-      if (t < at) break;
-      if (t < at + run) { out.push({ x: dir * (T.speed * (t - at) - T.reach), z, dir, k }); break; }
-      at += run;
-    }
-  });
-  return out;
+  const run = 2 * T.reach / T.speed, rnd = n => { const r = Math.sin(n * 12.9898) * 43758.5453; return r - Math.floor(r); };
+  // one train at a time down a random track, never more than 3 in a row on the same one. Waits of 1.5-6.3s: a train
+  // 25% more often than the two tracks' own 4-30s schedules (Gang Beasts' TrainSpawn) put together
+  for (let n = 0, at = 0, k = -1, same = 0; ; n++) { // ponytail: walks the schedule from 0 each call; ~t / 9s steps, cache if matches run for hours
+    const nk = same >= 3 ? (k + 1) % T.tracks.length : Math.floor(rnd(n + 0.5) * T.tracks.length);
+    same = nk === k ? same + 1 : 1; k = nk;
+    at += T.delay[0] + rnd(n) * (T.delay[1] - T.delay[0]);
+    if (t < at) return [];
+    const { z, dir } = T.tracks[k];
+    if (t < at + run) return [{ x: dir * (T.speed * (t - at) - T.reach), z, dir, k }];
+    at += run;
+  }
 }
 
 export const MAPS = {
@@ -93,7 +94,10 @@ export const MAPS = {
     boxes: [box(3.5, -0.2, 0, 8, 0.2, 3, 'plate')],
     rollers: [], kill: [],
     // Gang Beasts' trains: the back track runs +x, the front -x. Speed by eye; the tunnels' kill boxes start at |x| 17
-    trains: { tracks: [{ z: 6, dir: 1 }, { z: -6, dir: -1 }], y: -1.5, reach: 60, speed: 25, delay: [4, 30] },
+    trains: { tracks: [{ z: 6, dir: 1 }, { z: -6, dir: -1 }], y: -1.5, reach: 60, speed: 25, delay: [1.5, 6.3] },
+    // the platform walls under the yellow lip filled out flush with it (the front's sat 0.3m back): no hiding under it,
+    // and climbing up from the track the hands find the lip instead of the chest jamming beneath it
+    gbBoxes: [box(0, -0.8, 4.15, 25, 0.65, 0.15), box(0, -0.8, -4.15, 25, 0.65, 0.15)],
     spawns: [[9.5, 0, 1.5], [2.3, 0, -2.5], [5.2, 0, 2.5], [-2.5, 0, 1.5], [-2.5, 0, -1.5], [9.5, 0, -1.5], [2.3, 0, 2.5], [5.3, 0, -2.5]],
   },
   grind: {
