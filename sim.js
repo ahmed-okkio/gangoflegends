@@ -958,6 +958,11 @@ export function createSim({ mapId, players, practice = false, roundsToWin = 3, l
     else if (!(e[3] & 16) && me.ko > 0) { me.ko = 0; wake(me); }
     if (e[3] & 16) me.ko = e[x + 7];
     me.safe = e[3] & 32 ? Math.max(me.safe, 0.1) : 0;
+    // Abscond is cast on the host only (HOST_CASTS): my copy takes its empowered punch when the host's flag comes on and
+    // drops it when it goes off (used or run out). Edges only, so a punch my copy already spent isn't re-armed by a late snapshot
+    const emp = !!(e[3] & 4);
+    if (emp !== me.hostEmp && kit(me.champ, me.stole)[1].id === 'abscond') { me.empower = emp ? 4 : 0; me.emp = 'aoe'; }
+    me.hostEmp = emp;
     me.tied = !!(e[3] & 128); // holding / held by a champ: two ragdolls tied together only the host can simulate
     // GB mode (gb, game.js GB_MODE): my copy only walks; whatever moves me otherwise (abilities, headbutt, holding on) is the host's
     me.hostOwned = gb && !!(e[3] & (1 | 2 | 8 | 512)); // not 64 (a windup): my copy charges it too (useAbility)
