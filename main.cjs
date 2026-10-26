@@ -64,11 +64,14 @@ app.whenReady().then(() => {
   }, Number(process.env.SMOKE_MS || 5000));
 });
 
-// Downloads new versions from GitHub Releases at launch. The page shows a blocking progress bar (window.__update),
-// then the installer runs silently and relaunches the game.
-function checkForUpdates(win) {
-  const { autoUpdater } = require('electron-updater');
+// Downloads new versions from GitHub Releases at launch. The page shows a blocking progress bar (window.__update).
+// Usually only game files changed: patchFiles swaps those in and restarts in a second. When Electron or a dependency changed
+// (or the release has no files.json), the installer runs silently and relaunches the game, which takes most of a minute.
+async function checkForUpdates(win) {
   const show = s => win.webContents.executeJavaScript(`window.__update?.(${JSON.stringify(s)})`).catch(() => {});
+  await new Promise(r => win.webContents.once('did-finish-load', r));
+  try { if (await patchFiles(show)) return; } catch { /* half fetched or GitHub down: the installer path decides */ }
+  const { autoUpdater } = require('electron-updater');
   // the page starts blocked; every outcome except a found update releases it. found: the new version, once there is one
   let found = false;
   const release = () => { if (!found) show({ done: true }); };
@@ -81,7 +84,41 @@ function checkForUpdates(win) {
     show({ p: 100, installing: true });
     setTimeout(() => autoUpdater.quitAndInstall(true, true), 300); // long enough to paint "Installing…"; silent install, then reopen
   });
-  win.webContents.once('did-finish-load', () => autoUpdater.checkForUpdates().catch(() => {}));
+  autoUpdater.checkForUpdates().catch(() => {});
+}
+
+// files.json (release.cjs) lists every game file's git blob hash; the changed ones come from raw.githubusercontent at the
+// release's tag (the repo is public), are written next to their file and renamed over it once all are in, then the game
+// restarts. true: patched (or already current). false: needs the installer. ponytail: files a release drops stay behind
+async function patchFiles(show) {
+  const crypto = require('crypto'), sha = b => crypto.createHash('sha1').update(`blob ${b.length}\0`).update(b).digest('hex'); // git's blob hash
+  const rel = await (await fetch('https://api.github.com/repos/ahmed-okkio/gangoflegends/releases/latest', { signal: AbortSignal.timeout(15000) })).json();
+  if (rel.tag_name === `v${app.getVersion()}`) { show({ done: true }); return true; }
+  const asset = rel.assets?.find(a => a.name === 'files.json');
+  if (!asset) return false;
+  const m = await (await fetch(asset.browser_download_url, { signal: AbortSignal.timeout(15000) })).json();
+  if (m.electron !== process.versions.electron) return false;
+  const blob = p => { try { const b = fs.readFileSync(path.join(__dirname, p)); return sha(b); } catch { return null; } };
+  const changed = Object.keys(m.files).filter(p => blob(p) !== m.files[p]);
+  if (changed.some(p => m.local.includes(p))) return false;
+  const v = rel.tag_name.slice(1);
+  let got = 0;
+  show({ v, p: 0 });
+  for (let i = 0; i < changed.length; i += 8) await Promise.all(changed.slice(i, i + 8).map(async p => { // 8 at a time
+    const r = await fetch(`https://raw.githubusercontent.com/ahmed-okkio/gangoflegends/${rel.tag_name}/${p}`);
+    if (!r.ok) throw new Error(`${p}: ${r.status}`);
+    const b = Buffer.from(await r.arrayBuffer());
+    if (sha(b) !== m.files[p]) throw new Error(`${p}: hash`);
+    const f = path.join(__dirname, p);
+    fs.mkdirSync(path.dirname(f), { recursive: true });
+    fs.writeFileSync(f + '.new', b);
+    show({ v, p: ++got / changed.length * 100 });
+  }));
+  for (const p of changed) fs.renameSync(path.join(__dirname, p) + '.new', path.join(__dirname, p));
+  show({ p: 100, installing: true });
+  app.relaunch();
+  app.exit(0);
+  return true;
 }
 
 // Unsigned Mac builds can't install updates themselves (macOS refuses), so at launch they ask GitHub for the latest

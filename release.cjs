@@ -13,5 +13,17 @@ git('fetch', '-q', 'origin', 'main');
 if (git('rev-parse', 'HEAD') !== git('rev-parse', 'origin/main')) throw new Error('push main first: CI builds the Mac version from origin/main');
 execFileSync('gh', ['workflow', 'run', 'mac.yml', '--repo', 'ahmed-okkio/gangoflegends', '--ref', 'main', '-f', `tag=v${version}`], { stdio: 'inherit' });
 execFileSync('npx', ['electron-builder', '--win', '--publish', 'never'], { stdio: 'inherit', shell: true });
-const files = [`GangOfLegends-Setup-${version}.exe`, `GangOfLegends-Setup-${version}.exe.blockmap`, 'latest.yml'].map(f => `release/${f}`);
+// files.json: every packaged file's git blob hash, for the in-game patcher (main.cjs patchFiles). Files git has are fetched
+// from the release tag; the rest (node_modules) are marked local, and a change in one needs the installer
+const crypto = require('crypto'), fs = require('fs'), path = require('path');
+const tree = new Map(git('ls-tree', '-r', 'HEAD').split('\n').map(l => [l.split('\t')[1], l.split(' ')[2]]));
+const appDir = 'release/win-unpacked/resources/app', manifest = { electron: require('electron/package.json').version, files: {}, local: [] };
+for (const f of fs.readdirSync(appDir, { recursive: true })) {
+  const p = f.split(path.sep).join('/'), full = path.join(appDir, f);
+  if (!fs.statSync(full).isFile()) continue;
+  if (tree.has(p)) manifest.files[p] = tree.get(p);
+  else { const b = fs.readFileSync(full); manifest.files[p] = crypto.createHash('sha1').update(`blob ${b.length}\0`).update(b).digest('hex'); manifest.local.push(p); }
+}
+fs.writeFileSync('release/files.json', JSON.stringify(manifest));
+const files = [`GangOfLegends-Setup-${version}.exe`, `GangOfLegends-Setup-${version}.exe.blockmap`, 'latest.yml', 'files.json'].map(f => `release/${f}`);
 execFileSync('gh', ['release', 'create', `v${version}`, ...files, '--repo', 'ahmed-okkio/gangoflegends', '--title', `Gang of Legends ${version}`, '--notes', entry.notes], { stdio: 'inherit' });
