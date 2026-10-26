@@ -10,15 +10,15 @@ export const CHAMPS = {
   hec: {
     name: 'Hecarim', title: 'The Shadow of War', body: '#2f6274', limb: '#1d3f4c', eyes: '#5ff7d2',
     abilities: [
-      { id: 'rampage', name: 'Rampage', cd: 3, desc: 'Spin with both fists out, smacking everyone around you. Works on the move and mid-charge.' },
-      { id: 'charge', name: 'Devastating Charge', cd: 8, desc: 'Gallop, building up speed, and bowl over the first champ you reach. Steer as you go; faster hits harder. Press again to stop.' },
+      { id: 'rampage', name: 'Rampage', cd: 2.5, desc: 'Spin with both fists out, smacking everyone around you. Works on the move and mid-charge.' },
+      { id: 'charge', name: 'Devastating Charge', cd: 6.5, desc: 'Gallop, building up speed, and bowl over the first champ you reach. Steer as you go; faster hits harder. Press again to stop.' },
     ],
   },
   vi: {
     name: 'Vi', title: 'The Piltover Enforcer', body: '#5b6b8c', limb: '#45526d', eyes: '#7fd3ff', glow: '#ff5fae',
     abilities: [
-      { id: 'vault', name: 'Vault Breaker', cd: 6, aim: 8.03, aimMin: 2.97, windup: 0.94, desc: 'Hold to wind up (aimed at your cursor), let go to dash and punch the first champ you hit. Longer windup, bigger hit; fully wound up you can hold it 3s more.' },
-      { id: 'relentless', name: 'Relentless Force', cd: 3, desc: 'Your next punch smashes through its target into everyone behind it.' },
+      { id: 'vault', name: 'Vault Breaker', cd: 5, aim: 8.03, aimMin: 2.97, windup: 0.94, desc: 'Hold to wind up (aimed at your cursor), let go to dash and punch the first champ you hit. Longer windup, bigger hit; fully wound up you can hold it 3s more.' },
+      { id: 'relentless', name: 'Relentless Force', cd: 2.5, desc: 'Your next punch smashes through its target into everyone behind it.' },
     ],
   },
   sett: {
@@ -31,8 +31,8 @@ export const CHAMPS = {
   ali: {
     name: 'Alistar', title: 'The Minotaur', body: '#6f6680', limb: '#514a5e', eyes: '#ff7043', glow: '#ffb347',
     abilities: [
-      { id: 'pulverize', name: 'Pulverize', cd: 7, desc: 'Slam the ground, launching everyone around you into the air.' },
-      { id: 'headbutt', name: 'Headbutt', cd: 6, aim: 3.2, release: true, desc: 'Hold to aim at your cursor, let go to lunge and knock the first champ you hit far back. Headbutt someone still in the air from Pulverize to send them flying.' },
+      { id: 'pulverize', name: 'Pulverize', cd: 6, desc: 'Slam the ground, launching everyone around you into the air.' },
+      { id: 'headbutt', name: 'Headbutt', cd: 5, aim: 3.2, release: true, desc: 'Hold to aim at your cursor, let go to lunge and knock the first champ you hit far back. Headbutt someone still in the air from Pulverize to send them flying.' },
     ],
   },
   thresh: {
