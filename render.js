@@ -255,6 +255,31 @@ export function createRenderer(canvas) {
     Object.assign(r, { life: max, max, size, inward });
     r.m.visible = true;
   }
+  // Hijack: a gold chain from Sylas's right hand out to whoever he took it from (0.12s), a beat there, then reeled back
+  const lashes = [], LASH = 0.42;
+  const lashLinks = new THREE.InstancedMesh(new THREE.TorusGeometry(0.09, 0.03, 5, 10), std('#d8a940', { metalness: 0.8, roughness: 0.3, emissive: '#5fa8ff', emissiveIntensity: 1.6 }), 120);
+  lashLinks.count = 0; scene.add(lashLinks);
+  function stepLashes(dt) {
+    let n = 0;
+    const m4 = new THREE.Matrix4(), q = new THREE.Quaternion(), half = new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(1, 0, 0), Math.PI / 2), twist = new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(0, 0, 1), Math.PI / 2), one = new THREE.Vector3(1, 1, 1);
+    for (const l of lashes) {
+      l.t += dt;
+      const a = avatars[l.from], b = avatars[l.to];
+      if (!a?.group.visible || !b?.group.visible || l.t > LASH) { l.t = LASH + 1; continue; }
+      const arm = a.parts[FORE + 1], from = new THREE.Vector3().fromArray(HAND[1]).applyQuaternion(arm.quaternion).add(arm.position);
+      const dir = b.parts[CHEST].position.clone().sub(from), out = Math.min(1, l.t / 0.12) * Math.min(1, (LASH - l.t) / 0.18); // how far out it is
+      if (l.t < 0.12 && l.t + dt >= 0.12) emit(b.parts[CHEST].position, { color: Math.random() < 0.5 ? '#5fa8ff' : '#e8f4ff', n: 10, speed: 3, size: 0.2, life: 0.3, grav: 0 });
+      dir.multiplyScalar(out);
+      q.setFromUnitVectors(new THREE.Vector3(0, 0, 1), dir.clone().normalize());
+      const k = Math.min(120 - n, Math.max(1, Math.floor(dir.length() / 0.14)));
+      for (let i = 0; i < k; i++) {
+        m4.compose(from.clone().addScaledVector(dir, (i + 0.5) / k), q.clone().multiply(i % 2 ? twist : new THREE.Quaternion()).multiply(half), one);
+        lashLinks.setMatrixAt(n++, m4);
+      }
+    }
+    lashes.splice(0, lashes.length, ...lashes.filter(l => l.t <= LASH));
+    lashLinks.count = n; lashLinks.instanceMatrix.needsUpdate = true;
+  }
   function stepRings(dt) {
     for (const r of rings) {
       if (r.life <= 0) continue;
@@ -269,8 +294,9 @@ export function createRenderer(canvas) {
   function fx(events) {
     playEvents(events);
     const v = new THREE.Vector3();
-    for (const [kind, x, y, z, big] of events) {
+    for (const [kind, x, y, z, big, slot, vic] of events) {
       v.set(x, y, z);
+      if (kind === 'hijack') lashes.push({ from: slot, to: vic, t: 0 }); // Sylas's Hijack: his chain out to them (stepLashes)
       if (kind === 'hit') {
         emit(v, { color: big ? '#ffb347' : '#fff3b0', n: big ? 18 : 9, speed: big ? 7 : 4.5, size: big ? 0.35 : 0.22, life: 0.35, grav: 0 });
         ring(v, big ? '#ffb347' : '#ffffff', big ? 1.4 : 0.8);
@@ -851,7 +877,7 @@ export function createRenderer(canvas) {
       if (av.hay) {
         // winding up: everyone sees it, locked to Sett's yaw (sent in the snapshot, so it doesn't sway with his body)
         const x = 9 + PARTS.length * 4;
-        av.hay.visible = !!(flags & 64);
+        av.hay.visible = !!(flags & 64) && (av.champId === 'sett' || b.sl?.[slot] === 'sett'); // 64 is any windup (Vi's too): Sylas only with Haymaker stolen
         if (av.hay.visible) {
           av.hay.position.set(torso.x, av.parts[HIPS].position.y - HIP_HEIGHT + 0.04, torso.z);
           av.hay.rotation.y = pb[x + 8] ?? 0;
@@ -868,7 +894,8 @@ export function createRenderer(canvas) {
         const mt = m.material;
         if (!mt?.emissive) return;
         mt.userData.e0 ??= [mt.emissive.clone(), mt.emissiveIntensity];
-        if (lit) { mt.emissive.set(av.glow); mt.emissiveIntensity = av.zap ? (Math.random() < 0.15 ? 3.5 : 0.8 + Math.random() * 1.4) : 2.2 + Math.sin(time * 18); } // zap: lightning flicker else { mt.emissive.copy(mt.userData.e0[0]); mt.emissiveIntensity = mt.userData.e0[1]; }
+        if (lit) { mt.emissive.set(av.glow); mt.emissiveIntensity = av.zap ? (Math.random() < 0.15 ? 3.5 : 0.8 + Math.random() * 1.4) : 2.2 + Math.sin(time * 18); } // zap: lightning flicker
+        else { mt.emissive.copy(mt.userData.e0[0]); mt.emissiveIntensity = mt.userData.e0[1]; }
       });
       if (lit && av.fists.length && Math.random() < 0.5) emit(av.fists[Math.floor(Math.random() * 2)].getWorldPosition(tmp2), { color: av.glow, n: 1, speed: 0.6, size: 0.18, life: 0.35, grav: 3, up: 1 });
       if (lit && av.zap) for (const f of av.fists) if (Math.random() < 0.6) emit(f.localToWorld(tmp2.set((Math.random() - 0.5) * 0.25, -0.15 - Math.random() * 0.4, (Math.random() - 0.5) * 0.25)), { color: Math.random() < 0.7 ? av.glow : '#e8f4ff', n: 2, speed: 2.2, size: 0.12, life: 0.18, grav: 0 }); // sparks crackling off shackles and chains
@@ -1033,6 +1060,7 @@ export function createRenderer(canvas) {
     for (const fn of animated) fn({ dt, time });
     stepParticles(dt);
     stepRings(dt);
+    stepLashes(dt);
     shake = Math.max(0, shake - dt * 1.2);
     const j = shake * shake * 1.5;
     // menu backdrop: the camera comes in closer and frames the brawl low and to the right, under the menu panel

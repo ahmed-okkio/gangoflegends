@@ -423,7 +423,7 @@ export function createSim({ mapId, players, practice = false, roundsToWin = 3, l
       .sort((a, b) => Math.hypot(a.s.x - at.x, a.s.z - at.z) - Math.hypot(b.s.x - at.x, b.s.z - at.z));
     if (!o) return;
     p.cd[0] = ab.cd;
-    fx('sonic', o.o.bodies[TORSO].translation(), 0, p.slot, o.o.slot);
+    fx('hijack', o.o.bodies[TORSO].translation(), 0, p.slot, o.o.slot);
     if (local >= 0) return;
     p.stole = o.o.stole ?? (o.o.champ === 'sylas' ? null : o.o.champ);
     if (p.stole) p.cd[0] = 0;
@@ -760,7 +760,7 @@ export function createSim({ mapId, players, practice = false, roundsToWin = 3, l
         p.punch.hit.add(vic);
         if (p.empower > 0 && p.emp === 'through') { p.empower = 0; relentless(p, vic, part, pf); }
         else if (p.empower > 0 && p.emp === 'aoe') { // Sylas E: the punch bursts out round him, everyone close knocked away
-          p.empower = 0;
+          p.empower = 0; p.spin = SPIN; p.spinHit = new Set(ps); // one whirl round, arms out like Hecarim Q (League's chains spinning round him); the burst below does the hitting
           fx('pulv', tp, 0, p.slot);
           for (const o of ps) {
             if (o === p || !o.alive) continue;
