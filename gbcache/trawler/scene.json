@@ -1,0 +1,18710 @@
+{
+"stage": "trawler",
+"meshes": {
+"m2": {
+"name": "Combined Mesh (root: scene) 4",
+"verts": 10316,
+"normals": true,
+"uv0": true,
+"uv1": false,
+"indices": 17523,
+"subs": [
+[
+0,
+30
+],
+[
+30,
+138
+],
+[
+168,
+1608
+],
+[
+1776,
+30
+],
+[
+1806,
+210
+],
+[
+2016,
+3498
+],
+[
+5514,
+210
+],
+[
+5724,
+1584
+],
+[
+7308,
+210
+],
+[
+7518,
+30
+],
+[
+7548,
+3069
+],
+[
+10617,
+1494
+],
+[
+12111,
+30
+],
+[
+12141,
+210
+],
+[
+12351,
+42
+],
+[
+12393,
+42
+],
+[
+12435,
+1449
+],
+[
+13884,
+216
+],
+[
+14100,
+30
+],
+[
+14130,
+324
+],
+[
+14454,
+3069
+]
+]
+},
+"m4": {
+"name": "Combined Mesh (root: scene) 2",
+"verts": 552,
+"normals": true,
+"uv0": true,
+"uv1": false,
+"indices": 966,
+"subs": [
+[
+0,
+42
+],
+[
+42,
+42
+],
+[
+84,
+42
+],
+[
+126,
+42
+],
+[
+168,
+42
+],
+[
+210,
+42
+],
+[
+252,
+42
+],
+[
+294,
+42
+],
+[
+336,
+42
+],
+[
+378,
+42
+],
+[
+420,
+42
+],
+[
+462,
+42
+],
+[
+504,
+42
+],
+[
+546,
+42
+],
+[
+588,
+42
+],
+[
+630,
+42
+],
+[
+672,
+42
+],
+[
+714,
+42
+],
+[
+756,
+42
+],
+[
+798,
+42
+],
+[
+840,
+42
+],
+[
+882,
+42
+],
+[
+924,
+42
+]
+]
+},
+"m3": {
+"name": "Combined Mesh (root: scene) 9",
+"verts": 23672,
+"normals": true,
+"uv0": true,
+"uv1": false,
+"indices": 36048,
+"subs": [
+[
+0,
+30
+],
+[
+30,
+30
+],
+[
+60,
+480
+],
+[
+540,
+390
+],
+[
+930,
+756
+],
+[
+1686,
+150
+],
+[
+1836,
+726
+],
+[
+2562,
+90
+],
+[
+2652,
+348
+],
+[
+3000,
+144
+],
+[
+3144,
+540
+],
+[
+3684,
+180
+],
+[
+3864,
+450
+],
+[
+4314,
+336
+],
+[
+4650,
+360
+],
+[
+5010,
+462
+],
+[
+5472,
+726
+],
+[
+6198,
+366
+],
+[
+6564,
+30
+],
+[
+6594,
+30
+],
+[
+6624,
+750
+],
+[
+7374,
+30
+],
+[
+7404,
+366
+],
+[
+7770,
+504
+],
+[
+8274,
+30
+],
+[
+8304,
+30
+],
+[
+8334,
+750
+],
+[
+9084,
+336
+],
+[
+9420,
+30
+],
+[
+9450,
+144
+],
+[
+9594,
+30
+],
+[
+9624,
+180
+],
+[
+9804,
+348
+],
+[
+10152,
+30
+],
+[
+10182,
+180
+],
+[
+10362,
+348
+],
+[
+10710,
+180
+],
+[
+10890,
+450
+],
+[
+11340,
+90
+],
+[
+11430,
+30
+],
+[
+11460,
+390
+],
+[
+11850,
+180
+],
+[
+12030,
+30
+],
+[
+12060,
+90
+],
+[
+12150,
+30
+],
+[
+12180,
+330
+],
+[
+12510,
+330
+],
+[
+12840,
+30
+],
+[
+12870,
+150
+],
+[
+13020,
+726
+],
+[
+13746,
+330
+],
+[
+14076,
+90
+],
+[
+14166,
+360
+],
+[
+14526,
+750
+],
+[
+15276,
+150
+],
+[
+15426,
+396
+],
+[
+15822,
+210
+],
+[
+16032,
+30
+],
+[
+16062,
+348
+],
+[
+16410,
+726
+],
+[
+17136,
+210
+],
+[
+17346,
+330
+],
+[
+17676,
+762
+],
+[
+18438,
+396
+],
+[
+18834,
+30
+],
+[
+18864,
+348
+],
+[
+19212,
+480
+],
+[
+19692,
+360
+],
+[
+20052,
+330
+],
+[
+20382,
+30
+],
+[
+20412,
+180
+],
+[
+20592,
+30
+],
+[
+20622,
+450
+],
+[
+21072,
+750
+],
+[
+21822,
+288
+],
+[
+22110,
+336
+],
+[
+22446,
+30
+],
+[
+22476,
+348
+],
+[
+22824,
+762
+],
+[
+23586,
+30
+],
+[
+23616,
+366
+],
+[
+23982,
+348
+],
+[
+24330,
+90
+],
+[
+24420,
+90
+],
+[
+24510,
+348
+],
+[
+24858,
+360
+],
+[
+25218,
+360
+],
+[
+25578,
+360
+],
+[
+25938,
+336
+],
+[
+26274,
+480
+],
+[
+26754,
+30
+],
+[
+26784,
+366
+],
+[
+27150,
+144
+],
+[
+27294,
+150
+],
+[
+27444,
+210
+],
+[
+27654,
+336
+],
+[
+27990,
+150
+],
+[
+28140,
+390
+],
+[
+28530,
+30
+],
+[
+28560,
+504
+],
+[
+29064,
+30
+],
+[
+29094,
+726
+],
+[
+29820,
+480
+],
+[
+30300,
+330
+],
+[
+30630,
+360
+],
+[
+30990,
+360
+],
+[
+31350,
+366
+],
+[
+31716,
+366
+],
+[
+32082,
+90
+],
+[
+32172,
+390
+],
+[
+32562,
+150
+],
+[
+32712,
+726
+],
+[
+33438,
+348
+],
+[
+33786,
+366
+],
+[
+34152,
+210
+],
+[
+34362,
+762
+],
+[
+35124,
+90
+],
+[
+35214,
+150
+],
+[
+35364,
+180
+],
+[
+35544,
+504
+]
+]
+},
+"m3978d62c50a4": {
+"name": "Island002",
+"verts": 2359,
+"normals": true,
+"uv0": true,
+"uv1": false,
+"indices": 5289,
+"subs": [
+[
+0,
+5289
+]
+]
+},
+"m4fd87c2f9697": {
+"name": "Wheel",
+"verts": 3372,
+"normals": true,
+"uv0": true,
+"uv1": false,
+"indices": 7020,
+"subs": [
+[
+0,
+7020
+]
+]
+},
+"m1": {
+"name": "Combined Mesh (root: scene) 7",
+"verts": 418,
+"normals": true,
+"uv0": true,
+"uv1": false,
+"indices": 1710,
+"subs": [
+[
+0,
+6
+],
+[
+6,
+1704
+]
+]
+},
+"m5": {
+"name": "Combined Mesh (root: scene) 8",
+"verts": 5647,
+"normals": true,
+"uv0": true,
+"uv1": true,
+"indices": 8730,
+"subs": [
+[
+0,
+246
+],
+[
+246,
+558
+],
+[
+804,
+372
+],
+[
+1176,
+150
+],
+[
+1326,
+306
+],
+[
+1632,
+246
+],
+[
+1878,
+558
+],
+[
+2436,
+558
+],
+[
+2994,
+558
+],
+[
+3552,
+372
+],
+[
+3924,
+558
+],
+[
+4482,
+558
+],
+[
+5040,
+246
+],
+[
+5286,
+594
+],
+[
+5880,
+372
+],
+[
+6252,
+246
+],
+[
+6498,
+372
+],
+[
+6870,
+372
+],
+[
+7242,
+558
+],
+[
+7800,
+558
+],
+[
+8358,
+372
+]
+]
+},
+"m3a5d1617ae59": {
+"name": "Beef",
+"verts": 405,
+"normals": true,
+"uv0": false,
+"uv1": false,
+"indices": 960,
+"subs": [
+[
+0,
+960
+]
+]
+},
+"m757b525a2c61": {
+"name": "Trawler_Post05",
+"verts": 173,
+"normals": true,
+"uv0": false,
+"uv1": false,
+"indices": 822,
+"subs": [
+[
+0,
+588
+],
+[
+588,
+234
+]
+]
+},
+"me22284592c61": {
+"name": "Trawler_Railing022",
+"verts": 32,
+"normals": true,
+"uv0": false,
+"uv1": false,
+"indices": 180,
+"subs": [
+[
+0,
+180
+]
+]
+},
+"m6806455f2c61": {
+"name": "Trawler_Post19",
+"verts": 171,
+"normals": true,
+"uv0": false,
+"uv1": false,
+"indices": 810,
+"subs": [
+[
+0,
+576
+],
+[
+576,
+234
+]
+]
+},
+"ma5bb97fa2c61": {
+"name": "Trawler_Railing00",
+"verts": 32,
+"normals": true,
+"uv0": false,
+"uv1": false,
+"indices": 180,
+"subs": [
+[
+0,
+180
+]
+]
+},
+"m9ba6ee2d2c61": {
+"name": "Trawler_Railing019",
+"verts": 32,
+"normals": true,
+"uv0": false,
+"uv1": false,
+"indices": 180,
+"subs": [
+[
+0,
+180
+]
+]
+},
+"m339cd9d52c61": {
+"name": "Trawler_Post023",
+"verts": 171,
+"normals": true,
+"uv0": false,
+"uv1": false,
+"indices": 810,
+"subs": [
+[
+0,
+630
+],
+[
+630,
+180
+]
+]
+},
+"ma96a75872c61": {
+"name": "Trawler_Post09",
+"verts": 171,
+"normals": true,
+"uv0": false,
+"uv1": false,
+"indices": 810,
+"subs": [
+[
+0,
+576
+],
+[
+576,
+234
+]
+]
+},
+"m1fbff092c61": {
+"name": "Trawler_Railing02",
+"verts": 32,
+"normals": true,
+"uv0": false,
+"uv1": false,
+"indices": 180,
+"subs": [
+[
+0,
+180
+]
+]
+},
+"m703adee02c61": {
+"name": "Trawler_Post01",
+"verts": 171,
+"normals": true,
+"uv0": false,
+"uv1": false,
+"indices": 810,
+"subs": [
+[
+0,
+612
+],
+[
+612,
+198
+]
+]
+},
+"mf9d81e1e2c61": {
+"name": "Trawler_Post11",
+"verts": 171,
+"normals": true,
+"uv0": false,
+"uv1": false,
+"indices": 810,
+"subs": [
+[
+0,
+576
+],
+[
+576,
+234
+]
+]
+},
+"mc445fa9f2c61": {
+"name": "Trawler_Post07",
+"verts": 171,
+"normals": true,
+"uv0": false,
+"uv1": false,
+"indices": 810,
+"subs": [
+[
+0,
+576
+],
+[
+576,
+234
+]
+]
+},
+"md34758162c61": {
+"name": "Trawler_Post022",
+"verts": 171,
+"normals": true,
+"uv0": false,
+"uv1": false,
+"indices": 810,
+"subs": [
+[
+0,
+630
+],
+[
+630,
+180
+]
+]
+},
+"m87814df82c61": {
+"name": "Trawler_Railing06",
+"verts": 32,
+"normals": true,
+"uv0": false,
+"uv1": false,
+"indices": 180,
+"subs": [
+[
+0,
+180
+]
+]
+},
+"m7dea9c002c61": {
+"name": "Trawler_Post00",
+"verts": 126,
+"normals": true,
+"uv0": false,
+"uv1": false,
+"indices": 618,
+"subs": [
+[
+0,
+402
+],
+[
+402,
+216
+]
+]
+},
+"m18": {
+"name": "lighthouse_lowpoly_body",
+"verts": 1202,
+"normals": true,
+"uv0": true,
+"uv1": false,
+"indices": 3465,
+"subs": [
+[
+0,
+3465
+]
+]
+},
+"m131b24d42c61": {
+"name": "Trawler_Railing08",
+"verts": 32,
+"normals": true,
+"uv0": false,
+"uv1": false,
+"indices": 180,
+"subs": [
+[
+0,
+180
+]
+]
+},
+"mf0b36ab42c61": {
+"name": "Trawler_Railing10",
+"verts": 32,
+"normals": true,
+"uv0": false,
+"uv1": false,
+"indices": 180,
+"subs": [
+[
+0,
+180
+]
+]
+},
+"mb63069f22c61": {
+"name": "Trawler_Railing01",
+"verts": 32,
+"normals": true,
+"uv0": false,
+"uv1": false,
+"indices": 180,
+"subs": [
+[
+0,
+180
+]
+]
+},
+"mde162eae2c61": {
+"name": "Trawler_Railing12",
+"verts": 32,
+"normals": true,
+"uv0": false,
+"uv1": false,
+"indices": 180,
+"subs": [
+[
+0,
+180
+]
+]
+},
+"m7561be032c61": {
+"name": "Trawler_Post06",
+"verts": 127,
+"normals": true,
+"uv0": false,
+"uv1": false,
+"indices": 624,
+"subs": [
+[
+0,
+408
+],
+[
+408,
+216
+]
+]
+},
+"m1f0981f12c61": {
+"name": "Trawler_Hull",
+"verts": 28034,
+"normals": true,
+"uv0": true,
+"uv1": false,
+"indices": 107619,
+"subs": [
+[
+0,
+106407
+],
+[
+106407,
+288
+],
+[
+106695,
+12
+],
+[
+106707,
+912
+]
+]
+},
+"m18576a2a2c61": {
+"name": "Trawler_Wheel",
+"verts": 1680,
+"normals": true,
+"uv0": true,
+"uv1": false,
+"indices": 7152,
+"subs": [
+[
+0,
+7152
+]
+]
+},
+"m40b793ea2c61": {
+"name": "Trawler_Railing021",
+"verts": 32,
+"normals": true,
+"uv0": false,
+"uv1": false,
+"indices": 180,
+"subs": [
+[
+0,
+180
+]
+]
+},
+"mf27d7d8e2c61": {
+"name": "Trawler_Railing18",
+"verts": 32,
+"normals": true,
+"uv0": false,
+"uv1": false,
+"indices": 180,
+"subs": [
+[
+0,
+180
+]
+]
+},
+"mb27a60ca2c61": {
+"name": "Trawler_Railing07",
+"verts": 32,
+"normals": true,
+"uv0": false,
+"uv1": false,
+"indices": 180,
+"subs": [
+[
+0,
+180
+]
+]
+},
+"m8fed031b2c61": {
+"name": "Trawler_Rudder",
+"verts": 100,
+"normals": true,
+"uv0": true,
+"uv1": false,
+"indices": 342,
+"subs": [
+[
+0,
+342
+]
+]
+},
+"m922ccf6b2c61": {
+"name": "Trawler_Post12",
+"verts": 171,
+"normals": true,
+"uv0": false,
+"uv1": false,
+"indices": 810,
+"subs": [
+[
+0,
+576
+],
+[
+576,
+234
+]
+]
+},
+"mca1ad00a2c61": {
+"name": "Trawler_Propeller",
+"verts": 243,
+"normals": true,
+"uv0": true,
+"uv1": false,
+"indices": 1224,
+"subs": [
+[
+0,
+1224
+]
+]
+},
+"m6cee2b902c61": {
+"name": "Trawler_Post10",
+"verts": 173,
+"normals": true,
+"uv0": false,
+"uv1": false,
+"indices": 822,
+"subs": [
+[
+0,
+588
+],
+[
+588,
+234
+]
+]
+},
+"m2b55d9dd2c61": {
+"name": "Trawler_Railing11",
+"verts": 32,
+"normals": true,
+"uv0": false,
+"uv1": false,
+"indices": 180,
+"subs": [
+[
+0,
+180
+]
+]
+},
+"m948324212c61": {
+"name": "Trawler_Post024",
+"verts": 127,
+"normals": true,
+"uv0": false,
+"uv1": false,
+"indices": 624,
+"subs": [
+[
+0,
+444
+],
+[
+444,
+180
+]
+]
+},
+"mf0110b3a2c61": {
+"name": "Trawler_Railing020",
+"verts": 32,
+"normals": true,
+"uv0": false,
+"uv1": false,
+"indices": 180,
+"subs": [
+[
+0,
+180
+]
+]
+},
+"mbea8828d2c61": {
+"name": "Trawler_Post03",
+"verts": 171,
+"normals": true,
+"uv0": false,
+"uv1": false,
+"indices": 810,
+"subs": [
+[
+0,
+576
+],
+[
+576,
+234
+]
+]
+},
+"mdd6717ab2c61": {
+"name": "Trawler_Post02",
+"verts": 177,
+"normals": true,
+"uv0": false,
+"uv1": false,
+"indices": 846,
+"subs": [
+[
+0,
+612
+],
+[
+612,
+234
+]
+]
+},
+"m91a6d92a2c61": {
+"name": "Trawler_Railing04",
+"verts": 32,
+"normals": true,
+"uv0": false,
+"uv1": false,
+"indices": 180,
+"subs": [
+[
+0,
+180
+]
+]
+},
+"ma26ff4f92c61": {
+"name": "Trawler_Railing03",
+"verts": 32,
+"normals": true,
+"uv0": false,
+"uv1": false,
+"indices": 180,
+"subs": [
+[
+0,
+180
+]
+]
+},
+"me1d898ff2c61": {
+"name": "Trawler_Post04",
+"verts": 171,
+"normals": true,
+"uv0": false,
+"uv1": false,
+"indices": 810,
+"subs": [
+[
+0,
+576
+],
+[
+576,
+234
+]
+]
+},
+"mb5961e942c61": {
+"name": "Trawler_Post18",
+"verts": 127,
+"normals": true,
+"uv0": false,
+"uv1": false,
+"indices": 624,
+"subs": [
+[
+0,
+408
+],
+[
+408,
+216
+]
+]
+},
+"m86a4bb7d2c61": {
+"name": "Trawler_Railing05",
+"verts": 32,
+"normals": true,
+"uv0": false,
+"uv1": false,
+"indices": 180,
+"subs": [
+[
+0,
+180
+]
+]
+},
+"m32aca03d2c61": {
+"name": "Trawler_Post021",
+"verts": 127,
+"normals": true,
+"uv0": false,
+"uv1": false,
+"indices": 624,
+"subs": [
+[
+0,
+444
+],
+[
+444,
+180
+]
+]
+},
+"m2586ec132c61": {
+"name": "Trawler_Railing09",
+"verts": 32,
+"normals": true,
+"uv0": false,
+"uv1": false,
+"indices": 180,
+"subs": [
+[
+0,
+180
+]
+]
+},
+"m17": {
+"name": "Object001",
+"verts": 104,
+"normals": true,
+"uv0": true,
+"uv1": false,
+"indices": 156,
+"subs": [
+[
+0,
+156
+]
+]
+},
+"mdd089d992c61": {
+"name": "Trawler_Post08",
+"verts": 173,
+"normals": true,
+"uv0": false,
+"uv1": false,
+"indices": 822,
+"subs": [
+[
+0,
+588
+],
+[
+588,
+234
+]
+]
+},
+"m40a7f142c61": {
+"name": "Trawler_Hull_MeshCollider37",
+"verts": 30,
+"normals": true,
+"uv0": true,
+"uv1": false,
+"indices": 48,
+"subs": [
+[
+0,
+48
+]
+]
+},
+"m46d71e8d2c61": {
+"name": "Trawler_Hull_MeshCollider64",
+"verts": 24,
+"normals": true,
+"uv0": true,
+"uv1": false,
+"indices": 36,
+"subs": [
+[
+0,
+36
+]
+]
+},
+"m3e48acd22c61": {
+"name": "Trawler_Hull_MeshCollider16",
+"verts": 18,
+"normals": true,
+"uv0": true,
+"uv1": false,
+"indices": 24,
+"subs": [
+[
+0,
+24
+]
+]
+},
+"m6dd277542c61": {
+"name": "Trawler_Hull_MeshCollider17",
+"verts": 24,
+"normals": true,
+"uv0": true,
+"uv1": false,
+"indices": 36,
+"subs": [
+[
+0,
+36
+]
+]
+},
+"m6ca3b1ca2c61": {
+"name": "Trawler_Hull_MeshCollider40",
+"verts": 30,
+"normals": true,
+"uv0": true,
+"uv1": false,
+"indices": 48,
+"subs": [
+[
+0,
+48
+]
+]
+},
+"maf1c84fa2c61": {
+"name": "Trawler_Hull_MeshCollider34",
+"verts": 37,
+"normals": true,
+"uv0": true,
+"uv1": false,
+"indices": 60,
+"subs": [
+[
+0,
+60
+]
+]
+},
+"m30603ad82c61": {
+"name": "Trawler_Hull_MeshCollider35",
+"verts": 34,
+"normals": true,
+"uv0": true,
+"uv1": false,
+"indices": 48,
+"subs": [
+[
+0,
+48
+]
+]
+},
+"m9b4570fe2c61": {
+"name": "Trawler_Hull_MeshCollider10",
+"verts": 24,
+"normals": true,
+"uv0": true,
+"uv1": false,
+"indices": 36,
+"subs": [
+[
+0,
+36
+]
+]
+},
+"m65cfb0db2c61": {
+"name": "Trawler_Hull_MeshCollider09",
+"verts": 24,
+"normals": true,
+"uv0": true,
+"uv1": false,
+"indices": 36,
+"subs": [
+[
+0,
+36
+]
+]
+},
+"m220d157a2c61": {
+"name": "Trawler_Hull_MeshCollider04",
+"verts": 52,
+"normals": true,
+"uv0": true,
+"uv1": false,
+"indices": 84,
+"subs": [
+[
+0,
+84
+]
+]
+},
+"m69d2aa692c61": {
+"name": "Trawler_Hull_MeshCollider05",
+"verts": 86,
+"normals": true,
+"uv0": true,
+"uv1": false,
+"indices": 156,
+"subs": [
+[
+0,
+156
+]
+]
+},
+"m2619601c2c61": {
+"name": "Trawler_Hull_MeshCollider60",
+"verts": 24,
+"normals": true,
+"uv0": true,
+"uv1": false,
+"indices": 36,
+"subs": [
+[
+0,
+36
+]
+]
+},
+"m1f7d7722c61": {
+"name": "Trawler_Hull_MeshCollider15",
+"verts": 18,
+"normals": true,
+"uv0": true,
+"uv1": false,
+"indices": 24,
+"subs": [
+[
+0,
+24
+]
+]
+},
+"m60100e482c61": {
+"name": "Trawler_Hull_MeshCollider32",
+"verts": 24,
+"normals": true,
+"uv0": true,
+"uv1": false,
+"indices": 36,
+"subs": [
+[
+0,
+36
+]
+]
+},
+"me47232282c61": {
+"name": "Trawler_Hull_MeshCollider46",
+"verts": 34,
+"normals": true,
+"uv0": true,
+"uv1": false,
+"indices": 48,
+"subs": [
+[
+0,
+48
+]
+]
+},
+"mf0027c4e2c61": {
+"name": "Trawler_Hull_MeshCollider65",
+"verts": 24,
+"normals": true,
+"uv0": true,
+"uv1": false,
+"indices": 36,
+"subs": [
+[
+0,
+36
+]
+]
+},
+"mbb4f131d2c61": {
+"name": "Trawler_Hull_MeshCollider55",
+"verts": 44,
+"normals": true,
+"uv0": true,
+"uv1": false,
+"indices": 60,
+"subs": [
+[
+0,
+60
+]
+]
+},
+"m9a3093c32c61": {
+"name": "Trawler_Hull_MeshCollider56",
+"verts": 44,
+"normals": true,
+"uv0": true,
+"uv1": false,
+"indices": 60,
+"subs": [
+[
+0,
+60
+]
+]
+},
+"macd6b3ac2c61": {
+"name": "Trawler_Hull_MeshCollider67",
+"verts": 50,
+"normals": true,
+"uv0": true,
+"uv1": false,
+"indices": 84,
+"subs": [
+[
+0,
+84
+]
+]
+},
+"m8042e9032c61": {
+"name": "Trawler_Hull_MeshCollider39",
+"verts": 30,
+"normals": true,
+"uv0": true,
+"uv1": false,
+"indices": 48,
+"subs": [
+[
+0,
+48
+]
+]
+},
+"m2c2d7ceb2c61": {
+"name": "Trawler_Hull_MeshCollider51",
+"verts": 30,
+"normals": true,
+"uv0": true,
+"uv1": false,
+"indices": 48,
+"subs": [
+[
+0,
+48
+]
+]
+},
+"mb3a8bb9f2c61": {
+"name": "Trawler_Hull_MeshCollider01",
+"verts": 150,
+"normals": true,
+"uv0": true,
+"uv1": false,
+"indices": 240,
+"subs": [
+[
+0,
+240
+]
+]
+},
+"m3d2ff52f2c61": {
+"name": "Trawler_Hull_MeshCollider42",
+"verts": 30,
+"normals": true,
+"uv0": true,
+"uv1": false,
+"indices": 48,
+"subs": [
+[
+0,
+48
+]
+]
+},
+"m19952da52c61": {
+"name": "Trawler_Hull_MeshCollider24",
+"verts": 24,
+"normals": true,
+"uv0": true,
+"uv1": false,
+"indices": 36,
+"subs": [
+[
+0,
+36
+]
+]
+},
+"mc8f3157f2c61": {
+"name": "Trawler_Hull_MeshCollider22",
+"verts": 24,
+"normals": true,
+"uv0": true,
+"uv1": false,
+"indices": 36,
+"subs": [
+[
+0,
+36
+]
+]
+},
+"m2759a0442c61": {
+"name": "Trawler_Hull_MeshCollider63",
+"verts": 24,
+"normals": true,
+"uv0": true,
+"uv1": false,
+"indices": 36,
+"subs": [
+[
+0,
+36
+]
+]
+},
+"mf41bbe4d2c61": {
+"name": "Trawler_Hull_MeshCollider12",
+"verts": 24,
+"normals": true,
+"uv0": true,
+"uv1": false,
+"indices": 36,
+"subs": [
+[
+0,
+36
+]
+]
+},
+"mf23c258f2c61": {
+"name": "Trawler_Hull_MeshCollider57",
+"verts": 30,
+"normals": true,
+"uv0": true,
+"uv1": false,
+"indices": 48,
+"subs": [
+[
+0,
+48
+]
+]
+},
+"me0cbe5412c61": {
+"name": "Trawler_Hull_MeshCollider31",
+"verts": 26,
+"normals": true,
+"uv0": true,
+"uv1": false,
+"indices": 36,
+"subs": [
+[
+0,
+36
+]
+]
+},
+"me0fc2f3e2c61": {
+"name": "Trawler_Hull_MeshCollider36",
+"verts": 34,
+"normals": true,
+"uv0": true,
+"uv1": false,
+"indices": 48,
+"subs": [
+[
+0,
+48
+]
+]
+},
+"mb9bbfa9c2c61": {
+"name": "Trawler_Hull_MeshCollider11",
+"verts": 24,
+"normals": true,
+"uv0": true,
+"uv1": false,
+"indices": 36,
+"subs": [
+[
+0,
+36
+]
+]
+},
+"mc3748d4d2c61": {
+"name": "Trawler_Hull_MeshCollider47",
+"verts": 31,
+"normals": true,
+"uv0": true,
+"uv1": false,
+"indices": 48,
+"subs": [
+[
+0,
+48
+]
+]
+},
+"m1080c0872c61": {
+"name": "Trawler_Hull_MeshCollider14",
+"verts": 24,
+"normals": true,
+"uv0": true,
+"uv1": false,
+"indices": 36,
+"subs": [
+[
+0,
+36
+]
+]
+},
+"m97e88fe72c61": {
+"name": "Trawler_Hull_MeshCollider02",
+"verts": 52,
+"normals": true,
+"uv0": true,
+"uv1": false,
+"indices": 78,
+"subs": [
+[
+0,
+78
+]
+]
+},
+"mb8444c7a2c61": {
+"name": "Trawler_Hull_MeshCollider00",
+"verts": 78,
+"normals": true,
+"uv0": true,
+"uv1": false,
+"indices": 126,
+"subs": [
+[
+0,
+126
+]
+]
+},
+"me26bee2a2c61": {
+"name": "Trawler_Hull_MeshCollider54",
+"verts": 46,
+"normals": true,
+"uv0": true,
+"uv1": false,
+"indices": 60,
+"subs": [
+[
+0,
+60
+]
+]
+},
+"mb579e0282c61": {
+"name": "Trawler_Hull_MeshCollider52",
+"verts": 30,
+"normals": true,
+"uv0": true,
+"uv1": false,
+"indices": 48,
+"subs": [
+[
+0,
+48
+]
+]
+},
+"m6d82d8ac2c61": {
+"name": "Trawler_Hull_MeshCollider03",
+"verts": 52,
+"normals": true,
+"uv0": true,
+"uv1": false,
+"indices": 78,
+"subs": [
+[
+0,
+78
+]
+]
+},
+"m3c0ce4822c61": {
+"name": "Trawler_Hull_MeshCollider08",
+"verts": 24,
+"normals": true,
+"uv0": true,
+"uv1": false,
+"indices": 36,
+"subs": [
+[
+0,
+36
+]
+]
+},
+"m8ff6552b2c61": {
+"name": "Trawler_Hull_MeshCollider19",
+"verts": 24,
+"normals": true,
+"uv0": true,
+"uv1": false,
+"indices": 36,
+"subs": [
+[
+0,
+36
+]
+]
+},
+"m39415eb72c61": {
+"name": "Trawler_Hull_MeshCollider06",
+"verts": 78,
+"normals": true,
+"uv0": true,
+"uv1": false,
+"indices": 132,
+"subs": [
+[
+0,
+132
+]
+]
+},
+"m8ab37beb2c61": {
+"name": "Trawler_Hull_MeshCollider49",
+"verts": 32,
+"normals": true,
+"uv0": true,
+"uv1": false,
+"indices": 48,
+"subs": [
+[
+0,
+48
+]
+]
+},
+"mbfff99fe2c61": {
+"name": "Trawler_Hull_MeshCollider20",
+"verts": 18,
+"normals": true,
+"uv0": true,
+"uv1": false,
+"indices": 24,
+"subs": [
+[
+0,
+24
+]
+]
+},
+"m385688a72c61": {
+"name": "Trawler_Hull_MeshCollider18",
+"verts": 24,
+"normals": true,
+"uv0": true,
+"uv1": false,
+"indices": 36,
+"subs": [
+[
+0,
+36
+]
+]
+},
+"m7debdb112c61": {
+"name": "Trawler_Hull_MeshCollider21",
+"verts": 24,
+"normals": true,
+"uv0": true,
+"uv1": false,
+"indices": 36,
+"subs": [
+[
+0,
+36
+]
+]
+},
+"me730d7ae2c61": {
+"name": "Trawler_Hull_MeshCollider59",
+"verts": 24,
+"normals": true,
+"uv0": true,
+"uv1": false,
+"indices": 36,
+"subs": [
+[
+0,
+36
+]
+]
+},
+"m6bdae6262c61": {
+"name": "Trawler_Hull_MeshCollider27",
+"verts": 24,
+"normals": true,
+"uv0": true,
+"uv1": false,
+"indices": 36,
+"subs": [
+[
+0,
+36
+]
+]
+},
+"m23c1f8e72c61": {
+"name": "Trawler_Hull_MeshCollider29",
+"verts": 28,
+"normals": true,
+"uv0": true,
+"uv1": false,
+"indices": 42,
+"subs": [
+[
+0,
+42
+]
+]
+},
+"mea9c98ba2c61": {
+"name": "Trawler_Hull_MeshCollider38",
+"verts": 30,
+"normals": true,
+"uv0": true,
+"uv1": false,
+"indices": 48,
+"subs": [
+[
+0,
+48
+]
+]
+},
+"m827a80562c61": {
+"name": "Trawler_Hull_MeshCollider45",
+"verts": 34,
+"normals": true,
+"uv0": true,
+"uv1": false,
+"indices": 48,
+"subs": [
+[
+0,
+48
+]
+]
+},
+"m1b690a1d2c61": {
+"name": "Trawler_Hull_MeshCollider50",
+"verts": 32,
+"normals": true,
+"uv0": true,
+"uv1": false,
+"indices": 48,
+"subs": [
+[
+0,
+48
+]
+]
+},
+"mdcc0b92c2c61": {
+"name": "Trawler_Hull_MeshCollider26",
+"verts": 24,
+"normals": true,
+"uv0": true,
+"uv1": false,
+"indices": 36,
+"subs": [
+[
+0,
+36
+]
+]
+},
+"m8ec7c89f2c61": {
+"name": "Trawler_Hull_MeshCollider61",
+"verts": 24,
+"normals": true,
+"uv0": true,
+"uv1": false,
+"indices": 36,
+"subs": [
+[
+0,
+36
+]
+]
+},
+"m8893838d2c61": {
+"name": "Trawler_Hull_MeshCollider25",
+"verts": 24,
+"normals": true,
+"uv0": true,
+"uv1": false,
+"indices": 36,
+"subs": [
+[
+0,
+36
+]
+]
+},
+"m2d3f22fe2c61": {
+"name": "Trawler_Hull_MeshCollider66",
+"verts": 34,
+"normals": true,
+"uv0": true,
+"uv1": false,
+"indices": 48,
+"subs": [
+[
+0,
+48
+]
+]
+},
+"mbf37774f2c61": {
+"name": "Trawler_Hull_MeshCollider13",
+"verts": 24,
+"normals": true,
+"uv0": true,
+"uv1": false,
+"indices": 36,
+"subs": [
+[
+0,
+36
+]
+]
+},
+"m6785e26a2c61": {
+"name": "Trawler_Hull_MeshCollider48",
+"verts": 31,
+"normals": true,
+"uv0": true,
+"uv1": false,
+"indices": 48,
+"subs": [
+[
+0,
+48
+]
+]
+},
+"m252fb4b02c61": {
+"name": "Trawler_Hull_MeshCollider07",
+"verts": 16,
+"normals": true,
+"uv0": true,
+"uv1": false,
+"indices": 24,
+"subs": [
+[
+0,
+24
+]
+]
+},
+"meb0a9c02c61": {
+"name": "Trawler_Hull_MeshCollider41",
+"verts": 30,
+"normals": true,
+"uv0": true,
+"uv1": false,
+"indices": 48,
+"subs": [
+[
+0,
+48
+]
+]
+},
+"m249ee19b2c61": {
+"name": "Trawler_Hull_MeshCollider23",
+"verts": 24,
+"normals": true,
+"uv0": true,
+"uv1": false,
+"indices": 36,
+"subs": [
+[
+0,
+36
+]
+]
+},
+"m6bd808b2c61": {
+"name": "Trawler_Hull_MeshCollider28",
+"verts": 24,
+"normals": true,
+"uv0": true,
+"uv1": false,
+"indices": 36,
+"subs": [
+[
+0,
+36
+]
+]
+},
+"m16308ea52c61": {
+"name": "Trawler_Hull_MeshCollider44",
+"verts": 44,
+"normals": true,
+"uv0": true,
+"uv1": false,
+"indices": 66,
+"subs": [
+[
+0,
+66
+]
+]
+},
+"mef63c4822c61": {
+"name": "Trawler_Hull_MeshCollider62",
+"verts": 24,
+"normals": true,
+"uv0": true,
+"uv1": false,
+"indices": 36,
+"subs": [
+[
+0,
+36
+]
+]
+},
+"m919e387a2c61": {
+"name": "Trawler_Hull_MeshCollider33",
+"verts": 32,
+"normals": true,
+"uv0": true,
+"uv1": false,
+"indices": 48,
+"subs": [
+[
+0,
+48
+]
+]
+},
+"mc386a1052c61": {
+"name": "Trawler_Hull_MeshCollider58",
+"verts": 30,
+"normals": true,
+"uv0": true,
+"uv1": false,
+"indices": 48,
+"subs": [
+[
+0,
+48
+]
+]
+},
+"m88b8f102c61": {
+"name": "Trawler_Hull_MeshCollider30",
+"verts": 28,
+"normals": true,
+"uv0": true,
+"uv1": false,
+"indices": 42,
+"subs": [
+[
+0,
+42
+]
+]
+},
+"m1476ef372c61": {
+"name": "Trawler_Hull_MeshCollider43",
+"verts": 44,
+"normals": true,
+"uv0": true,
+"uv1": false,
+"indices": 66,
+"subs": [
+[
+0,
+66
+]
+]
+},
+"mccf533112c61": {
+"name": "Trawler_Hull_MeshCollider53",
+"verts": 46,
+"normals": true,
+"uv0": true,
+"uv1": false,
+"indices": 60,
+"subs": [
+[
+0,
+60
+]
+]
+}
+},
+"materials": {
+"StageBuildings_Diffuse_534d2054": {
+"name": "StageBuildings_Diffuse",
+"color": [
+0.6604,
+0.6604,
+0.6604,
+1.0
+],
+"map": "StageBuildings_Diffuse_9245e1df.png",
+"smoothness": 1.0,
+"metallic": 0.0,
+"emission": [
+0.0,
+0.0,
+0.0
+]
+},
+"Default_fd38fe3": {
+"name": "Default",
+"color": [
+0.48,
+0.48,
+0.48,
+1.0
+],
+"map": null,
+"smoothness": 0.5,
+"metallic": 0.0,
+"emission": [
+0.0,
+0.0,
+0.0
+]
+},
+"No Name_a72f2e95": {
+"name": "No Name",
+"color": [
+0.4398,
+0.478,
+0.0,
+1.0
+],
+"map": null,
+"smoothness": 0.0,
+"metallic": 0.0,
+"emission": [
+0.0,
+0.0,
+0.0
+]
+},
+"City_Diffuse_ea64890a": {
+"name": "City_Diffuse",
+"color": [
+0.6792,
+0.6537,
+0.6184,
+1.0
+],
+"map": "City_Diffuse_1_a49f6e2.png",
+"smoothness": 0.241,
+"metallic": 0.0,
+"emission": [
+0.0,
+0.0,
+0.0
+]
+},
+"Island_afebe932": {
+"name": "Island",
+"color": [
+0.934,
+0.934,
+0.934,
+1.0
+],
+"map": "Island_Diffuse_c32f182d.png",
+"smoothness": 0.0,
+"metallic": 0.0,
+"emission": [
+0.0,
+0.0,
+0.0
+]
+},
+"Underwater_f5003b39": {
+"name": "Underwater",
+"color": [
+0.0,
+0.1446,
+0.1981,
+0.884
+],
+"map": null,
+"smoothness": 0.0,
+"metallic": 0.0,
+"emission": [
+0.0,
+0.0,
+0.0
+]
+},
+"Grey (100)_c05d93a3": {
+"name": "Grey (100)",
+"color": [
+0.434,
+0.411,
+0.411,
+1.0
+],
+"map": null,
+"smoothness": 0.0,
+"metallic": 0.2,
+"emission": [
+0.0,
+0.0,
+0.0
+]
+},
+"FishingWhite_aebd8f15": {
+"name": "FishingWhite",
+"color": [
+1.0,
+1.0,
+1.0,
+1.0
+],
+"map": null,
+"smoothness": 0.4,
+"metallic": 0.2,
+"emission": [
+0.0,
+0.0,
+0.0
+]
+},
+"Trawler Metal (Painted Dark Cream)_8156615": {
+"name": "Trawler Metal (Painted Dark Cream)",
+"color": [
+0.949,
+0.9059,
+0.7882,
+1.0
+],
+"map": null,
+"smoothness": 0.4,
+"metallic": 0.8,
+"emission": [
+0.0,
+0.0,
+0.0
+]
+},
+"Trawler Metal (Raw)_b32ba8e6": {
+"name": "Trawler Metal (Raw)",
+"color": [
+0.6887,
+0.6887,
+0.6887,
+1.0
+],
+"map": null,
+"smoothness": 0.8,
+"metallic": 1.0,
+"emission": [
+0.0,
+0.0,
+0.0
+]
+},
+"lighthouse_lowpoly_diffuse_7": {
+"name": "lighthouse_lowpoly_diffuse",
+"color": [
+1.0,
+1.0,
+1.0,
+1.0
+],
+"map": "lighthouse_lowpoly_uv_sheet__diffuse_9.png",
+"smoothness": 0.141,
+"metallic": 0.0,
+"emission": [
+0.0,
+0.0,
+0.0
+]
+},
+"Trawler Hull_299bfb8d": {
+"name": "Trawler Hull",
+"color": [
+1.0,
+1.0,
+1.0,
+1.0
+],
+"map": "trawler_hull_diffuse_a773fe18.png",
+"smoothness": 0.4,
+"metallic": 0.8,
+"emission": [
+0.0,
+0.0,
+0.0
+]
+},
+"Trawler Window_453b6c5f": {
+"name": "Trawler Window",
+"color": [
+0.4906,
+0.4906,
+0.4906,
+1.0
+],
+"map": null,
+"smoothness": 0.9,
+"metallic": 0.0,
+"emission": [
+0.0,
+0.0,
+0.0
+]
+},
+"Trawler Fog_ada085c3": {
+"name": "Trawler Fog",
+"color": [
+0.0,
+0.0,
+0.0,
+1.0
+],
+"map": null,
+"smoothness": 0.8,
+"metallic": 0.6,
+"emission": [
+0.0,
+0.0,
+0.0
+]
+},
+"Trawler Safty Glass_918cac76": {
+"name": "Trawler Safty Glass",
+"color": [
+0.1,
+0.2,
+0.3,
+0.4
+],
+"map": "Grid_Diffuse_1_ed2c2a78.png",
+"smoothness": 1.0,
+"metallic": 0.0,
+"emission": [
+0.0,
+0.0,
+0.0
+]
+},
+"02 - Default_b6602c61": {
+"name": "02 - Default",
+"color": [
+0.4889,
+0.4889,
+0.4889,
+1.0
+],
+"map": null,
+"smoothness": 0.0,
+"metallic": 0.0,
+"emission": [
+0.0,
+0.0,
+0.0
+]
+},
+"LightHouse_Railing_4": {
+"name": "LightHouse_Railing",
+"color": [
+1.0,
+1.0,
+1.0,
+1.0
+],
+"map": "lighthouse_rail_lowpoly_uv_sheet_diffuse_alpha_a.png",
+"smoothness": 0.5,
+"metallic": 0.0,
+"emission": [
+0.0,
+0.0,
+0.0
+]
+}
+},
+"renderers": [
+{
+"path": "City Pivot (1)/SM_Beef_City_4/CityBuildings/bouy",
+"mesh": "m2",
+"subs": [
+16,
+17
+],
+"mats": [
+"StageBuildings_Diffuse_534d2054",
+"Default_fd38fe3"
+],
+"matrix": null,
+"lightmap": -1,
+"lmso": [
+1.0,
+1.0,
+0.0,
+0.0
+],
+"cast": 0,
+"recv": true,
+"layer": 0
+},
+{
+"path": "City Pivot (1)/SM_Beef_City_4/CityBuildings/trees_01 (15)",
+"mesh": "m4",
+"subs": [
+16
+],
+"mats": [
+"No Name_a72f2e95"
+],
+"matrix": null,
+"lightmap": -1,
+"lmso": [
+1.0,
+1.0,
+0.0,
+0.0
+],
+"cast": 0,
+"recv": true,
+"layer": 0
+},
+{
+"path": "City Pivot (1)/SM_Beef_City_4/CityBuildings/factoryTower_02 (1)",
+"mesh": "m2",
+"subs": [
+8
+],
+"mats": [
+"StageBuildings_Diffuse_534d2054"
+],
+"matrix": null,
+"lightmap": -1,
+"lmso": [
+1.0,
+1.0,
+0.0,
+0.0
+],
+"cast": 0,
+"recv": true,
+"layer": 0
+},
+{
+"path": "City Pivot (1)/SM_Beef_City_4/CityBuildings/tree_02 (19)",
+"mesh": "m4",
+"subs": [
+9
+],
+"mats": [
+"No Name_a72f2e95"
+],
+"matrix": null,
+"lightmap": -1,
+"lmso": [
+1.0,
+1.0,
+0.0,
+0.0
+],
+"cast": 0,
+"recv": true,
+"layer": 0
+},
+{
+"path": "City Pivot (1)/SM_Beef_City_4/CityBuildings/Building_group_12 (7)",
+"mesh": "m3",
+"subs": [
+87
+],
+"mats": [
+"City_Diffuse_ea64890a"
+],
+"matrix": null,
+"lightmap": -1,
+"lmso": [
+1.0,
+1.0,
+0.0,
+0.0
+],
+"cast": 0,
+"recv": true,
+"layer": 0
+},
+{
+"path": "City Pivot (1)/SM_Beef_City_4/CityBuildings/trees_01 (14)",
+"mesh": "m4",
+"subs": [
+22
+],
+"mats": [
+"No Name_a72f2e95"
+],
+"matrix": null,
+"lightmap": -1,
+"lmso": [
+1.0,
+1.0,
+0.0,
+0.0
+],
+"cast": 0,
+"recv": true,
+"layer": 0
+},
+{
+"path": "City Pivot (1)/SM_Beef_City_4/CityBuildings/trees_01 (29)",
+"mesh": "m4",
+"subs": [
+12
+],
+"mats": [
+"No Name_a72f2e95"
+],
+"matrix": null,
+"lightmap": -1,
+"lmso": [
+1.0,
+1.0,
+0.0,
+0.0
+],
+"cast": 0,
+"recv": true,
+"layer": 0
+},
+{
+"path": "City Pivot (1)/SM_Beef_City_4/CityBuildings/trees_01 (17)",
+"mesh": "m4",
+"subs": [
+10
+],
+"mats": [
+"No Name_a72f2e95"
+],
+"matrix": null,
+"lightmap": -1,
+"lmso": [
+1.0,
+1.0,
+0.0,
+0.0
+],
+"cast": 0,
+"recv": true,
+"layer": 0
+},
+{
+"path": "City Pivot (1)/SM_Beef_City_4/Island (1)",
+"mesh": "m3978d62c50a4",
+"subs": [
+0
+],
+"mats": [
+"Island_afebe932"
+],
+"matrix": [
+[
+9.09434,
+-3.26502,
+0.0,
+962.70887
+],
+[
+0.0,
+-0.0,
+-9.66268,
+13.40225
+],
+[
+3.26501,
+9.09434,
+-0.0,
+1959.65421
+],
+[
+0.0,
+0.0,
+-0.0,
+1.0
+]
+],
+"lightmap": -1,
+"lmso": [
+1.0,
+1.0,
+0.0,
+0.0
+],
+"cast": 0,
+"recv": true,
+"layer": 0
+},
+{
+"path": "City Pivot (1)/SM_Beef_City_4/CityBuildings/Building_group_06 (1)",
+"mesh": "m3",
+"subs": [
+27
+],
+"mats": [
+"City_Diffuse_ea64890a"
+],
+"matrix": null,
+"lightmap": -1,
+"lmso": [
+1.0,
+1.0,
+0.0,
+0.0
+],
+"cast": 0,
+"recv": true,
+"layer": 0
+},
+{
+"path": "City Pivot (1)/SM_Beef_City_4/CityBuildings/tree_02 (29)",
+"mesh": "m4",
+"subs": [
+8
+],
+"mats": [
+"No Name_a72f2e95"
+],
+"matrix": null,
+"lightmap": -1,
+"lmso": [
+1.0,
+1.0,
+0.0,
+0.0
+],
+"cast": 0,
+"recv": true,
+"layer": 0
+},
+{
+"path": "City Pivot (1)/SM_Beef_City_4/CityBuildings/tree_02 (27)",
+"mesh": "m4",
+"subs": [
+1
+],
+"mats": [
+"No Name_a72f2e95"
+],
+"matrix": null,
+"lightmap": -1,
+"lmso": [
+1.0,
+1.0,
+0.0,
+0.0
+],
+"cast": 0,
+"recv": true,
+"layer": 0
+},
+{
+"path": "City Pivot (1)/SM_Beef_City_4/CityBuildings/MeatCorpBuilding",
+"mesh": "m2",
+"subs": [
+2
+],
+"mats": [
+"StageBuildings_Diffuse_534d2054"
+],
+"matrix": null,
+"lightmap": -1,
+"lmso": [
+1.0,
+1.0,
+0.0,
+0.0
+],
+"cast": 0,
+"recv": true,
+"layer": 0
+},
+{
+"path": "City Pivot (1)/SM_Beef_City_4/CityBuildings/factoryTower_02",
+"mesh": "m2",
+"subs": [
+4
+],
+"mats": [
+"StageBuildings_Diffuse_534d2054"
+],
+"matrix": null,
+"lightmap": -1,
+"lmso": [
+1.0,
+1.0,
+0.0,
+0.0
+],
+"cast": 0,
+"recv": true,
+"layer": 0
+},
+{
+"path": "City Pivot (1)/SM_Beef_City_4/CityBuildings/tree_02 (28)",
+"mesh": "m4",
+"subs": [
+2
+],
+"mats": [
+"No Name_a72f2e95"
+],
+"matrix": null,
+"lightmap": -1,
+"lmso": [
+1.0,
+1.0,
+0.0,
+0.0
+],
+"cast": 0,
+"recv": true,
+"layer": 0
+},
+{
+"path": "City Pivot (1)/SM_Beef_City_4/CityBuildings/trees_01 (32)",
+"mesh": "m4",
+"subs": [
+17
+],
+"mats": [
+"No Name_a72f2e95"
+],
+"matrix": null,
+"lightmap": -1,
+"lmso": [
+1.0,
+1.0,
+0.0,
+0.0
+],
+"cast": 0,
+"recv": true,
+"layer": 0
+},
+{
+"path": "City Pivot (1)/SM_Beef_City_4/CityBuildings/trees_01 (16)",
+"mesh": "m4",
+"subs": [
+21
+],
+"mats": [
+"No Name_a72f2e95"
+],
+"matrix": null,
+"lightmap": -1,
+"lmso": [
+1.0,
+1.0,
+0.0,
+0.0
+],
+"cast": 0,
+"recv": true,
+"layer": 0
+},
+{
+"path": "City Pivot (1)/SM_Beef_City_4/CityBuildings/trees_01 (23)",
+"mesh": "m4",
+"subs": [
+13
+],
+"mats": [
+"No Name_a72f2e95"
+],
+"matrix": null,
+"lightmap": -1,
+"lmso": [
+1.0,
+1.0,
+0.0,
+0.0
+],
+"cast": 0,
+"recv": true,
+"layer": 0
+},
+{
+"path": "City Pivot (1)/SM_Beef_City_4/CityBuildings/warehouse",
+"mesh": "m2",
+"subs": [
+14
+],
+"mats": [
+"StageBuildings_Diffuse_534d2054"
+],
+"matrix": null,
+"lightmap": -1,
+"lmso": [
+1.0,
+1.0,
+0.0,
+0.0
+],
+"cast": 0,
+"recv": true,
+"layer": 0
+},
+{
+"path": "City Pivot (1)/SM_Beef_City_4/CityBuildings/hotdog",
+"mesh": "m2",
+"subs": [
+11
+],
+"mats": [
+"StageBuildings_Diffuse_534d2054"
+],
+"matrix": null,
+"lightmap": -1,
+"lmso": [
+1.0,
+1.0,
+0.0,
+0.0
+],
+"cast": 0,
+"recv": true,
+"layer": 0
+},
+{
+"path": "City Pivot (1)/SM_Beef_City_4/CityBuildings/trees_01 (31)",
+"mesh": "m4",
+"subs": [
+4
+],
+"mats": [
+"No Name_a72f2e95"
+],
+"matrix": null,
+"lightmap": -1,
+"lmso": [
+1.0,
+1.0,
+0.0,
+0.0
+],
+"cast": 0,
+"recv": true,
+"layer": 0
+},
+{
+"path": "City Pivot (1)/SM_Beef_City_4/CityBuildings/trees_01 (33)",
+"mesh": "m4",
+"subs": [
+15
+],
+"mats": [
+"No Name_a72f2e95"
+],
+"matrix": null,
+"lightmap": -1,
+"lmso": [
+1.0,
+1.0,
+0.0,
+0.0
+],
+"cast": 0,
+"recv": true,
+"layer": 0
+},
+{
+"path": "City Pivot (1)/SM_Beef_City_4/CityBuildings/tree_01 (3)",
+"mesh": "m4",
+"subs": [
+5
+],
+"mats": [
+"No Name_a72f2e95"
+],
+"matrix": null,
+"lightmap": -1,
+"lmso": [
+1.0,
+1.0,
+0.0,
+0.0
+],
+"cast": 0,
+"recv": true,
+"layer": 0
+},
+{
+"path": "City Pivot (1)/SM_Beef_City_4/CityBuildings/warehouse (1)",
+"mesh": "m2",
+"subs": [
+15
+],
+"mats": [
+"StageBuildings_Diffuse_534d2054"
+],
+"matrix": null,
+"lightmap": -1,
+"lmso": [
+1.0,
+1.0,
+0.0,
+0.0
+],
+"cast": 0,
+"recv": true,
+"layer": 0
+},
+{
+"path": "City Pivot (1)/SM_Beef_City_4/CityBuildings/trees_01 (30)",
+"mesh": "m4",
+"subs": [
+7
+],
+"mats": [
+"No Name_a72f2e95"
+],
+"matrix": null,
+"lightmap": -1,
+"lmso": [
+1.0,
+1.0,
+0.0,
+0.0
+],
+"cast": 0,
+"recv": true,
+"layer": 0
+},
+{
+"path": "City Pivot (1)/SM_Beef_City_4/CityBuildings/wheel",
+"mesh": "m4fd87c2f9697",
+"subs": [
+0
+],
+"mats": [
+"StageBuildings_Diffuse_534d2054"
+],
+"matrix": [
+[
+1.86179,
+-9.48161,
+-0.0,
+994.78678
+],
+[
+-0.0,
+0.0,
+-9.66267,
+13.33988
+],
+[
+9.48161,
+1.86179,
+-0.0,
+1107.46899
+],
+[
+0.0,
+0.0,
+-0.0,
+1.0
+]
+],
+"lightmap": -1,
+"lmso": [
+1.0,
+1.0,
+0.0,
+0.0
+],
+"cast": 0,
+"recv": true,
+"layer": 0
+},
+{
+"path": "City Pivot (1)/SM_Beef_City_4/CityBuildings/tree_02 (12)",
+"mesh": "m4",
+"subs": [
+18
+],
+"mats": [
+"No Name_a72f2e95"
+],
+"matrix": null,
+"lightmap": -1,
+"lmso": [
+1.0,
+1.0,
+0.0,
+0.0
+],
+"cast": 0,
+"recv": true,
+"layer": 0
+},
+{
+"path": "City Pivot (1)/SM_Beef_City_4/CityBuildings/tree_02 (13)",
+"mesh": "m4",
+"subs": [
+0
+],
+"mats": [
+"No Name_a72f2e95"
+],
+"matrix": null,
+"lightmap": -1,
+"lmso": [
+1.0,
+1.0,
+0.0,
+0.0
+],
+"cast": 0,
+"recv": true,
+"layer": 0
+},
+{
+"path": "City Pivot (1)/SM_Beef_City_4/CityBuildings/trees_01 (21)",
+"mesh": "m4",
+"subs": [
+14
+],
+"mats": [
+"No Name_a72f2e95"
+],
+"matrix": null,
+"lightmap": -1,
+"lmso": [
+1.0,
+1.0,
+0.0,
+0.0
+],
+"cast": 0,
+"recv": true,
+"layer": 0
+},
+{
+"path": "City Pivot (1)/SM_Beef_City_4/CityBuildings/tree_01 (4)",
+"mesh": "m4",
+"subs": [
+3
+],
+"mats": [
+"No Name_a72f2e95"
+],
+"matrix": null,
+"lightmap": -1,
+"lmso": [
+1.0,
+1.0,
+0.0,
+0.0
+],
+"cast": 0,
+"recv": true,
+"layer": 0
+},
+{
+"path": "City Pivot (1)/SM_Beef_City_4/CityBuildings/tree_02 (18)",
+"mesh": "m4",
+"subs": [
+20
+],
+"mats": [
+"No Name_a72f2e95"
+],
+"matrix": null,
+"lightmap": -1,
+"lmso": [
+1.0,
+1.0,
+0.0,
+0.0
+],
+"cast": 0,
+"recv": true,
+"layer": 0
+},
+{
+"path": "City Pivot (1)/SM_Beef_City_4/CityBuildings/factoryTower_02 (2)",
+"mesh": "m2",
+"subs": [
+13
+],
+"mats": [
+"StageBuildings_Diffuse_534d2054"
+],
+"matrix": null,
+"lightmap": -1,
+"lmso": [
+1.0,
+1.0,
+0.0,
+0.0
+],
+"cast": 0,
+"recv": true,
+"layer": 0
+},
+{
+"path": "City Pivot (1)/SM_Beef_City_4/CityBuildings/tree_02 (10)",
+"mesh": "m4",
+"subs": [
+6
+],
+"mats": [
+"No Name_a72f2e95"
+],
+"matrix": null,
+"lightmap": -1,
+"lmso": [
+1.0,
+1.0,
+0.0,
+0.0
+],
+"cast": 0,
+"recv": true,
+"layer": 0
+},
+{
+"path": "City Pivot (1)/SM_Beef_City_4/CityBuildings/factoryTower_02 (3)",
+"mesh": "m2",
+"subs": [
+6
+],
+"mats": [
+"StageBuildings_Diffuse_534d2054"
+],
+"matrix": null,
+"lightmap": -1,
+"lmso": [
+1.0,
+1.0,
+0.0,
+0.0
+],
+"cast": 0,
+"recv": true,
+"layer": 0
+},
+{
+"path": "City Pivot (1)/SM_Beef_City_4/CityBuildings/Building_group_12 (8)",
+"mesh": "m3",
+"subs": [
+104
+],
+"mats": [
+"City_Diffuse_ea64890a"
+],
+"matrix": null,
+"lightmap": -1,
+"lmso": [
+1.0,
+1.0,
+0.0,
+0.0
+],
+"cast": 0,
+"recv": true,
+"layer": 0
+},
+{
+"path": "Water",
+"mesh": "m1",
+"subs": [
+0
+],
+"mats": [
+"Underwater_f5003b39"
+],
+"matrix": null,
+"lightmap": -1,
+"lmso": [
+1.0,
+1.0,
+0.0,
+0.0
+],
+"cast": 0,
+"recv": true,
+"layer": 0
+},
+{
+"path": "City Pivot (1)/SM_Beef_City_4/CityBuildings/Building_group_12 (1)",
+"mesh": "m3",
+"subs": [
+85
+],
+"mats": [
+"City_Diffuse_ea64890a"
+],
+"matrix": null,
+"lightmap": -1,
+"lmso": [
+1.0,
+1.0,
+0.0,
+0.0
+],
+"cast": 0,
+"recv": true,
+"layer": 0
+},
+{
+"path": "City Pivot (1)/SM_Beef_City_4/CityBuildings/tree_02 (11)",
+"mesh": "m4",
+"subs": [
+11
+],
+"mats": [
+"No Name_a72f2e95"
+],
+"matrix": null,
+"lightmap": -1,
+"lmso": [
+1.0,
+1.0,
+0.0,
+0.0
+],
+"cast": 0,
+"recv": true,
+"layer": 0
+},
+{
+"path": "City Pivot (1)/SM_Beef_City_4/CityBuildings/tree_02 (17)",
+"mesh": "m4",
+"subs": [
+19
+],
+"mats": [
+"No Name_a72f2e95"
+],
+"matrix": null,
+"lightmap": -1,
+"lmso": [
+1.0,
+1.0,
+0.0,
+0.0
+],
+"cast": 0,
+"recv": true,
+"layer": 0
+},
+{
+"path": "City Pivot (1)/SM_Beef_City_4/CityBuildings/skyscraper_09",
+"mesh": "m3",
+"subs": [
+23
+],
+"mats": [
+"City_Diffuse_ea64890a"
+],
+"matrix": null,
+"lightmap": -1,
+"lmso": [
+1.0,
+1.0,
+0.0,
+0.0
+],
+"cast": 0,
+"recv": true,
+"layer": 0
+},
+{
+"path": "City Pivot (1)/SM_Beef_City_4/CityBuildings/skyscraper_09",
+"mesh": "m3",
+"subs": [
+99
+],
+"mats": [
+"City_Diffuse_ea64890a"
+],
+"matrix": null,
+"lightmap": -1,
+"lmso": [
+1.0,
+1.0,
+0.0,
+0.0
+],
+"cast": 0,
+"recv": true,
+"layer": 0
+},
+{
+"path": "City Pivot (1)/SM_Beef_City_4/CityBuildings/skyscraper_09 (1)",
+"mesh": "m3",
+"subs": [
+119
+],
+"mats": [
+"City_Diffuse_ea64890a"
+],
+"matrix": null,
+"lightmap": -1,
+"lmso": [
+1.0,
+1.0,
+0.0,
+0.0
+],
+"cast": 0,
+"recv": true,
+"layer": 0
+},
+{
+"path": "City Pivot (1)/SM_Beef_City_4/CityBuildings/Building_03 (3)",
+"mesh": "m3",
+"subs": [
+114
+],
+"mats": [
+"City_Diffuse_ea64890a"
+],
+"matrix": null,
+"lightmap": -1,
+"lmso": [
+1.0,
+1.0,
+0.0,
+0.0
+],
+"cast": 0,
+"recv": true,
+"layer": 0
+},
+{
+"path": "City Pivot (1)/SM_Beef_City_4/CityBuildings/Building_03",
+"mesh": "m3",
+"subs": [
+94
+],
+"mats": [
+"City_Diffuse_ea64890a"
+],
+"matrix": null,
+"lightmap": -1,
+"lmso": [
+1.0,
+1.0,
+0.0,
+0.0
+],
+"cast": 0,
+"recv": true,
+"layer": 0
+},
+{
+"path": "City Pivot (1)/SM_Beef_City_4/CityBuildings/Building_03 (2)",
+"mesh": "m3",
+"subs": [
+56
+],
+"mats": [
+"City_Diffuse_ea64890a"
+],
+"matrix": null,
+"lightmap": -1,
+"lmso": [
+1.0,
+1.0,
+0.0,
+0.0
+],
+"cast": 0,
+"recv": true,
+"layer": 0
+},
+{
+"path": "City Pivot (1)/SM_Beef_City_4/CityBuildings/Building_03 (1)",
+"mesh": "m3",
+"subs": [
+60
+],
+"mats": [
+"City_Diffuse_ea64890a"
+],
+"matrix": null,
+"lightmap": -1,
+"lmso": [
+1.0,
+1.0,
+0.0,
+0.0
+],
+"cast": 0,
+"recv": true,
+"layer": 0
+},
+{
+"path": "City Pivot (1)/SM_Beef_City_4/CityBuildings/Building_06 (3)",
+"mesh": "m5",
+"subs": [
+16
+],
+"mats": [
+"City_Diffuse_ea64890a"
+],
+"matrix": null,
+"lightmap": -1,
+"lmso": [
+1.0,
+1.0,
+0.0,
+0.0
+],
+"cast": 0,
+"recv": true,
+"layer": 0
+},
+{
+"path": "City Pivot (1)/SM_Beef_City_4/CityBuildings/Building_06",
+"mesh": "m5",
+"subs": [
+14
+],
+"mats": [
+"City_Diffuse_ea64890a"
+],
+"matrix": null,
+"lightmap": -1,
+"lmso": [
+1.0,
+1.0,
+0.0,
+0.0
+],
+"cast": 0,
+"recv": true,
+"layer": 0
+},
+{
+"path": "City Pivot (1)/SM_Beef_City_4/CityBuildings/Building_06 (5)",
+"mesh": "m5",
+"subs": [
+20
+],
+"mats": [
+"City_Diffuse_ea64890a"
+],
+"matrix": null,
+"lightmap": -1,
+"lmso": [
+1.0,
+1.0,
+0.0,
+0.0
+],
+"cast": 0,
+"recv": true,
+"layer": 0
+},
+{
+"path": "City Pivot (1)/SM_Beef_City_4/CityBuildings/Building_06 (8)",
+"mesh": "m5",
+"subs": [
+2
+],
+"mats": [
+"City_Diffuse_ea64890a"
+],
+"matrix": null,
+"lightmap": -1,
+"lmso": [
+1.0,
+1.0,
+0.0,
+0.0
+],
+"cast": 0,
+"recv": true,
+"layer": 0
+},
+{
+"path": "City Pivot (1)/SM_Beef_City_4/CityBuildings/Building_06 (6)",
+"mesh": "m5",
+"subs": [
+17
+],
+"mats": [
+"City_Diffuse_ea64890a"
+],
+"matrix": null,
+"lightmap": -1,
+"lmso": [
+1.0,
+1.0,
+0.0,
+0.0
+],
+"cast": 0,
+"recv": true,
+"layer": 0
+},
+{
+"path": "City Pivot (1)/SM_Beef_City_4/CityBuildings/Building_06 (7)",
+"mesh": "m5",
+"subs": [
+9
+],
+"mats": [
+"City_Diffuse_ea64890a"
+],
+"matrix": null,
+"lightmap": -1,
+"lmso": [
+1.0,
+1.0,
+0.0,
+0.0
+],
+"cast": 0,
+"recv": true,
+"layer": 0
+},
+{
+"path": "City Pivot (1)/SM_Beef_City_4/CityBuildings/Building_group_04 (2)",
+"mesh": "m3",
+"subs": [
+109
+],
+"mats": [
+"City_Diffuse_ea64890a"
+],
+"matrix": null,
+"lightmap": -1,
+"lmso": [
+1.0,
+1.0,
+0.0,
+0.0
+],
+"cast": 0,
+"recv": true,
+"layer": 0
+},
+{
+"path": "City Pivot (1)/SM_Beef_City_4/CityBuildings/Building_group_04",
+"mesh": "m3",
+"subs": [
+97
+],
+"mats": [
+"City_Diffuse_ea64890a"
+],
+"matrix": null,
+"lightmap": -1,
+"lmso": [
+1.0,
+1.0,
+0.0,
+0.0
+],
+"cast": 0,
+"recv": true,
+"layer": 0
+},
+{
+"path": "City Pivot (1)/SM_Beef_City_4/CityBuildings/Building_group_04",
+"mesh": "m3",
+"subs": [
+40
+],
+"mats": [
+"City_Diffuse_ea64890a"
+],
+"matrix": null,
+"lightmap": -1,
+"lmso": [
+1.0,
+1.0,
+0.0,
+0.0
+],
+"cast": 0,
+"recv": true,
+"layer": 0
+},
+{
+"path": "City Pivot (1)/SM_Beef_City_4/CityBuildings/Building_group_04 (1)",
+"mesh": "m3",
+"subs": [
+3
+],
+"mats": [
+"City_Diffuse_ea64890a"
+],
+"matrix": null,
+"lightmap": -1,
+"lmso": [
+1.0,
+1.0,
+0.0,
+0.0
+],
+"cast": 0,
+"recv": true,
+"layer": 0
+},
+{
+"path": "City Pivot (1)/SM_Beef_City_4/CityBuildings/Building_05",
+"mesh": "m5",
+"subs": [
+3
+],
+"mats": [
+"City_Diffuse_ea64890a"
+],
+"matrix": null,
+"lightmap": -1,
+"lmso": [
+1.0,
+1.0,
+0.0,
+0.0
+],
+"cast": 0,
+"recv": true,
+"layer": 0
+},
+{
+"path": "City Pivot (1)/SM_Beef_City_4/CityBuildings/Building_01_low (18)",
+"mesh": "m3",
+"subs": [
+19
+],
+"mats": [
+"City_Diffuse_ea64890a"
+],
+"matrix": null,
+"lightmap": -1,
+"lmso": [
+1.0,
+1.0,
+0.0,
+0.0
+],
+"cast": 0,
+"recv": true,
+"layer": 0
+},
+{
+"path": "City Pivot (1)/SM_Beef_City_4/CityBuildings/Building_01_low (6)",
+"mesh": "m3",
+"subs": [
+0
+],
+"mats": [
+"City_Diffuse_ea64890a"
+],
+"matrix": null,
+"lightmap": -1,
+"lmso": [
+1.0,
+1.0,
+0.0,
+0.0
+],
+"cast": 0,
+"recv": true,
+"layer": 0
+},
+{
+"path": "City Pivot (1)/SM_Beef_City_4/CityBuildings/Building_04_low (8)",
+"mesh": "m3",
+"subs": [
+33
+],
+"mats": [
+"City_Diffuse_ea64890a"
+],
+"matrix": null,
+"lightmap": -1,
+"lmso": [
+1.0,
+1.0,
+0.0,
+0.0
+],
+"cast": 0,
+"recv": true,
+"layer": 0
+},
+{
+"path": "City Pivot (1)/SM_Beef_City_4/CityBuildings/Building_04_low (11)",
+"mesh": "m3",
+"subs": [
+1
+],
+"mats": [
+"City_Diffuse_ea64890a"
+],
+"matrix": null,
+"lightmap": -1,
+"lmso": [
+1.0,
+1.0,
+0.0,
+0.0
+],
+"cast": 0,
+"recv": true,
+"layer": 0
+},
+{
+"path": "City Pivot (1)/SM_Beef_City_4/CityBuildings/Building_01_low (12)",
+"mesh": "m3",
+"subs": [
+24
+],
+"mats": [
+"City_Diffuse_ea64890a"
+],
+"matrix": null,
+"lightmap": -1,
+"lmso": [
+1.0,
+1.0,
+0.0,
+0.0
+],
+"cast": 0,
+"recv": true,
+"layer": 0
+},
+{
+"path": "City Pivot (1)/SM_Beef_City_4/CityBuildings/Building_01_low (17)",
+"mesh": "m3",
+"subs": [
+39
+],
+"mats": [
+"City_Diffuse_ea64890a"
+],
+"matrix": null,
+"lightmap": -1,
+"lmso": [
+1.0,
+1.0,
+0.0,
+0.0
+],
+"cast": 0,
+"recv": true,
+"layer": 0
+},
+{
+"path": "City Pivot (1)/SM_Beef_City_4/CityBuildings/Building_01_low (22)",
+"mesh": "m3",
+"subs": [
+30
+],
+"mats": [
+"City_Diffuse_ea64890a"
+],
+"matrix": null,
+"lightmap": -1,
+"lmso": [
+1.0,
+1.0,
+0.0,
+0.0
+],
+"cast": 0,
+"recv": true,
+"layer": 0
+},
+{
+"path": "City Pivot (1)/SM_Beef_City_4/CityBuildings/Building_01_low (14)",
+"mesh": "m3",
+"subs": [
+44
+],
+"mats": [
+"City_Diffuse_ea64890a"
+],
+"matrix": null,
+"lightmap": -1,
+"lmso": [
+1.0,
+1.0,
+0.0,
+0.0
+],
+"cast": 0,
+"recv": true,
+"layer": 0
+},
+{
+"path": "City Pivot (1)/SM_Beef_City_4/CityBuildings/Building_04_low (13)",
+"mesh": "m3",
+"subs": [
+100
+],
+"mats": [
+"City_Diffuse_ea64890a"
+],
+"matrix": null,
+"lightmap": -1,
+"lmso": [
+1.0,
+1.0,
+0.0,
+0.0
+],
+"cast": 0,
+"recv": true,
+"layer": 0
+},
+{
+"path": "City Pivot (1)/SM_Beef_City_4/CityBuildings/Building_04_low (14)",
+"mesh": "m3",
+"subs": [
+69
+],
+"mats": [
+"City_Diffuse_ea64890a"
+],
+"matrix": null,
+"lightmap": -1,
+"lmso": [
+1.0,
+1.0,
+0.0,
+0.0
+],
+"cast": 0,
+"recv": true,
+"layer": 0
+},
+{
+"path": "City Pivot (1)/SM_Beef_City_4/CityBuildings/Building_04_low (22)",
+"mesh": "m3",
+"subs": [
+71
+],
+"mats": [
+"City_Diffuse_ea64890a"
+],
+"matrix": null,
+"lightmap": -1,
+"lmso": [
+1.0,
+1.0,
+0.0,
+0.0
+],
+"cast": 0,
+"recv": true,
+"layer": 0
+},
+{
+"path": "City Pivot (1)/SM_Beef_City_4/CityBuildings/Building_04_low (20)",
+"mesh": "m3",
+"subs": [
+90
+],
+"mats": [
+"City_Diffuse_ea64890a"
+],
+"matrix": null,
+"lightmap": -1,
+"lmso": [
+1.0,
+1.0,
+0.0,
+0.0
+],
+"cast": 0,
+"recv": true,
+"layer": 0
+},
+{
+"path": "City Pivot (1)/SM_Beef_City_4/CityBuildings/Building_04_low (5)",
+"mesh": "m3",
+"subs": [
+28
+],
+"mats": [
+"City_Diffuse_ea64890a"
+],
+"matrix": null,
+"lightmap": -1,
+"lmso": [
+1.0,
+1.0,
+0.0,
+0.0
+],
+"cast": 0,
+"recv": true,
+"layer": 0
+},
+{
+"path": "City Pivot (1)/SM_Beef_City_4/CityBuildings/Building_04_low (9)",
+"mesh": "m3",
+"subs": [
+64
+],
+"mats": [
+"City_Diffuse_ea64890a"
+],
+"matrix": null,
+"lightmap": -1,
+"lmso": [
+1.0,
+1.0,
+0.0,
+0.0
+],
+"cast": 0,
+"recv": true,
+"layer": 0
+},
+{
+"path": "City Pivot (1)/SM_Beef_City_4/CityBuildings/Building_01_low (20)",
+"mesh": "m3",
+"subs": [
+98
+],
+"mats": [
+"City_Diffuse_ea64890a"
+],
+"matrix": null,
+"lightmap": -1,
+"lmso": [
+1.0,
+1.0,
+0.0,
+0.0
+],
+"cast": 0,
+"recv": true,
+"layer": 0
+},
+{
+"path": "City Pivot (1)/SM_Beef_City_4/CityBuildings/Building_01_low (16)",
+"mesh": "m3",
+"subs": [
+76
+],
+"mats": [
+"City_Diffuse_ea64890a"
+],
+"matrix": null,
+"lightmap": -1,
+"lmso": [
+1.0,
+1.0,
+0.0,
+0.0
+],
+"cast": 0,
+"recv": true,
+"layer": 0
+},
+{
+"path": "City Pivot (1)/SM_Beef_City_4/CityBuildings/Building_04_low (21)",
+"mesh": "m3",
+"subs": [
+18
+],
+"mats": [
+"City_Diffuse_ea64890a"
+],
+"matrix": null,
+"lightmap": -1,
+"lmso": [
+1.0,
+1.0,
+0.0,
+0.0
+],
+"cast": 0,
+"recv": true,
+"layer": 0
+},
+{
+"path": "City Pivot (1)/SM_Beef_City_4/CityBuildings/Building_04_low (18)",
+"mesh": "m3",
+"subs": [
+79
+],
+"mats": [
+"City_Diffuse_ea64890a"
+],
+"matrix": null,
+"lightmap": -1,
+"lmso": [
+1.0,
+1.0,
+0.0,
+0.0
+],
+"cast": 0,
+"recv": true,
+"layer": 0
+},
+{
+"path": "City Pivot (1)/SM_Beef_City_4/CityBuildings/Building_01_low (15)",
+"mesh": "m3",
+"subs": [
+21
+],
+"mats": [
+"City_Diffuse_ea64890a"
+],
+"matrix": null,
+"lightmap": -1,
+"lmso": [
+1.0,
+1.0,
+0.0,
+0.0
+],
+"cast": 0,
+"recv": true,
+"layer": 0
+},
+{
+"path": "City Pivot (1)/SM_Beef_City_4/CityBuildings/Building_01_low (11)",
+"mesh": "m3",
+"subs": [
+25
+],
+"mats": [
+"City_Diffuse_ea64890a"
+],
+"matrix": null,
+"lightmap": -1,
+"lmso": [
+1.0,
+1.0,
+0.0,
+0.0
+],
+"cast": 0,
+"recv": true,
+"layer": 0
+},
+{
+"path": "City Pivot (1)/SM_Beef_City_4/CityBuildings/skyscraper_06 (2)",
+"mesh": "m3",
+"subs": [
+91
+],
+"mats": [
+"City_Diffuse_ea64890a"
+],
+"matrix": null,
+"lightmap": -1,
+"lmso": [
+1.0,
+1.0,
+0.0,
+0.0
+],
+"cast": 0,
+"recv": true,
+"layer": 0
+},
+{
+"path": "City Pivot (1)/SM_Beef_City_4/CityBuildings/skyscraper_06",
+"mesh": "m3",
+"subs": [
+107
+],
+"mats": [
+"City_Diffuse_ea64890a"
+],
+"matrix": null,
+"lightmap": -1,
+"lmso": [
+1.0,
+1.0,
+0.0,
+0.0
+],
+"cast": 0,
+"recv": true,
+"layer": 0
+},
+{
+"path": "City Pivot (1)/SM_Beef_City_4/CityBuildings/skyscraper_06 (1)",
+"mesh": "m3",
+"subs": [
+113
+],
+"mats": [
+"City_Diffuse_ea64890a"
+],
+"matrix": null,
+"lightmap": -1,
+"lmso": [
+1.0,
+1.0,
+0.0,
+0.0
+],
+"cast": 0,
+"recv": true,
+"layer": 0
+},
+{
+"path": "City Pivot (1)/SM_Beef_City_4/CityBuildings/skyscraper_06 (3)",
+"mesh": "m3",
+"subs": [
+17
+],
+"mats": [
+"City_Diffuse_ea64890a"
+],
+"matrix": null,
+"lightmap": -1,
+"lmso": [
+1.0,
+1.0,
+0.0,
+0.0
+],
+"cast": 0,
+"recv": true,
+"layer": 0
+},
+{
+"path": "City Pivot (1)/SM_Beef_City_4/CityBuildings/Building_group_10",
+"mesh": "m3",
+"subs": [
+15
+],
+"mats": [
+"City_Diffuse_ea64890a"
+],
+"matrix": null,
+"lightmap": -1,
+"lmso": [
+1.0,
+1.0,
+0.0,
+0.0
+],
+"cast": 0,
+"recv": true,
+"layer": 0
+},
+{
+"path": "City Pivot (1)/SM_Beef_City_4/CityBuildings/cranes",
+"mesh": "m2",
+"subs": [
+20
+],
+"mats": [
+"StageBuildings_Diffuse_534d2054"
+],
+"matrix": null,
+"lightmap": -1,
+"lmso": [
+1.0,
+1.0,
+0.0,
+0.0
+],
+"cast": 0,
+"recv": true,
+"layer": 0
+},
+{
+"path": "City Pivot (1)/SM_Beef_City_4/CityBuildings/cranes (1)",
+"mesh": "m2",
+"subs": [
+10
+],
+"mats": [
+"StageBuildings_Diffuse_534d2054"
+],
+"matrix": null,
+"lightmap": -1,
+"lmso": [
+1.0,
+1.0,
+0.0,
+0.0
+],
+"cast": 0,
+"recv": true,
+"layer": 0
+},
+{
+"path": "City Pivot (1)/SM_Beef_City_4/CityBuildings/Building_group_12 (4)",
+"mesh": "m3",
+"subs": [
+52
+],
+"mats": [
+"City_Diffuse_ea64890a"
+],
+"matrix": null,
+"lightmap": -1,
+"lmso": [
+1.0,
+1.0,
+0.0,
+0.0
+],
+"cast": 0,
+"recv": true,
+"layer": 0
+},
+{
+"path": "City Pivot (1)/SM_Beef_City_4/CityBuildings/Building_group_12",
+"mesh": "m3",
+"subs": [
+14
+],
+"mats": [
+"City_Diffuse_ea64890a"
+],
+"matrix": null,
+"lightmap": -1,
+"lmso": [
+1.0,
+1.0,
+0.0,
+0.0
+],
+"cast": 0,
+"recv": true,
+"layer": 0
+},
+{
+"path": "City Pivot (1)/SM_Beef_City_4/CityBuildings/Building_group_12 (5)",
+"mesh": "m3",
+"subs": [
+67
+],
+"mats": [
+"City_Diffuse_ea64890a"
+],
+"matrix": null,
+"lightmap": -1,
+"lmso": [
+1.0,
+1.0,
+0.0,
+0.0
+],
+"cast": 0,
+"recv": true,
+"layer": 0
+},
+{
+"path": "City Pivot (1)/SM_Beef_City_4/CityBuildings/Building_group_12 (6)",
+"mesh": "m3",
+"subs": [
+86
+],
+"mats": [
+"City_Diffuse_ea64890a"
+],
+"matrix": null,
+"lightmap": -1,
+"lmso": [
+1.0,
+1.0,
+0.0,
+0.0
+],
+"cast": 0,
+"recv": true,
+"layer": 0
+},
+{
+"path": "City Pivot (1)/SM_Beef_City_4/CityBuildings/Building_group_12 (3)",
+"mesh": "m3",
+"subs": [
+105
+],
+"mats": [
+"City_Diffuse_ea64890a"
+],
+"matrix": null,
+"lightmap": -1,
+"lmso": [
+1.0,
+1.0,
+0.0,
+0.0
+],
+"cast": 0,
+"recv": true,
+"layer": 0
+},
+{
+"path": "City Pivot (1)/SM_Beef_City_4/CityBuildings/Building_group_14 (2)",
+"mesh": "m3",
+"subs": [
+118
+],
+"mats": [
+"City_Diffuse_ea64890a"
+],
+"matrix": null,
+"lightmap": -1,
+"lmso": [
+1.0,
+1.0,
+0.0,
+0.0
+],
+"cast": 0,
+"recv": true,
+"layer": 0
+},
+{
+"path": "City Pivot (1)/SM_Beef_City_4/CityBuildings/Building_group_14 (9)",
+"mesh": "m3",
+"subs": [
+36
+],
+"mats": [
+"City_Diffuse_ea64890a"
+],
+"matrix": null,
+"lightmap": -1,
+"lmso": [
+1.0,
+1.0,
+0.0,
+0.0
+],
+"cast": 0,
+"recv": true,
+"layer": 0
+},
+{
+"path": "City Pivot (1)/SM_Beef_City_4/CityBuildings/Building_group_14 (5)",
+"mesh": "m3",
+"subs": [
+11
+],
+"mats": [
+"City_Diffuse_ea64890a"
+],
+"matrix": null,
+"lightmap": -1,
+"lmso": [
+1.0,
+1.0,
+0.0,
+0.0
+],
+"cast": 0,
+"recv": true,
+"layer": 0
+},
+{
+"path": "City Pivot (1)/SM_Beef_City_4/CityBuildings/Building_group_14 (4)",
+"mesh": "m3",
+"subs": [
+41
+],
+"mats": [
+"City_Diffuse_ea64890a"
+],
+"matrix": null,
+"lightmap": -1,
+"lmso": [
+1.0,
+1.0,
+0.0,
+0.0
+],
+"cast": 0,
+"recv": true,
+"layer": 0
+},
+{
+"path": "City Pivot (1)/SM_Beef_City_4/CityBuildings/Building_group_14 (3)",
+"mesh": "m3",
+"subs": [
+31
+],
+"mats": [
+"City_Diffuse_ea64890a"
+],
+"matrix": null,
+"lightmap": -1,
+"lmso": [
+1.0,
+1.0,
+0.0,
+0.0
+],
+"cast": 0,
+"recv": true,
+"layer": 0
+},
+{
+"path": "City Pivot (1)/SM_Beef_City_4/CityBuildings/Building_group_14",
+"mesh": "m3",
+"subs": [
+70
+],
+"mats": [
+"City_Diffuse_ea64890a"
+],
+"matrix": null,
+"lightmap": -1,
+"lmso": [
+1.0,
+1.0,
+0.0,
+0.0
+],
+"cast": 0,
+"recv": true,
+"layer": 0
+},
+{
+"path": "City Pivot (1)/SM_Beef_City_4/CityBuildings/Building_group_14 (1)",
+"mesh": "m3",
+"subs": [
+34
+],
+"mats": [
+"City_Diffuse_ea64890a"
+],
+"matrix": null,
+"lightmap": -1,
+"lmso": [
+1.0,
+1.0,
+0.0,
+0.0
+],
+"cast": 0,
+"recv": true,
+"layer": 0
+},
+{
+"path": "City Pivot (1)/SM_Beef_City_4/CityBuildings/Building_group_07 (4)",
+"mesh": "m3",
+"subs": [
+48
+],
+"mats": [
+"City_Diffuse_ea64890a"
+],
+"matrix": null,
+"lightmap": -1,
+"lmso": [
+1.0,
+1.0,
+0.0,
+0.0
+],
+"cast": 0,
+"recv": true,
+"layer": 0
+},
+{
+"path": "City Pivot (1)/SM_Beef_City_4/CityBuildings/Building_group_07 (10)",
+"mesh": "m3",
+"subs": [
+96
+],
+"mats": [
+"City_Diffuse_ea64890a"
+],
+"matrix": null,
+"lightmap": -1,
+"lmso": [
+1.0,
+1.0,
+0.0,
+0.0
+],
+"cast": 0,
+"recv": true,
+"layer": 0
+},
+{
+"path": "City Pivot (1)/SM_Beef_City_4/CityBuildings/Building_group_07",
+"mesh": "m3",
+"subs": [
+54
+],
+"mats": [
+"City_Diffuse_ea64890a"
+],
+"matrix": null,
+"lightmap": -1,
+"lmso": [
+1.0,
+1.0,
+0.0,
+0.0
+],
+"cast": 0,
+"recv": true,
+"layer": 0
+},
+{
+"path": "City Pivot (1)/SM_Beef_City_4/CityBuildings/Building_group_07 (7)",
+"mesh": "m3",
+"subs": [
+5
+],
+"mats": [
+"City_Diffuse_ea64890a"
+],
+"matrix": null,
+"lightmap": -1,
+"lmso": [
+1.0,
+1.0,
+0.0,
+0.0
+],
+"cast": 0,
+"recv": true,
+"layer": 0
+},
+{
+"path": "City Pivot (1)/SM_Beef_City_4/CityBuildings/Building_group_07",
+"mesh": "m3",
+"subs": [
+117
+],
+"mats": [
+"City_Diffuse_ea64890a"
+],
+"matrix": null,
+"lightmap": -1,
+"lmso": [
+1.0,
+1.0,
+0.0,
+0.0
+],
+"cast": 0,
+"recv": true,
+"layer": 0
+},
+{
+"path": "City Pivot (1)/SM_Beef_City_4/CityBuildings/Building_group_07 (1)",
+"mesh": "m3",
+"subs": [
+110
+],
+"mats": [
+"City_Diffuse_ea64890a"
+],
+"matrix": null,
+"lightmap": -1,
+"lmso": [
+1.0,
+1.0,
+0.0,
+0.0
+],
+"cast": 0,
+"recv": true,
+"layer": 0
+},
+{
+"path": "City Pivot (1)/SM_Beef_City_4/CityBuildings/Building_group_07 (6)",
+"mesh": "m3",
+"subs": [
+93
+],
+"mats": [
+"City_Diffuse_ea64890a"
+],
+"matrix": null,
+"lightmap": -1,
+"lmso": [
+1.0,
+1.0,
+0.0,
+0.0
+],
+"cast": 0,
+"recv": true,
+"layer": 0
+},
+{
+"path": "City Pivot (1)/SM_Beef_City_4/CityBuildings/Building_08 (3)",
+"mesh": "m5",
+"subs": [
+5
+],
+"mats": [
+"City_Diffuse_ea64890a"
+],
+"matrix": null,
+"lightmap": -1,
+"lmso": [
+1.0,
+1.0,
+0.0,
+0.0
+],
+"cast": 0,
+"recv": true,
+"layer": 0
+},
+{
+"path": "City Pivot (1)/SM_Beef_City_4/CityBuildings/Building_08 (5)",
+"mesh": "m5",
+"subs": [
+12
+],
+"mats": [
+"City_Diffuse_ea64890a"
+],
+"matrix": null,
+"lightmap": -1,
+"lmso": [
+1.0,
+1.0,
+0.0,
+0.0
+],
+"cast": 0,
+"recv": true,
+"layer": 0
+},
+{
+"path": "City Pivot (1)/SM_Beef_City_4/CityBuildings/Building_08 (4)",
+"mesh": "m5",
+"subs": [
+15
+],
+"mats": [
+"City_Diffuse_ea64890a"
+],
+"matrix": null,
+"lightmap": -1,
+"lmso": [
+1.0,
+1.0,
+0.0,
+0.0
+],
+"cast": 0,
+"recv": true,
+"layer": 0
+},
+{
+"path": "City Pivot (1)/SM_Beef_City_4/CityBuildings/Building_08",
+"mesh": "m5",
+"subs": [
+0
+],
+"mats": [
+"City_Diffuse_ea64890a"
+],
+"matrix": null,
+"lightmap": -1,
+"lmso": [
+1.0,
+1.0,
+0.0,
+0.0
+],
+"cast": 0,
+"recv": true,
+"layer": 0
+},
+{
+"path": "City Pivot (1)/SM_Beef_City_4/CityBuildings/Building_group_06 (2)",
+"mesh": "m3",
+"subs": [
+88
+],
+"mats": [
+"City_Diffuse_ea64890a"
+],
+"matrix": null,
+"lightmap": -1,
+"lmso": [
+1.0,
+1.0,
+0.0,
+0.0
+],
+"cast": 0,
+"recv": true,
+"layer": 0
+},
+{
+"path": "City Pivot (1)/SM_Beef_City_4/CityBuildings/Building_group_06",
+"mesh": "m3",
+"subs": [
+75
+],
+"mats": [
+"City_Diffuse_ea64890a"
+],
+"matrix": null,
+"lightmap": -1,
+"lmso": [
+1.0,
+1.0,
+0.0,
+0.0
+],
+"cast": 0,
+"recv": true,
+"layer": 0
+},
+{
+"path": "City Pivot (1)/SM_Beef_City_4/CityBuildings/Building_group_06",
+"mesh": "m3",
+"subs": [
+95
+],
+"mats": [
+"City_Diffuse_ea64890a"
+],
+"matrix": null,
+"lightmap": -1,
+"lmso": [
+1.0,
+1.0,
+0.0,
+0.0
+],
+"cast": 0,
+"recv": true,
+"layer": 0
+},
+{
+"path": "City Pivot (1)/SM_Beef_City_4/CityBuildings/Building_group_06",
+"mesh": "m3",
+"subs": [
+13
+],
+"mats": [
+"City_Diffuse_ea64890a"
+],
+"matrix": null,
+"lightmap": -1,
+"lmso": [
+1.0,
+1.0,
+0.0,
+0.0
+],
+"cast": 0,
+"recv": true,
+"layer": 0
+},
+{
+"path": "City Pivot (1)/SM_Beef_City_4/CityBuildings/Building_group_01 (1)",
+"mesh": "m3",
+"subs": [
+16
+],
+"mats": [
+"City_Diffuse_ea64890a"
+],
+"matrix": null,
+"lightmap": -1,
+"lmso": [
+1.0,
+1.0,
+0.0,
+0.0
+],
+"cast": 0,
+"recv": true,
+"layer": 0
+},
+{
+"path": "City Pivot (1)/SM_Beef_City_4/CityBuildings/Building_group_01",
+"mesh": "m3",
+"subs": [
+59
+],
+"mats": [
+"City_Diffuse_ea64890a"
+],
+"matrix": null,
+"lightmap": -1,
+"lmso": [
+1.0,
+1.0,
+0.0,
+0.0
+],
+"cast": 0,
+"recv": true,
+"layer": 0
+},
+{
+"path": "City Pivot (1)/SM_Beef_City_4/CityBuildings/Building_group_01 (2)",
+"mesh": "m3",
+"subs": [
+49
+],
+"mats": [
+"City_Diffuse_ea64890a"
+],
+"matrix": null,
+"lightmap": -1,
+"lmso": [
+1.0,
+1.0,
+0.0,
+0.0
+],
+"cast": 0,
+"recv": true,
+"layer": 0
+},
+{
+"path": "City Pivot (1)/SM_Beef_City_4/CityBuildings/Building_group_01",
+"mesh": "m3",
+"subs": [
+111
+],
+"mats": [
+"City_Diffuse_ea64890a"
+],
+"matrix": null,
+"lightmap": -1,
+"lmso": [
+1.0,
+1.0,
+0.0,
+0.0
+],
+"cast": 0,
+"recv": true,
+"layer": 0
+},
+{
+"path": "City Pivot (1)/SM_Beef_City_4/CityBuildings/Building_group_01 (4)",
+"mesh": "m3",
+"subs": [
+6
+],
+"mats": [
+"City_Diffuse_ea64890a"
+],
+"matrix": null,
+"lightmap": -1,
+"lmso": [
+1.0,
+1.0,
+0.0,
+0.0
+],
+"cast": 0,
+"recv": true,
+"layer": 0
+},
+{
+"path": "City Pivot (1)/SM_Beef_City_4/CityBuildings/Building_group_01 (3)",
+"mesh": "m3",
+"subs": [
+101
+],
+"mats": [
+"City_Diffuse_ea64890a"
+],
+"matrix": null,
+"lightmap": -1,
+"lmso": [
+1.0,
+1.0,
+0.0,
+0.0
+],
+"cast": 0,
+"recv": true,
+"layer": 0
+},
+{
+"path": "City Pivot (1)/SM_Beef_City_4/CityBuildings/skyscraper_05 (1)",
+"mesh": "m3",
+"subs": [
+4
+],
+"mats": [
+"City_Diffuse_ea64890a"
+],
+"matrix": null,
+"lightmap": -1,
+"lmso": [
+1.0,
+1.0,
+0.0,
+0.0
+],
+"cast": 0,
+"recv": true,
+"layer": 0
+},
+{
+"path": "City Pivot (1)/SM_Beef_City_4/CityBuildings/girders",
+"mesh": "m2",
+"subs": [
+5
+],
+"mats": [
+"StageBuildings_Diffuse_534d2054"
+],
+"matrix": null,
+"lightmap": -1,
+"lmso": [
+1.0,
+1.0,
+0.0,
+0.0
+],
+"cast": 0,
+"recv": true,
+"layer": 0
+},
+{
+"path": "City Pivot (1)/SM_Beef_City_4/CityBuildings/factory",
+"mesh": "m2",
+"subs": [
+1
+],
+"mats": [
+"StageBuildings_Diffuse_534d2054"
+],
+"matrix": null,
+"lightmap": -1,
+"lmso": [
+1.0,
+1.0,
+0.0,
+0.0
+],
+"cast": 0,
+"recv": true,
+"layer": 0
+},
+{
+"path": "City Pivot (1)/SM_Beef_City_4/CityBuildings/BoneLoafStatue",
+"mesh": "m1",
+"subs": [
+1
+],
+"mats": [
+"Grey (100)_c05d93a3"
+],
+"matrix": null,
+"lightmap": -1,
+"lmso": [
+1.0,
+1.0,
+0.0,
+0.0
+],
+"cast": 0,
+"recv": true,
+"layer": 0
+},
+{
+"path": "City Pivot (1)/SM_Beef_City_4/CityBuildings/containers (3)",
+"mesh": "m2",
+"subs": [
+0
+],
+"mats": [
+"StageBuildings_Diffuse_534d2054"
+],
+"matrix": null,
+"lightmap": -1,
+"lmso": [
+1.0,
+1.0,
+0.0,
+0.0
+],
+"cast": 0,
+"recv": true,
+"layer": 0
+},
+{
+"path": "City Pivot (1)/SM_Beef_City_4/CityBuildings/containers (2)",
+"mesh": "m2",
+"subs": [
+9
+],
+"mats": [
+"StageBuildings_Diffuse_534d2054"
+],
+"matrix": null,
+"lightmap": -1,
+"lmso": [
+1.0,
+1.0,
+0.0,
+0.0
+],
+"cast": 0,
+"recv": true,
+"layer": 0
+},
+{
+"path": "City Pivot (1)/SM_Beef_City_4/CityBuildings/containers (7)",
+"mesh": "m2",
+"subs": [
+12
+],
+"mats": [
+"StageBuildings_Diffuse_534d2054"
+],
+"matrix": null,
+"lightmap": -1,
+"lmso": [
+1.0,
+1.0,
+0.0,
+0.0
+],
+"cast": 0,
+"recv": true,
+"layer": 0
+},
+{
+"path": "City Pivot (1)/SM_Beef_City_4/CityBuildings/containers (4)",
+"mesh": "m2",
+"subs": [
+18
+],
+"mats": [
+"StageBuildings_Diffuse_534d2054"
+],
+"matrix": null,
+"lightmap": -1,
+"lmso": [
+1.0,
+1.0,
+0.0,
+0.0
+],
+"cast": 0,
+"recv": true,
+"layer": 0
+},
+{
+"path": "City Pivot (1)/SM_Beef_City_4/CityBuildings/containers (5)",
+"mesh": "m2",
+"subs": [
+3
+],
+"mats": [
+"StageBuildings_Diffuse_534d2054"
+],
+"matrix": null,
+"lightmap": -1,
+"lmso": [
+1.0,
+1.0,
+0.0,
+0.0
+],
+"cast": 0,
+"recv": true,
+"layer": 0
+},
+{
+"path": "City Pivot (1)/SM_Beef_City_4/CityBuildings/skyscraper_07",
+"mesh": "m5",
+"subs": [
+13
+],
+"mats": [
+"City_Diffuse_ea64890a"
+],
+"matrix": null,
+"lightmap": -1,
+"lmso": [
+1.0,
+1.0,
+0.0,
+0.0
+],
+"cast": 0,
+"recv": true,
+"layer": 0
+},
+{
+"path": "City Pivot (1)/SM_Beef_City_4/bridge",
+"mesh": "m2",
+"subs": [
+7
+],
+"mats": [
+"StageBuildings_Diffuse_534d2054"
+],
+"matrix": null,
+"lightmap": -1,
+"lmso": [
+1.0,
+1.0,
+0.0,
+0.0
+],
+"cast": 0,
+"recv": true,
+"layer": 0
+},
+{
+"path": "City Pivot (1)/SM_Beef_City_4/CityBuildings/skyscraper_08",
+"mesh": "m5",
+"subs": [
+4
+],
+"mats": [
+"City_Diffuse_ea64890a"
+],
+"matrix": null,
+"lightmap": -1,
+"lmso": [
+1.0,
+1.0,
+0.0,
+0.0
+],
+"cast": 0,
+"recv": true,
+"layer": 0
+},
+{
+"path": "City Pivot (1)/SM_Beef_City_4/CityBuildings/Building_group_08 (4)",
+"mesh": "m3",
+"subs": [
+83
+],
+"mats": [
+"City_Diffuse_ea64890a"
+],
+"matrix": null,
+"lightmap": -1,
+"lmso": [
+1.0,
+1.0,
+0.0,
+0.0
+],
+"cast": 0,
+"recv": true,
+"layer": 0
+},
+{
+"path": "City Pivot (1)/SM_Beef_City_4/CityBuildings/Building_group_08",
+"mesh": "m3",
+"subs": [
+43
+],
+"mats": [
+"City_Diffuse_ea64890a"
+],
+"matrix": null,
+"lightmap": -1,
+"lmso": [
+1.0,
+1.0,
+0.0,
+0.0
+],
+"cast": 0,
+"recv": true,
+"layer": 0
+},
+{
+"path": "City Pivot (1)/SM_Beef_City_4/CityBuildings/Building_group_08 (11)",
+"mesh": "m3",
+"subs": [
+7
+],
+"mats": [
+"City_Diffuse_ea64890a"
+],
+"matrix": null,
+"lightmap": -1,
+"lmso": [
+1.0,
+1.0,
+0.0,
+0.0
+],
+"cast": 0,
+"recv": true,
+"layer": 0
+},
+{
+"path": "City Pivot (1)/SM_Beef_City_4/CityBuildings/Building_group_08 (9)",
+"mesh": "m3",
+"subs": [
+82
+],
+"mats": [
+"City_Diffuse_ea64890a"
+],
+"matrix": null,
+"lightmap": -1,
+"lmso": [
+1.0,
+1.0,
+0.0,
+0.0
+],
+"cast": 0,
+"recv": true,
+"layer": 0
+},
+{
+"path": "City Pivot (1)/SM_Beef_City_4/CityBuildings/Building_group_08 (5)",
+"mesh": "m3",
+"subs": [
+116
+],
+"mats": [
+"City_Diffuse_ea64890a"
+],
+"matrix": null,
+"lightmap": -1,
+"lmso": [
+1.0,
+1.0,
+0.0,
+0.0
+],
+"cast": 0,
+"recv": true,
+"layer": 0
+},
+{
+"path": "City Pivot (1)/SM_Beef_City_4/CityBuildings/Building_group_08 (3)",
+"mesh": "m3",
+"subs": [
+38
+],
+"mats": [
+"City_Diffuse_ea64890a"
+],
+"matrix": null,
+"lightmap": -1,
+"lmso": [
+1.0,
+1.0,
+0.0,
+0.0
+],
+"cast": 0,
+"recv": true,
+"layer": 0
+},
+{
+"path": "City Pivot (1)/SM_Beef_City_4/CityBuildings/Building_group_08 (2)",
+"mesh": "m3",
+"subs": [
+51
+],
+"mats": [
+"City_Diffuse_ea64890a"
+],
+"matrix": null,
+"lightmap": -1,
+"lmso": [
+1.0,
+1.0,
+0.0,
+0.0
+],
+"cast": 0,
+"recv": true,
+"layer": 0
+},
+{
+"path": "City Pivot (1)/SM_Beef_City_4/CityBuildings/Building_group_08",
+"mesh": "m3",
+"subs": [
+108
+],
+"mats": [
+"City_Diffuse_ea64890a"
+],
+"matrix": null,
+"lightmap": -1,
+"lmso": [
+1.0,
+1.0,
+0.0,
+0.0
+],
+"cast": 0,
+"recv": true,
+"layer": 0
+},
+{
+"path": "City Pivot (1)/SM_Beef_City_4/CityBuildings/skyscraper_01",
+"mesh": "m3",
+"subs": [
+106
+],
+"mats": [
+"City_Diffuse_ea64890a"
+],
+"matrix": null,
+"lightmap": -1,
+"lmso": [
+1.0,
+1.0,
+0.0,
+0.0
+],
+"cast": 0,
+"recv": true,
+"layer": 0
+},
+{
+"path": "City Pivot (1)/SM_Beef_City_4/CityBuildings/skyscraper_01 (2)",
+"mesh": "m3",
+"subs": [
+22
+],
+"mats": [
+"City_Diffuse_ea64890a"
+],
+"matrix": null,
+"lightmap": -1,
+"lmso": [
+1.0,
+1.0,
+0.0,
+0.0
+],
+"cast": 0,
+"recv": true,
+"layer": 0
+},
+{
+"path": "City Pivot (1)/SM_Beef_City_4/CityBuildings/skyscraper_01 (1)",
+"mesh": "m3",
+"subs": [
+80
+],
+"mats": [
+"City_Diffuse_ea64890a"
+],
+"matrix": null,
+"lightmap": -1,
+"lmso": [
+1.0,
+1.0,
+0.0,
+0.0
+],
+"cast": 0,
+"recv": true,
+"layer": 0
+},
+{
+"path": "City Pivot (1)/SM_Beef_City_4/CityBuildings/beefLogo",
+"mesh": "m3a5d1617ae59",
+"subs": [
+0
+],
+"mats": [
+"FishingWhite_aebd8f15"
+],
+"matrix": [
+[
+6.93069,
+-6.73297,
+-0.0,
+22.91133
+],
+[
+0.0,
+0.0,
+-9.66267,
+117.8216
+],
+[
+6.73297,
+6.93068,
+0.0,
+1781.09585
+],
+[
+0.0,
+0.0,
+-0.0,
+1.0
+]
+],
+"lightmap": -1,
+"lmso": [
+1.0,
+1.0,
+0.0,
+0.0
+],
+"cast": 0,
+"recv": true,
+"layer": 0
+},
+{
+"path": "City Pivot (1)/SM_Beef_City_4/CityBuildings/Building_02 (3)",
+"mesh": "m3",
+"subs": [
+9
+],
+"mats": [
+"City_Diffuse_ea64890a"
+],
+"matrix": null,
+"lightmap": -1,
+"lmso": [
+1.0,
+1.0,
+0.0,
+0.0
+],
+"cast": 0,
+"recv": true,
+"layer": 0
+},
+{
+"path": "City Pivot (1)/SM_Beef_City_4/CityBuildings/Building_02 (2)",
+"mesh": "m3",
+"subs": [
+92
+],
+"mats": [
+"City_Diffuse_ea64890a"
+],
+"matrix": null,
+"lightmap": -1,
+"lmso": [
+1.0,
+1.0,
+0.0,
+0.0
+],
+"cast": 0,
+"recv": true,
+"layer": 0
+},
+{
+"path": "City Pivot (1)/SM_Beef_City_4/CityBuildings/Building_02 (4)",
+"mesh": "m3",
+"subs": [
+29
+],
+"mats": [
+"City_Diffuse_ea64890a"
+],
+"matrix": null,
+"lightmap": -1,
+"lmso": [
+1.0,
+1.0,
+0.0,
+0.0
+],
+"cast": 0,
+"recv": true,
+"layer": 0
+},
+{
+"path": "City Pivot (1)/SM_Beef_City_4/CityBuildings/Building_group_09",
+"mesh": "m3",
+"subs": [
+10
+],
+"mats": [
+"City_Diffuse_ea64890a"
+],
+"matrix": null,
+"lightmap": -1,
+"lmso": [
+1.0,
+1.0,
+0.0,
+0.0
+],
+"cast": 0,
+"recv": true,
+"layer": 0
+},
+{
+"path": "City Pivot (1)/SM_Beef_City_4/CityBuildings/Building_group_02 (2)",
+"mesh": "m3",
+"subs": [
+53
+],
+"mats": [
+"City_Diffuse_ea64890a"
+],
+"matrix": null,
+"lightmap": -1,
+"lmso": [
+1.0,
+1.0,
+0.0,
+0.0
+],
+"cast": 0,
+"recv": true,
+"layer": 0
+},
+{
+"path": "City Pivot (1)/SM_Beef_City_4/CityBuildings/Building_group_02",
+"mesh": "m3",
+"subs": [
+26
+],
+"mats": [
+"City_Diffuse_ea64890a"
+],
+"matrix": null,
+"lightmap": -1,
+"lmso": [
+1.0,
+1.0,
+0.0,
+0.0
+],
+"cast": 0,
+"recv": true,
+"layer": 0
+},
+{
+"path": "City Pivot (1)/SM_Beef_City_4/CityBuildings/Building_group_02",
+"mesh": "m3",
+"subs": [
+20
+],
+"mats": [
+"City_Diffuse_ea64890a"
+],
+"matrix": null,
+"lightmap": -1,
+"lmso": [
+1.0,
+1.0,
+0.0,
+0.0
+],
+"cast": 0,
+"recv": true,
+"layer": 0
+},
+{
+"path": "City Pivot (1)/SM_Beef_City_4/CityBuildings/Building_group_02 (1)",
+"mesh": "m3",
+"subs": [
+73
+],
+"mats": [
+"City_Diffuse_ea64890a"
+],
+"matrix": null,
+"lightmap": -1,
+"lmso": [
+1.0,
+1.0,
+0.0,
+0.0
+],
+"cast": 0,
+"recv": true,
+"layer": 0
+},
+{
+"path": "City Pivot (1)/SM_Beef_City_4/CityBuildings/Building_group_05 (10)",
+"mesh": "m3",
+"subs": [
+58
+],
+"mats": [
+"City_Diffuse_ea64890a"
+],
+"matrix": null,
+"lightmap": -1,
+"lmso": [
+1.0,
+1.0,
+0.0,
+0.0
+],
+"cast": 0,
+"recv": true,
+"layer": 0
+},
+{
+"path": "City Pivot (1)/SM_Beef_City_4/CityBuildings/Building_group_05 (2)",
+"mesh": "m3",
+"subs": [
+32
+],
+"mats": [
+"City_Diffuse_ea64890a"
+],
+"matrix": null,
+"lightmap": -1,
+"lmso": [
+1.0,
+1.0,
+0.0,
+0.0
+],
+"cast": 0,
+"recv": true,
+"layer": 0
+},
+{
+"path": "City Pivot (1)/SM_Beef_City_4/CityBuildings/Building_group_05 (12)",
+"mesh": "m3",
+"subs": [
+84
+],
+"mats": [
+"City_Diffuse_ea64890a"
+],
+"matrix": null,
+"lightmap": -1,
+"lmso": [
+1.0,
+1.0,
+0.0,
+0.0
+],
+"cast": 0,
+"recv": true,
+"layer": 0
+},
+{
+"path": "City Pivot (1)/SM_Beef_City_4/CityBuildings/Building_group_05 (1)",
+"mesh": "m3",
+"subs": [
+8
+],
+"mats": [
+"City_Diffuse_ea64890a"
+],
+"matrix": null,
+"lightmap": -1,
+"lmso": [
+1.0,
+1.0,
+0.0,
+0.0
+],
+"cast": 0,
+"recv": true,
+"layer": 0
+},
+{
+"path": "City Pivot (1)/SM_Beef_City_4/CityBuildings/Building_group_05",
+"mesh": "m3",
+"subs": [
+112
+],
+"mats": [
+"City_Diffuse_ea64890a"
+],
+"matrix": null,
+"lightmap": -1,
+"lmso": [
+1.0,
+1.0,
+0.0,
+0.0
+],
+"cast": 0,
+"recv": true,
+"layer": 0
+},
+{
+"path": "City Pivot (1)/SM_Beef_City_4/CityBuildings/Building_group_05 (11)",
+"mesh": "m3",
+"subs": [
+81
+],
+"mats": [
+"City_Diffuse_ea64890a"
+],
+"matrix": null,
+"lightmap": -1,
+"lmso": [
+1.0,
+1.0,
+0.0,
+0.0
+],
+"cast": 0,
+"recv": true,
+"layer": 0
+},
+{
+"path": "City Pivot (1)/SM_Beef_City_4/CityBuildings/Building_group_05 (8)",
+"mesh": "m3",
+"subs": [
+77
+],
+"mats": [
+"City_Diffuse_ea64890a"
+],
+"matrix": null,
+"lightmap": -1,
+"lmso": [
+1.0,
+1.0,
+0.0,
+0.0
+],
+"cast": 0,
+"recv": true,
+"layer": 0
+},
+{
+"path": "City Pivot (1)/SM_Beef_City_4/CityBuildings/Building_group_05",
+"mesh": "m3",
+"subs": [
+65
+],
+"mats": [
+"City_Diffuse_ea64890a"
+],
+"matrix": null,
+"lightmap": -1,
+"lmso": [
+1.0,
+1.0,
+0.0,
+0.0
+],
+"cast": 0,
+"recv": true,
+"layer": 0
+},
+{
+"path": "City Pivot (1)/SM_Beef_City_4/CityBuildings/Building_group_05 (9)",
+"mesh": "m3",
+"subs": [
+35
+],
+"mats": [
+"City_Diffuse_ea64890a"
+],
+"matrix": null,
+"lightmap": -1,
+"lmso": [
+1.0,
+1.0,
+0.0,
+0.0
+],
+"cast": 0,
+"recv": true,
+"layer": 0
+},
+{
+"path": "City Pivot (1)/SM_Beef_City_4/CityBuildings/skyscraper_04",
+"mesh": "m3",
+"subs": [
+62
+],
+"mats": [
+"City_Diffuse_ea64890a"
+],
+"matrix": null,
+"lightmap": -1,
+"lmso": [
+1.0,
+1.0,
+0.0,
+0.0
+],
+"cast": 0,
+"recv": true,
+"layer": 0
+},
+{
+"path": "City Pivot (1)/SM_Beef_City_4/CityBuildings/skyscraper_04 (2)",
+"mesh": "m3",
+"subs": [
+115
+],
+"mats": [
+"City_Diffuse_ea64890a"
+],
+"matrix": null,
+"lightmap": -1,
+"lmso": [
+1.0,
+1.0,
+0.0,
+0.0
+],
+"cast": 0,
+"recv": true,
+"layer": 0
+},
+{
+"path": "City Pivot (1)/SM_Beef_City_4/CityBuildings/skyscraper_04 (3)",
+"mesh": "m3",
+"subs": [
+78
+],
+"mats": [
+"City_Diffuse_ea64890a"
+],
+"matrix": null,
+"lightmap": -1,
+"lmso": [
+1.0,
+1.0,
+0.0,
+0.0
+],
+"cast": 0,
+"recv": true,
+"layer": 0
+},
+{
+"path": "City Pivot (1)/SM_Beef_City_4/CityBuildings/Building_group_03 (4)",
+"mesh": "m3",
+"subs": [
+103
+],
+"mats": [
+"City_Diffuse_ea64890a"
+],
+"matrix": null,
+"lightmap": -1,
+"lmso": [
+1.0,
+1.0,
+0.0,
+0.0
+],
+"cast": 0,
+"recv": true,
+"layer": 0
+},
+{
+"path": "City Pivot (1)/SM_Beef_City_4/CityBuildings/Building_group_03 (6)",
+"mesh": "m3",
+"subs": [
+61
+],
+"mats": [
+"City_Diffuse_ea64890a"
+],
+"matrix": null,
+"lightmap": -1,
+"lmso": [
+1.0,
+1.0,
+0.0,
+0.0
+],
+"cast": 0,
+"recv": true,
+"layer": 0
+},
+{
+"path": "City Pivot (1)/SM_Beef_City_4/CityBuildings/Building_group_03",
+"mesh": "m3",
+"subs": [
+68
+],
+"mats": [
+"City_Diffuse_ea64890a"
+],
+"matrix": null,
+"lightmap": -1,
+"lmso": [
+1.0,
+1.0,
+0.0,
+0.0
+],
+"cast": 0,
+"recv": true,
+"layer": 0
+},
+{
+"path": "City Pivot (1)/SM_Beef_City_4/CityBuildings/Building_group_03 (2)",
+"mesh": "m3",
+"subs": [
+45
+],
+"mats": [
+"City_Diffuse_ea64890a"
+],
+"matrix": null,
+"lightmap": -1,
+"lmso": [
+1.0,
+1.0,
+0.0,
+0.0
+],
+"cast": 0,
+"recv": true,
+"layer": 0
+},
+{
+"path": "City Pivot (1)/SM_Beef_City_4/CityBuildings/Building_group_03 (3)",
+"mesh": "m3",
+"subs": [
+46
+],
+"mats": [
+"City_Diffuse_ea64890a"
+],
+"matrix": null,
+"lightmap": -1,
+"lmso": [
+1.0,
+1.0,
+0.0,
+0.0
+],
+"cast": 0,
+"recv": true,
+"layer": 0
+},
+{
+"path": "City Pivot (1)/SM_Beef_City_4/CityBuildings/Building_group_03 (7)",
+"mesh": "m3",
+"subs": [
+50
+],
+"mats": [
+"City_Diffuse_ea64890a"
+],
+"matrix": null,
+"lightmap": -1,
+"lmso": [
+1.0,
+1.0,
+0.0,
+0.0
+],
+"cast": 0,
+"recv": true,
+"layer": 0
+},
+{
+"path": "City Pivot (1)/SM_Beef_City_4/CityBuildings/skyscraper_10 (1)",
+"mesh": "m3",
+"subs": [
+63
+],
+"mats": [
+"City_Diffuse_ea64890a"
+],
+"matrix": null,
+"lightmap": -1,
+"lmso": [
+1.0,
+1.0,
+0.0,
+0.0
+],
+"cast": 0,
+"recv": true,
+"layer": 0
+},
+{
+"path": "City Pivot (1)/SM_Beef_City_4/CityBuildings/skyscraper_10 (2)",
+"mesh": "m3",
+"subs": [
+55
+],
+"mats": [
+"City_Diffuse_ea64890a"
+],
+"matrix": null,
+"lightmap": -1,
+"lmso": [
+1.0,
+1.0,
+0.0,
+0.0
+],
+"cast": 0,
+"recv": true,
+"layer": 0
+},
+{
+"path": "City Pivot (1)/SM_Beef_City_4/CityBuildings/skyscraper_03 (3)",
+"mesh": "m3",
+"subs": [
+2
+],
+"mats": [
+"City_Diffuse_ea64890a"
+],
+"matrix": null,
+"lightmap": -1,
+"lmso": [
+1.0,
+1.0,
+0.0,
+0.0
+],
+"cast": 0,
+"recv": true,
+"layer": 0
+},
+{
+"path": "City Pivot (1)/SM_Beef_City_4/CityBuildings/skyscraper_03",
+"mesh": "m3",
+"subs": [
+102
+],
+"mats": [
+"City_Diffuse_ea64890a"
+],
+"matrix": null,
+"lightmap": -1,
+"lmso": [
+1.0,
+1.0,
+0.0,
+0.0
+],
+"cast": 0,
+"recv": true,
+"layer": 0
+},
+{
+"path": "City Pivot (1)/SM_Beef_City_4/CityBuildings/skyscraper_03 (4)",
+"mesh": "m3",
+"subs": [
+66
+],
+"mats": [
+"City_Diffuse_ea64890a"
+],
+"matrix": null,
+"lightmap": -1,
+"lmso": [
+1.0,
+1.0,
+0.0,
+0.0
+],
+"cast": 0,
+"recv": true,
+"layer": 0
+},
+{
+"path": "City Pivot (1)/SM_Beef_City_4/CityBuildings/skyscraper_03 (1)",
+"mesh": "m3",
+"subs": [
+89
+],
+"mats": [
+"City_Diffuse_ea64890a"
+],
+"matrix": null,
+"lightmap": -1,
+"lmso": [
+1.0,
+1.0,
+0.0,
+0.0
+],
+"cast": 0,
+"recv": true,
+"layer": 0
+},
+{
+"path": "City Pivot (1)/SM_Beef_City_4/CityBuildings/skyscraper_02 (2)",
+"mesh": "m3",
+"subs": [
+74
+],
+"mats": [
+"City_Diffuse_ea64890a"
+],
+"matrix": null,
+"lightmap": -1,
+"lmso": [
+1.0,
+1.0,
+0.0,
+0.0
+],
+"cast": 0,
+"recv": true,
+"layer": 0
+},
+{
+"path": "City Pivot (1)/SM_Beef_City_4/CityBuildings/stadium",
+"mesh": "m2",
+"subs": [
+19
+],
+"mats": [
+"StageBuildings_Diffuse_534d2054"
+],
+"matrix": null,
+"lightmap": -1,
+"lmso": [
+1.0,
+1.0,
+0.0,
+0.0
+],
+"cast": 0,
+"recv": true,
+"layer": 0
+},
+{
+"path": "City Pivot (1)/SM_Beef_City_4/CityBuildings/Building_07 (6)",
+"mesh": "m5",
+"subs": [
+8
+],
+"mats": [
+"City_Diffuse_ea64890a"
+],
+"matrix": null,
+"lightmap": -1,
+"lmso": [
+1.0,
+1.0,
+0.0,
+0.0
+],
+"cast": 0,
+"recv": true,
+"layer": 0
+},
+{
+"path": "City Pivot (1)/SM_Beef_City_4/CityBuildings/Building_07 (3)",
+"mesh": "m5",
+"subs": [
+10
+],
+"mats": [
+"City_Diffuse_ea64890a"
+],
+"matrix": null,
+"lightmap": -1,
+"lmso": [
+1.0,
+1.0,
+0.0,
+0.0
+],
+"cast": 0,
+"recv": true,
+"layer": 0
+},
+{
+"path": "City Pivot (1)/SM_Beef_City_4/CityBuildings/Building_07 (2)",
+"mesh": "m5",
+"subs": [
+19
+],
+"mats": [
+"City_Diffuse_ea64890a"
+],
+"matrix": null,
+"lightmap": -1,
+"lmso": [
+1.0,
+1.0,
+0.0,
+0.0
+],
+"cast": 0,
+"recv": true,
+"layer": 0
+},
+{
+"path": "City Pivot (1)/SM_Beef_City_4/CityBuildings/Building_07 (7)",
+"mesh": "m5",
+"subs": [
+7
+],
+"mats": [
+"City_Diffuse_ea64890a"
+],
+"matrix": null,
+"lightmap": -1,
+"lmso": [
+1.0,
+1.0,
+0.0,
+0.0
+],
+"cast": 0,
+"recv": true,
+"layer": 0
+},
+{
+"path": "City Pivot (1)/SM_Beef_City_4/CityBuildings/Building_07 (5)",
+"mesh": "m5",
+"subs": [
+18
+],
+"mats": [
+"City_Diffuse_ea64890a"
+],
+"matrix": null,
+"lightmap": -1,
+"lmso": [
+1.0,
+1.0,
+0.0,
+0.0
+],
+"cast": 0,
+"recv": true,
+"layer": 0
+},
+{
+"path": "City Pivot (1)/SM_Beef_City_4/CityBuildings/Building_07 (8)",
+"mesh": "m5",
+"subs": [
+1
+],
+"mats": [
+"City_Diffuse_ea64890a"
+],
+"matrix": null,
+"lightmap": -1,
+"lmso": [
+1.0,
+1.0,
+0.0,
+0.0
+],
+"cast": 0,
+"recv": true,
+"layer": 0
+},
+{
+"path": "City Pivot (1)/SM_Beef_City_4/CityBuildings/Building_07 (10)",
+"mesh": "m5",
+"subs": [
+6
+],
+"mats": [
+"City_Diffuse_ea64890a"
+],
+"matrix": null,
+"lightmap": -1,
+"lmso": [
+1.0,
+1.0,
+0.0,
+0.0
+],
+"cast": 0,
+"recv": true,
+"layer": 0
+},
+{
+"path": "City Pivot (1)/SM_Beef_City_4/CityBuildings/Building_07 (9)",
+"mesh": "m5",
+"subs": [
+11
+],
+"mats": [
+"City_Diffuse_ea64890a"
+],
+"matrix": null,
+"lightmap": -1,
+"lmso": [
+1.0,
+1.0,
+0.0,
+0.0
+],
+"cast": 0,
+"recv": true,
+"layer": 0
+},
+{
+"path": "City Pivot (1)/SM_Beef_City_4/CityBuildings/Building_group_11",
+"mesh": "m3",
+"subs": [
+12
+],
+"mats": [
+"City_Diffuse_ea64890a"
+],
+"matrix": null,
+"lightmap": -1,
+"lmso": [
+1.0,
+1.0,
+0.0,
+0.0
+],
+"cast": 0,
+"recv": true,
+"layer": 0
+},
+{
+"path": "City Pivot (1)/SM_Beef_City_4/CityBuildings/Building_group_11 (1)",
+"mesh": "m3",
+"subs": [
+72
+],
+"mats": [
+"City_Diffuse_ea64890a"
+],
+"matrix": null,
+"lightmap": -1,
+"lmso": [
+1.0,
+1.0,
+0.0,
+0.0
+],
+"cast": 0,
+"recv": true,
+"layer": 0
+},
+{
+"path": "City Pivot (1)/SM_Beef_City_4/CityBuildings/Building_group_11 (2)",
+"mesh": "m3",
+"subs": [
+37
+],
+"mats": [
+"City_Diffuse_ea64890a"
+],
+"matrix": null,
+"lightmap": -1,
+"lmso": [
+1.0,
+1.0,
+0.0,
+0.0
+],
+"cast": 0,
+"recv": true,
+"layer": 0
+},
+{
+"path": "City Pivot (1)/SM_Beef_City_4/CityBuildings/Building_01_low (7)",
+"mesh": "m3",
+"subs": [
+57
+],
+"mats": [
+"City_Diffuse_ea64890a"
+],
+"matrix": null,
+"lightmap": -1,
+"lmso": [
+1.0,
+1.0,
+0.0,
+0.0
+],
+"cast": 0,
+"recv": true,
+"layer": 0
+},
+{
+"path": "City Pivot (1)/SM_Beef_City_4/CityBuildings/Building_01 (25)",
+"mesh": "m3",
+"subs": [
+47
+],
+"mats": [
+"City_Diffuse_ea64890a"
+],
+"matrix": null,
+"lightmap": -1,
+"lmso": [
+1.0,
+1.0,
+0.0,
+0.0
+],
+"cast": 0,
+"recv": true,
+"layer": 0
+},
+{
+"path": "City Pivot (1)/SM_Beef_City_4/CityBuildings/Building_01 (26)",
+"mesh": "m3",
+"subs": [
+42
+],
+"mats": [
+"City_Diffuse_ea64890a"
+],
+"matrix": null,
+"lightmap": -1,
+"lmso": [
+1.0,
+1.0,
+0.0,
+0.0
+],
+"cast": 0,
+"recv": true,
+"layer": 0
+},
+{
+"path": "Trawler/Posts/Trawler_Post05",
+"mesh": "m757b525a2c61",
+"subs": [
+0,
+1
+],
+"mats": [
+"Trawler Metal (Painted Dark Cream)_8156615",
+"Trawler Metal (Raw)_b32ba8e6"
+],
+"matrix": [
+[
+1.0,
+0.0,
+-0.0,
+-3.15664
+],
+[
+0.0,
+1.0,
+0.0,
+6.30583
+],
+[
+-0.0,
+-0.0,
+1.0,
+-2.13582
+],
+[
+0.0,
+0.0,
+-0.0,
+1.0
+]
+],
+"lightmap": -1,
+"lmso": [
+1.0,
+1.0,
+0.0,
+0.0
+],
+"cast": 1,
+"recv": true,
+"layer": 8
+},
+{
+"path": "Trawler/Railings/Trawler_Railing022",
+"mesh": "me22284592c61",
+"subs": [
+0
+],
+"mats": [
+"Trawler Metal (Raw)_b32ba8e6"
+],
+"matrix": [
+[
+0.0,
+-0.0,
+1.0,
+-4.59358
+],
+[
+0.0,
+1.0,
+0.0,
+4.07481
+],
+[
+-1.0,
+-0.0,
+0.0,
+4.3
+],
+[
+0.0,
+0.0,
+-0.0,
+1.0
+]
+],
+"lightmap": -1,
+"lmso": [
+1.0,
+1.0,
+0.0,
+0.0
+],
+"cast": 1,
+"recv": true,
+"layer": 8
+},
+{
+"path": "Trawler/Posts/Trawler_Post19",
+"mesh": "m6806455f2c61",
+"subs": [
+0,
+1
+],
+"mats": [
+"Trawler Metal (Painted Dark Cream)_8156615",
+"Trawler Metal (Raw)_b32ba8e6"
+],
+"matrix": [
+[
+1.0,
+0.0,
+-0.0,
+-6.10022
+],
+[
+0.0,
+1.0,
+0.0,
+3.88063
+],
+[
+-0.0,
+-0.0,
+1.0,
+-2.2151
+],
+[
+0.0,
+0.0,
+-0.0,
+1.0
+]
+],
+"lightmap": -1,
+"lmso": [
+1.0,
+1.0,
+0.0,
+0.0
+],
+"cast": 1,
+"recv": true,
+"layer": 8
+},
+{
+"path": "Trawler/Railings/Trawler_Railing00",
+"mesh": "ma5bb97fa2c61",
+"subs": [
+0
+],
+"mats": [
+"Trawler Metal (Raw)_b32ba8e6"
+],
+"matrix": [
+[
+1.0,
+-0.0,
+0.0,
+6.30698
+],
+[
+0.0,
+1.0,
+0.0,
+4.17509
+],
+[
+-0.0,
+-0.0,
+1.0,
+-2.15
+],
+[
+0.0,
+0.0,
+-0.0,
+1.0
+]
+],
+"lightmap": -1,
+"lmso": [
+1.0,
+1.0,
+0.0,
+0.0
+],
+"cast": 1,
+"recv": true,
+"layer": 8
+},
+{
+"path": "Trawler/Railings/Trawler_Railing019",
+"mesh": "m9ba6ee2d2c61",
+"subs": [
+0
+],
+"mats": [
+"Trawler Metal (Raw)_b32ba8e6"
+],
+"matrix": [
+[
+1.0,
+0.0,
+-0.0,
+-6.10023
+],
+[
+0.0,
+1.0,
+0.0,
+4.07481
+],
+[
+-0.0,
+-0.0,
+1.0,
+-2.16747
+],
+[
+0.0,
+0.0,
+-0.0,
+1.0
+]
+],
+"lightmap": -1,
+"lmso": [
+1.0,
+1.0,
+0.0,
+0.0
+],
+"cast": 1,
+"recv": true,
+"layer": 8
+},
+{
+"path": "Trawler/Posts/Trawler_Post023",
+"mesh": "m339cd9d52c61",
+"subs": [
+0,
+1
+],
+"mats": [
+"Trawler Metal (Painted Dark Cream)_8156615",
+"Trawler Metal (Raw)_b32ba8e6"
+],
+"matrix": [
+[
+0.0,
+0.0,
+-1.0,
+-4.59358
+],
+[
+-0.0,
+1.0,
+0.0,
+3.88063
+],
+[
+1.0,
+-0.0,
+0.0,
+4.3
+],
+[
+0.0,
+0.0,
+-0.0,
+1.0
+]
+],
+"lightmap": -1,
+"lmso": [
+1.0,
+1.0,
+0.0,
+0.0
+],
+"cast": 1,
+"recv": true,
+"layer": 8
+},
+{
+"path": "Trawler/Posts/Trawler_Post09",
+"mesh": "ma96a75872c61",
+"subs": [
+0,
+1
+],
+"mats": [
+"Trawler Metal (Painted Dark Cream)_8156615",
+"Trawler Metal (Raw)_b32ba8e6"
+],
+"matrix": [
+[
+1.0,
+-0.0,
+0.0,
+7.20129
+],
+[
+0.0,
+1.0,
+0.0,
+6.30582
+],
+[
+-0.0,
+-0.0,
+1.0,
+2.11054
+],
+[
+0.0,
+0.0,
+-0.0,
+1.0
+]
+],
+"lightmap": -1,
+"lmso": [
+1.0,
+1.0,
+0.0,
+0.0
+],
+"cast": 1,
+"recv": true,
+"layer": 8
+},
+{
+"path": "Trawler/Railings/Trawler_Railing02",
+"mesh": "m1fbff092c61",
+"subs": [
+0
+],
+"mats": [
+"Trawler Metal (Raw)_b32ba8e6"
+],
+"matrix": [
+[
+1.0,
+-0.0,
+0.0,
+2.01128
+],
+[
+0.0,
+1.0,
+0.0,
+6.5
+],
+[
+-0.0,
+-0.0,
+1.0,
+-2.15
+],
+[
+0.0,
+0.0,
+-0.0,
+1.0
+]
+],
+"lightmap": -1,
+"lmso": [
+1.0,
+1.0,
+0.0,
+0.0
+],
+"cast": 1,
+"recv": true,
+"layer": 8
+},
+{
+"path": "Trawler/Posts/Trawler_Post01",
+"mesh": "m703adee02c61",
+"subs": [
+0,
+1
+],
+"mats": [
+"Trawler Metal (Painted Dark Cream)_8156615",
+"Trawler Metal (Raw)_b32ba8e6"
+],
+"matrix": [
+[
+1.0,
+-0.0,
+0.0,
+5.28449
+],
+[
+0.0,
+1.0,
+0.0,
+4.83561
+],
+[
+-0.0,
+-0.0,
+1.0,
+-2.15
+],
+[
+0.0,
+0.0,
+-0.0,
+1.0
+]
+],
+"lightmap": -1,
+"lmso": [
+1.0,
+1.0,
+0.0,
+0.0
+],
+"cast": 1,
+"recv": true,
+"layer": 8
+},
+{
+"path": "Trawler/Posts/Trawler_Post11",
+"mesh": "mf9d81e1e2c61",
+"subs": [
+0,
+1
+],
+"mats": [
+"Trawler Metal (Painted Dark Cream)_8156615",
+"Trawler Metal (Raw)_b32ba8e6"
+],
+"matrix": [
+[
+1.0,
+-0.0,
+0.0,
+5.25628
+],
+[
+0.0,
+1.0,
+0.0,
+6.30582
+],
+[
+-0.0,
+-0.0,
+1.0,
+4.36107
+],
+[
+0.0,
+0.0,
+-0.0,
+1.0
+]
+],
+"lightmap": -1,
+"lmso": [
+1.0,
+1.0,
+0.0,
+0.0
+],
+"cast": 1,
+"recv": true,
+"layer": 8
+},
+{
+"path": "Trawler/Posts/Trawler_Post07",
+"mesh": "mc445fa9f2c61",
+"subs": [
+0,
+1
+],
+"mats": [
+"Trawler Metal (Painted Dark Cream)_8156615",
+"Trawler Metal (Raw)_b32ba8e6"
+],
+"matrix": [
+[
+1.0,
+-0.0,
+0.0,
+5.25628
+],
+[
+0.0,
+1.0,
+0.0,
+6.30583
+],
+[
+-0.0,
+-0.0,
+1.0,
+-0.13999
+],
+[
+0.0,
+0.0,
+-0.0,
+1.0
+]
+],
+"lightmap": -1,
+"lmso": [
+1.0,
+1.0,
+0.0,
+0.0
+],
+"cast": 1,
+"recv": true,
+"layer": 8
+},
+{
+"path": "Trawler/Posts/Trawler_Post022",
+"mesh": "md34758162c61",
+"subs": [
+0,
+1
+],
+"mats": [
+"Trawler Metal (Painted Dark Cream)_8156615",
+"Trawler Metal (Raw)_b32ba8e6"
+],
+"matrix": [
+[
+1.0,
+0.0,
+-0.0,
+-6.10022
+],
+[
+0.0,
+1.0,
+0.0,
+3.88063
+],
+[
+-0.0,
+-0.0,
+1.0,
+-0.1302
+],
+[
+0.0,
+0.0,
+-0.0,
+1.0
+]
+],
+"lightmap": -1,
+"lmso": [
+1.0,
+1.0,
+0.0,
+0.0
+],
+"cast": 1,
+"recv": true,
+"layer": 8
+},
+{
+"path": "Trawler/Railings/Trawler_Railing06",
+"mesh": "m87814df82c61",
+"subs": [
+0
+],
+"mats": [
+"Trawler Metal (Raw)_b32ba8e6"
+],
+"matrix": [
+[
+1.0,
+-0.0,
+0.0,
+4.23379
+],
+[
+0.0,
+1.0,
+0.0,
+6.5
+],
+[
+-0.0,
+-0.0,
+1.0,
+-0.13999
+],
+[
+0.0,
+0.0,
+-0.0,
+1.0
+]
+],
+"lightmap": -1,
+"lmso": [
+1.0,
+1.0,
+0.0,
+0.0
+],
+"cast": 1,
+"recv": true,
+"layer": 8
+},
+{
+"path": "Trawler/Posts/Trawler_Post00",
+"mesh": "m7dea9c002c61",
+"subs": [
+0,
+1
+],
+"mats": [
+"Trawler Metal (Painted Dark Cream)_8156615",
+"Trawler Metal (Raw)_b32ba8e6"
+],
+"matrix": [
+[
+1.0,
+-0.0,
+0.0,
+7.28246
+],
+[
+0.0,
+1.0,
+0.0,
+3.28575
+],
+[
+-0.0,
+-0.0,
+1.0,
+-2.15
+],
+[
+0.0,
+0.0,
+-0.0,
+1.0
+]
+],
+"lightmap": -1,
+"lmso": [
+1.0,
+1.0,
+0.0,
+0.0
+],
+"cast": 1,
+"recv": true,
+"layer": 8
+},
+{
+"path": "lighthouse_lowpoly/lighthouse_lowpoly_body",
+"mesh": "m18",
+"subs": [
+0
+],
+"mats": [
+"lighthouse_lowpoly_diffuse_7"
+],
+"matrix": [
+[
+-60.83884,
+79.36395,
+-1e-05,
+28.0
+],
+[
+0.0,
+-1e-05,
+-100.00001,
+-3.0
+],
+[
+-79.36394,
+-60.83885,
+1e-05,
+229.0
+],
+[
+0.0,
+0.0,
+-0.0,
+1.0
+]
+],
+"lightmap": -1,
+"lmso": [
+1.0,
+1.0,
+0.0,
+0.0
+],
+"cast": 1,
+"recv": true,
+"layer": 0
+},
+{
+"path": "Trawler/Railings/Trawler_Railing08",
+"mesh": "m131b24d42c61",
+"subs": [
+0
+],
+"mats": [
+"Trawler Metal (Raw)_b32ba8e6"
+],
+"matrix": [
+[
+1.0,
+-0.0,
+0.0,
+7.20128
+],
+[
+0.0,
+1.0,
+0.0,
+6.5
+],
+[
+-0.0,
+-0.0,
+1.0,
+0.98527
+],
+[
+0.0,
+0.0,
+-0.0,
+1.0
+]
+],
+"lightmap": -1,
+"lmso": [
+1.0,
+1.0,
+0.0,
+0.0
+],
+"cast": 1,
+"recv": true,
+"layer": 8
+},
+{
+"path": "Trawler/Railings/Trawler_Railing10",
+"mesh": "mf0b36ab42c61",
+"subs": [
+0
+],
+"mats": [
+"Trawler Metal (Raw)_b32ba8e6"
+],
+"matrix": [
+[
+1.0,
+-0.0,
+0.0,
+6.27879
+],
+[
+0.0,
+1.0,
+0.0,
+6.5
+],
+[
+-0.0,
+-0.0,
+1.0,
+4.36107
+],
+[
+0.0,
+0.0,
+-0.0,
+1.0
+]
+],
+"lightmap": -1,
+"lmso": [
+1.0,
+1.0,
+0.0,
+0.0
+],
+"cast": 1,
+"recv": true,
+"layer": 8
+},
+{
+"path": "Trawler/Railings/Trawler_Railing01",
+"mesh": "mb63069f22c61",
+"subs": [
+0
+],
+"mats": [
+"Trawler Metal (Raw)_b32ba8e6"
+],
+"matrix": [
+[
+1.0,
+-0.0,
+0.0,
+4.26358
+],
+[
+0.0,
+1.0,
+0.0,
+5.71075
+],
+[
+-0.0,
+-0.0,
+1.0,
+-2.15
+],
+[
+0.0,
+0.0,
+-0.0,
+1.0
+]
+],
+"lightmap": -1,
+"lmso": [
+1.0,
+1.0,
+0.0,
+0.0
+],
+"cast": 1,
+"recv": true,
+"layer": 8
+},
+{
+"path": "Trawler/Railings/Trawler_Railing12",
+"mesh": "mde162eae2c61",
+"subs": [
+0
+],
+"mats": [
+"Trawler Metal (Raw)_b32ba8e6"
+],
+"matrix": [
+[
+1.0,
+0.0,
+-0.0,
+2.23629
+],
+[
+0.0,
+1.0,
+0.0,
+6.5
+],
+[
+-0.0,
+-0.0,
+1.0,
+4.36107
+],
+[
+0.0,
+0.0,
+-0.0,
+1.0
+]
+],
+"lightmap": -1,
+"lmso": [
+1.0,
+1.0,
+0.0,
+0.0
+],
+"cast": 1,
+"recv": true,
+"layer": 8
+},
+{
+"path": "Trawler/Posts/Trawler_Post06",
+"mesh": "m7561be032c61",
+"subs": [
+0,
+1
+],
+"mats": [
+"Trawler Metal (Painted Dark Cream)_8156615",
+"Trawler Metal (Raw)_b32ba8e6"
+],
+"matrix": [
+[
+1.0,
+-0.0,
+0.0,
+3.22546
+],
+[
+0.0,
+1.0,
+0.0,
+6.30583
+],
+[
+-0.0,
+-0.0,
+1.0,
+-0.13999
+],
+[
+0.0,
+0.0,
+-0.0,
+1.0
+]
+],
+"lightmap": -1,
+"lmso": [
+1.0,
+1.0,
+0.0,
+0.0
+],
+"cast": 1,
+"recv": true,
+"layer": 8
+},
+{
+"path": "Trawler/Trawler_Hull",
+"mesh": "m1f0981f12c61",
+"subs": [
+0,
+1,
+2,
+3
+],
+"mats": [
+"Trawler Hull_299bfb8d",
+"Trawler Window_453b6c5f",
+"Trawler Fog_ada085c3",
+"Trawler Safty Glass_918cac76"
+],
+"matrix": [
+[
+-0.0,
+-0.0,
+1.0,
+0.58359
+],
+[
+-0.0,
+1.0,
+0.0,
+3.0
+],
+[
+-1.0,
+0.0,
+-0.0,
+-0.0
+],
+[
+0.0,
+0.0,
+-0.0,
+1.0
+]
+],
+"lightmap": -1,
+"lmso": [
+1.0,
+1.0,
+0.0,
+0.0
+],
+"cast": 1,
+"recv": true,
+"layer": 0
+},
+{
+"path": "Trawler/Trawler_Wheel",
+"mesh": "m18576a2a2c61",
+"subs": [
+0
+],
+"mats": [
+"02 - Default_b6602c61"
+],
+"matrix": [
+[
+-0.0,
+-0.0,
+1.0,
+-2.23906
+],
+[
+-0.0,
+1.0,
+0.0,
+6.51028
+],
+[
+-1.0,
+0.0,
+-0.0,
+1.02797
+],
+[
+0.0,
+0.0,
+-0.0,
+1.0
+]
+],
+"lightmap": -1,
+"lmso": [
+1.0,
+1.0,
+0.0,
+0.0
+],
+"cast": 1,
+"recv": true,
+"layer": 10
+},
+{
+"path": "Trawler/Railings/Trawler_Railing021",
+"mesh": "m40b793ea2c61",
+"subs": [
+0
+],
+"mats": [
+"Trawler Metal (Raw)_b32ba8e6"
+],
+"matrix": [
+[
+0.0,
+-0.0,
+1.0,
+-6.10023
+],
+[
+0.0,
+1.0,
+0.0,
+4.07481
+],
+[
+-1.0,
+-0.0,
+0.0,
+4.3
+],
+[
+0.0,
+0.0,
+-0.0,
+1.0
+]
+],
+"lightmap": -1,
+"lmso": [
+1.0,
+1.0,
+0.0,
+0.0
+],
+"cast": 1,
+"recv": true,
+"layer": 8
+},
+{
+"path": "Trawler/Railings/Trawler_Railing18",
+"mesh": "mf27d7d8e2c61",
+"subs": [
+0
+],
+"mats": [
+"Trawler Metal (Raw)_b32ba8e6"
+],
+"matrix": [
+[
+1.0,
+0.0,
+-0.0,
+-6.10023
+],
+[
+0.0,
+1.0,
+0.0,
+4.07481
+],
+[
+-0.0,
+-0.0,
+1.0,
+-0.1302
+],
+[
+0.0,
+0.0,
+-0.0,
+1.0
+]
+],
+"lightmap": -1,
+"lmso": [
+1.0,
+1.0,
+0.0,
+0.0
+],
+"cast": 1,
+"recv": true,
+"layer": 8
+},
+{
+"path": "Trawler/Railings/Trawler_Railing07",
+"mesh": "mb27a60ca2c61",
+"subs": [
+0
+],
+"mats": [
+"Trawler Metal (Raw)_b32ba8e6"
+],
+"matrix": [
+[
+1.0,
+-0.0,
+0.0,
+6.22878
+],
+[
+0.0,
+1.0,
+0.0,
+6.5
+],
+[
+-0.0,
+-0.0,
+1.0,
+-0.13999
+],
+[
+0.0,
+0.0,
+-0.0,
+1.0
+]
+],
+"lightmap": -1,
+"lmso": [
+1.0,
+1.0,
+0.0,
+0.0
+],
+"cast": 1,
+"recv": true,
+"layer": 8
+},
+{
+"path": "Trawler/Trawler_Rudder",
+"mesh": "m8fed031b2c61",
+"subs": [
+0
+],
+"mats": [
+"02 - Default_b6602c61"
+],
+"matrix": [
+[
+-0.0,
+-0.0,
+1.0,
+12.99802
+],
+[
+-0.0,
+1.0,
+0.0,
+-0.72191
+],
+[
+-1.0,
+0.0,
+-0.0,
+-0.0
+],
+[
+0.0,
+0.0,
+-0.0,
+1.0
+]
+],
+"lightmap": -1,
+"lmso": [
+1.0,
+1.0,
+0.0,
+0.0
+],
+"cast": 1,
+"recv": true,
+"layer": 0
+},
+{
+"path": "Trawler/Posts/Trawler_Post12",
+"mesh": "m922ccf6b2c61",
+"subs": [
+0,
+1
+],
+"mats": [
+"Trawler Metal (Painted Dark Cream)_8156615",
+"Trawler Metal (Raw)_b32ba8e6"
+],
+"matrix": [
+[
+1.0,
+-0.0,
+0.0,
+3.21129
+],
+[
+0.0,
+1.0,
+0.0,
+6.30582
+],
+[
+-0.0,
+-0.0,
+1.0,
+4.36107
+],
+[
+0.0,
+0.0,
+-0.0,
+1.0
+]
+],
+"lightmap": -1,
+"lmso": [
+1.0,
+1.0,
+0.0,
+0.0
+],
+"cast": 1,
+"recv": true,
+"layer": 8
+},
+{
+"path": "Trawler/Trawler_Propeller",
+"mesh": "mca1ad00a2c61",
+"subs": [
+0
+],
+"mats": [
+"02 - Default_b6602c61"
+],
+"matrix": [
+[
+-0.0,
+-0.0,
+1.0,
+12.21703
+],
+[
+-0.0,
+1.0,
+0.0,
+-0.72191
+],
+[
+-1.0,
+0.0,
+-0.0,
+0.0
+],
+[
+0.0,
+0.0,
+-0.0,
+1.0
+]
+],
+"lightmap": -1,
+"lmso": [
+1.0,
+1.0,
+0.0,
+0.0
+],
+"cast": 1,
+"recv": true,
+"layer": 0
+},
+{
+"path": "Trawler/Posts/Trawler_Post10",
+"mesh": "m6cee2b902c61",
+"subs": [
+0,
+1
+],
+"mats": [
+"Trawler Metal (Painted Dark Cream)_8156615",
+"Trawler Metal (Raw)_b32ba8e6"
+],
+"matrix": [
+[
+1.0,
+-0.0,
+0.0,
+7.18711
+],
+[
+0.0,
+1.0,
+0.0,
+6.30582
+],
+[
+-0.0,
+-0.0,
+1.0,
+4.3469
+],
+[
+0.0,
+0.0,
+-0.0,
+1.0
+]
+],
+"lightmap": -1,
+"lmso": [
+1.0,
+1.0,
+0.0,
+0.0
+],
+"cast": 1,
+"recv": true,
+"layer": 8
+},
+{
+"path": "Trawler/Railings/Trawler_Railing11",
+"mesh": "m2b55d9dd2c61",
+"subs": [
+0
+],
+"mats": [
+"Trawler Metal (Raw)_b32ba8e6"
+],
+"matrix": [
+[
+1.0,
+-0.0,
+0.0,
+4.23379
+],
+[
+0.0,
+1.0,
+0.0,
+6.5
+],
+[
+-0.0,
+-0.0,
+1.0,
+4.36107
+],
+[
+0.0,
+0.0,
+-0.0,
+1.0
+]
+],
+"lightmap": -1,
+"lmso": [
+1.0,
+1.0,
+0.0,
+0.0
+],
+"cast": 1,
+"recv": true,
+"layer": 8
+},
+{
+"path": "Trawler/Posts/Trawler_Post024",
+"mesh": "m948324212c61",
+"subs": [
+0,
+1
+],
+"mats": [
+"Trawler Metal (Painted Dark Cream)_8156615",
+"Trawler Metal (Raw)_b32ba8e6"
+],
+"matrix": [
+[
+-1.0,
+-0.0,
+-0.0,
+-6.10022
+],
+[
+-0.0,
+1.0,
+-0.0,
+3.88063
+],
+[
+0.0,
+-0.0,
+-1.0,
+-4.3
+],
+[
+0.0,
+0.0,
+-0.0,
+1.0
+]
+],
+"lightmap": -1,
+"lmso": [
+1.0,
+1.0,
+0.0,
+0.0
+],
+"cast": 1,
+"recv": true,
+"layer": 8
+},
+{
+"path": "Trawler/Railings/Trawler_Railing020",
+"mesh": "mf0110b3a2c61",
+"subs": [
+0
+],
+"mats": [
+"Trawler Metal (Raw)_b32ba8e6"
+],
+"matrix": [
+[
+1.0,
+0.0,
+-0.0,
+-6.10022
+],
+[
+0.0,
+1.0,
+0.0,
+4.07481
+],
+[
+-0.0,
+-0.0,
+1.0,
+-4.22855
+],
+[
+0.0,
+0.0,
+-0.0,
+1.0
+]
+],
+"lightmap": -1,
+"lmso": [
+1.0,
+1.0,
+0.0,
+0.0
+],
+"cast": 1,
+"recv": true,
+"layer": 8
+},
+{
+"path": "Trawler/Posts/Trawler_Post03",
+"mesh": "mbea8828d2c61",
+"subs": [
+0,
+1
+],
+"mats": [
+"Trawler Metal (Painted Dark Cream)_8156615",
+"Trawler Metal (Raw)_b32ba8e6"
+],
+"matrix": [
+[
+1.0,
+-0.0,
+0.0,
+1.08865
+],
+[
+0.0,
+1.0,
+0.0,
+6.30583
+],
+[
+-0.0,
+-0.0,
+1.0,
+-2.15
+],
+[
+0.0,
+0.0,
+-0.0,
+1.0
+]
+],
+"lightmap": -1,
+"lmso": [
+1.0,
+1.0,
+0.0,
+0.0
+],
+"cast": 1,
+"recv": true,
+"layer": 8
+},
+{
+"path": "Trawler/Posts/Trawler_Post02",
+"mesh": "mdd6717ab2c61",
+"subs": [
+0,
+1
+],
+"mats": [
+"Trawler Metal (Painted Dark Cream)_8156615",
+"Trawler Metal (Raw)_b32ba8e6"
+],
+"matrix": [
+[
+1.0,
+0.0,
+-0.0,
+3.21129
+],
+[
+0.0,
+1.0,
+0.0,
+6.04
+],
+[
+-0.0,
+-0.0,
+1.0,
+-2.15
+],
+[
+0.0,
+0.0,
+-0.0,
+1.0
+]
+],
+"lightmap": -1,
+"lmso": [
+1.0,
+1.0,
+0.0,
+0.0
+],
+"cast": 1,
+"recv": true,
+"layer": 8
+},
+{
+"path": "Trawler/Railings/Trawler_Railing04",
+"mesh": "m91a6d92a2c61",
+"subs": [
+0
+],
+"mats": [
+"Trawler Metal (Raw)_b32ba8e6"
+],
+"matrix": [
+[
+1.0,
+-0.0,
+0.0,
+-2.95664
+],
+[
+0.0,
+1.0,
+0.0,
+6.5
+],
+[
+-0.0,
+-0.0,
+1.0,
+-2.15
+],
+[
+0.0,
+0.0,
+-0.0,
+1.0
+]
+],
+"lightmap": -1,
+"lmso": [
+1.0,
+1.0,
+0.0,
+0.0
+],
+"cast": 1,
+"recv": true,
+"layer": 8
+},
+{
+"path": "Trawler/Railings/Trawler_Railing03",
+"mesh": "ma26ff4f92c61",
+"subs": [
+0
+],
+"mats": [
+"Trawler Metal (Raw)_b32ba8e6"
+],
+"matrix": [
+[
+1.0,
+-0.0,
+0.0,
+-0.47018
+],
+[
+0.0,
+1.0,
+0.0,
+6.5
+],
+[
+-0.0,
+-0.0,
+1.0,
+-2.15
+],
+[
+0.0,
+0.0,
+-0.0,
+1.0
+]
+],
+"lightmap": -1,
+"lmso": [
+1.0,
+1.0,
+0.0,
+0.0
+],
+"cast": 1,
+"recv": true,
+"layer": 8
+},
+{
+"path": "Trawler/Posts/Trawler_Post04",
+"mesh": "me1d898ff2c61",
+"subs": [
+0,
+1
+],
+"mats": [
+"Trawler Metal (Painted Dark Cream)_8156615",
+"Trawler Metal (Raw)_b32ba8e6"
+],
+"matrix": [
+[
+1.0,
+-0.0,
+0.0,
+-1.034
+],
+[
+0.0,
+1.0,
+0.0,
+6.30583
+],
+[
+-0.0,
+-0.0,
+1.0,
+-2.15
+],
+[
+0.0,
+0.0,
+-0.0,
+1.0
+]
+],
+"lightmap": -1,
+"lmso": [
+1.0,
+1.0,
+0.0,
+0.0
+],
+"cast": 1,
+"recv": true,
+"layer": 8
+},
+{
+"path": "Trawler/Posts/Trawler_Post18",
+"mesh": "mb5961e942c61",
+"subs": [
+0,
+1
+],
+"mats": [
+"Trawler Metal (Painted Dark Cream)_8156615",
+"Trawler Metal (Raw)_b32ba8e6"
+],
+"matrix": [
+[
+1.0,
+-0.0,
+0.0,
+-6.10023
+],
+[
+0.0,
+1.0,
+0.0,
+3.88063
+],
+[
+-0.0,
+-0.0,
+1.0,
+1.94052
+],
+[
+0.0,
+0.0,
+-0.0,
+1.0
+]
+],
+"lightmap": -1,
+"lmso": [
+1.0,
+1.0,
+0.0,
+0.0
+],
+"cast": 1,
+"recv": true,
+"layer": 8
+},
+{
+"path": "Trawler/Railings/Trawler_Railing05",
+"mesh": "m86a4bb7d2c61",
+"subs": [
+0
+],
+"mats": [
+"Trawler Metal (Raw)_b32ba8e6"
+],
+"matrix": [
+[
+1.0,
+0.0,
+-0.0,
+-3.15664
+],
+[
+0.0,
+1.0,
+0.0,
+6.5
+],
+[
+-0.0,
+-0.0,
+1.0,
+-1.15581
+],
+[
+0.0,
+0.0,
+-0.0,
+1.0
+]
+],
+"lightmap": -1,
+"lmso": [
+1.0,
+1.0,
+0.0,
+0.0
+],
+"cast": 1,
+"recv": true,
+"layer": 8
+},
+{
+"path": "Trawler/Posts/Trawler_Post021",
+"mesh": "m32aca03d2c61",
+"subs": [
+0,
+1
+],
+"mats": [
+"Trawler Metal (Painted Dark Cream)_8156615",
+"Trawler Metal (Raw)_b32ba8e6"
+],
+"matrix": [
+[
+0.0,
+0.0,
+-1.0,
+-6.10022
+],
+[
+-0.0,
+1.0,
+0.0,
+3.88063
+],
+[
+1.0,
+-0.0,
+0.0,
+0.0
+],
+[
+0.0,
+0.0,
+-0.0,
+1.0
+]
+],
+"lightmap": -1,
+"lmso": [
+1.0,
+1.0,
+0.0,
+0.0
+],
+"cast": 1,
+"recv": true,
+"layer": 8
+},
+{
+"path": "Trawler/Railings/Trawler_Railing09",
+"mesh": "m2586ec132c61",
+"subs": [
+0
+],
+"mats": [
+"Trawler Metal (Raw)_b32ba8e6"
+],
+"matrix": [
+[
+1.0,
+-0.0,
+0.0,
+7.20128
+],
+[
+0.0,
+1.0,
+0.0,
+6.5
+],
+[
+-0.0,
+-0.0,
+1.0,
+3.2358
+],
+[
+0.0,
+0.0,
+-0.0,
+1.0
+]
+],
+"lightmap": -1,
+"lmso": [
+1.0,
+1.0,
+0.0,
+0.0
+],
+"cast": 1,
+"recv": true,
+"layer": 8
+},
+{
+"path": "lighthouse_lowpoly/Object001",
+"mesh": "m17",
+"subs": [
+0
+],
+"mats": [
+"LightHouse_Railing_4"
+],
+"matrix": [
+[
+-60.83884,
+79.36395,
+-1e-05,
+28.0
+],
+[
+0.0,
+-1e-05,
+-100.00001,
+-3.0
+],
+[
+-79.36394,
+-60.83885,
+1e-05,
+229.0
+],
+[
+0.0,
+0.0,
+-0.0,
+1.0
+]
+],
+"lightmap": -1,
+"lmso": [
+1.0,
+1.0,
+0.0,
+0.0
+],
+"cast": 1,
+"recv": true,
+"layer": 0
+},
+{
+"path": "Trawler/Posts/Trawler_Post08",
+"mesh": "mdd089d992c61",
+"subs": [
+0,
+1
+],
+"mats": [
+"Trawler Metal (Painted Dark Cream)_8156615",
+"Trawler Metal (Raw)_b32ba8e6"
+],
+"matrix": [
+[
+1.0,
+-0.0,
+0.0,
+7.1871
+],
+[
+0.0,
+1.0,
+0.0,
+6.30583
+],
+[
+-0.0,
+-0.0,
+1.0,
+-0.12582
+],
+[
+0.0,
+0.0,
+-0.0,
+1.0
+]
+],
+"lightmap": -1,
+"lmso": [
+1.0,
+1.0,
+0.0,
+0.0
+],
+"cast": 1,
+"recv": true,
+"layer": 8
+}
+],
+"colliders": [
+{
+"path": "Trawler/Trawler_Hull/Colliders/Trawler_Hull_HullPainter/window",
+"p": [
+-3.0271,
+4.5289,
+1.3007
+],
+"q": [
+0.79335,
+-0.0,
+-0.0,
+0.60876
+],
+"h": [
+0.1328,
+0.0592,
+0.025
+]
+},
+{
+"path": "Trawler/Trawler_Hull/Colliders/Trawler_Hull_HullPainter/window",
+"p": [
+5.0619,
+4.5289,
+4.2884
+],
+"q": [
+0.70106,
+-0.0923,
+-0.0923,
+0.70106
+],
+"h": [
+0.0592,
+0.1328,
+0.025
+]
+},
+{
+"path": "Trawler/Trawler_Hull/Colliders/Trawler_Hull_HullPainter/step",
+"p": [
+6.4113,
+3.5,
+-1.15
+],
+"q": [
+-0.0,
+0.70711,
+0.0,
+0.70711
+],
+"h": [
+0.89,
+0.1,
+0.0995
+]
+},
+{
+"path": "Trawler/Trawler_Hull/Colliders/Trawler_Hull_HullPainter/step",
+"p": [
+-4.5936,
+3.35,
+1.6205
+],
+"q": [
+-0.0,
+0.70711,
+0.0,
+0.70711
+],
+"h": [
+0.0976,
+0.1,
+1.3949
+]
+},
+{
+"path": "Trawler/Trawler_Hull/Colliders/Trawler_Hull_HullPainter/window",
+"p": [
+1.6741,
+4.1049,
+4.2884
+],
+"q": [
+0.56099,
+-0.43046,
+-0.56099,
+-0.43046
+],
+"h": [
+0.103,
+0.0718,
+0.025
+]
+},
+{
+"path": "Trawler/Trawler_Hull/Colliders/Trawler_Hull_HullPainter/window",
+"p": [
+7.0497,
+4.1049,
+2.9871
+],
+"q": [
+-0.0,
+0.60876,
+0.79335,
+0.0
+],
+"h": [
+0.103,
+0.0718,
+0.025
+]
+},
+{
+"path": "Trawler/Trawler_Propeller/Hull 3",
+"p": [
+12.2206,
+-0.9856,
+0.361
+],
+"q": [
+0.02234,
+-0.61865,
+-0.3521,
+0.702
+],
+"h": [
+0.3,
+0.244,
+0.1
+]
+},
+{
+"path": "Trawler/Trawler_Hull/Colliders/Trawler_Hull_HullPainter/beam",
+"p": [
+1.1613,
+7.1685,
+4.4337
+],
+"q": [
+-0.70575,
+0.70575,
+0.04375,
+0.04375
+],
+"h": [
+1.1589,
+0.15,
+0.15
+]
+},
+{
+"path": "Trawler/Trawler_Hull/Colliders/Trawler_Hull_HullPainter/window",
+"p": [
+-3.0271,
+4.2767,
+2.8153
+],
+"q": [
+-0.13053,
+-0.0,
+0.0,
+0.99144
+],
+"h": [
+0.103,
+0.0718,
+0.025
+]
+},
+{
+"path": "Trawler/Trawler_Hull/Colliders/Trawler_Hull_HullPainter/window",
+"p": [
+7.0497,
+4.1049,
+1.3129
+],
+"q": [
+-0.0,
+0.79335,
+0.60876,
+0.0
+],
+"h": [
+0.103,
+0.0718,
+0.025
+]
+},
+{
+"path": "Trawler/Trawler_Hull/Colliders/Trawler_Hull_HullPainter/window",
+"p": [
+7.0497,
+4.5744,
+2.9871
+],
+"q": [
+0.60876,
+0.0,
+0.0,
+0.79335
+],
+"h": [
+0.103,
+0.0718,
+0.025
+]
+},
+{
+"path": "Trawler/Trawler_Hull/Colliders/Trawler_Hull_HullPainter/window",
+"p": [
+1.4394,
+4.5115,
+4.2884
+],
+"q": [
+0.65328,
+-0.2706,
+0.65328,
+0.2706
+],
+"h": [
+0.103,
+0.0718,
+0.025
+]
+},
+{
+"path": "Trawler/Trawler_Hull/Colliders/Trawler_Hull_HullPainter/window",
+"p": [
+-3.0271,
+4.5115,
+2.8782
+],
+"q": [
+0.0,
+-0.38268,
+0.92388,
+0.0
+],
+"h": [
+0.103,
+0.0718,
+0.025
+]
+},
+{
+"path": "Trawler/Trawler_Hull/Colliders/Trawler_Hull_HullPainter/window",
+"p": [
+-3.0271,
+4.4782,
+1.3886
+],
+"q": [
+0.92388,
+0.0,
+-0.0,
+0.38268
+],
+"h": [
+0.1328,
+0.0592,
+0.025
+]
+},
+{
+"path": "Trawler/Trawler_Hull/Colliders/Trawler_Hull_HullPainter/window",
+"p": [
+7.0497,
+4.1504,
+1.1993
+],
+"q": [
+0.0,
+0.60876,
+0.79335,
+-0.0
+],
+"h": [
+0.1328,
+0.0592,
+0.025
+]
+},
+{
+"path": "Trawler/Trawler_Hull/Colliders/Trawler_Hull_HullPainter/window",
+"p": [
+-1.6235,
+4.2767,
+4.2884
+],
+"q": [
+-0.56099,
+0.43046,
+-0.43046,
+0.56099
+],
+"h": [
+0.0718,
+0.103,
+0.025
+]
+},
+{
+"path": "Trawler/Trawler_Hull/Colliders/Trawler_Hull_HullPainter/window",
+"p": [
+5.0741,
+4.1049,
+4.2884
+],
+"q": [
+-0.43046,
+-0.56099,
+-0.43046,
+0.56099
+],
+"h": [
+0.103,
+0.0718,
+0.025
+]
+},
+{
+"path": "Trawler/Trawler_Hull/Colliders/Trawler_Hull_HullPainter/step",
+"p": [
+4.6113,
+4.85,
+-1.15
+],
+"q": [
+-0.0,
+0.70711,
+0.0,
+0.70711
+],
+"h": [
+0.89,
+0.1,
+0.0995
+]
+},
+{
+"path": "Trawler/Trawler_Hull/Colliders/Trawler_Hull_HullPainter/window",
+"p": [
+1.5483,
+4.1049,
+4.2884
+],
+"q": [
+0.56099,
+0.43046,
+0.56099,
+-0.43046
+],
+"h": [
+0.103,
+0.0718,
+0.025
+]
+},
+{
+"path": "Trawler/Trawler_Hull/Colliders/Trawler_Hull_HullPainter/window",
+"p": [
+-3.0271,
+4.4025,
+2.8153
+],
+"q": [
+-0.0,
+-0.13053,
+0.99144,
+-0.0
+],
+"h": [
+0.103,
+0.0718,
+0.025
+]
+},
+{
+"path": "Trawler/Trawler_Hull/Colliders/Trawler_Hull_HullPainter/window",
+"p": [
+1.4727,
+4.4782,
+0.0116
+],
+"q": [
+0.65328,
+0.2706,
+0.2706,
+0.65328
+],
+"h": [
+0.0592,
+0.1328,
+0.025
+]
+},
+{
+"path": "Trawler/Trawler_Hull/Colliders/Trawler_Hull_HullPainter/window",
+"p": [
+-3.0271,
+4.1049,
+3.1129
+],
+"q": [
+-0.79335,
+-0.0,
+-0.0,
+0.60876
+],
+"h": [
+0.103,
+0.0718,
+0.025
+]
+},
+{
+"path": "Trawler/Trawler_Hull/Colliders/Trawler_Hull_HullPainter/window",
+"p": [
+7.0497,
+4.3903,
+1.0608
+],
+"q": [
+-0.0,
+-0.13053,
+0.99144,
+-0.0
+],
+"h": [
+0.1328,
+0.0592,
+0.025
+]
+},
+{
+"path": "Trawler/Trawler_Hull/Colliders/Trawler_Hull_HullPainter/window",
+"p": [
+7.0497,
+4.5115,
+1.4219
+],
+"q": [
+-0.0,
+0.92388,
+-0.38268,
+-0.0
+],
+"h": [
+0.103,
+0.0718,
+0.025
+]
+},
+{
+"path": "Trawler/Trawler_Hull/Colliders/Trawler_Hull_HullPainter/lip",
+"p": [
+-8.0508,
+1.9835,
+4.4493
+],
+"q": [
+0.72047,
+0.68252,
+0.08917,
+0.08447
+],
+"h": [
+0.1765,
+0.6716,
+0.1
+]
+},
+{
+"path": "Trawler/Trawler_Hull/Colliders/Trawler_Hull_HullPainter/window",
+"p": [
+1.8005,
+4.3903,
+4.2884
+],
+"q": [
+0.56099,
+-0.43046,
+-0.43046,
+0.56099
+],
+"h": [
+0.0592,
+0.1328,
+0.025
+]
+},
+{
+"path": "Trawler/Trawler_Wheel/Trawler_Wheel_Collider",
+"p": [
+-2.1164,
+6.3324,
+0.8501
+],
+"q": [
+0.0,
+0.38268,
+0.92388,
+-0.0
+],
+"h": [
+0.0514,
+0.1249,
+0.05
+]
+},
+{
+"path": "Trawler/Trawler_Hull/Colliders/Trawler_Hull_HullPainter/step",
+"p": [
+4.4113,
+5.0,
+-1.15
+],
+"q": [
+-0.0,
+0.70711,
+0.0,
+0.70711
+],
+"h": [
+0.89,
+0.1,
+0.0995
+]
+},
+{
+"path": "Trawler/Trawler_Hull/Colliders/Trawler_Hull_HullPainter/window",
+"p": [
+-1.4395,
+4.5289,
+4.2884
+],
+"q": [
+0.56099,
+-0.43046,
+0.56099,
+0.43046
+],
+"h": [
+0.1328,
+0.0592,
+0.025
+]
+},
+{
+"path": "Trawler/Trawler_Hull/Colliders/Trawler_Hull_HullPainter/window",
+"p": [
+1.6742,
+4.5744,
+0.0116
+],
+"q": [
+0.70106,
+-0.0923,
+-0.0923,
+0.70106
+],
+"h": [
+0.0718,
+0.103,
+0.025
+]
+},
+{
+"path": "Trawler/Trawler_Hull/Colliders/Trawler_Hull_HullPainter/lip",
+"p": [
+-10.9564,
+2.2515,
+-3.0379
+],
+"q": [
+-0.25064,
+0.22627,
+-0.69867,
+0.63075
+],
+"h": [
+0.177,
+0.5728,
+0.1
+]
+},
+{
+"path": "Trawler/Trawler_Hull/Colliders/Trawler_Hull_HullPainter/step",
+"p": [
+5.2113,
+4.4,
+-1.15
+],
+"q": [
+-0.0,
+0.70711,
+0.0,
+0.70711
+],
+"h": [
+0.89,
+0.1,
+0.0995
+]
+},
+{
+"path": "Trawler/Trawler_Hull/Colliders/Trawler_Hull_HullPainter/window",
+"p": [
+-3.0271,
+4.5115,
+1.0782
+],
+"q": [
+0.2706,
+0.2706,
+-0.65328,
+0.65328
+],
+"h": [
+0.0718,
+0.103,
+0.025
+]
+},
+{
+"path": "Trawler/Trawler_Hull/Colliders/Trawler_Hull_HullPainter/window",
+"p": [
+-1.4517,
+4.5744,
+4.2884
+],
+"q": [
+0.56099,
+-0.43046,
+0.56099,
+0.43046
+],
+"h": [
+0.103,
+0.0718,
+0.025
+]
+},
+{
+"path": "Trawler/Trawler_Hull/Colliders/Trawler_Hull_HullPainter/lip",
+"p": [
+-11.7152,
+2.3556,
+2.3314
+],
+"q": [
+-0.61603,
+0.67987,
+-0.26941,
+0.29275
+],
+"h": [
+0.1772,
+0.5195,
+0.1
+]
+},
+{
+"path": "Trawler/Trawler_Hull/Colliders/Trawler_Hull_HullPainter/window",
+"p": [
+-3.0271,
+4.1049,
+1.1871
+],
+"q": [
+-0.0,
+0.60876,
+0.79335,
+0.0
+],
+"h": [
+0.103,
+0.0718,
+0.025
+]
+},
+{
+"path": "Trawler/Trawler_Hull/Colliders/Trawler_Hull_HullPainter/step",
+"p": [
+-4.5936,
+3.2,
+1.4205
+],
+"q": [
+-0.0,
+0.70711,
+0.0,
+0.70711
+],
+"h": [
+0.0976,
+0.1,
+1.3949
+]
+},
+{
+"path": "Trawler/Trawler_Hull/Colliders/Trawler_Hull_HullPainter/lip",
+"p": [
+-12.3836,
+2.4596,
+1.49
+],
+"q": [
+0.88527,
+-0.049,
+0.46234,
+-0.01168
+],
+"h": [
+0.6112,
+0.1776,
+0.1
+]
+},
+{
+"path": "Trawler/Trawler_Hull/Colliders/Trawler_Hull_HullPainter/window",
+"p": [
+1.4727,
+4.2011,
+4.2884
+],
+"q": [
+0.65328,
+0.2706,
+0.65328,
+-0.2706
+],
+"h": [
+0.1328,
+0.0592,
+0.025
+]
+},
+{
+"path": "Trawler/Trawler_Hull/Colliders/Trawler_Hull_HullPainter/lip",
+"p": [
+13.7226,
+1.8799,
+-4.5609
+],
+"q": [
+0.20807,
+-0.20807,
+-0.6758,
+0.6758
+],
+"h": [
+0.1687,
+0.2415,
+0.1
+]
+},
+{
+"path": "Trawler/Trawler_Hull/Colliders/Trawler_Hull_HullPainter/window",
+"p": [
+7.0497,
+4.1049,
+3.1129
+],
+"q": [
+-0.79335,
+-0.0,
+-0.0,
+0.60876
+],
+"h": [
+0.103,
+0.0718,
+0.025
+]
+},
+{
+"path": "Trawler/Trawler_Hull/Colliders/Trawler_Hull_HullPainter/window",
+"p": [
+1.5606,
+4.1504,
+0.0116
+],
+"q": [
+-0.43046,
+0.56099,
+0.43046,
+0.56099
+],
+"h": [
+0.1328,
+0.0592,
+0.025
+]
+},
+{
+"path": "Trawler/Trawler_Hull/Colliders/Trawler_Hull_HullPainter/window",
+"p": [
+-3.0271,
+4.5115,
+3.2219
+],
+"q": [
+0.92388,
+-0.0,
+-0.0,
+0.38268
+],
+"h": [
+0.103,
+0.0718,
+0.025
+]
+},
+{
+"path": "Trawler/Trawler_Hull/Colliders/Trawler_Hull_HullPainter/window",
+"p": [
+-3.0271,
+4.2767,
+1.4848
+],
+"q": [
+0.0,
+0.99144,
+0.13053,
+0.0
+],
+"h": [
+0.103,
+0.0718,
+0.025
+]
+},
+{
+"path": "Trawler/Trawler_Hull/Colliders/Trawler_Hull_HullPainter/window",
+"p": [
+-3.0271,
+4.3903,
+1.4393
+],
+"q": [
+0.99144,
+-0.0,
+0.0,
+0.13053
+],
+"h": [
+0.1328,
+0.0592,
+0.025
+]
+},
+{
+"path": "Trawler/Trawler_Hull/Colliders/Trawler_Hull_HullPainter/window",
+"p": [
+5.2459,
+4.4025,
+4.2884
+],
+"q": [
+0.56099,
+-0.43046,
+-0.43046,
+0.56099
+],
+"h": [
+0.0718,
+0.103,
+0.025
+]
+},
+{
+"path": "Trawler/Trawler_Hull/Colliders/Trawler_Hull_HullPainter/window",
+"p": [
+1.4394,
+4.1678,
+4.2884
+],
+"q": [
+0.2706,
+0.65328,
+0.65328,
+0.2706
+],
+"h": [
+0.0718,
+0.103,
+0.025
+]
+},
+{
+"path": "Trawler/Trawler_Wheel/Trawler_Wheel_Collider",
+"p": [
+-2.1164,
+6.5103,
+1.2795
+],
+"q": [
+0.70711,
+-0.70711,
+0.0,
+0.0
+],
+"h": [
+0.1249,
+0.0514,
+0.05
+]
+},
+{
+"path": "Trawler/Trawler_Hull/Colliders/Trawler_Hull_HullPainter/window",
+"p": [
+1.6619,
+4.5289,
+4.2884
+],
+"q": [
+0.70106,
+-0.0923,
+-0.0923,
+0.70106
+],
+"h": [
+0.0592,
+0.1328,
+0.025
+]
+},
+{
+"path": "Trawler/Trawler_Hull/Colliders/Trawler_Hull_HullPainter/lip",
+"p": [
+14.0495,
+1.8799,
+-4.2567
+],
+"q": [
+-0.43594,
+-0.0,
+0.89998,
+-0.0
+],
+"h": [
+0.241,
+0.1687,
+0.1
+]
+},
+{
+"path": "Trawler/Trawler_Hull/Colliders/Trawler_Hull_HullPainter/window",
+"p": [
+1.846,
+4.2767,
+0.0116
+],
+"q": [
+-0.43046,
+0.56099,
+0.56099,
+-0.43046
+],
+"h": [
+0.0718,
+0.103,
+0.025
+]
+},
+{
+"path": "Trawler/Trawler_Hull/Colliders/Trawler_Hull_HullPainter/window",
+"p": [
+-3.0271,
+4.2767,
+1.0153
+],
+"q": [
+-0.13053,
+-0.0,
+0.0,
+0.99144
+],
+"h": [
+0.103,
+0.0718,
+0.025
+]
+},
+{
+"path": "Trawler/Trawler_Hull/Colliders/Trawler_Hull_HullPainter/window",
+"p": [
+5.0741,
+4.5744,
+4.2884
+],
+"q": [
+0.43046,
+-0.56099,
+0.43046,
+0.56099
+],
+"h": [
+0.103,
+0.0718,
+0.025
+]
+},
+{
+"path": "Trawler/Trawler_Hull/Colliders/Trawler_Hull_HullPainter/window",
+"p": [
+4.8394,
+4.1678,
+4.2884
+],
+"q": [
+-0.2706,
+0.65328,
+0.2706,
+0.65328
+],
+"h": [
+0.103,
+0.0718,
+0.025
+]
+},
+{
+"path": "Trawler/Trawler_Hull/Colliders/Trawler_Hull_HullPainter/window",
+"p": [
+4.9605,
+4.1504,
+4.2884
+],
+"q": [
+0.56099,
+0.43046,
+0.56099,
+-0.43046
+],
+"h": [
+0.1328,
+0.0592,
+0.025
+]
+},
+{
+"path": "Trawler/Trawler_Hull/Colliders/Trawler_Hull_HullPainter/window",
+"p": [
+7.0497,
+4.2767,
+1.0153
+],
+"q": [
+-0.0923,
+-0.0923,
+-0.70106,
+0.70106
+],
+"h": [
+0.0718,
+0.103,
+0.025
+]
+},
+{
+"path": "Trawler/Trawler_Hull/Colliders/Trawler_Hull_HullPainter/window",
+"p": [
+7.0497,
+4.4782,
+1.3886
+],
+"q": [
+-0.0,
+0.92388,
+-0.38268,
+-0.0
+],
+"h": [
+0.1328,
+0.0592,
+0.025
+]
+},
+{
+"path": "Trawler/Trawler_Hull/Colliders/Trawler_Hull_HullPainter/radar",
+"p": [
+0.5816,
+9.7397,
+4.1177
+],
+"q": [
+0.61237,
+-0.61237,
+-0.35355,
+0.35355
+],
+"h": [
+0.1192,
+0.1732,
+0.3
+]
+},
+{
+"path": "Trawler/Trawler_Hull/Colliders/Trawler_Hull_HullPainter/window",
+"p": [
+1.422,
+4.2889,
+4.2884
+],
+"q": [
+0.70106,
+0.0923,
+0.70106,
+-0.0923
+],
+"h": [
+0.1328,
+0.0592,
+0.025
+]
+},
+{
+"path": "Trawler/Trawler_Hull/Colliders/Trawler_Hull_HullPainter/window",
+"p": [
+-3.0271,
+4.1504,
+3.1007
+],
+"q": [
+-0.79335,
+-0.0,
+-0.0,
+0.60876
+],
+"h": [
+0.1328,
+0.0592,
+0.025
+]
+},
+{
+"path": "Trawler/Trawler_Hull/Colliders/Trawler_Hull_HullPainter/window",
+"p": [
+7.0497,
+4.5115,
+3.2219
+],
+"q": [
+0.92388,
+0.0,
+-0.0,
+0.38268
+],
+"h": [
+0.103,
+0.0718,
+0.025
+]
+},
+{
+"path": "Trawler/Trawler_Hull/Colliders/Trawler_Hull_HullPainter/window",
+"p": [
+1.5605,
+4.1504,
+4.2884
+],
+"q": [
+0.56099,
+0.43046,
+0.56099,
+-0.43046
+],
+"h": [
+0.1328,
+0.0592,
+0.025
+]
+},
+{
+"path": "Trawler/Trawler_Hull/Colliders/Trawler_Hull_HullPainter/window",
+"p": [
+1.7498,
+4.2011,
+0.0116
+],
+"q": [
+0.65328,
+-0.2706,
+-0.65328,
+-0.2706
+],
+"h": [
+0.1328,
+0.0592,
+0.025
+]
+},
+{
+"path": "Trawler/Trawler_Hull/Colliders/Trawler_Hull_HullPainter/window",
+"p": [
+1.662,
+4.1504,
+0.0116
+],
+"q": [
+0.56099,
+-0.43046,
+-0.56099,
+-0.43046
+],
+"h": [
+0.1328,
+0.0592,
+0.025
+]
+},
+{
+"path": "Trawler/Trawler_Hull/Colliders/Trawler_Hull_HullPainter/lip",
+"p": [
+-8.0508,
+1.9835,
+-4.4493
+],
+"q": [
+-0.00332,
+0.12278,
+-0.02684,
+0.99207
+],
+"h": [
+0.6716,
+0.1765,
+0.1
+]
+},
+{
+"path": "Trawler/Trawler_Hull/Colliders/Trawler_Hull_HullPainter/lip",
+"p": [
+-9.1796,
+2.0574,
+4.1024
+],
+"q": [
+0.98303,
+-0.0339,
+0.18015,
+-0.00621
+],
+"h": [
+0.547,
+0.1776,
+0.1
+]
+},
+{
+"path": "Trawler/Trawler_Hull/Colliders/Trawler_Hull_HullPainter/window",
+"p": [
+7.0497,
+4.4782,
+3.1886
+],
+"q": [
+0.92388,
+0.0,
+-0.0,
+0.38268
+],
+"h": [
+0.1328,
+0.0592,
+0.025
+]
+},
+{
+"path": "Trawler/Trawler_Hull/Colliders/Trawler_Hull_HullPainter/step",
+"p": [
+5.8113,
+3.95,
+-1.15
+],
+"q": [
+-0.0,
+0.70711,
+0.0,
+0.70711
+],
+"h": [
+0.89,
+0.1,
+0.0995
+]
+},
+{
+"path": "Trawler/Trawler_Hull/Colliders/Trawler_Hull_HullPainter/window",
+"p": [
+1.6742,
+4.1049,
+0.0116
+],
+"q": [
+-0.43046,
+-0.56099,
+-0.43046,
+0.56099
+],
+"h": [
+0.103,
+0.0718,
+0.025
+]
+},
+{
+"path": "Trawler/Trawler_Hull/Colliders/Trawler_Hull_HullPainter/window",
+"p": [
+1.7498,
+4.2011,
+4.2884
+],
+"q": [
+0.65328,
+-0.2706,
+-0.65328,
+-0.2706
+],
+"h": [
+0.1328,
+0.0592,
+0.025
+]
+},
+{
+"path": "Trawler/Trawler_Hull/Colliders/Trawler_Hull_HullPainter/window",
+"p": [
+7.0497,
+4.2889,
+3.2393
+],
+"q": [
+0.99144,
+0.0,
+0.0,
+-0.13053
+],
+"h": [
+0.1328,
+0.0592,
+0.025
+]
+},
+{
+"path": "Trawler/Trawler_Hull/Colliders/Trawler_Hull_HullPainter/window",
+"p": [
+-1.4517,
+4.1049,
+4.2884
+],
+"q": [
+-0.70106,
+0.0923,
+-0.0923,
+0.70106
+],
+"h": [
+0.0718,
+0.103,
+0.025
+]
+},
+{
+"path": "Trawler/Trawler_Hull/Colliders/Trawler_Hull_HullPainter/window",
+"p": [
+5.183,
+4.1678,
+4.2884
+],
+"q": [
+0.65328,
+-0.2706,
+-0.65328,
+-0.2706
+],
+"h": [
+0.103,
+0.0718,
+0.025
+]
+},
+{
+"path": "Trawler/Trawler_Hull/Colliders/Trawler_Hull_HullPainter/window",
+"p": [
+-1.5606,
+4.5115,
+4.2884
+],
+"q": [
+0.2706,
+0.65328,
+-0.2706,
+0.65328
+],
+"h": [
+0.103,
+0.0718,
+0.025
+]
+},
+{
+"path": "Trawler/Trawler_Hull/Colliders/Trawler_Hull_HullPainter/window",
+"p": [
+-3.0271,
+4.2889,
+3.2393
+],
+"q": [
+0.99144,
+0.0,
+0.0,
+-0.13053
+],
+"h": [
+0.1328,
+0.0592,
+0.025
+]
+},
+{
+"path": "Trawler/Trawler_Hull/Colliders/Trawler_Hull_HullPainter/window",
+"p": [
+-1.154,
+4.2767,
+4.2884
+],
+"q": [
+0.70106,
+-0.0923,
+-0.70106,
+-0.0923
+],
+"h": [
+0.103,
+0.0718,
+0.025
+]
+},
+{
+"path": "Trawler/Trawler_Hull/Colliders/Trawler_Hull_HullPainter/window",
+"p": [
+1.5606,
+4.5289,
+0.0116
+],
+"q": [
+0.43046,
+0.56099,
+-0.43046,
+0.56099
+],
+"h": [
+0.1328,
+0.0592,
+0.025
+]
+},
+{
+"path": "Trawler/Trawler_Hull/Colliders/Trawler_Hull_HullPainter/window",
+"p": [
+-1.5273,
+4.2011,
+4.2884
+],
+"q": [
+0.65328,
+0.2706,
+0.65328,
+-0.2706
+],
+"h": [
+0.1328,
+0.0592,
+0.025
+]
+},
+{
+"path": "Trawler/Trawler_Hull/Colliders/Trawler_Hull_HullPainter/window",
+"p": [
+-1.1995,
+4.3903,
+4.2884
+],
+"q": [
+0.70106,
+0.0923,
+-0.70106,
+0.0923
+],
+"h": [
+0.1328,
+0.0592,
+0.025
+]
+},
+{
+"path": "Trawler/Trawler_Hull/Colliders/Trawler_Hull_HullPainter/window",
+"p": [
+7.0497,
+4.1678,
+1.0782
+],
+"q": [
+-0.0,
+0.38268,
+0.92388,
+-0.0
+],
+"h": [
+0.103,
+0.0718,
+0.025
+]
+},
+{
+"path": "Trawler/Trawler_Hull/Colliders/Trawler_Hull_HullPainter/window",
+"p": [
+1.7831,
+4.5115,
+0.0116
+],
+"q": [
+0.2706,
+0.65328,
+-0.65328,
+-0.2706
+],
+"h": [
+0.0718,
+0.103,
+0.025
+]
+},
+{
+"path": "Trawler/Trawler_Hull/Colliders/Trawler_Hull_HullPainter/step",
+"p": [
+4.8113,
+4.7,
+-1.15
+],
+"q": [
+-0.0,
+0.70711,
+0.0,
+0.70711
+],
+"h": [
+0.89,
+0.1,
+0.0995
+]
+},
+{
+"path": "Trawler/Trawler_Wheel/Trawler_Wheel_Collider",
+"p": [
+-2.1164,
+6.6881,
+0.8501
+],
+"q": [
+0.38268,
+-0.0,
+0.0,
+0.92388
+],
+"h": [
+0.0514,
+0.1249,
+0.05
+]
+},
+{
+"path": "Trawler/Trawler_Hull/Colliders/Trawler_Hull_HullPainter/window",
+"p": [
+-3.0271,
+4.4025,
+1.4848
+],
+"q": [
+0.99144,
+0.0,
+-0.0,
+0.13053
+],
+"h": [
+0.103,
+0.0718,
+0.025
+]
+},
+{
+"path": "Trawler/Trawler_Hull/Colliders/Trawler_Hull_HullPainter/window",
+"p": [
+7.0497,
+4.5744,
+1.3129
+],
+"q": [
+-0.0,
+0.79335,
+-0.60876,
+0.0
+],
+"h": [
+0.103,
+0.0718,
+0.025
+]
+},
+{
+"path": "Trawler/Trawler_Hull/Colliders/Trawler_Hull_HullPainter/lip",
+"p": [
+-9.1796,
+2.0573,
+-4.1024
+],
+"q": [
+0.18015,
+0.00621,
+0.98303,
+0.03391
+],
+"h": [
+0.547,
+0.1776,
+0.1
+]
+},
+{
+"path": "Trawler/Trawler_Hull/Colliders/Trawler_Hull_HullPainter/window",
+"p": [
+7.0497,
+4.5744,
+3.1129
+],
+"q": [
+0.56099,
+0.56099,
+-0.43046,
+0.43046
+],
+"h": [
+0.0718,
+0.103,
+0.025
+]
+},
+{
+"path": "Trawler/Trawler_Hull/Colliders/Trawler_Hull_HullPainter/step",
+"p": [
+7.0113,
+3.05,
+-1.15
+],
+"q": [
+-0.0,
+0.70711,
+0.0,
+0.70711
+],
+"h": [
+0.89,
+0.1,
+0.0995
+]
+},
+{
+"path": "Trawler/Trawler_Hull/Colliders/Trawler_Hull_HullPainter/window",
+"p": [
+-1.338,
+4.5289,
+4.2884
+],
+"q": [
+0.70106,
+-0.0923,
+-0.0923,
+0.70106
+],
+"h": [
+0.0592,
+0.1328,
+0.025
+]
+},
+{
+"path": "Trawler/Trawler_Hull/Colliders/Trawler_Hull_HullPainter/window",
+"p": [
+1.662,
+4.5289,
+0.0116
+],
+"q": [
+0.70106,
+-0.0923,
+-0.0923,
+0.70106
+],
+"h": [
+0.0592,
+0.1328,
+0.025
+]
+},
+{
+"path": "Trawler/Trawler_Wheel/Trawler_Wheel_Collider",
+"p": [
+-2.1164,
+6.5103,
+0.7765
+],
+"q": [
+0.0,
+-0.0,
+0.0,
+1.0
+],
+"h": [
+0.0514,
+0.1249,
+0.05
+]
+},
+{
+"path": "Trawler/Trawler_Hull/Colliders/Trawler_Hull_HullPainter/lip",
+"p": [
+-6.5344,
+1.916,
+-4.7145
+],
+"q": [
+0.0596,
+0.00101,
+0.99808,
+0.01699
+],
+"h": [
+0.9006,
+0.1754,
+0.1
+]
+},
+{
+"path": "Trawler/Trawler_Hull/Colliders/Trawler_Hull_HullPainter/window",
+"p": [
+-1.2502,
+4.2011,
+4.2884
+],
+"q": [
+0.65328,
+-0.2706,
+-0.65328,
+-0.2706
+],
+"h": [
+0.1328,
+0.0592,
+0.025
+]
+},
+{
+"path": "Trawler/Trawler_Hull/Colliders/Trawler_Hull_HullPainter/window",
+"p": [
+-3.0271,
+4.5744,
+1.3129
+],
+"q": [
+0.79335,
+0.0,
+0.0,
+0.60876
+],
+"h": [
+0.103,
+0.0718,
+0.025
+]
+},
+{
+"path": "Trawler/Trawler_Hull/Colliders/Trawler_Hull_HullPainter/window",
+"p": [
+7.0497,
+4.2889,
+2.8608
+],
+"q": [
+-0.13053,
+-0.0,
+0.0,
+0.99145
+],
+"h": [
+0.1328,
+0.0592,
+0.025
+]
+},
+{
+"path": "Trawler/Trawler_Hull/Colliders/Trawler_Hull_HullPainter/window",
+"p": [
+-3.0271,
+4.2011,
+1.1115
+],
+"q": [
+-0.38268,
+-0.0,
+0.0,
+0.92388
+],
+"h": [
+0.1328,
+0.0592,
+0.025
+]
+},
+{
+"path": "Trawler/Trawler_Hull/Colliders/Trawler_Hull_HullPainter/lip",
+"p": [
+14.2709,
+1.8799,
+-3.8627
+],
+"q": [
+0.40248,
+-0.40248,
+-0.58139,
+0.58139
+],
+"h": [
+0.1687,
+0.2475,
+0.1
+]
+},
+{
+"path": "Trawler/Trawler_Hull/Colliders/Trawler_Hull_HullPainter/beam",
+"p": [
+-3.3178,
+7.1849,
+4.4325
+],
+"q": [
+-0.52774,
+0.47063,
+-0.40381,
+0.58046
+],
+"h": [
+1.2091,
+0.1489,
+0.15
+]
+},
+{
+"path": "Trawler/Trawler_Hull/Colliders/Trawler_Hull_HullPainter/window",
+"p": [
+1.5484,
+4.1049,
+0.0116
+],
+"q": [
+-0.43046,
+0.56099,
+0.43046,
+0.56099
+],
+"h": [
+0.103,
+0.0718,
+0.025
+]
+},
+{
+"path": "Trawler/Trawler_Hull/Colliders/Trawler_Hull_HullPainter/window",
+"p": [
+-3.0271,
+4.4025,
+3.2848
+],
+"q": [
+0.0,
+0.99144,
+-0.13053,
+-0.0
+],
+"h": [
+0.103,
+0.0718,
+0.025
+]
+},
+{
+"path": "Trawler/Trawler_Hull/Colliders/Trawler_Hull_HullPainter/window",
+"p": [
+7.0497,
+4.1678,
+3.2219
+],
+"q": [
+0.92388,
+0.0,
+0.0,
+-0.38268
+],
+"h": [
+0.103,
+0.0718,
+0.025
+]
+},
+{
+"path": "Trawler/Trawler_Hull/Colliders/Trawler_Hull_HullPainter/window",
+"p": [
+-3.0271,
+4.2767,
+3.2848
+],
+"q": [
+0.70106,
+-0.70106,
+-0.0923,
+-0.0923
+],
+"h": [
+0.0718,
+0.103,
+0.025
+]
+},
+{
+"path": "Trawler/Trawler_Hull/Colliders/Trawler_Hull_HullPainter/window",
+"p": [
+-1.3259,
+4.5744,
+4.2884
+],
+"q": [
+0.70106,
+-0.0923,
+-0.0923,
+0.70106
+],
+"h": [
+0.0718,
+0.103,
+0.025
+]
+},
+{
+"path": "Trawler/Trawler_Hull/Colliders/Trawler_Hull_HullPainter/window",
+"p": [
+-3.0271,
+4.2889,
+1.0608
+],
+"q": [
+-0.0923,
+-0.0923,
+-0.70106,
+0.70106
+],
+"h": [
+0.0592,
+0.1328,
+0.025
+]
+},
+{
+"path": "Trawler/Trawler_Hull/Colliders/Trawler_Hull_HullPainter/beam",
+"p": [
+-0.1389,
+7.1685,
+4.4337
+],
+"q": [
+-0.70575,
+0.70575,
+0.04375,
+0.04375
+],
+"h": [
+1.1589,
+0.15,
+0.15
+]
+},
+{
+"path": "Trawler/Trawler_Hull/Colliders/Trawler_Hull_HullPainter/window",
+"p": [
+4.8219,
+4.2889,
+4.2884
+],
+"q": [
+-0.56099,
+0.43046,
+-0.43046,
+0.56098
+],
+"h": [
+0.0592,
+0.1328,
+0.025
+]
+},
+{
+"path": "Trawler/Trawler_Hull/Colliders/Trawler_Hull_HullPainter/lip",
+"p": [
+-12.8467,
+2.5438,
+-0.5048
+],
+"q": [
+-0.00013,
+0.60878,
+-0.03123,
+0.79272
+],
+"h": [
+0.5565,
+0.1782,
+0.1
+]
+},
+{
+"path": "Trawler/Trawler_Hull/Colliders/Trawler_Hull_HullPainter/window",
+"p": [
+1.846,
+4.2767,
+4.2884
+],
+"q": [
+-0.43046,
+0.56099,
+0.56099,
+-0.43046
+],
+"h": [
+0.0718,
+0.103,
+0.025
+]
+},
+{
+"path": "Trawler/Trawler_Hull/Colliders/Trawler_Hull_HullPainter/radar",
+"p": [
+0.5816,
+9.7397,
+0.2527
+],
+"q": [
+-0.5,
+-0.0,
+0.86603,
+-0.0
+],
+"h": [
+0.1732,
+0.1192,
+0.3
+]
+},
+{
+"path": "Trawler/Trawler_Hull/Colliders/Trawler_Hull_HullPainter/window",
+"p": [
+4.9483,
+4.5744,
+4.2884
+],
+"q": [
+0.70106,
+0.0923,
+0.0923,
+0.70106
+],
+"h": [
+0.0718,
+0.103,
+0.025
+]
+},
+{
+"path": "Trawler/Trawler_Hull/Colliders/Trawler_Hull_HullPainter/window",
+"p": [
+7.0497,
+4.2889,
+1.4393
+],
+"q": [
+0.70106,
+-0.70106,
+-0.0923,
+-0.0923
+],
+"h": [
+0.0592,
+0.1328,
+0.025
+]
+},
+{
+"path": "Trawler/Trawler_Wheel/Trawler_Wheel_Collider",
+"p": [
+-2.1164,
+6.7618,
+1.028
+],
+"q": [
+0.70711,
+0.0,
+0.0,
+0.70711
+],
+"h": [
+0.0514,
+0.1249,
+0.05
+]
+},
+{
+"path": "Trawler/Trawler_Hull/Colliders/Trawler_Hull_HullPainter/beam",
+"p": [
+5.1213,
+4.455,
+-2.15
+],
+"q": [
+0.67082,
+-0.22361,
+-0.2236,
+0.67082
+],
+"h": [
+2.375,
+0.1,
+0.15
+]
+},
+{
+"path": "Trawler/Trawler_Hull/Colliders/Trawler_Hull_HullPainter/beam",
+"p": [
+-0.1389,
+7.1685,
+-0.1337
+],
+"q": [
+-0.0,
+0.06187,
+0.99808,
+-0.0
+],
+"h": [
+0.15,
+1.1589,
+0.15
+]
+},
+{
+"path": "Trawler/Trawler_Hull/Colliders/Trawler_Hull_HullPainter/lip",
+"p": [
+-10.1016,
+2.1446,
+-3.6511
+],
+"q": [
+0.18282,
+0.20145,
+0.64669,
+0.71259
+],
+"h": [
+0.1773,
+0.5362,
+0.1
+]
+},
+{
+"path": "Trawler/Trawler_Hull/Colliders/Trawler_Hull_HullPainter/window",
+"p": [
+5.1497,
+4.2011,
+4.2884
+],
+"q": [
+0.65328,
+-0.2706,
+-0.65328,
+-0.2706
+],
+"h": [
+0.1328,
+0.0592,
+0.025
+]
+},
+{
+"path": "Trawler/Trawler_Hull/Colliders/Trawler_Hull_HullPainter/step",
+"p": [
+4.0113,
+5.3,
+-1.15
+],
+"q": [
+-0.0,
+0.70711,
+0.0,
+0.70711
+],
+"h": [
+0.89,
+0.1,
+0.0995
+]
+},
+{
+"path": "Trawler/Trawler_Hull/Colliders/Trawler_Hull_HullPainter/window",
+"p": [
+-3.0271,
+4.2011,
+1.3886
+],
+"q": [
+0.92388,
+0.0,
+0.0,
+-0.38268
+],
+"h": [
+0.1328,
+0.0592,
+0.025
+]
+},
+{
+"path": "Trawler/Trawler_Hull/Colliders/Trawler_Hull_HullPainter/window",
+"p": [
+4.8219,
+4.3903,
+4.2884
+],
+"q": [
+0.43046,
+-0.56099,
+0.56099,
+-0.43046
+],
+"h": [
+0.0592,
+0.1328,
+0.025
+]
+},
+{
+"path": "Trawler/Trawler_Hull/Colliders/Trawler_Hull_HullPainter/window",
+"p": [
+-3.0271,
+4.5115,
+1.4219
+],
+"q": [
+0.92388,
+-0.0,
+-0.0,
+0.38268
+],
+"h": [
+0.103,
+0.0718,
+0.025
+]
+},
+{
+"path": "Trawler/Trawler_Hull/Colliders/Trawler_Hull_HullPainter/window",
+"p": [
+-1.3259,
+4.1049,
+4.2884
+],
+"q": [
+0.56099,
+-0.43046,
+-0.56099,
+-0.43046
+],
+"h": [
+0.103,
+0.0718,
+0.025
+]
+},
+{
+"path": "Trawler/Trawler_Hull/Colliders/Trawler_Hull_HullPainter/window",
+"p": [
+7.0497,
+4.5744,
+1.1871
+],
+"q": [
+0.60876,
+0.0,
+0.0,
+0.79335
+],
+"h": [
+0.103,
+0.0718,
+0.025
+]
+},
+{
+"path": "Trawler/Trawler_Propeller/Hull 2",
+"p": [
+12.2206,
+-0.9815,
+-0.361
+],
+"q": [
+0.43479,
+-0.44078,
+-0.269,
+0.73777
+],
+"h": [
+0.3,
+0.244,
+0.1
+]
+},
+{
+"path": "Trawler/Trawler_Hull/Colliders/Trawler_Hull_HullPainter/window",
+"p": [
+-3.0271,
+4.2889,
+1.4393
+],
+"q": [
+0.99144,
+0.0,
+0.0,
+-0.13053
+],
+"h": [
+0.1328,
+0.0592,
+0.025
+]
+},
+{
+"path": "Trawler/Trawler_Hull/Colliders/Trawler_Hull_HullPainter/supports",
+"p": [
+0.0298,
+5.5496,
+-3.327
+],
+"q": [
+-0.0,
+-0.63713,
+0.77075,
+-0.0
+],
+"h": [
+0.1,
+1.0933,
+0.09
+]
+},
+{
+"path": "Trawler/Trawler_Hull/Colliders/Trawler_Hull_HullPainter/window",
+"p": [
+1.7498,
+4.4782,
+4.2884
+],
+"q": [
+-0.2706,
+-0.65328,
+0.65328,
+0.2706
+],
+"h": [
+0.0592,
+0.1328,
+0.025
+]
+},
+{
+"path": "Trawler/Trawler_Hull/Colliders/Trawler_Hull_HullPainter/window",
+"p": [
+-3.0271,
+4.1504,
+1.3007
+],
+"q": [
+-0.79335,
+-0.0,
+-0.0,
+0.60876
+],
+"h": [
+0.1328,
+0.0592,
+0.025
+]
+},
+{
+"path": "Trawler/Trawler_Hull/Colliders/Trawler_Hull_HullPainter/step",
+"p": [
+6.2113,
+3.65,
+-1.15
+],
+"q": [
+-0.0,
+0.70711,
+0.0,
+0.70711
+],
+"h": [
+0.89,
+0.1,
+0.0995
+]
+},
+{
+"path": "Trawler/Trawler_Hull/Colliders/Trawler_Hull_HullPainter/window",
+"p": [
+-1.2169,
+4.5115,
+4.2884
+],
+"q": [
+0.2706,
+0.65328,
+-0.65328,
+-0.2706
+],
+"h": [
+0.0718,
+0.103,
+0.025
+]
+},
+{
+"path": "Trawler/Trawler_Hull/Colliders/Trawler_Hull_HullPainter/window",
+"p": [
+1.6741,
+4.5744,
+4.2884
+],
+"q": [
+0.43046,
+-0.56099,
+0.43046,
+0.56099
+],
+"h": [
+0.103,
+0.0718,
+0.025
+]
+},
+{
+"path": "Trawler/Trawler_Hull/Colliders/Trawler_Hull_HullPainter/window",
+"p": [
+4.8726,
+4.2011,
+4.2884
+],
+"q": [
+-0.2706,
+0.65328,
+0.2706,
+0.65328
+],
+"h": [
+0.1328,
+0.0592,
+0.025
+]
+},
+{
+"path": "Trawler/Trawler_Hull/Colliders/Trawler_Hull_HullPainter/window",
+"p": [
+7.0497,
+4.1504,
+1.3007
+],
+"q": [
+0.56099,
+-0.56099,
+-0.43046,
+-0.43046
+],
+"h": [
+0.0592,
+0.1328,
+0.025
+]
+},
+{
+"path": "Trawler/Trawler_Hull/Colliders/Trawler_Hull_HullPainter/window",
+"p": [
+1.6619,
+4.1504,
+4.2884
+],
+"q": [
+0.56099,
+-0.43046,
+-0.56099,
+-0.43046
+],
+"h": [
+0.1328,
+0.0592,
+0.025
+]
+},
+{
+"path": "Trawler/Trawler_Hull/Colliders/Trawler_Hull_HullPainter/beam",
+"p": [
+5.1213,
+4.455,
+-0.15
+],
+"q": [
+0.67082,
+-0.22361,
+-0.22361,
+0.67082
+],
+"h": [
+2.375,
+0.1,
+0.15
+]
+},
+{
+"path": "Trawler/Trawler_Hull/Colliders/Trawler_Hull_HullPainter/step",
+"p": [
+5.6113,
+4.1,
+-1.15
+],
+"q": [
+-0.0,
+0.70711,
+0.0,
+0.70711
+],
+"h": [
+0.89,
+0.1,
+0.0995
+]
+},
+{
+"path": "Trawler/Trawler_Hull/Colliders/Trawler_Hull_HullPainter/window",
+"p": [
+1.7831,
+4.1678,
+0.0116
+],
+"q": [
+0.65328,
+-0.2706,
+-0.65328,
+-0.2706
+],
+"h": [
+0.103,
+0.0718,
+0.025
+]
+},
+{
+"path": "Trawler/Trawler_Hull/Colliders/Trawler_Hull_HullPainter/window",
+"p": [
+4.9605,
+4.5289,
+4.2884
+],
+"q": [
+0.70106,
+0.0923,
+0.0923,
+0.70106
+],
+"h": [
+0.0592,
+0.1328,
+0.025
+]
+},
+{
+"path": "Trawler/Trawler_Hull/Colliders/Trawler_Hull_HullPainter/radar",
+"p": [
+0.5816,
+9.7397,
+0.2527
+],
+"q": [
+0.86603,
+0.0,
+-0.5,
+0.0
+],
+"h": [
+0.1732,
+0.1192,
+0.3
+]
+},
+{
+"path": "Trawler/Trawler_Hull/Colliders/Trawler_Hull_HullPainter/window",
+"p": [
+7.0497,
+4.4025,
+3.2848
+],
+"q": [
+0.0,
+0.99144,
+-0.13053,
+-0.0
+],
+"h": [
+0.103,
+0.0718,
+0.025
+]
+},
+{
+"path": "Trawler/Trawler_Hull/Colliders/Trawler_Hull_HullPainter/window",
+"p": [
+-3.0271,
+4.1504,
+2.9993
+],
+"q": [
+-0.43046,
+-0.43046,
+-0.56099,
+0.56099
+],
+"h": [
+0.0592,
+0.1328,
+0.025
+]
+},
+{
+"path": "Trawler/Trawler_Hull/Colliders/Trawler_Hull_HullPainter/window",
+"p": [
+-3.0271,
+4.5289,
+2.9993
+],
+"q": [
+0.43046,
+-0.43046,
+0.56099,
+0.56099
+],
+"h": [
+0.0592,
+0.1328,
+0.025
+]
+},
+{
+"path": "Trawler/Trawler_Hull/Colliders/Trawler_Hull_HullPainter/window",
+"p": [
+1.4394,
+4.1678,
+0.0116
+],
+"q": [
+0.2706,
+0.65328,
+0.65328,
+0.2706
+],
+"h": [
+0.0718,
+0.103,
+0.025
+]
+},
+{
+"path": "Trawler/Trawler_Hull/Colliders/Trawler_Hull_HullPainter/radar",
+"p": [
+0.5816,
+9.7397,
+4.1178
+],
+"q": [
+-0.5,
+0.0,
+0.86603,
+-0.0
+],
+"h": [
+0.1732,
+0.1192,
+0.3
+]
+},
+{
+"path": "Trawler/Trawler_Hull/Colliders/Trawler_Hull_HullPainter/window",
+"p": [
+7.0497,
+4.2011,
+2.9115
+],
+"q": [
+-0.0,
+0.38268,
+0.92388,
+0.0
+],
+"h": [
+0.1328,
+0.0592,
+0.025
+]
+},
+{
+"path": "Trawler/Trawler_Hull/Colliders/Trawler_Hull_HullPainter/window",
+"p": [
+7.0497,
+4.2011,
+1.3886
+],
+"q": [
+-0.0,
+0.92388,
+0.38268,
+0.0
+],
+"h": [
+0.1328,
+0.0592,
+0.025
+]
+},
+{
+"path": "Trawler/Trawler_Hull/Colliders/Trawler_Hull_HullPainter/radar",
+"p": [
+0.5817,
+9.7397,
+4.1177
+],
+"q": [
+1.0,
+0.0,
+0.0,
+0.0
+],
+"h": [
+0.1732,
+0.1192,
+0.3
+]
+},
+{
+"path": "Trawler/Trawler_Hull/Colliders/Trawler_Hull_HullPainter/lip",
+"p": [
+13.3239,
+1.8799,
+4.7544
+],
+"q": [
+-0.0,
+0.98859,
+-0.0,
+-0.15065
+],
+"h": [
+0.2362,
+0.1687,
+0.1
+]
+},
+{
+"path": "Trawler/Trawler_Wheel/Trawler_Wheel_Collider",
+"p": [
+-2.1164,
+6.3324,
+1.2058
+],
+"q": [
+0.92388,
+0.0,
+-0.0,
+-0.38268
+],
+"h": [
+0.0514,
+0.1249,
+0.05
+]
+},
+{
+"path": "Trawler/Trawler_Hull/Colliders/Trawler_Hull_HullPainter/window",
+"p": [
+-1.5273,
+4.4782,
+4.2884
+],
+"q": [
+0.65328,
+0.2706,
+0.2706,
+0.65328
+],
+"h": [
+0.0592,
+0.1328,
+0.025
+]
+},
+{
+"path": "Trawler/Trawler_Hull/Colliders/Trawler_Hull_HullPainter/step",
+"p": [
+5.4113,
+4.25,
+-1.15
+],
+"q": [
+-0.0,
+0.70711,
+0.0,
+0.70711
+],
+"h": [
+0.89,
+0.1,
+0.0995
+]
+},
+{
+"path": "Trawler/Trawler_Hull/Colliders/Trawler_Hull_HullPainter/window",
+"p": [
+5.183,
+4.5115,
+4.2884
+],
+"q": [
+0.65328,
+0.2706,
+-0.65328,
+0.2706
+],
+"h": [
+0.103,
+0.0718,
+0.025
+]
+},
+{
+"path": "Trawler/Trawler_Hull/Colliders/Trawler_Hull_HullPainter/window",
+"p": [
+7.0497,
+4.5115,
+2.8782
+],
+"q": [
+0.0,
+-0.38268,
+0.92388,
+0.0
+],
+"h": [
+0.103,
+0.0718,
+0.025
+]
+},
+{
+"path": "Trawler/Trawler_Hull/Colliders/Trawler_Hull_HullPainter/window",
+"p": [
+-1.2502,
+4.4782,
+4.2884
+],
+"q": [
+0.65328,
+0.2706,
+-0.65328,
+0.2706
+],
+"h": [
+0.1328,
+0.0592,
+0.025
+]
+},
+{
+"path": "Trawler/Trawler_Hull/Colliders/Trawler_Hull_HullPainter/window",
+"p": [
+1.5483,
+4.5744,
+4.2884
+],
+"q": [
+0.70106,
+0.0923,
+0.0923,
+0.70106
+],
+"h": [
+0.0718,
+0.103,
+0.025
+]
+},
+{
+"path": "Trawler/Trawler_Hull/Colliders/Trawler_Hull_HullPainter/window",
+"p": [
+-3.0271,
+4.2889,
+2.8608
+],
+"q": [
+-0.13053,
+-0.0,
+0.0,
+0.99145
+],
+"h": [
+0.1328,
+0.0592,
+0.025
+]
+},
+{
+"path": "Trawler/Trawler_Hull/Colliders/Trawler_Hull_HullPainter/radar",
+"p": [
+0.5817,
+9.7397,
+0.2527
+],
+"q": [
+0.70711,
+0.70711,
+0.0,
+0.0
+],
+"h": [
+0.1192,
+0.1732,
+0.3
+]
+},
+{
+"path": "Trawler/Trawler_Hull/Colliders/Trawler_Hull_HullPainter/window",
+"p": [
+7.0497,
+4.5289,
+2.9993
+],
+"q": [
+0.60876,
+-0.0,
+-0.0,
+0.79335
+],
+"h": [
+0.1328,
+0.0592,
+0.025
+]
+},
+{
+"path": "Trawler/Trawler_Hull/Colliders/Trawler_Hull_HullPainter/window",
+"p": [
+7.0497,
+4.1678,
+2.8782
+],
+"q": [
+-0.38268,
+-0.0,
+-0.0,
+0.92388
+],
+"h": [
+0.103,
+0.0718,
+0.025
+]
+},
+{
+"path": "Trawler/Trawler_Hull/Colliders/Trawler_Hull_HullPainter/window",
+"p": [
+7.0497,
+4.2767,
+3.2848
+],
+"q": [
+-0.70106,
+0.70106,
+0.0923,
+0.0923
+],
+"h": [
+0.0718,
+0.103,
+0.025
+]
+},
+{
+"path": "Trawler/Trawler_Wheel/Trawler_Wheel_Collider",
+"p": [
+-2.1164,
+6.2588,
+1.028
+],
+"q": [
+-0.5,
+0.5,
+0.5,
+0.5
+],
+"h": [
+0.1249,
+0.0514,
+0.05
+]
+},
+{
+"path": "Trawler/Trawler_Hull/Colliders/Trawler_Hull_HullPainter/step",
+"p": [
+-4.5936,
+3.05,
+1.2205
+],
+"q": [
+-0.0,
+0.70711,
+0.0,
+0.70711
+],
+"h": [
+0.0976,
+0.1,
+1.3949
+]
+},
+{
+"path": "Trawler/Trawler_Hull/Colliders/Trawler_Hull_HullPainter/lip",
+"p": [
+13.3239,
+1.8799,
+-4.7544
+],
+"q": [
+0.10653,
+-0.10653,
+-0.69904,
+0.69904
+],
+"h": [
+0.1687,
+0.2362,
+0.1
+]
+},
+{
+"path": "Trawler/Trawler_Hull/Colliders/Trawler_Hull_HullPainter/lip",
+"p": [
+-10.9564,
+2.2515,
+3.0379
+],
+"q": [
+-0.63074,
+0.69867,
+-0.22627,
+0.25064
+],
+"h": [
+0.177,
+0.5728,
+0.1
+]
+},
+{
+"path": "Trawler/Trawler_Hull/Colliders/Trawler_Hull_HullPainter/window",
+"p": [
+5.0619,
+4.1504,
+4.2884
+],
+"q": [
+0.56099,
+-0.43046,
+-0.56099,
+-0.43046
+],
+"h": [
+0.1328,
+0.0592,
+0.025
+]
+},
+{
+"path": "Trawler/Trawler_Hull/Colliders/Trawler_Hull_HullPainter/window",
+"p": [
+-3.0271,
+4.5744,
+3.1129
+],
+"q": [
+0.79335,
+0.0,
+0.0,
+0.60876
+],
+"h": [
+0.103,
+0.0718,
+0.025
+]
+},
+{
+"path": "Trawler/Trawler_Hull/Colliders/Trawler_Hull_HullPainter/window",
+"p": [
+1.7498,
+4.4782,
+0.0116
+],
+"q": [
+0.65328,
+0.2706,
+-0.65328,
+0.2706
+],
+"h": [
+0.1328,
+0.0592,
+0.025
+]
+},
+{
+"path": "Trawler/Trawler_Hull/Colliders/Trawler_Hull_HullPainter/window",
+"p": [
+-1.578,
+4.3903,
+4.2884
+],
+"q": [
+0.43046,
+-0.56099,
+0.56099,
+-0.43046
+],
+"h": [
+0.0592,
+0.1328,
+0.025
+]
+},
+{
+"path": "Trawler/Trawler_Hull/Colliders/Trawler_Hull_HullPainter/window",
+"p": [
+1.5605,
+4.5289,
+4.2884
+],
+"q": [
+0.0923,
+-0.70106,
+0.70106,
+-0.0923
+],
+"h": [
+0.0592,
+0.1328,
+0.025
+]
+},
+{
+"path": "Trawler/Trawler_Hull/Colliders/Trawler_Hull_HullPainter/window",
+"p": [
+7.0497,
+4.4782,
+1.1115
+],
+"q": [
+-0.0,
+-0.38268,
+0.92388,
+-0.0
+],
+"h": [
+0.1328,
+0.0592,
+0.025
+]
+},
+{
+"path": "Trawler/Trawler_Hull/Colliders/Trawler_Hull_HullPainter/window",
+"p": [
+-3.0271,
+4.2011,
+3.1886
+],
+"q": [
+0.65328,
+-0.65328,
+-0.2706,
+-0.2706
+],
+"h": [
+0.0592,
+0.1328,
+0.025
+]
+},
+{
+"path": "Trawler/Trawler_Hull/Colliders/Trawler_Hull_HullPainter/step",
+"p": [
+3.4113,
+5.75,
+-1.15
+],
+"q": [
+-0.0,
+0.70711,
+0.0,
+0.70711
+],
+"h": [
+0.89,
+0.1,
+0.0995
+]
+},
+{
+"path": "Trawler/Trawler_Hull/Colliders/Trawler_Hull_HullPainter/window",
+"p": [
+7.0497,
+4.4025,
+2.8153
+],
+"q": [
+-0.0,
+-0.13053,
+0.99144,
+-0.0
+],
+"h": [
+0.103,
+0.0718,
+0.025
+]
+},
+{
+"path": "Trawler/Trawler_Hull/Colliders/Trawler_Hull_HullPainter/lip",
+"p": [
+-12.3835,
+2.4589,
+-1.4901
+],
+"q": [
+-0.33356,
+0.32135,
+-0.66144,
+0.58989
+],
+"h": [
+0.1776,
+0.6112,
+0.1
+]
+},
+{
+"path": "Trawler/Trawler_Hull/Colliders/Trawler_Hull_HullPainter/window",
+"p": [
+-3.0271,
+4.3903,
+2.8608
+],
+"q": [
+-0.0,
+-0.13053,
+0.99144,
+-0.0
+],
+"h": [
+0.1328,
+0.0592,
+0.025
+]
+},
+{
+"path": "Trawler/Trawler_Hull/Colliders/Trawler_Hull_HullPainter/window",
+"p": [
+1.3766,
+4.2767,
+0.0116
+],
+"q": [
+0.70106,
+0.0923,
+0.70106,
+-0.0923
+],
+"h": [
+0.103,
+0.0718,
+0.025
+]
+},
+{
+"path": "Trawler/Trawler_Hull/Colliders/Trawler_Hull_HullPainter/window",
+"p": [
+-3.0271,
+4.1504,
+1.1993
+],
+"q": [
+0.0,
+0.60876,
+0.79335,
+-0.0
+],
+"h": [
+0.1328,
+0.0592,
+0.025
+]
+},
+{
+"path": "Trawler/Trawler_Hull/Colliders/Trawler_Hull_HullPainter/window",
+"p": [
+7.0497,
+4.2011,
+3.1886
+],
+"q": [
+0.92388,
+0.0,
+0.0,
+-0.38268
+],
+"h": [
+0.1328,
+0.0592,
+0.025
+]
+},
+{
+"path": "Trawler/Trawler_Hull/Colliders/Trawler_Hull_HullPainter/window",
+"p": [
+1.5484,
+4.5744,
+0.0116
+],
+"q": [
+0.70106,
+0.0923,
+0.0923,
+0.70106
+],
+"h": [
+0.0718,
+0.103,
+0.025
+]
+},
+{
+"path": "Trawler/Trawler_Hull/Colliders/Trawler_Hull_HullPainter/window",
+"p": [
+-3.0271,
+4.5744,
+1.1871
+],
+"q": [
+0.60876,
+0.0,
+0.0,
+0.79335
+],
+"h": [
+0.103,
+0.0718,
+0.025
+]
+},
+{
+"path": "Trawler/Trawler_Hull/Colliders/Trawler_Hull_HullPainter/step",
+"p": [
+4.2113,
+5.15,
+-1.15
+],
+"q": [
+-0.0,
+0.70711,
+0.0,
+0.70711
+],
+"h": [
+0.89,
+0.1,
+0.0995
+]
+},
+{
+"path": "Trawler/Trawler_Hull/Colliders/Trawler_Hull_HullPainter/window",
+"p": [
+1.422,
+4.3903,
+0.0116
+],
+"q": [
+0.70106,
+-0.0923,
+0.70106,
+0.0923
+],
+"h": [
+0.1328,
+0.0592,
+0.025
+]
+},
+{
+"path": "Trawler/Trawler_Hull/Colliders/Trawler_Hull_HullPainter/window",
+"p": [
+7.0497,
+4.1504,
+2.9993
+],
+"q": [
+-0.43046,
+0.43046,
+0.56099,
+0.56099
+],
+"h": [
+0.0592,
+0.1328,
+0.025
+]
+},
+{
+"path": "Trawler/Trawler_Hull/Colliders/Trawler_Hull_HullPainter/window",
+"p": [
+-3.0271,
+4.3903,
+3.2393
+],
+"q": [
+-0.70106,
+0.70106,
+-0.0923,
+-0.0923
+],
+"h": [
+0.0592,
+0.1328,
+0.025
+]
+},
+{
+"path": "Trawler/Trawler_Wheel/Trawler_Wheel_Collider",
+"p": [
+-2.1164,
+6.6881,
+1.2058
+],
+"q": [
+0.92388,
+-0.0,
+-0.0,
+0.38268
+],
+"h": [
+0.0514,
+0.1249,
+0.05
+]
+},
+{
+"path": "Trawler/Trawler_Hull/Colliders/Trawler_Hull_HullPainter/window",
+"p": [
+5.2459,
+4.2767,
+4.2884
+],
+"q": [
+-0.43046,
+0.56099,
+0.56099,
+-0.43046
+],
+"h": [
+0.0718,
+0.103,
+0.025
+]
+},
+{
+"path": "Trawler/Trawler_Rudder/Hull 1",
+"p": [
+13.37,
+-0.7119,
+0.0612
+],
+"q": [
+0.03892,
+-0.0,
+0.99924,
+-0.0
+],
+"h": [
+0.5811,
+0.9919,
+0.1
+]
+},
+{
+"path": "Trawler/Trawler_Hull/Colliders/Trawler_Hull_HullPainter/window",
+"p": [
+1.4727,
+4.4782,
+4.2884
+],
+"q": [
+0.65328,
+-0.2706,
+0.65328,
+0.2706
+],
+"h": [
+0.1328,
+0.0592,
+0.025
+]
+},
+{
+"path": "Trawler/Trawler_Hull/Colliders/Trawler_Hull_HullPainter/window",
+"p": [
+-1.578,
+4.2889,
+4.2884
+],
+"q": [
+0.70106,
+0.0923,
+0.70106,
+-0.0923
+],
+"h": [
+0.1328,
+0.0592,
+0.025
+]
+},
+{
+"path": "Trawler/Trawler_Hull/Colliders/Trawler_Hull_HullPainter/window",
+"p": [
+-3.0271,
+4.4782,
+3.1886
+],
+"q": [
+0.65328,
+-0.65328,
+0.2706,
+0.2706
+],
+"h": [
+0.0592,
+0.1328,
+0.025
+]
+},
+{
+"path": "Trawler/Trawler_Hull/Colliders/Trawler_Hull_HullPainter/window",
+"p": [
+-1.1995,
+4.2889,
+4.2884
+],
+"q": [
+-0.43046,
+0.56099,
+0.56099,
+-0.43046
+],
+"h": [
+0.0592,
+0.1328,
+0.025
+]
+},
+{
+"path": "Trawler/Trawler_Hull/Colliders/Trawler_Hull_HullPainter/window",
+"p": [
+-3.0271,
+4.5289,
+3.1007
+],
+"q": [
+-0.56099,
+0.56099,
+-0.43046,
+-0.43046
+],
+"h": [
+0.0592,
+0.1328,
+0.025
+]
+},
+{
+"path": "Trawler/Trawler_Hull/Colliders/Trawler_Hull_HullPainter/window",
+"p": [
+-3.0271,
+4.1678,
+3.2219
+],
+"q": [
+0.92388,
+0.0,
+0.0,
+-0.38268
+],
+"h": [
+0.103,
+0.0718,
+0.025
+]
+},
+{
+"path": "Trawler/Trawler_Hull/Colliders/Trawler_Hull_HullPainter/window",
+"p": [
+7.0497,
+4.2767,
+1.4848
+],
+"q": [
+0.99144,
+0.0,
+0.0,
+-0.13053
+],
+"h": [
+0.103,
+0.0718,
+0.025
+]
+},
+{
+"path": "Trawler/Trawler_Hull/Colliders/Trawler_Hull_HullPainter/window",
+"p": [
+-3.0271,
+4.4782,
+2.9115
+],
+"q": [
+-0.0,
+-0.38268,
+0.92388,
+-0.0
+],
+"h": [
+0.1328,
+0.0592,
+0.025
+]
+},
+{
+"path": "Trawler/Trawler_Hull/Colliders/Trawler_Hull_HullPainter/window",
+"p": [
+4.7765,
+4.4025,
+4.2884
+],
+"q": [
+0.70106,
+-0.0923,
+0.70106,
+0.0923
+],
+"h": [
+0.103,
+0.0718,
+0.025
+]
+},
+{
+"path": "Trawler/Trawler_Hull/Colliders/Trawler_Hull_HullPainter/window",
+"p": [
+7.0497,
+4.5289,
+1.3007
+],
+"q": [
+0.79335,
+-0.0,
+-0.0,
+0.60876
+],
+"h": [
+0.1328,
+0.0592,
+0.025
+]
+},
+{
+"path": "Trawler/Trawler_Hull/Colliders/Trawler_Hull_HullPainter/window",
+"p": [
+7.0497,
+4.3903,
+1.4393
+],
+"q": [
+0.99144,
+0.0,
+-0.0,
+0.13053
+],
+"h": [
+0.1328,
+0.0592,
+0.025
+]
+},
+{
+"path": "Trawler/Trawler_Hull/Colliders/Trawler_Hull_HullPainter/lip",
+"p": [
+-11.7152,
+2.3556,
+-2.3314
+],
+"q": [
+-0.29275,
+0.26941,
+-0.67987,
+0.61604
+],
+"h": [
+0.1772,
+0.5195,
+0.1
+]
+},
+{
+"path": "Trawler/Trawler_Hull/Colliders/Trawler_Hull_HullPainter/window",
+"p": [
+4.8394,
+4.5115,
+4.2884
+],
+"q": [
+-0.2706,
+0.65328,
+-0.65328,
+0.2706
+],
+"h": [
+0.0718,
+0.103,
+0.025
+]
+},
+{
+"path": "Trawler/Trawler_Hull/Colliders/Trawler_Hull_HullPainter/window",
+"p": [
+1.846,
+4.4025,
+0.0116
+],
+"q": [
+0.70106,
+0.0923,
+-0.70106,
+0.0923
+],
+"h": [
+0.103,
+0.0718,
+0.025
+]
+},
+{
+"path": "Trawler/Trawler_Hull/Colliders/Trawler_Hull_HullPainter/window",
+"p": [
+1.8006,
+4.2889,
+0.0116
+],
+"q": [
+0.70106,
+-0.0923,
+-0.70106,
+-0.0923
+],
+"h": [
+0.1328,
+0.0592,
+0.025
+]
+},
+{
+"path": "Trawler/Trawler_Hull/Colliders/Trawler_Hull_HullPainter/window",
+"p": [
+7.0497,
+4.3903,
+3.2393
+],
+"q": [
+0.99144,
+-0.0,
+0.0,
+0.13053
+],
+"h": [
+0.1328,
+0.0592,
+0.025
+]
+},
+{
+"path": "Trawler/Trawler_Hull/Colliders/Trawler_Hull_HullPainter/window",
+"p": [
+5.2005,
+4.3903,
+4.2884
+],
+"q": [
+0.70106,
+0.0923,
+-0.70106,
+0.0923
+],
+"h": [
+0.1328,
+0.0592,
+0.025
+]
+},
+{
+"path": "Trawler/Trawler_Hull/Colliders/Trawler_Hull_HullPainter/step",
+"p": [
+5.0113,
+4.55,
+-1.15
+],
+"q": [
+-0.0,
+0.70711,
+0.0,
+0.70711
+],
+"h": [
+0.89,
+0.1,
+0.0995
+]
+},
+{
+"path": "Trawler/Trawler_Hull/Colliders/Trawler_Hull_HullPainter/window",
+"p": [
+-3.0271,
+4.5744,
+2.9871
+],
+"q": [
+0.60876,
+0.0,
+0.0,
+0.79335
+],
+"h": [
+0.103,
+0.0718,
+0.025
+]
+},
+{
+"path": "Trawler/Trawler_Hull/Colliders/Trawler_Hull_HullPainter/window",
+"p": [
+-1.6235,
+4.4025,
+4.2884
+],
+"q": [
+0.43046,
+-0.56099,
+0.56099,
+-0.43046
+],
+"h": [
+0.0718,
+0.103,
+0.025
+]
+},
+{
+"path": "Trawler/Trawler_Hull/Colliders/Trawler_Hull_HullPainter/window",
+"p": [
+7.0497,
+4.2011,
+1.1115
+],
+"q": [
+-0.0,
+0.38268,
+0.92388,
+-0.0
+],
+"h": [
+0.1328,
+0.0592,
+0.025
+]
+},
+{
+"path": "Trawler/Trawler_Hull/Colliders/Trawler_Hull_HullPainter/window",
+"p": [
+-1.4395,
+4.1504,
+4.2884
+],
+"q": [
+0.56099,
+0.43046,
+0.56099,
+-0.43046
+],
+"h": [
+0.1328,
+0.0592,
+0.025
+]
+},
+{
+"path": "Trawler/Trawler_Hull/Colliders/Trawler_Hull_HullPainter/lip",
+"p": [
+14.0495,
+1.8799,
+4.2567
+],
+"q": [
+0.89998,
+0.0,
+-0.43594,
+0.0
+],
+"h": [
+0.241,
+0.1687,
+0.1
+]
+},
+{
+"path": "Trawler/Trawler_Hull/Colliders/Trawler_Hull_HullPainter/lip",
+"p": [
+13.7226,
+1.8799,
+4.5609
+],
+"q": [
+0.95572,
+0.0,
+-0.29426,
+0.0
+],
+"h": [
+0.2415,
+0.1687,
+0.1
+]
+},
+{
+"path": "Trawler/Trawler_Hull/Colliders/Trawler_Hull_HullPainter/window",
+"p": [
+7.0497,
+4.4025,
+1.0153
+],
+"q": [
+0.0923,
+0.0923,
+-0.70106,
+0.70106
+],
+"h": [
+0.0718,
+0.103,
+0.025
+]
+},
+{
+"path": "Trawler/Trawler_Hull/Colliders/Trawler_Hull_HullPainter/lip",
+"p": [
+3.7348,
+1.8799,
+-4.8202
+],
+"q": [
+-0.0,
+-0.0,
+-0.70711,
+0.70711
+],
+"h": [
+0.1687,
+9.3934,
+0.1
+]
+},
+{
+"path": "Trawler/Trawler_Rudder/Hull 2",
+"p": [
+13.37,
+-0.7119,
+-0.0612
+],
+"q": [
+0.70657,
+-0.70657,
+0.02752,
+-0.02752
+],
+"h": [
+0.9919,
+0.5811,
+0.1
+]
+},
+{
+"path": "Trawler/Trawler_Hull/Colliders/Trawler_Hull_HullPainter/window",
+"p": [
+7.0497,
+4.1049,
+1.1871
+],
+"q": [
+-0.0,
+0.60876,
+0.79335,
+0.0
+],
+"h": [
+0.103,
+0.0718,
+0.025
+]
+},
+{
+"path": "Trawler/Trawler_Hull/Colliders/Trawler_Hull_HullPainter/lip",
+"p": [
+-12.8467,
+2.5438,
+0.5048
+],
+"q": [
+0.58262,
+0.53846,
+0.43057,
+0.43038
+],
+"h": [
+0.1782,
+0.5565,
+0.1
+]
+},
+{
+"path": "Trawler/Trawler_Hull/Colliders/Trawler_Hull_HullPainter/window",
+"p": [
+5.1497,
+4.4782,
+4.2884
+],
+"q": [
+0.2706,
+-0.65328,
+0.2706,
+0.65328
+],
+"h": [
+0.1328,
+0.0592,
+0.025
+]
+},
+{
+"path": "Trawler/Trawler_Propeller/Hull 1",
+"p": [
+12.2206,
+-0.3582,
+0.0035
+],
+"q": [
+0.61447,
+-0.59655,
+-0.37048,
+0.35958
+],
+"h": [
+0.3,
+0.2441,
+0.1
+]
+},
+{
+"path": "Trawler/Trawler_Hull/Colliders/Trawler_Hull_HullPainter/window",
+"p": [
+-1.154,
+4.4025,
+4.2884
+],
+"q": [
+0.56099,
+-0.43046,
+-0.43046,
+0.56099
+],
+"h": [
+0.0718,
+0.103,
+0.025
+]
+},
+{
+"path": "Trawler/Trawler_Hull/Colliders/Trawler_Hull_HullPainter/window",
+"p": [
+-3.0271,
+4.4025,
+1.0153
+],
+"q": [
+-0.0,
+-0.13053,
+0.99144,
+-0.0
+],
+"h": [
+0.103,
+0.0718,
+0.025
+]
+},
+{
+"path": "Trawler/Trawler_Hull/Colliders/Trawler_Hull_HullPainter/window",
+"p": [
+1.7831,
+4.1678,
+4.2884
+],
+"q": [
+0.65328,
+-0.2706,
+-0.65328,
+-0.2706
+],
+"h": [
+0.103,
+0.0718,
+0.025
+]
+},
+{
+"path": "Trawler/Trawler_Hull/Colliders/Trawler_Hull_HullPainter/step",
+"p": [
+3.6113,
+5.6,
+-1.15
+],
+"q": [
+-0.0,
+0.70711,
+0.0,
+0.70711
+],
+"h": [
+0.89,
+0.1,
+0.0995
+]
+},
+{
+"path": "Trawler/Trawler_Hull/Colliders/Trawler_Hull_HullPainter/window",
+"p": [
+7.0497,
+4.5115,
+1.0782
+],
+"q": [
+0.2706,
+0.2706,
+-0.65328,
+0.65328
+],
+"h": [
+0.0718,
+0.103,
+0.025
+]
+},
+{
+"path": "Trawler/Trawler_Hull/Colliders/Trawler_Hull_HullPainter/lip",
+"p": [
+14.2709,
+1.8799,
+3.8627
+],
+"q": [
+-0.58139,
+0.58139,
+0.40248,
+-0.40248
+],
+"h": [
+0.1687,
+0.2475,
+0.1
+]
+},
+{
+"path": "Trawler/Trawler_Hull/Colliders/Trawler_Hull_HullPainter/window",
+"p": [
+1.422,
+4.3903,
+4.2884
+],
+"q": [
+0.70106,
+-0.0923,
+0.70106,
+0.0923
+],
+"h": [
+0.1328,
+0.0592,
+0.025
+]
+},
+{
+"path": "Trawler/Trawler_Hull/Colliders/Trawler_Hull_HullPainter/window",
+"p": [
+-3.0271,
+4.2011,
+2.9115
+],
+"q": [
+-0.0,
+0.38268,
+0.92388,
+0.0
+],
+"h": [
+0.1328,
+0.0592,
+0.025
+]
+},
+{
+"path": "Trawler/Trawler_Hull/Colliders/Trawler_Hull_HullPainter/window",
+"p": [
+7.0497,
+4.1504,
+3.1007
+],
+"q": [
+-0.79335,
+-0.0,
+-0.0,
+0.60876
+],
+"h": [
+0.1328,
+0.0592,
+0.025
+]
+},
+{
+"path": "Trawler/Trawler_Hull/Colliders/Trawler_Hull_HullPainter/window",
+"p": [
+4.9483,
+4.1049,
+4.2884
+],
+"q": [
+0.56099,
+0.43046,
+0.56099,
+-0.43046
+],
+"h": [
+0.103,
+0.0718,
+0.025
+]
+},
+{
+"path": "Trawler/Trawler_Hull/Colliders/Trawler_Hull_HullPainter/window",
+"p": [
+-1.5606,
+4.1678,
+4.2884
+],
+"q": [
+-0.2706,
+0.65328,
+0.2706,
+0.65328
+],
+"h": [
+0.103,
+0.0718,
+0.025
+]
+},
+{
+"path": "Trawler/Trawler_Hull/Colliders/Trawler_Hull_HullPainter/beam",
+"p": [
+-3.3178,
+7.1849,
+-0.1325
+],
+"q": [
+-0.58046,
+0.40382,
+-0.47062,
+0.52774
+],
+"h": [
+1.2091,
+0.1489,
+0.15
+]
+},
+{
+"path": "Trawler/Trawler_Hull/Colliders/Trawler_Hull_HullPainter/window",
+"p": [
+7.0497,
+4.1678,
+1.4219
+],
+"q": [
+0.65328,
+-0.65328,
+-0.2706,
+-0.2706
+],
+"h": [
+0.0718,
+0.103,
+0.025
+]
+},
+{
+"path": "Trawler/Trawler_Hull/Colliders/Trawler_Hull_HullPainter/step",
+"p": [
+6.8113,
+3.2,
+-1.15
+],
+"q": [
+-0.0,
+0.70711,
+0.0,
+0.70711
+],
+"h": [
+0.89,
+0.1,
+0.0995
+]
+},
+{
+"path": "Trawler/Trawler_Hull/Colliders/Trawler_Hull_HullPainter/window",
+"p": [
+-1.338,
+4.1504,
+4.2884
+],
+"q": [
+0.56099,
+-0.43046,
+-0.56099,
+-0.43046
+],
+"h": [
+0.1328,
+0.0592,
+0.025
+]
+},
+{
+"path": "Trawler/Trawler_Hull/Colliders/Trawler_Hull_HullPainter/lip",
+"p": [
+-6.5344,
+1.916,
+4.7145
+],
+"q": [
+0.99808,
+-0.01697,
+0.0596,
+-0.00101
+],
+"h": [
+0.9006,
+0.1754,
+0.1
+]
+},
+{
+"path": "Trawler/Trawler_Hull/Colliders/Trawler_Hull_HullPainter/window",
+"p": [
+-3.0271,
+4.4782,
+1.1115
+],
+"q": [
+-0.0,
+-0.38268,
+0.92388,
+-0.0
+],
+"h": [
+0.1328,
+0.0592,
+0.025
+]
+},
+{
+"path": "Trawler/Trawler_Hull/Colliders/Trawler_Hull_HullPainter/step",
+"p": [
+6.6113,
+3.35,
+-1.15
+],
+"q": [
+-0.0,
+0.70711,
+0.0,
+0.70711
+],
+"h": [
+0.89,
+0.1,
+0.0995
+]
+},
+{
+"path": "Trawler/Trawler_Hull/Colliders/Trawler_Hull_HullPainter/lip",
+"p": [
+3.7348,
+1.8799,
+4.8202
+],
+"q": [
+0.70711,
+0.70711,
+-0.0,
+0.0
+],
+"h": [
+0.1687,
+9.3934,
+0.1
+]
+},
+{
+"path": "Trawler/Trawler_Hull/Colliders/Trawler_Hull_HullPainter/window",
+"p": [
+1.422,
+4.2889,
+0.0116
+],
+"q": [
+0.70106,
+0.0923,
+0.70106,
+-0.0923
+],
+"h": [
+0.1328,
+0.0592,
+0.025
+]
+},
+{
+"path": "Trawler/Trawler_Hull/Colliders/Trawler_Hull_HullPainter/window",
+"p": [
+4.7765,
+4.2767,
+4.2884
+],
+"q": [
+0.70106,
+0.0923,
+0.70106,
+-0.0923
+],
+"h": [
+0.103,
+0.0718,
+0.025
+]
+},
+{
+"path": "Trawler/Trawler_Hull/Colliders/Trawler_Hull_HullPainter/window",
+"p": [
+5.2005,
+4.2889,
+4.2884
+],
+"q": [
+0.70106,
+-0.0923,
+-0.70106,
+-0.0923
+],
+"h": [
+0.1328,
+0.0592,
+0.025
+]
+},
+{
+"path": "Trawler/Trawler_Hull/Colliders/Trawler_Hull_HullPainter/window",
+"p": [
+-1.2169,
+4.1678,
+4.2884
+],
+"q": [
+0.65328,
+-0.2706,
+-0.65328,
+-0.2706
+],
+"h": [
+0.103,
+0.0718,
+0.025
+]
+},
+{
+"path": "Trawler/Trawler_Hull/Colliders/Trawler_Hull_HullPainter/window",
+"p": [
+1.7831,
+4.5115,
+4.2884
+],
+"q": [
+0.2706,
+0.65328,
+-0.65328,
+-0.2706
+],
+"h": [
+0.0718,
+0.103,
+0.025
+]
+},
+{
+"path": "Trawler/Trawler_Hull/Colliders/Trawler_Hull_HullPainter/window",
+"p": [
+-3.0271,
+4.1678,
+1.4219
+],
+"q": [
+0.65328,
+0.65328,
+0.2706,
+-0.2706
+],
+"h": [
+0.0718,
+0.103,
+0.025
+]
+},
+{
+"path": "Trawler/Trawler_Hull/Colliders/Trawler_Hull_HullPainter/supports",
+"p": [
+2.9138,
+5.5496,
+-3.327
+],
+"q": [
+0.45052,
+-0.45052,
+0.54501,
+0.54501
+],
+"h": [
+1.0933,
+0.1,
+0.09
+]
+},
+{
+"path": "Trawler/Trawler_Hull/Colliders/Trawler_Hull_HullPainter/window",
+"p": [
+1.3766,
+4.4025,
+0.0116
+],
+"q": [
+0.70106,
+-0.0923,
+0.70106,
+0.0923
+],
+"h": [
+0.103,
+0.0718,
+0.025
+]
+},
+{
+"path": "Trawler/Trawler_Hull/Colliders/Trawler_Hull_HullPainter/window",
+"p": [
+7.0497,
+4.3903,
+2.8608
+],
+"q": [
+0.13053,
+-0.0,
+0.0,
+0.99144
+],
+"h": [
+0.1328,
+0.0592,
+0.025
+]
+},
+{
+"path": "Trawler/Trawler_Hull/Colliders/Trawler_Hull_HullPainter/window",
+"p": [
+-3.0271,
+4.1049,
+1.3129
+],
+"q": [
+0.56099,
+-0.56098,
+-0.43046,
+-0.43046
+],
+"h": [
+0.0718,
+0.103,
+0.025
+]
+},
+{
+"path": "Trawler/Trawler_Hull/Colliders/Trawler_Hull_HullPainter/window",
+"p": [
+1.8005,
+4.2889,
+4.2884
+],
+"q": [
+0.70106,
+-0.0923,
+-0.70106,
+-0.0923
+],
+"h": [
+0.1328,
+0.0592,
+0.025
+]
+},
+{
+"path": "Trawler/Trawler_Hull/Colliders/Trawler_Hull_HullPainter/window",
+"p": [
+-3.0271,
+4.3903,
+1.0608
+],
+"q": [
+-0.0,
+-0.13053,
+0.99144,
+-0.0
+],
+"h": [
+0.1328,
+0.0592,
+0.025
+]
+},
+{
+"path": "Trawler/Trawler_Hull/Colliders/Trawler_Hull_HullPainter/beam",
+"p": [
+1.1613,
+7.1685,
+-0.1337
+],
+"q": [
+-0.0,
+0.06187,
+0.99808,
+-0.0
+],
+"h": [
+0.15,
+1.1589,
+0.15
+]
+},
+{
+"path": "Trawler/Trawler_Hull/Colliders/Trawler_Hull_HullPainter/window",
+"p": [
+1.846,
+4.4025,
+4.2884
+],
+"q": [
+0.56099,
+-0.43046,
+-0.43046,
+0.56099
+],
+"h": [
+0.0718,
+0.103,
+0.025
+]
+},
+{
+"path": "Trawler/Trawler_Hull/Colliders/Trawler_Hull_HullPainter/lip",
+"p": [
+14.3516,
+1.8799,
+-0.0
+],
+"q": [
+0.70711,
+0.0,
+-0.70711,
+0.0
+],
+"h": [
+3.6663,
+0.1687,
+0.1
+]
+},
+{
+"path": "Trawler/Trawler_Hull/Colliders/Trawler_Hull_HullPainter/window",
+"p": [
+4.8726,
+4.4782,
+4.2884
+],
+"q": [
+0.65328,
+-0.2706,
+0.65328,
+0.2706
+],
+"h": [
+0.1328,
+0.0592,
+0.025
+]
+},
+{
+"path": "Trawler/Trawler_Hull/Colliders/Trawler_Hull_HullPainter/window",
+"p": [
+7.0497,
+4.4782,
+2.9115
+],
+"q": [
+-0.0,
+-0.38268,
+0.92388,
+-0.0
+],
+"h": [
+0.1328,
+0.0592,
+0.025
+]
+},
+{
+"path": "Trawler/Trawler_Hull/Colliders/Trawler_Hull_HullPainter/window",
+"p": [
+1.4394,
+4.5115,
+0.0116
+],
+"q": [
+0.2706,
+0.65328,
+-0.2706,
+0.65328
+],
+"h": [
+0.103,
+0.0718,
+0.025
+]
+},
+{
+"path": "Trawler/Trawler_Hull/Colliders/Trawler_Hull_HullPainter/window",
+"p": [
+1.8006,
+4.3903,
+0.0116
+],
+"q": [
+0.70106,
+0.0923,
+-0.70106,
+0.0923
+],
+"h": [
+0.1328,
+0.0592,
+0.025
+]
+},
+{
+"path": "Trawler/Trawler_Hull/Colliders/Trawler_Hull_HullPainter/step",
+"p": [
+3.8113,
+5.45,
+-1.15
+],
+"q": [
+-0.0,
+0.70711,
+0.0,
+0.70711
+],
+"h": [
+0.89,
+0.1,
+0.0995
+]
+},
+{
+"path": "Trawler/Trawler_Hull/Colliders/Trawler_Hull_HullPainter/window",
+"p": [
+1.3765,
+4.2767,
+4.2884
+],
+"q": [
+-0.0923,
+0.70106,
+0.0923,
+0.70106
+],
+"h": [
+0.103,
+0.0718,
+0.025
+]
+},
+{
+"path": "Trawler/Trawler_Hull/Colliders/Trawler_Hull_HullPainter/window",
+"p": [
+7.0497,
+4.5289,
+3.1007
+],
+"q": [
+-0.56099,
+0.56099,
+-0.43046,
+-0.43046
+],
+"h": [
+0.0592,
+0.1328,
+0.025
+]
+},
+{
+"path": "Trawler/Trawler_Hull/Colliders/Trawler_Hull_HullPainter/window",
+"p": [
+7.0497,
+4.2767,
+2.8153
+],
+"q": [
+0.0,
+0.13053,
+0.99144,
+-0.0
+],
+"h": [
+0.103,
+0.0718,
+0.025
+]
+},
+{
+"path": "Trawler/Trawler_Hull/Colliders/Trawler_Hull_HullPainter/window",
+"p": [
+-3.0271,
+4.1678,
+2.8782
+],
+"q": [
+-0.0,
+0.38268,
+0.92388,
+0.0
+],
+"h": [
+0.103,
+0.0718,
+0.025
+]
+},
+{
+"path": "Trawler/Trawler_Hull/Colliders/Trawler_Hull_HullPainter/beam",
+"p": [
+-3.3178,
+7.1849,
+2.15
+],
+"q": [
+0.70224,
+0.0828,
+0.70224,
+-0.0828
+],
+"h": [
+0.15,
+1.1824,
+0.15
+]
+},
+{
+"path": "Trawler/Trawler_Hull/Colliders/Trawler_Hull_HullPainter/window",
+"p": [
+-3.0271,
+4.5289,
+1.1993
+],
+"q": [
+0.60876,
+-0.0,
+-0.0,
+0.79335
+],
+"h": [
+0.1328,
+0.0592,
+0.025
+]
+},
+{
+"path": "Trawler/Trawler_Hull/Colliders/Trawler_Hull_HullPainter/window",
+"p": [
+1.3765,
+4.4025,
+4.2884
+],
+"q": [
+0.70106,
+-0.0923,
+0.70106,
+0.0923
+],
+"h": [
+0.103,
+0.0718,
+0.025
+]
+},
+{
+"path": "Trawler/Trawler_Hull/Colliders/Trawler_Hull_HullPainter/window",
+"p": [
+-3.0271,
+4.1678,
+1.0782
+],
+"q": [
+-0.2706,
+0.2706,
+0.65328,
+0.65328
+],
+"h": [
+0.0718,
+0.103,
+0.025
+]
+},
+{
+"path": "Trawler/Trawler_Hull/Colliders/Trawler_Hull_HullPainter/supports",
+"p": [
+-3.0387,
+5.5496,
+-3.327
+],
+"q": [
+0.63713,
+-0.0,
+0.0,
+0.77075
+],
+"h": [
+0.1,
+1.0933,
+0.09
+]
+},
+{
+"path": "Trawler/Trawler_Hull/Colliders/Trawler_Hull_HullPainter/window",
+"p": [
+7.0497,
+4.5289,
+1.1993
+],
+"q": [
+0.60876,
+-0.0,
+-0.0,
+0.79335
+],
+"h": [
+0.1328,
+0.0592,
+0.025
+]
+},
+{
+"path": "Trawler/Trawler_Hull/Colliders/Trawler_Hull_HullPainter/window",
+"p": [
+7.0497,
+4.2889,
+1.0608
+],
+"q": [
+-0.13053,
+-0.0,
+0.0,
+0.99145
+],
+"h": [
+0.1328,
+0.0592,
+0.025
+]
+},
+{
+"path": "Trawler/Trawler_Hull/Colliders/Trawler_Hull_HullPainter/window",
+"p": [
+1.4727,
+4.2011,
+0.0116
+],
+"q": [
+0.65328,
+0.2706,
+0.65328,
+-0.2706
+],
+"h": [
+0.1328,
+0.0592,
+0.025
+]
+},
+{
+"path": "Trawler/Trawler_Hull/Colliders/Trawler_Hull_HullPainter/window",
+"p": [
+7.0497,
+4.4025,
+1.4848
+],
+"q": [
+0.99144,
+0.0,
+-0.0,
+0.13053
+],
+"h": [
+0.103,
+0.0718,
+0.025
+]
+},
+{
+"path": "Trawler/Trawler_Hull/Colliders/Trawler_Hull_HullPainter/window",
+"p": [
+-3.0271,
+4.1049,
+2.9871
+],
+"q": [
+-0.43046,
+-0.43046,
+-0.56099,
+0.56099
+],
+"h": [
+0.0718,
+0.103,
+0.025
+]
+},
+{
+"path": "Trawler/Trawler_Hull/Colliders/Trawler_Hull_HullPainter/step",
+"p": [
+6.0113,
+3.8,
+-1.15
+],
+"q": [
+-0.0,
+0.70711,
+0.0,
+0.70711
+],
+"h": [
+0.89,
+0.1,
+0.0995
+]
+},
+{
+"path": "Trawler/Trawler_Hull/Colliders/Trawler_Hull_HullPainter/lip",
+"p": [
+-10.1015,
+2.1446,
+3.6511
+],
+"q": [
+-0.6467,
+0.71259,
+-0.18282,
+0.20145
+],
+"h": [
+0.1773,
+0.5362,
+0.1
+]
+},
+{
+"path": "Trawler/Trawler_Hull/Colliders/Trawler_Hull_BoxCollider41",
+"p": [
+2.0113,
+5.261,
+2.15
+],
+"q": [
+-0.0,
+0.70711,
+0.0,
+0.70711
+],
+"h": [
+2.3,
+0.1,
+5.2
+]
+},
+{
+"path": "Trawler/Trawler_Hull/Colliders/Trawler_Hull_BoxCollider05",
+"p": [
+11.213,
+3.1719,
+4.6624
+],
+"q": [
+-0.0,
+0.70711,
+0.0,
+0.70711
+],
+"h": [
+0.2149,
+0.1719,
+0.1491
+]
+},
+{
+"path": "Trawler/Trawler_Hull/Colliders/Trawler_Hull_BoxCollider28",
+"p": [
+0.0273,
+4.425,
+-0.0
+],
+"q": [
+-0.0,
+0.70711,
+0.0,
+0.70711
+],
+"h": [
+0.15,
+1.425,
+0.15
+]
+},
+{
+"path": "Trawler/Trawler_Hull/Colliders/Trawler_Hull_BoxCollider51",
+"p": [
+-2.2605,
+10.0763,
+2.15
+],
+"q": [
+-0.0,
+0.70711,
+0.0,
+0.70711
+],
+"h": [
+0.9245,
+0.1103,
+0.1244
+]
+},
+{
+"path": "Trawler/Trawler_Hull/Colliders/Trawler_Hull_BoxCollider20",
+"p": [
+-1.3887,
+4.0,
+4.12
+],
+"q": [
+-0.0,
+0.70711,
+0.0,
+0.70711
+],
+"h": [
+0.25,
+1.0,
+1.0
+]
+},
+{
+"path": "Trawler/Trawler_Hull/Colliders/Trawler_Hull_BoxCollider18",
+"p": [
+-4.5486,
+3.2983,
+3.0453
+],
+"q": [
+-0.0,
+0.70711,
+0.0,
+0.70711
+],
+"h": [
+1.3247,
+0.3018,
+1.4399
+]
+},
+{
+"path": "Trawler/Trawler_Hull/Colliders/Trawler_Hull_BoxCollider32",
+"p": [
+-7.4256,
+3.7392,
+-1.0
+],
+"q": [
+-0.0,
+0.70711,
+0.0,
+0.70711
+],
+"h": [
+0.1,
+0.1392,
+1.1
+]
+},
+{
+"path": "Trawler/Trawler_Hull/Colliders/Trawler_Hull_BoxCollider50",
+"p": [
+-2.5035,
+9.3759,
+2.15
+],
+"q": [
+-0.0,
+0.70711,
+0.0,
+0.70711
+],
+"h": [
+1.1745,
+0.1103,
+0.1702
+]
+},
+{
+"path": "Trawler/Trawler_Hull/Colliders/Trawler_Hull_BoxCollider19",
+"p": [
+-2.7487,
+4.425,
+2.15
+],
+"q": [
+-0.0,
+0.70711,
+0.0,
+0.70711
+],
+"h": [
+2.22,
+1.425,
+0.36
+]
+},
+{
+"path": "Trawler/Trawler_Hull/Colliders/Trawler_Hull_BoxCollider44",
+"p": [
+2.0292,
+5.925,
+2.15
+],
+"q": [
+-0.0,
+0.70711,
+0.0,
+0.70711
+],
+"h": [
+2.4,
+0.075,
+5.282
+]
+},
+{
+"path": "Trawler/Trawler_Hull/Colliders/Trawler_Hull_BoxCollider08",
+"p": [
+5.9468,
+3.1719,
+-4.6624
+],
+"q": [
+-0.0,
+0.70711,
+0.0,
+0.70711
+],
+"h": [
+0.2149,
+0.1719,
+1.1155
+]
+},
+{
+"path": "Trawler/Trawler_Hull/Colliders/Trawler_Hull_BoxCollider07",
+"p": [
+9.0631,
+3.1719,
+4.6624
+],
+"q": [
+-0.0,
+0.70711,
+0.0,
+0.70711
+],
+"h": [
+0.2149,
+0.1719,
+1.28
+]
+},
+{
+"path": "Trawler/Trawler_Hull/Colliders/Trawler_Hull_BoxCollider45",
+"p": [
+1.1113,
+7.15,
+0.4
+],
+"q": [
+-0.0,
+0.70711,
+0.0,
+0.70711
+],
+"h": [
+0.25,
+1.15,
+0.1
+]
+},
+{
+"path": "Trawler/Trawler_Hull/Colliders/Trawler_Hull_BoxCollider03",
+"p": [
+14.3372,
+3.0984,
+-0.0
+],
+"q": [
+-0.0,
+0.70711,
+0.0,
+0.70711
+],
+"h": [
+1.4022,
+0.0982,
+0.2655
+]
+},
+{
+"path": "Trawler/Trawler_Hull/Colliders/Trawler_Hull_BoxCollider35",
+"p": [
+-6.6756,
+3.8439,
+-1.1501
+],
+"q": [
+-0.0,
+0.70711,
+0.0,
+0.70711
+],
+"h": [
+0.0502,
+0.118,
+0.0984
+]
+},
+{
+"path": "Trawler/Trawler_Hull/Colliders/Trawler_Hull_BoxCollider13",
+"p": [
+-0.0528,
+3.1719,
+4.6624
+],
+"q": [
+-0.0,
+0.70711,
+0.0,
+0.70711
+],
+"h": [
+0.2149,
+0.1719,
+1.1305
+]
+},
+{
+"path": "Trawler/Trawler_Hull/Colliders/Trawler_Hull_BoxCollider30",
+"p": [
+-3.0387,
+4.425,
+4.3
+],
+"q": [
+-0.0,
+0.70711,
+0.0,
+0.70711
+],
+"h": [
+0.15,
+1.425,
+0.15
+]
+},
+{
+"path": "Trawler/Trawler_Hull/Colliders/Trawler_Hull_BoxCollider21",
+"p": [
+3.3713,
+4.425,
+2.15
+],
+"q": [
+-0.0,
+0.70711,
+0.0,
+0.70711
+],
+"h": [
+2.22,
+1.425,
+3.76
+]
+},
+{
+"path": "Trawler/Trawler_Hull/Colliders/Trawler_Hull_BoxCollider25",
+"p": [
+2.9113,
+4.425,
+-0.0
+],
+"q": [
+-0.0,
+0.70711,
+0.0,
+0.70711
+],
+"h": [
+0.15,
+1.425,
+0.15
+]
+},
+{
+"path": "Trawler/Trawler_Hull/Colliders/Trawler_Hull_BoxCollider47",
+"p": [
+1.1113,
+7.15,
+2.9
+],
+"q": [
+-0.0,
+0.70711,
+0.0,
+0.70711
+],
+"h": [
+1.25,
+1.15,
+0.1
+]
+},
+{
+"path": "Trawler/Trawler_Hull/Colliders/Trawler_Hull_BoxCollider40",
+"p": [
+-1.3887,
+5.425,
+2.15
+],
+"q": [
+-0.0,
+0.70711,
+0.0,
+0.70711
+],
+"h": [
+2.22,
+0.425,
+1.0
+]
+},
+{
+"path": "Trawler/Trawler_Hull/Colliders/Trawler_Hull_BoxCollider38",
+"p": [
+-8.1756,
+3.8439,
+1.1501
+],
+"q": [
+-0.0,
+0.70711,
+0.0,
+0.70711
+],
+"h": [
+0.0502,
+0.118,
+0.0984
+]
+},
+{
+"path": "Trawler/Trawler_Hull/Colliders/Trawler_Hull_BoxCollider48",
+"p": [
+1.1113,
+8.15,
+1.15
+],
+"q": [
+-0.0,
+0.70711,
+0.0,
+0.70711
+],
+"h": [
+0.5,
+0.15,
+0.1
+]
+},
+{
+"path": "Trawler/Trawler_Hull/Colliders/Trawler_Hull_BoxCollider26",
+"p": [
+0.3113,
+4.425,
+4.3
+],
+"q": [
+-0.0,
+0.70711,
+0.0,
+0.70711
+],
+"h": [
+0.15,
+1.425,
+0.15
+]
+},
+{
+"path": "Trawler/Trawler_Hull/Colliders/Trawler_Hull_BoxCollider15",
+"p": [
+-3.0435,
+3.1719,
+4.6624
+],
+"q": [
+-0.0,
+0.70711,
+0.0,
+0.70711
+],
+"h": [
+0.2149,
+0.1719,
+1.1416
+]
+},
+{
+"path": "Trawler/Trawler_Hull/Colliders/Trawler_Hull_BoxCollider01",
+"p": [
+9.8205,
+-0.7554,
+-0.0
+],
+"q": [
+-0.0,
+0.70711,
+0.0,
+0.70711
+],
+"h": [
+0.1667,
+0.8995,
+1.1558
+]
+},
+{
+"path": "Trawler/Trawler_Hull/Colliders/Trawler_Hull_BoxCollider17",
+"p": [
+-5.2781,
+3.1719,
+4.6624
+],
+"q": [
+-0.0,
+0.70711,
+0.0,
+0.70711
+],
+"h": [
+0.2149,
+0.1719,
+0.3722
+]
+},
+{
+"path": "Trawler/Trawler_Hull/Colliders/Trawler_Hull_BoxCollider52",
+"p": [
+-3.1487,
+3.525,
+0.9353
+],
+"q": [
+-0.0,
+0.70711,
+0.0,
+0.70711
+],
+"h": [
+0.7853,
+0.075,
+0.04
+]
+},
+{
+"path": "Trawler/Trawler_Hull/Colliders/Trawler_Hull_BoxCollider29",
+"p": [
+-3.0387,
+4.425,
+-0.0
+],
+"q": [
+-0.0,
+0.70711,
+0.0,
+0.70711
+],
+"h": [
+0.15,
+1.425,
+0.15
+]
+},
+{
+"path": "Trawler/Trawler_Hull/Colliders/Trawler_Hull_BoxCollider24",
+"p": [
+2.9138,
+4.2144,
+-4.317
+],
+"q": [
+-0.0,
+0.70711,
+0.0,
+0.70711
+],
+"h": [
+0.1,
+1.2143,
+0.1
+]
+},
+{
+"path": "Trawler/Trawler_Hull/Colliders/Trawler_Hull_BoxCollider54",
+"p": [
+2.9113,
+4.425,
+4.3
+],
+"q": [
+-0.0,
+0.70711,
+0.0,
+0.70711
+],
+"h": [
+0.15,
+1.425,
+0.15
+]
+},
+{
+"path": "Trawler/Trawler_Hull/Colliders/Trawler_Hull_BoxCollider36",
+"p": [
+-6.6756,
+3.8439,
+1.1501
+],
+"q": [
+-0.0,
+0.70711,
+0.0,
+0.70711
+],
+"h": [
+0.0502,
+0.118,
+0.0984
+]
+},
+{
+"path": "Trawler/Trawler_Hull/Colliders/Trawler_Hull_BoxCollider46",
+"p": [
+1.1613,
+7.15,
+2.15
+],
+"q": [
+-0.0,
+0.70711,
+0.0,
+0.70711
+],
+"h": [
+0.15,
+1.15,
+0.15
+]
+},
+{
+"path": "Trawler/Trawler_Hull/Colliders/Trawler_Hull_BoxCollider27",
+"p": [
+0.0298,
+4.2144,
+-4.317
+],
+"q": [
+-0.0,
+0.70711,
+0.0,
+0.70711
+],
+"h": [
+0.1,
+1.2143,
+0.1
+]
+},
+{
+"path": "Trawler/Trawler_Hull/Colliders/Trawler_Hull_BoxCollider49",
+"p": [
+-1.2267,
+8.4,
+2.15
+],
+"q": [
+-0.0,
+0.70711,
+0.0,
+0.70711
+],
+"h": [
+2.688,
+0.1,
+2.638
+]
+},
+{
+"path": "Trawler/Trawler_Hull/Colliders/Trawler_Hull_BoxCollider10",
+"p": [
+2.9546,
+3.1719,
+-4.6624
+],
+"q": [
+-0.0,
+0.70711,
+0.0,
+0.70711
+],
+"h": [
+0.2149,
+0.1719,
+1.156
+]
+},
+{
+"path": "Trawler/Trawler_Hull/Colliders/Trawler_Hull_BoxCollider53",
+"p": [
+1.2113,
+8.15,
+1.15
+],
+"q": [
+-0.0,
+0.70711,
+0.0,
+0.70711
+],
+"h": [
+0.5,
+0.15,
+0.0
+]
+},
+{
+"path": "Trawler/Trawler_Hull/Colliders/Trawler_Hull_BoxCollider12",
+"p": [
+-0.0528,
+3.1719,
+-4.6624
+],
+"q": [
+-0.0,
+0.70711,
+0.0,
+0.70711
+],
+"h": [
+0.2149,
+0.1719,
+1.1305
+]
+},
+{
+"path": "Trawler/Trawler_Hull/Colliders/Trawler_Hull_BoxCollider14",
+"p": [
+-3.0435,
+3.1719,
+-4.6624
+],
+"q": [
+-0.0,
+0.70711,
+0.0,
+0.70711
+],
+"h": [
+0.2149,
+0.1719,
+1.1416
+]
+},
+{
+"path": "Trawler/Trawler_Hull/Colliders/Trawler_Hull_BoxCollider33",
+"p": [
+-7.4256,
+3.7392,
+1.0
+],
+"q": [
+-0.0,
+0.70711,
+0.0,
+0.70711
+],
+"h": [
+0.1,
+0.1392,
+1.1
+]
+},
+{
+"path": "Trawler/Trawler_Hull/Colliders/Trawler_Hull_BoxCollider02",
+"p": [
+10.9314,
+0.4164,
+-0.0028
+],
+"q": [
+-0.0,
+0.70711,
+0.0,
+0.70711
+],
+"h": [
+0.5028,
+0.2723,
+2.2666
+]
+},
+{
+"path": "Trawler/Trawler_Hull/Colliders/Trawler_Hull_BoxCollider23",
+"p": [
+7.0613,
+4.425,
+4.3
+],
+"q": [
+-0.0,
+0.70711,
+0.0,
+0.70711
+],
+"h": [
+0.15,
+1.425,
+0.15
+]
+},
+{
+"path": "Trawler/Trawler_Hull/Colliders/Trawler_Hull_BoxCollider34",
+"p": [
+-6.4256,
+3.7392,
+-0.0
+],
+"q": [
+-0.0,
+0.70711,
+0.0,
+0.70711
+],
+"h": [
+0.9,
+0.1392,
+0.1
+]
+},
+{
+"path": "Trawler/Trawler_Hull/Colliders/Trawler_Hull_BoxCollider31",
+"p": [
+-3.0387,
+4.2144,
+-4.317
+],
+"q": [
+-0.0,
+0.70711,
+0.0,
+0.70711
+],
+"h": [
+0.1,
+1.2143,
+0.1
+]
+},
+{
+"path": "Trawler/Trawler_Hull/Colliders/Trawler_Hull_BoxCollider00",
+"p": [
+10.9314,
+-1.836,
+-0.0
+],
+"q": [
+-0.0,
+0.70711,
+0.0,
+0.70711
+],
+"h": [
+0.2,
+0.1819,
+2.2666
+]
+},
+{
+"path": "Trawler/Trawler_Hull/Colliders/Trawler_Hull_BoxCollider42",
+"p": [
+0.0713,
+5.7754,
+-2.1597
+],
+"q": [
+-0.0,
+0.70711,
+0.0,
+0.70711
+],
+"h": [
+0.1097,
+0.0754,
+3.24
+]
+},
+{
+"path": "Trawler/Trawler_Hull/Colliders/Trawler_Hull_BoxCollider43",
+"p": [
+0.0292,
+5.925,
+-1.2497
+],
+"q": [
+-0.0,
+0.70711,
+0.0,
+0.70711
+],
+"h": [
+0.9997,
+0.075,
+3.2821
+]
+},
+{
+"path": "Trawler/Trawler_Hull/Colliders/Trawler_Hull_BoxCollider11",
+"p": [
+2.9546,
+3.1719,
+4.6624
+],
+"q": [
+-0.0,
+0.70711,
+0.0,
+0.70711
+],
+"h": [
+0.2149,
+0.1719,
+1.156
+]
+},
+{
+"path": "Trawler/Trawler_Hull/Colliders/Trawler_Hull_BoxCollider09",
+"p": [
+5.9468,
+3.1719,
+4.6624
+],
+"q": [
+-0.0,
+0.70711,
+0.0,
+0.70711
+],
+"h": [
+0.2149,
+0.1719,
+1.1155
+]
+},
+{
+"path": "Trawler/Trawler_Hull/Colliders/Trawler_Hull_BoxCollider22",
+"p": [
+7.0613,
+4.425,
+-0.0
+],
+"q": [
+-0.0,
+0.70711,
+0.0,
+0.70711
+],
+"h": [
+0.15,
+1.425,
+0.15
+]
+},
+{
+"path": "Trawler/Trawler_Hull/Colliders/Trawler_Hull_BoxCollider37",
+"p": [
+-8.1756,
+3.8439,
+-1.1501
+],
+"q": [
+-0.0,
+0.70711,
+0.0,
+0.70711
+],
+"h": [
+0.0502,
+0.118,
+0.0984
+]
+},
+{
+"path": "Trawler/Trawler_Hull/Colliders/Trawler_Hull_BoxCollider04",
+"p": [
+11.213,
+3.1719,
+-4.6624
+],
+"q": [
+-0.0,
+0.70711,
+0.0,
+0.70711
+],
+"h": [
+0.2149,
+0.1719,
+0.1491
+]
+},
+{
+"path": "Trawler/Trawler_Hull/Colliders/Trawler_Hull_BoxCollider16",
+"p": [
+-5.2781,
+3.1719,
+-4.6624
+],
+"q": [
+-0.0,
+0.70711,
+0.0,
+0.70711
+],
+"h": [
+0.2149,
+0.1719,
+0.3722
+]
+},
+{
+"path": "Trawler/Trawler_Hull/Colliders/Trawler_Hull_BoxCollider39",
+"p": [
+-8.4256,
+3.7392,
+-0.0
+],
+"q": [
+-0.0,
+0.70711,
+0.0,
+0.70711
+],
+"h": [
+0.9,
+0.1392,
+0.1
+]
+},
+{
+"path": "Trawler/Trawler_Hull/Colliders/Trawler_Hull_BoxCollider06",
+"p": [
+9.0631,
+3.1719,
+-4.6624
+],
+"q": [
+-0.0,
+0.70711,
+0.0,
+0.70711
+],
+"h": [
+0.2149,
+0.1719,
+1.28
+]
+}
+],
+"capsules": [
+{
+"path": "Trawler/Trawler_Hull/Colliders/Trawler_Hull_HullPainter/hook",
+"p": [
+14.3428,
+3.9,
+-3.0846
+],
+"q": [
+0.70711,
+0.0,
+0.0,
+0.70711
+],
+"r": 0.2,
+"hh": 0
+},
+{
+"path": "Trawler/Trawler_Hull/Colliders/Trawler_Hull_HullPainter/hook",
+"p": [
+-4.5389,
+3.75,
+4.77
+],
+"q": [
+0.70711,
+0.0,
+0.0,
+0.70711
+],
+"r": 0.2,
+"hh": 0
+},
+{
+"path": "Trawler/Trawler_Hull/Colliders/Trawler_Hull_HullPainter/hook",
+"p": [
+10.7136,
+3.75,
+-4.77
+],
+"q": [
+0.70711,
+0.0,
+0.0,
+0.70711
+],
+"r": 0.2,
+"hh": 0
+},
+{
+"path": "Trawler/Trawler_Hull/Colliders/Trawler_Hull_HullPainter/hook",
+"p": [
+10.7136,
+3.75,
+-4.77
+],
+"q": [
+0.70711,
+0.0,
+0.0,
+0.70711
+],
+"r": 0.2,
+"hh": 0
+},
+{
+"path": "Trawler/Trawler_Hull/Colliders/Trawler_Hull_HullPainter/hook",
+"p": [
+-4.5389,
+3.75,
+-4.77
+],
+"q": [
+0.70711,
+0.0,
+0.0,
+0.70711
+],
+"r": 0.2,
+"hh": 0
+},
+{
+"path": "Trawler/Trawler_Hull/Colliders/Trawler_Hull_HullPainter/hook",
+"p": [
+14.3428,
+3.9,
+3.0846
+],
+"q": [
+0.70711,
+0.0,
+0.0,
+0.70711
+],
+"r": 0.2,
+"hh": 0
+},
+{
+"path": "Trawler/Trawler_Arial/Trawler_Arial_Bone00",
+"p": [
+-1.0326,
+8.5443,
+0.616
+],
+"q": [
+-0.0,
+0.70711,
+0.0,
+0.70711
+],
+"r": 0.1498,
+"hh": 0
+},
+{
+"path": "Trawler/Posts/Trawler_Post03/Trawler_Post03_capsuleCollider (1)",
+"p": [
+1.09,
+6.5058,
+-2.15
+],
+"q": [
+-0.0,
+0.0,
+-0.70711,
+0.7071
+],
+"r": 0.0739,
+"hh": 0.0711
+},
+{
+"path": "Trawler/Posts/Trawler_Post023/Trawler_Post023_capsuleCollider (1)",
+"p": [
+-4.6018,
+4.0806,
+4.3
+],
+"q": [
+0.5,
+0.5,
+0.5,
+-0.5
+],
+"r": 0.0652,
+"hh": 0.0537
+},
+{
+"path": "Trawler/Posts/Trawler_Post05/Trawler_Post05_capsuleCollider (2)",
+"p": [
+-3.1231,
+6.5058,
+-2.146
+],
+"q": [
+-0.0,
+-0.0,
+-0.70711,
+0.7071
+],
+"r": 0.0625,
+"hh": 0.0422
+},
+{
+"path": "Trawler/Trawler_Wheel/Trawler_Wheel_Collider",
+"p": [
+-2.1191,
+6.5103,
+1.028
+],
+"q": [
+0.70711,
+0.0,
+0.0,
+0.70711
+],
+"r": 0.05,
+"hh": 0.45
+},
+{
+"path": "Trawler/Posts/Trawler_Post04/Trawler_Post04_capsuleCollider (0)",
+"p": [
+-1.0327,
+6.3058,
+-2.15
+],
+"q": [
+-0.0,
+0.0,
+0.0,
+1.0
+],
+"r": 0.0739,
+"hh": 0.1919
+},
+{
+"path": "Trawler/Posts/Trawler_Post06/Trawler_Post06_capsuleCollider (0)",
+"p": [
+3.2123,
+6.3058,
+-0.14
+],
+"q": [
+-0.0,
+0.0,
+0.0,
+1.0
+],
+"r": 0.0726,
+"hh": 0.1932
+},
+{
+"path": "Trawler/Posts/Trawler_Post00/Trawler_Post00_capsuleCollider (0)",
+"p": [
+7.3013,
+3.263,
+-2.15
+],
+"q": [
+-0.0,
+0.0,
+0.0,
+1.0
+],
+"r": 0.0716,
+"hh": 0.1514
+},
+{
+"path": "Trawler/Railings/Trawler_Railing01/Trawler_Railing01_capsuleCollider",
+"p": [
+4.2636,
+5.7108,
+-2.15
+],
+"q": [
+0.0,
+0.0,
+0.44503,
+0.89552
+],
+"r": 0.06,
+"hh": 1.09
+},
+{
+"path": "Trawler/Posts/Trawler_Post02/Trawler_Post02_capsuleCollider (0)",
+"p": [
+3.212,
+6.3058,
+-2.15
+],
+"q": [
+-0.0,
+0.0,
+0.0,
+1.0
+],
+"r": 0.0717,
+"hh": 0.1941
+},
+{
+"path": "Trawler/Posts/Trawler_Post09/Trawler_Post09_capsuleCollider (1)",
+"p": [
+7.2026,
+6.5058,
+2.1105
+],
+"q": [
+-0.70711,
+0.0,
+0.0,
+0.7071
+],
+"r": 0.0739,
+"hh": 0.0711
+},
+{
+"path": "Trawler/Posts/Trawler_Post12/Trawler_Post12_capsuleCollider (1)",
+"p": [
+3.2126,
+6.5058,
+4.3611
+],
+"q": [
+-0.0,
+0.0,
+-0.70711,
+0.7071
+],
+"r": 0.0739,
+"hh": 0.0711
+},
+{
+"path": "Trawler/Posts/Trawler_Post08/Trawler_Post08_capsuleCollider (2)",
+"p": [
+7.1884,
+6.5058,
+-0.1123
+],
+"q": [
+-0.70711,
+0.0,
+0.0,
+0.7071
+],
+"r": 0.0739,
+"hh": 0.0196
+},
+{
+"path": "Trawler/Posts/Trawler_Post021/Trawler_Post021_capsuleCollider (0)",
+"p": [
+-6.1003,
+3.8806,
+4.3
+],
+"q": [
+-0.0,
+-0.70711,
+-0.0,
+0.70711
+],
+"r": 0.0716,
+"hh": 0.1942
+},
+{
+"path": "Trawler/Trawler_Wheel/Trawler_Wheel_Collider",
+"p": [
+-2.1191,
+6.5103,
+1.028
+],
+"q": [
+-0.38268,
+-0.0,
+0.0,
+0.92388
+],
+"r": 0.05,
+"hh": 0.45
+},
+{
+"path": "Trawler/Posts/Trawler_Post05/Trawler_Post05_capsuleCollider (0)",
+"p": [
+-3.1556,
+6.3058,
+-2.146
+],
+"q": [
+-0.0,
+0.0,
+0.0,
+1.0
+],
+"r": 0.0625,
+"hh": 0.2033
+},
+{
+"path": "Trawler/Posts/Trawler_Post08/Trawler_Post08_capsuleCollider (0)",
+"p": [
+7.2032,
+6.3058,
+-0.1324
+],
+"q": [
+-0.0,
+0.0,
+0.0,
+1.0
+],
+"r": 0.0631,
+"hh": 0.2028
+},
+{
+"path": "Trawler/Posts/Trawler_Post03/Trawler_Post03_capsuleCollider (0)",
+"p": [
+1.0894,
+6.3058,
+-2.15
+],
+"q": [
+-0.0,
+0.0,
+0.0,
+1.0
+],
+"r": 0.0714,
+"hh": 0.1945
+},
+{
+"path": "Trawler/Posts/Trawler_Post11/Trawler_Post11_capsuleCollider (0)",
+"p": [
+5.2563,
+6.3058,
+4.3611
+],
+"q": [
+-0.0,
+0.0,
+0.0,
+1.0
+],
+"r": 0.0701,
+"hh": 0.1957
+},
+{
+"path": "Trawler/Trawler_Wheel/Trawler_Wheel_Collider",
+"p": [
+-2.2391,
+6.5103,
+1.028
+],
+"q": [
+-0.5,
+0.5,
+0.5,
+0.5
+],
+"r": 0.1,
+"hh": 0.1
+},
+{
+"path": "Trawler/Posts/Trawler_Post18/Trawler_Post18_capsuleCollider (1)",
+"p": [
+-6.1002,
+4.0806,
+1.918
+],
+"q": [
+-0.70711,
+0.0,
+0.0,
+0.7071
+],
+"r": 0.066,
+"hh": 0.0308
+},
+{
+"path": "Trawler/Posts/Trawler_Post06/Trawler_Post06_capsuleCollider (1)",
+"p": [
+3.2411,
+6.5058,
+-0.14
+],
+"q": [
+-0.0,
+0.0,
+-0.70711,
+0.7071
+],
+"r": 0.0739,
+"hh": 0.0329
+},
+{
+"path": "Trawler/Posts/Trawler_Post024/Trawler_Post024_capsuleCollider (1)",
+"p": [
+-6.1002,
+4.0806,
+-4.2751
+],
+"q": [
+0.0,
+0.7071,
+0.70711,
+-0.0
+],
+"r": 0.066,
+"hh": 0.0285
+},
+{
+"path": "Trawler/Posts/Trawler_Post022/Trawler_Post022_capsuleCollider (0)",
+"p": [
+-6.1002,
+3.8806,
+-0.1286
+],
+"q": [
+-0.0,
+0.0,
+0.0,
+1.0
+],
+"r": 0.0624,
+"hh": 0.2035
+},
+{
+"path": "Trawler/Posts/Trawler_Post10/Trawler_Post10_capsuleCollider (1)",
+"p": [
+7.1691,
+6.5058,
+4.3469
+],
+"q": [
+-0.0,
+0.0,
+-0.70711,
+0.7071
+],
+"r": 0.0739,
+"hh": 0.0293
+},
+{
+"path": "Trawler/Posts/Trawler_Post05/Trawler_Post05_capsuleCollider (1)",
+"p": [
+-3.1556,
+6.5058,
+-2.1179
+],
+"q": [
+-0.70711,
+0.0,
+0.0,
+0.7071
+],
+"r": 0.0625,
+"hh": 0.0481
+},
+{
+"path": "Trawler/Posts/Trawler_Post08/Trawler_Post08_capsuleCollider (1)",
+"p": [
+7.1657,
+6.5058,
+-0.1258
+],
+"q": [
+-0.0,
+0.0,
+-0.70711,
+0.7071
+],
+"r": 0.0739,
+"hh": 0.0339
+},
+{
+"path": "Trawler/Posts/Trawler_Post021/Trawler_Post021_capsuleCollider (1)",
+"p": [
+-6.0757,
+4.0806,
+4.3
+],
+"q": [
+0.5,
+0.5,
+0.5,
+-0.5
+],
+"r": 0.0716,
+"hh": 0.0272
+},
+{
+"path": "Trawler/Posts/Trawler_Post04/Trawler_Post04_capsuleCollider (1)",
+"p": [
+-1.0327,
+6.5058,
+-2.15
+],
+"q": [
+-0.0,
+0.0,
+-0.70711,
+0.7071
+],
+"r": 0.0739,
+"hh": 0.0711
+},
+{
+"path": "Trawler/Posts/Trawler_Post022/Trawler_Post022_capsuleCollider (1)",
+"p": [
+-6.1002,
+4.0806,
+-0.1239
+],
+"q": [
+-0.70711,
+0.0,
+0.0,
+0.7071
+],
+"r": 0.066,
+"hh": 0.0596
+},
+{
+"path": "Trawler/Posts/Trawler_Post024/Trawler_Post024_capsuleCollider (0)",
+"p": [
+-6.1002,
+3.8806,
+-4.3001
+],
+"q": [
+-0.0,
+1.0,
+-0.0,
+-0.0
+],
+"r": 0.066,
+"hh": 0.1998
+},
+{
+"path": "Trawler/Posts/Trawler_Post02/Trawler_Post02_capsuleCollider (1)",
+"p": [
+3.2383,
+6.467,
+-2.15
+],
+"q": [
+-0.0,
+-0.0,
+-0.84487,
+0.53497
+],
+"r": 0.0739,
+"hh": 0.0711
+},
+{
+"path": "Trawler/Posts/Trawler_Post19/Trawler_Post19_capsuleCollider (1)",
+"p": [
+-6.1002,
+4.0806,
+-2.2088
+],
+"q": [
+-0.70711,
+0.0,
+0.0,
+0.7071
+],
+"r": 0.066,
+"hh": 0.0596
+},
+{
+"path": "Trawler/Trawler_Wheel/Trawler_Wheel_Collider",
+"p": [
+-2.1191,
+6.5103,
+1.028
+],
+"q": [
+0.38268,
+0.0,
+0.0,
+0.92388
+],
+"r": 0.05,
+"hh": 0.45
+},
+{
+"path": "Trawler/Posts/Trawler_Post07/Trawler_Post07_capsuleCollider (0)",
+"p": [
+5.2562,
+6.3058,
+-0.14
+],
+"q": [
+-0.0,
+0.0,
+0.0,
+1.0
+],
+"r": 0.0704,
+"hh": 0.1954
+},
+{
+"path": "Trawler/Posts/Trawler_Post01/Trawler_Post01_capsuleCollider (0)",
+"p": [
+5.2537,
+4.8243,
+-2.15
+],
+"q": [
+-0.0,
+0.0,
+0.0,
+1.0
+],
+"r": 0.0713,
+"hh": 0.1501
+},
+{
+"path": "Trawler/Posts/Trawler_Post11/Trawler_Post11_capsuleCollider (1)",
+"p": [
+5.2576,
+6.5058,
+4.3611
+],
+"q": [
+-0.0,
+0.0,
+-0.70711,
+0.7071
+],
+"r": 0.0739,
+"hh": 0.0711
+},
+{
+"path": "Trawler/Posts/Trawler_Post07/Trawler_Post07_capsuleCollider (1)",
+"p": [
+5.2576,
+6.5058,
+-0.14
+],
+"q": [
+-0.0,
+0.0,
+-0.70711,
+0.7071
+],
+"r": 0.0739,
+"hh": 0.0711
+},
+{
+"path": "Trawler/Trawler_Wheel/Trawler_Wheel_Collider",
+"p": [
+-2.1191,
+6.5103,
+1.028
+],
+"q": [
+-0.0,
+-0.0,
+0.0,
+1.0
+],
+"r": 0.05,
+"hh": 0.45
+},
+{
+"path": "Trawler/Posts/Trawler_Post023/Trawler_Post023_capsuleCollider (0)",
+"p": [
+-4.5961,
+3.8806,
+4.3
+],
+"q": [
+-0.0,
+-0.70711,
+-0.0,
+0.70711
+],
+"r": 0.0652,
+"hh": 0.2006
+},
+{
+"path": "Trawler/Posts/Trawler_Post10/Trawler_Post10_capsuleCollider (0)",
+"p": [
+7.1957,
+6.3058,
+4.3628
+],
+"q": [
+-0.0,
+0.0,
+0.0,
+1.0
+],
+"r": 0.0613,
+"hh": 0.2045
+},
+{
+"path": "Trawler/Posts/Trawler_Post12/Trawler_Post12_capsuleCollider (0)",
+"p": [
+3.2146,
+6.3058,
+4.3611
+],
+"q": [
+-0.0,
+0.0,
+0.0,
+1.0
+],
+"r": 0.0768,
+"hh": 0.1891
+},
+{
+"path": "Trawler/Posts/Trawler_Post10/Trawler_Post10_capsuleCollider (2)",
+"p": [
+7.1885,
+6.5058,
+4.3279
+],
+"q": [
+-0.70711,
+0.0,
+0.0,
+0.7071
+],
+"r": 0.0739,
+"hh": 0.0266
+},
+{
+"path": "Trawler/Posts/Trawler_Post09/Trawler_Post09_capsuleCollider (0)",
+"p": [
+7.2013,
+6.3058,
+2.1098
+],
+"q": [
+-0.0,
+0.0,
+0.0,
+1.0
+],
+"r": 0.0689,
+"hh": 0.1969
+},
+{
+"path": "Trawler/Railings/Trawler_Railing00/Trawler_Railing00_capsuleCollider",
+"p": [
+6.307,
+4.1751,
+-2.15
+],
+"q": [
+0.0,
+0.0,
+0.44503,
+0.89552
+],
+"r": 0.06,
+"hh": 1.09
+},
+{
+"path": "Trawler/Posts/Trawler_Post18/Trawler_Post18_capsuleCollider (0)",
+"p": [
+-6.1002,
+3.8806,
+1.959
+],
+"q": [
+-0.0,
+0.0,
+0.0,
+1.0
+],
+"r": 0.0674,
+"hh": 0.1985
+},
+{
+"path": "Trawler/Posts/Trawler_Post00/Trawler_Post00_capsuleCollider (1)",
+"p": [
+7.2819,
+3.4383,
+-2.15
+],
+"q": [
+-0.0,
+0.0,
+0.46484,
+0.88539
+],
+"r": 0.0716,
+"hh": 0.0334
+},
+{
+"path": "Trawler/Posts/Trawler_Post01/Trawler_Post01_capsuleCollider (1)",
+"p": [
+5.2851,
+4.9449,
+-2.15
+],
+"q": [
+0.0,
+-0.0,
+0.89344,
+-0.44919
+],
+"r": 0.0713,
+"hh": 0.0887
+},
+{
+"path": "Trawler/Posts/Trawler_Post19/Trawler_Post19_capsuleCollider (0)",
+"p": [
+-6.1002,
+3.8806,
+-2.2136
+],
+"q": [
+-0.0,
+0.0,
+0.0,
+1.0
+],
+"r": 0.0645,
+"hh": 0.2013
+},
+{
+"path": "Trawler/Trawler_Hull/Colliders/Trawler_Hull_CapsuleCollider03",
+"p": [
+-2.2386,
+10.3016,
+2.6085
+],
+"q": [
+0.0,
+0.70711,
+0.0,
+0.70711
+],
+"r": 0.0776,
+"hh": 0.0494
+},
+{
+"path": "Trawler/Trawler_Hull/Colliders/Trawler_Hull_CapsuleCollider00",
+"p": [
+0.5817,
+9.0795,
+0.2527
+],
+"q": [
+-0.0,
+0.70711,
+0.0,
+0.70711
+],
+"r": 0.1482,
+"hh": 0.6313
+},
+{
+"path": "Trawler/Railings/Trawler_Railing10",
+"p": [
+6.2788,
+6.5,
+4.3611
+],
+"q": [
+-0.0,
+0.0,
+-0.70711,
+0.7071
+],
+"r": 0.07,
+"hh": 0.88
+},
+{
+"path": "Trawler/Railings/Trawler_Railing09",
+"p": [
+7.2013,
+6.5,
+3.2358
+],
+"q": [
+-0.70711,
+0.0,
+0.0,
+0.7071
+],
+"r": 0.07,
+"hh": 0.98
+},
+{
+"path": "Trawler/Railings/Trawler_Railing020",
+"p": [
+-6.1002,
+4.0748,
+-3.2575
+],
+"q": [
+-0.70711,
+0.0,
+0.0,
+0.7071
+],
+"r": 0.07,
+"hh": 0.905
+},
+{
+"path": "Trawler/Railings/Trawler_Railing08",
+"p": [
+7.2013,
+6.5,
+0.9853
+],
+"q": [
+-0.70711,
+0.0,
+0.0,
+0.7071
+],
+"r": 0.07,
+"hh": 0.98
+},
+{
+"path": "Trawler/Railings/Trawler_Railing019",
+"p": [
+-6.1002,
+4.0748,
+-1.1726
+],
+"q": [
+-0.70711,
+0.0,
+0.0,
+0.7071
+],
+"r": 0.07,
+"hh": 0.905
+},
+{
+"path": "Trawler/Railings/Trawler_Railing07",
+"p": [
+6.2288,
+6.5,
+-0.14
+],
+"q": [
+-0.0,
+0.0,
+-0.70711,
+0.7071
+],
+"r": 0.07,
+"hh": 0.88
+},
+{
+"path": "Trawler/Railings/Trawler_Railing06",
+"p": [
+4.2338,
+6.5,
+-0.14
+],
+"q": [
+-0.0,
+0.0,
+-0.70711,
+0.7071
+],
+"r": 0.07,
+"hh": 0.88
+},
+{
+"path": "Trawler/Railings/Trawler_Railing021",
+"p": [
+-5.3469,
+4.0748,
+4.3
+],
+"q": [
+0.5,
+-0.5,
+-0.5,
+-0.5
+],
+"r": 0.07,
+"hh": 0.63
+},
+{
+"path": "Trawler/Trawler_Arial/Trawler_Arial_Bone02",
+"p": [
+-1.0326,
+10.1636,
+0.616
+],
+"q": [
+-0.0,
+0.70711,
+0.0,
+0.70711
+],
+"r": 0.06,
+"hh": 0.5109
+},
+{
+"path": "Trawler/Railings/Trawler_Railing04",
+"p": [
+-2.0953,
+6.5,
+-2.15
+],
+"q": [
+-0.0,
+0.0,
+-0.70711,
+0.7071
+],
+"r": 0.07,
+"hh": 0.93
+},
+{
+"path": "Trawler/Railings/Trawler_Railing03",
+"p": [
+0.0273,
+6.5,
+-2.15
+],
+"q": [
+-0.0,
+0.0,
+-0.70711,
+0.7071
+],
+"r": 0.07,
+"hh": 0.93
+},
+{
+"path": "Trawler/Trawler_Hull/Colliders/Trawler_Hull_CapsuleCollider02",
+"p": [
+-2.2386,
+10.3016,
+1.6915
+],
+"q": [
+-0.0,
+0.70711,
+0.0,
+0.70711
+],
+"r": 0.0776,
+"hh": 0.0494
+},
+{
+"path": "Trawler/Railings/Trawler_Railing022",
+"p": [
+-3.8716,
+4.0748,
+4.3
+],
+"q": [
+0.5,
+-0.5,
+-0.5,
+-0.5
+],
+"r": 0.07,
+"hh": 0.63
+},
+{
+"path": "Trawler/Railings/Trawler_Railing18",
+"p": [
+-6.1002,
+4.0748,
+0.9122
+],
+"q": [
+-0.70711,
+0.0,
+0.0,
+0.7071
+],
+"r": 0.07,
+"hh": 0.905
+},
+{
+"path": "Trawler/Trawler_Arial/Trawler_Arial_Bone03",
+"p": [
+-1.0326,
+11.3054,
+0.616
+],
+"q": [
+-0.0,
+0.70711,
+0.0,
+0.70711
+],
+"r": 0.06,
+"hh": 0.5109
+},
+{
+"path": "Trawler/Railings/Trawler_Railing12",
+"p": [
+2.2363,
+6.5,
+4.3611
+],
+"q": [
+-0.0,
+-0.0,
+-0.70711,
+0.7071
+],
+"r": 0.07,
+"hh": 0.83
+},
+{
+"path": "Trawler/Railings/Trawler_Railing02",
+"p": [
+2.15,
+6.5,
+-2.15
+],
+"q": [
+-0.0,
+0.0,
+-0.70711,
+0.7071
+],
+"r": 0.07,
+"hh": 0.93
+},
+{
+"path": "Trawler/Railings/Trawler_Railing05",
+"p": [
+-3.1566,
+6.5,
+-1.1558
+],
+"q": [
+-0.70711,
+0.0,
+0.0,
+0.7071
+],
+"r": 0.07,
+"hh": 0.83
+},
+{
+"path": "Trawler/Trawler_Arial/Trawler_Arial_Bone01",
+"p": [
+-1.0326,
+9.1152,
+0.616
+],
+"q": [
+-0.0,
+0.70711,
+0.0,
+0.70711
+],
+"r": 0.06,
+"hh": 0.4176
+},
+{
+"path": "Trawler/Railings/Trawler_Railing11",
+"p": [
+4.2338,
+6.5,
+4.3611
+],
+"q": [
+-0.0,
+0.0,
+-0.70711,
+0.7071
+],
+"r": 0.07,
+"hh": 0.88
+},
+{
+"path": "Trawler/Trawler_Hull/Colliders/Trawler_Hull_CapsuleCollider01",
+"p": [
+0.5817,
+9.0795,
+4.1178
+],
+"q": [
+-0.0,
+0.70711,
+0.0,
+0.70711
+],
+"r": 0.1482,
+"hh": 0.6313
+}
+],
+"trimeshes": [
+{
+"path": "Trawler/Trawler_Hull/Colliders/Trawler_Hull_MeshCollider37",
+"mesh": "m40a7f142c61",
+"matrix": [
+[
+0.0,
+-0.0,
+1.0,
+0.58359
+],
+[
+-0.0,
+1.0,
+0.0,
+3.0
+],
+[
+-1.0,
+-0.0,
+0.0,
+-0.0
+],
+[
+0.0,
+0.0,
+-0.0,
+1.0
+]
+]
+},
+{
+"path": "Trawler/Trawler_Hull/Colliders/Trawler_Hull_MeshCollider64",
+"mesh": "m46d71e8d2c61",
+"matrix": [
+[
+0.0,
+-0.0,
+1.0,
+0.58359
+],
+[
+-0.0,
+1.0,
+0.0,
+3.0
+],
+[
+-1.0,
+-0.0,
+0.0,
+-0.0
+],
+[
+0.0,
+0.0,
+-0.0,
+1.0
+]
+]
+},
+{
+"path": "Trawler/Trawler_Hull/Colliders/Trawler_Hull_MeshCollider16",
+"mesh": "m3e48acd22c61",
+"matrix": [
+[
+0.0,
+-0.0,
+1.0,
+0.58359
+],
+[
+-0.0,
+1.0,
+0.0,
+3.0
+],
+[
+-1.0,
+-0.0,
+0.0,
+-0.0
+],
+[
+0.0,
+0.0,
+-0.0,
+1.0
+]
+]
+},
+{
+"path": "Trawler/Trawler_Hull/Colliders/Trawler_Hull_MeshCollider17",
+"mesh": "m6dd277542c61",
+"matrix": [
+[
+0.0,
+-0.0,
+1.0,
+0.58359
+],
+[
+-0.0,
+1.0,
+0.0,
+3.0
+],
+[
+-1.0,
+-0.0,
+0.0,
+-0.0
+],
+[
+0.0,
+0.0,
+-0.0,
+1.0
+]
+]
+},
+{
+"path": "Trawler/Trawler_Hull/Colliders/Trawler_Hull_MeshCollider40",
+"mesh": "m6ca3b1ca2c61",
+"matrix": [
+[
+0.0,
+-0.0,
+1.0,
+0.58359
+],
+[
+-0.0,
+1.0,
+0.0,
+3.0
+],
+[
+-1.0,
+-0.0,
+0.0,
+-0.0
+],
+[
+0.0,
+0.0,
+-0.0,
+1.0
+]
+]
+},
+{
+"path": "Trawler/Trawler_Hull/Colliders/Trawler_Hull_MeshCollider34",
+"mesh": "maf1c84fa2c61",
+"matrix": [
+[
+0.0,
+-0.0,
+1.0,
+0.58359
+],
+[
+-0.0,
+1.0,
+0.0,
+3.0
+],
+[
+-1.0,
+-0.0,
+0.0,
+-0.0
+],
+[
+0.0,
+0.0,
+-0.0,
+1.0
+]
+]
+},
+{
+"path": "Trawler/Trawler_Hull/Colliders/Trawler_Hull_MeshCollider35",
+"mesh": "m30603ad82c61",
+"matrix": [
+[
+0.0,
+-0.0,
+1.0,
+0.58359
+],
+[
+-0.0,
+1.0,
+0.0,
+3.0
+],
+[
+-1.0,
+-0.0,
+0.0,
+-0.0
+],
+[
+0.0,
+0.0,
+-0.0,
+1.0
+]
+]
+},
+{
+"path": "Trawler/Trawler_Hull/Colliders/Trawler_Hull_MeshCollider10",
+"mesh": "m9b4570fe2c61",
+"matrix": [
+[
+0.0,
+-0.0,
+1.0,
+0.58359
+],
+[
+-0.0,
+1.0,
+0.0,
+3.0
+],
+[
+-1.0,
+-0.0,
+0.0,
+-0.0
+],
+[
+0.0,
+0.0,
+-0.0,
+1.0
+]
+]
+},
+{
+"path": "Trawler/Trawler_Hull/Colliders/Trawler_Hull_MeshCollider09",
+"mesh": "m65cfb0db2c61",
+"matrix": [
+[
+0.0,
+-0.0,
+1.0,
+0.58359
+],
+[
+-0.0,
+1.0,
+0.0,
+3.0
+],
+[
+-1.0,
+-0.0,
+0.0,
+-0.0
+],
+[
+0.0,
+0.0,
+-0.0,
+1.0
+]
+]
+},
+{
+"path": "Trawler/Trawler_Hull/Colliders/Trawler_Hull_MeshCollider04",
+"mesh": "m220d157a2c61",
+"matrix": [
+[
+0.0,
+-0.0,
+1.0,
+0.58359
+],
+[
+-0.0,
+1.0,
+0.0,
+3.0
+],
+[
+-1.0,
+-0.0,
+0.0,
+-0.0
+],
+[
+0.0,
+0.0,
+-0.0,
+1.0
+]
+]
+},
+{
+"path": "Trawler/Trawler_Hull/Colliders/Trawler_Hull_MeshCollider05",
+"mesh": "m69d2aa692c61",
+"matrix": [
+[
+0.0,
+-0.0,
+1.0,
+0.58359
+],
+[
+-0.0,
+1.0,
+0.0,
+3.0
+],
+[
+-1.0,
+-0.0,
+0.0,
+-0.0
+],
+[
+0.0,
+0.0,
+-0.0,
+1.0
+]
+]
+},
+{
+"path": "Trawler/Trawler_Hull/Colliders/Trawler_Hull_MeshCollider60",
+"mesh": "m2619601c2c61",
+"matrix": [
+[
+0.0,
+-0.0,
+1.0,
+0.58359
+],
+[
+-0.0,
+1.0,
+0.0,
+3.0
+],
+[
+-1.0,
+-0.0,
+0.0,
+-0.0
+],
+[
+0.0,
+0.0,
+-0.0,
+1.0
+]
+]
+},
+{
+"path": "Trawler/Trawler_Hull/Colliders/Trawler_Hull_MeshCollider15",
+"mesh": "m1f7d7722c61",
+"matrix": [
+[
+0.0,
+-0.0,
+1.0,
+0.58359
+],
+[
+-0.0,
+1.0,
+0.0,
+3.0
+],
+[
+-1.0,
+-0.0,
+0.0,
+-0.0
+],
+[
+0.0,
+0.0,
+-0.0,
+1.0
+]
+]
+},
+{
+"path": "Trawler/Trawler_Hull/Colliders/Trawler_Hull_MeshCollider32",
+"mesh": "m60100e482c61",
+"matrix": [
+[
+0.0,
+-0.0,
+1.0,
+0.58359
+],
+[
+-0.0,
+1.0,
+0.0,
+3.0
+],
+[
+-1.0,
+-0.0,
+0.0,
+-0.0
+],
+[
+0.0,
+0.0,
+-0.0,
+1.0
+]
+]
+},
+{
+"path": "Trawler/Trawler_Hull/Colliders/Trawler_Hull_MeshCollider46",
+"mesh": "me47232282c61",
+"matrix": [
+[
+0.0,
+-0.0,
+1.0,
+0.58359
+],
+[
+-0.0,
+1.0,
+0.0,
+3.0
+],
+[
+-1.0,
+-0.0,
+0.0,
+-0.0
+],
+[
+0.0,
+0.0,
+-0.0,
+1.0
+]
+]
+},
+{
+"path": "Trawler/Trawler_Hull/Colliders/Trawler_Hull_MeshCollider65",
+"mesh": "mf0027c4e2c61",
+"matrix": [
+[
+0.0,
+-0.0,
+1.0,
+0.58359
+],
+[
+-0.0,
+1.0,
+0.0,
+3.0
+],
+[
+-1.0,
+-0.0,
+0.0,
+-0.0
+],
+[
+0.0,
+0.0,
+-0.0,
+1.0
+]
+]
+},
+{
+"path": "Trawler/Trawler_Hull/Colliders/Trawler_Hull_MeshCollider55",
+"mesh": "mbb4f131d2c61",
+"matrix": [
+[
+0.0,
+-0.0,
+1.0,
+0.58359
+],
+[
+-0.0,
+1.0,
+0.0,
+3.0
+],
+[
+-1.0,
+-0.0,
+0.0,
+-0.0
+],
+[
+0.0,
+0.0,
+-0.0,
+1.0
+]
+]
+},
+{
+"path": "Trawler/Trawler_Hull/Colliders/Trawler_Hull_MeshCollider56",
+"mesh": "m9a3093c32c61",
+"matrix": [
+[
+0.0,
+-0.0,
+1.0,
+0.58359
+],
+[
+-0.0,
+1.0,
+0.0,
+3.0
+],
+[
+-1.0,
+-0.0,
+0.0,
+-0.0
+],
+[
+0.0,
+0.0,
+-0.0,
+1.0
+]
+]
+},
+{
+"path": "Trawler/Trawler_Hull/Colliders/Trawler_Hull_MeshCollider67",
+"mesh": "macd6b3ac2c61",
+"matrix": [
+[
+0.0,
+-0.0,
+1.0,
+0.58359
+],
+[
+-0.0,
+1.0,
+0.0,
+3.0
+],
+[
+-1.0,
+-0.0,
+0.0,
+-0.0
+],
+[
+0.0,
+0.0,
+-0.0,
+1.0
+]
+]
+},
+{
+"path": "Trawler/Trawler_Hull/Colliders/Trawler_Hull_MeshCollider39",
+"mesh": "m8042e9032c61",
+"matrix": [
+[
+0.0,
+-0.0,
+1.0,
+0.58359
+],
+[
+-0.0,
+1.0,
+0.0,
+3.0
+],
+[
+-1.0,
+-0.0,
+0.0,
+-0.0
+],
+[
+0.0,
+0.0,
+-0.0,
+1.0
+]
+]
+},
+{
+"path": "Trawler/Trawler_Hull/Colliders/Trawler_Hull_MeshCollider51",
+"mesh": "m2c2d7ceb2c61",
+"matrix": [
+[
+0.0,
+-0.0,
+1.0,
+0.58359
+],
+[
+-0.0,
+1.0,
+0.0,
+3.0
+],
+[
+-1.0,
+-0.0,
+0.0,
+-0.0
+],
+[
+0.0,
+0.0,
+-0.0,
+1.0
+]
+]
+},
+{
+"path": "Trawler/Trawler_Hull/Colliders/Trawler_Hull_MeshCollider01",
+"mesh": "mb3a8bb9f2c61",
+"matrix": [
+[
+0.0,
+-0.0,
+1.0,
+0.58359
+],
+[
+-0.0,
+1.0,
+0.0,
+3.0
+],
+[
+-1.0,
+-0.0,
+0.0,
+-0.0
+],
+[
+0.0,
+0.0,
+-0.0,
+1.0
+]
+]
+},
+{
+"path": "Trawler/Trawler_Hull/Colliders/Trawler_Hull_MeshCollider42",
+"mesh": "m3d2ff52f2c61",
+"matrix": [
+[
+0.0,
+-0.0,
+1.0,
+0.58359
+],
+[
+-0.0,
+1.0,
+0.0,
+3.0
+],
+[
+-1.0,
+-0.0,
+0.0,
+-0.0
+],
+[
+0.0,
+0.0,
+-0.0,
+1.0
+]
+]
+},
+{
+"path": "Trawler/Trawler_Hull/Colliders/Trawler_Hull_MeshCollider24",
+"mesh": "m19952da52c61",
+"matrix": [
+[
+0.0,
+-0.0,
+1.0,
+0.58359
+],
+[
+-0.0,
+1.0,
+0.0,
+3.0
+],
+[
+-1.0,
+-0.0,
+0.0,
+-0.0
+],
+[
+0.0,
+0.0,
+-0.0,
+1.0
+]
+]
+},
+{
+"path": "Trawler/Trawler_Hull/Colliders/Trawler_Hull_MeshCollider22",
+"mesh": "mc8f3157f2c61",
+"matrix": [
+[
+0.0,
+-0.0,
+1.0,
+0.58359
+],
+[
+-0.0,
+1.0,
+0.0,
+3.0
+],
+[
+-1.0,
+-0.0,
+0.0,
+-0.0
+],
+[
+0.0,
+0.0,
+-0.0,
+1.0
+]
+]
+},
+{
+"path": "Trawler/Trawler_Hull/Colliders/Trawler_Hull_MeshCollider63",
+"mesh": "m2759a0442c61",
+"matrix": [
+[
+0.0,
+-0.0,
+1.0,
+0.58359
+],
+[
+-0.0,
+1.0,
+0.0,
+3.0
+],
+[
+-1.0,
+-0.0,
+0.0,
+-0.0
+],
+[
+0.0,
+0.0,
+-0.0,
+1.0
+]
+]
+},
+{
+"path": "Trawler/Trawler_Hull/Colliders/Trawler_Hull_MeshCollider12",
+"mesh": "mf41bbe4d2c61",
+"matrix": [
+[
+0.0,
+-0.0,
+1.0,
+0.58359
+],
+[
+-0.0,
+1.0,
+0.0,
+3.0
+],
+[
+-1.0,
+-0.0,
+0.0,
+-0.0
+],
+[
+0.0,
+0.0,
+-0.0,
+1.0
+]
+]
+},
+{
+"path": "Trawler/Trawler_Hull/Colliders/Trawler_Hull_MeshCollider57",
+"mesh": "mf23c258f2c61",
+"matrix": [
+[
+0.0,
+-0.0,
+1.0,
+0.58359
+],
+[
+-0.0,
+1.0,
+0.0,
+3.0
+],
+[
+-1.0,
+-0.0,
+0.0,
+-0.0
+],
+[
+0.0,
+0.0,
+-0.0,
+1.0
+]
+]
+},
+{
+"path": "Trawler/Trawler_Hull/Colliders/Trawler_Hull_MeshCollider31",
+"mesh": "me0cbe5412c61",
+"matrix": [
+[
+0.0,
+-0.0,
+1.0,
+0.58359
+],
+[
+-0.0,
+1.0,
+0.0,
+3.0
+],
+[
+-1.0,
+-0.0,
+0.0,
+-0.0
+],
+[
+0.0,
+0.0,
+-0.0,
+1.0
+]
+]
+},
+{
+"path": "Trawler/Trawler_Hull/Colliders/Trawler_Hull_MeshCollider36",
+"mesh": "me0fc2f3e2c61",
+"matrix": [
+[
+0.0,
+-0.0,
+1.0,
+0.58359
+],
+[
+-0.0,
+1.0,
+0.0,
+3.0
+],
+[
+-1.0,
+-0.0,
+0.0,
+-0.0
+],
+[
+0.0,
+0.0,
+-0.0,
+1.0
+]
+]
+},
+{
+"path": "Trawler/Trawler_Hull/Colliders/Trawler_Hull_MeshCollider11",
+"mesh": "mb9bbfa9c2c61",
+"matrix": [
+[
+0.0,
+-0.0,
+1.0,
+0.58359
+],
+[
+-0.0,
+1.0,
+0.0,
+3.0
+],
+[
+-1.0,
+-0.0,
+0.0,
+-0.0
+],
+[
+0.0,
+0.0,
+-0.0,
+1.0
+]
+]
+},
+{
+"path": "Trawler/Trawler_Hull/Colliders/Trawler_Hull_MeshCollider47",
+"mesh": "mc3748d4d2c61",
+"matrix": [
+[
+0.0,
+-0.0,
+1.0,
+0.58359
+],
+[
+-0.0,
+1.0,
+0.0,
+3.0
+],
+[
+-1.0,
+-0.0,
+0.0,
+-0.0
+],
+[
+0.0,
+0.0,
+-0.0,
+1.0
+]
+]
+},
+{
+"path": "Trawler/Trawler_Hull/Colliders/Trawler_Hull_MeshCollider14",
+"mesh": "m1080c0872c61",
+"matrix": [
+[
+0.0,
+-0.0,
+1.0,
+0.58359
+],
+[
+-0.0,
+1.0,
+0.0,
+3.0
+],
+[
+-1.0,
+-0.0,
+0.0,
+-0.0
+],
+[
+0.0,
+0.0,
+-0.0,
+1.0
+]
+]
+},
+{
+"path": "Trawler/Trawler_Hull/Colliders/Trawler_Hull_MeshCollider02",
+"mesh": "m97e88fe72c61",
+"matrix": [
+[
+0.0,
+-0.0,
+1.0,
+0.58359
+],
+[
+-0.0,
+1.0,
+0.0,
+3.0
+],
+[
+-1.0,
+-0.0,
+0.0,
+-0.0
+],
+[
+0.0,
+0.0,
+-0.0,
+1.0
+]
+]
+},
+{
+"path": "Trawler/Trawler_Hull/Colliders/Trawler_Hull_MeshCollider00",
+"mesh": "mb8444c7a2c61",
+"matrix": [
+[
+0.0,
+-0.0,
+1.0,
+0.58359
+],
+[
+-0.0,
+1.0,
+0.0,
+3.0
+],
+[
+-1.0,
+-0.0,
+0.0,
+-0.0
+],
+[
+0.0,
+0.0,
+-0.0,
+1.0
+]
+]
+},
+{
+"path": "Trawler/Trawler_Hull/Colliders/Trawler_Hull_MeshCollider54",
+"mesh": "me26bee2a2c61",
+"matrix": [
+[
+0.0,
+-0.0,
+1.0,
+0.58359
+],
+[
+-0.0,
+1.0,
+0.0,
+3.0
+],
+[
+-1.0,
+-0.0,
+0.0,
+-0.0
+],
+[
+0.0,
+0.0,
+-0.0,
+1.0
+]
+]
+},
+{
+"path": "Trawler/Trawler_Hull/Colliders/Trawler_Hull_MeshCollider52",
+"mesh": "mb579e0282c61",
+"matrix": [
+[
+0.0,
+-0.0,
+1.0,
+0.58359
+],
+[
+-0.0,
+1.0,
+0.0,
+3.0
+],
+[
+-1.0,
+-0.0,
+0.0,
+-0.0
+],
+[
+0.0,
+0.0,
+-0.0,
+1.0
+]
+]
+},
+{
+"path": "Trawler/Trawler_Hull/Colliders/Trawler_Hull_MeshCollider03",
+"mesh": "m6d82d8ac2c61",
+"matrix": [
+[
+0.0,
+-0.0,
+1.0,
+0.58359
+],
+[
+-0.0,
+1.0,
+0.0,
+3.0
+],
+[
+-1.0,
+-0.0,
+0.0,
+-0.0
+],
+[
+0.0,
+0.0,
+-0.0,
+1.0
+]
+]
+},
+{
+"path": "Trawler/Trawler_Hull/Colliders/Trawler_Hull_MeshCollider08",
+"mesh": "m3c0ce4822c61",
+"matrix": [
+[
+0.0,
+-0.0,
+1.0,
+0.58359
+],
+[
+-0.0,
+1.0,
+0.0,
+3.0
+],
+[
+-1.0,
+-0.0,
+0.0,
+-0.0
+],
+[
+0.0,
+0.0,
+-0.0,
+1.0
+]
+]
+},
+{
+"path": "Trawler/Trawler_Hull/Colliders/Trawler_Hull_MeshCollider19",
+"mesh": "m8ff6552b2c61",
+"matrix": [
+[
+0.0,
+-0.0,
+1.0,
+0.58359
+],
+[
+-0.0,
+1.0,
+0.0,
+3.0
+],
+[
+-1.0,
+-0.0,
+0.0,
+-0.0
+],
+[
+0.0,
+0.0,
+-0.0,
+1.0
+]
+]
+},
+{
+"path": "Trawler/Trawler_Hull/Colliders/Trawler_Hull_MeshCollider06",
+"mesh": "m39415eb72c61",
+"matrix": [
+[
+0.0,
+-0.0,
+1.0,
+0.58359
+],
+[
+-0.0,
+1.0,
+0.0,
+3.0
+],
+[
+-1.0,
+-0.0,
+0.0,
+-0.0
+],
+[
+0.0,
+0.0,
+-0.0,
+1.0
+]
+]
+},
+{
+"path": "Trawler/Trawler_Hull/Colliders/Trawler_Hull_MeshCollider49",
+"mesh": "m8ab37beb2c61",
+"matrix": [
+[
+0.0,
+-0.0,
+1.0,
+0.58359
+],
+[
+-0.0,
+1.0,
+0.0,
+3.0
+],
+[
+-1.0,
+-0.0,
+0.0,
+-0.0
+],
+[
+0.0,
+0.0,
+-0.0,
+1.0
+]
+]
+},
+{
+"path": "Trawler/Trawler_Hull/Colliders/Trawler_Hull_MeshCollider20",
+"mesh": "mbfff99fe2c61",
+"matrix": [
+[
+0.0,
+-0.0,
+1.0,
+0.58359
+],
+[
+-0.0,
+1.0,
+0.0,
+3.0
+],
+[
+-1.0,
+-0.0,
+0.0,
+-0.0
+],
+[
+0.0,
+0.0,
+-0.0,
+1.0
+]
+]
+},
+{
+"path": "Trawler/Trawler_Hull/Colliders/Trawler_Hull_MeshCollider18",
+"mesh": "m385688a72c61",
+"matrix": [
+[
+0.0,
+-0.0,
+1.0,
+0.58359
+],
+[
+-0.0,
+1.0,
+0.0,
+3.0
+],
+[
+-1.0,
+-0.0,
+0.0,
+-0.0
+],
+[
+0.0,
+0.0,
+-0.0,
+1.0
+]
+]
+},
+{
+"path": "Trawler/Trawler_Hull/Colliders/Trawler_Hull_MeshCollider21",
+"mesh": "m7debdb112c61",
+"matrix": [
+[
+0.0,
+-0.0,
+1.0,
+0.58359
+],
+[
+-0.0,
+1.0,
+0.0,
+3.0
+],
+[
+-1.0,
+-0.0,
+0.0,
+-0.0
+],
+[
+0.0,
+0.0,
+-0.0,
+1.0
+]
+]
+},
+{
+"path": "Trawler/Trawler_Hull/Colliders/Trawler_Hull_MeshCollider59",
+"mesh": "me730d7ae2c61",
+"matrix": [
+[
+0.0,
+-0.0,
+1.0,
+0.58359
+],
+[
+-0.0,
+1.0,
+0.0,
+3.0
+],
+[
+-1.0,
+-0.0,
+0.0,
+-0.0
+],
+[
+0.0,
+0.0,
+-0.0,
+1.0
+]
+]
+},
+{
+"path": "Trawler/Trawler_Hull/Colliders/Trawler_Hull_MeshCollider27",
+"mesh": "m6bdae6262c61",
+"matrix": [
+[
+0.0,
+-0.0,
+1.0,
+0.58359
+],
+[
+-0.0,
+1.0,
+0.0,
+3.0
+],
+[
+-1.0,
+-0.0,
+0.0,
+-0.0
+],
+[
+0.0,
+0.0,
+-0.0,
+1.0
+]
+]
+},
+{
+"path": "Trawler/Trawler_Hull/Colliders/Trawler_Hull_MeshCollider29",
+"mesh": "m23c1f8e72c61",
+"matrix": [
+[
+0.0,
+-0.0,
+1.0,
+0.58359
+],
+[
+-0.0,
+1.0,
+0.0,
+3.0
+],
+[
+-1.0,
+-0.0,
+0.0,
+-0.0
+],
+[
+0.0,
+0.0,
+-0.0,
+1.0
+]
+]
+},
+{
+"path": "Trawler/Trawler_Hull/Colliders/Trawler_Hull_MeshCollider38",
+"mesh": "mea9c98ba2c61",
+"matrix": [
+[
+0.0,
+-0.0,
+1.0,
+0.58359
+],
+[
+-0.0,
+1.0,
+0.0,
+3.0
+],
+[
+-1.0,
+-0.0,
+0.0,
+-0.0
+],
+[
+0.0,
+0.0,
+-0.0,
+1.0
+]
+]
+},
+{
+"path": "Trawler/Trawler_Hull/Colliders/Trawler_Hull_MeshCollider45",
+"mesh": "m827a80562c61",
+"matrix": [
+[
+0.0,
+-0.0,
+1.0,
+0.58359
+],
+[
+-0.0,
+1.0,
+0.0,
+3.0
+],
+[
+-1.0,
+-0.0,
+0.0,
+-0.0
+],
+[
+0.0,
+0.0,
+-0.0,
+1.0
+]
+]
+},
+{
+"path": "Trawler/Trawler_Hull/Colliders/Trawler_Hull_MeshCollider50",
+"mesh": "m1b690a1d2c61",
+"matrix": [
+[
+0.0,
+-0.0,
+1.0,
+0.58359
+],
+[
+-0.0,
+1.0,
+0.0,
+3.0
+],
+[
+-1.0,
+-0.0,
+0.0,
+-0.0
+],
+[
+0.0,
+0.0,
+-0.0,
+1.0
+]
+]
+},
+{
+"path": "Trawler/Trawler_Hull/Colliders/Trawler_Hull_MeshCollider26",
+"mesh": "mdcc0b92c2c61",
+"matrix": [
+[
+0.0,
+-0.0,
+1.0,
+0.58359
+],
+[
+-0.0,
+1.0,
+0.0,
+3.0
+],
+[
+-1.0,
+-0.0,
+0.0,
+-0.0
+],
+[
+0.0,
+0.0,
+-0.0,
+1.0
+]
+]
+},
+{
+"path": "Trawler/Trawler_Hull/Colliders/Trawler_Hull_MeshCollider61",
+"mesh": "m8ec7c89f2c61",
+"matrix": [
+[
+0.0,
+-0.0,
+1.0,
+0.58359
+],
+[
+-0.0,
+1.0,
+0.0,
+3.0
+],
+[
+-1.0,
+-0.0,
+0.0,
+-0.0
+],
+[
+0.0,
+0.0,
+-0.0,
+1.0
+]
+]
+},
+{
+"path": "Trawler/Trawler_Hull/Colliders/Trawler_Hull_MeshCollider25",
+"mesh": "m8893838d2c61",
+"matrix": [
+[
+0.0,
+-0.0,
+1.0,
+0.58359
+],
+[
+-0.0,
+1.0,
+0.0,
+3.0
+],
+[
+-1.0,
+-0.0,
+0.0,
+-0.0
+],
+[
+0.0,
+0.0,
+-0.0,
+1.0
+]
+]
+},
+{
+"path": "Trawler/Trawler_Hull/Colliders/Trawler_Hull_MeshCollider66",
+"mesh": "m2d3f22fe2c61",
+"matrix": [
+[
+0.0,
+-0.0,
+1.0,
+0.58359
+],
+[
+-0.0,
+1.0,
+0.0,
+3.0
+],
+[
+-1.0,
+-0.0,
+0.0,
+-0.0
+],
+[
+0.0,
+0.0,
+-0.0,
+1.0
+]
+]
+},
+{
+"path": "Trawler/Trawler_Hull/Colliders/Trawler_Hull_MeshCollider13",
+"mesh": "mbf37774f2c61",
+"matrix": [
+[
+0.0,
+-0.0,
+1.0,
+0.58359
+],
+[
+-0.0,
+1.0,
+0.0,
+3.0
+],
+[
+-1.0,
+-0.0,
+0.0,
+-0.0
+],
+[
+0.0,
+0.0,
+-0.0,
+1.0
+]
+]
+},
+{
+"path": "Trawler/Trawler_Hull/Colliders/Trawler_Hull_MeshCollider48",
+"mesh": "m6785e26a2c61",
+"matrix": [
+[
+0.0,
+-0.0,
+1.0,
+0.58359
+],
+[
+-0.0,
+1.0,
+0.0,
+3.0
+],
+[
+-1.0,
+-0.0,
+0.0,
+-0.0
+],
+[
+0.0,
+0.0,
+-0.0,
+1.0
+]
+]
+},
+{
+"path": "Trawler/Trawler_Hull/Colliders/Trawler_Hull_MeshCollider07",
+"mesh": "m252fb4b02c61",
+"matrix": [
+[
+0.0,
+-0.0,
+1.0,
+0.58359
+],
+[
+-0.0,
+1.0,
+0.0,
+3.0
+],
+[
+-1.0,
+-0.0,
+0.0,
+-0.0
+],
+[
+0.0,
+0.0,
+-0.0,
+1.0
+]
+]
+},
+{
+"path": "Trawler/Trawler_Hull/Colliders/Trawler_Hull_MeshCollider41",
+"mesh": "meb0a9c02c61",
+"matrix": [
+[
+0.0,
+-0.0,
+1.0,
+0.58359
+],
+[
+-0.0,
+1.0,
+0.0,
+3.0
+],
+[
+-1.0,
+-0.0,
+0.0,
+-0.0
+],
+[
+0.0,
+0.0,
+-0.0,
+1.0
+]
+]
+},
+{
+"path": "Trawler/Trawler_Hull/Colliders/Trawler_Hull_MeshCollider23",
+"mesh": "m249ee19b2c61",
+"matrix": [
+[
+0.0,
+-0.0,
+1.0,
+0.58359
+],
+[
+-0.0,
+1.0,
+0.0,
+3.0
+],
+[
+-1.0,
+-0.0,
+0.0,
+-0.0
+],
+[
+0.0,
+0.0,
+-0.0,
+1.0
+]
+]
+},
+{
+"path": "Trawler/Trawler_Hull/Colliders/Trawler_Hull_MeshCollider28",
+"mesh": "m6bd808b2c61",
+"matrix": [
+[
+0.0,
+-0.0,
+1.0,
+0.58359
+],
+[
+-0.0,
+1.0,
+0.0,
+3.0
+],
+[
+-1.0,
+-0.0,
+0.0,
+-0.0
+],
+[
+0.0,
+0.0,
+-0.0,
+1.0
+]
+]
+},
+{
+"path": "Trawler/Trawler_Hull/Colliders/Trawler_Hull_MeshCollider44",
+"mesh": "m16308ea52c61",
+"matrix": [
+[
+0.0,
+-0.0,
+1.0,
+0.58359
+],
+[
+-0.0,
+1.0,
+0.0,
+3.0
+],
+[
+-1.0,
+-0.0,
+0.0,
+-0.0
+],
+[
+0.0,
+0.0,
+-0.0,
+1.0
+]
+]
+},
+{
+"path": "Trawler/Trawler_Hull/Colliders/Trawler_Hull_MeshCollider62",
+"mesh": "mef63c4822c61",
+"matrix": [
+[
+0.0,
+-0.0,
+1.0,
+0.58359
+],
+[
+-0.0,
+1.0,
+0.0,
+3.0
+],
+[
+-1.0,
+-0.0,
+0.0,
+-0.0
+],
+[
+0.0,
+0.0,
+-0.0,
+1.0
+]
+]
+},
+{
+"path": "Trawler/Trawler_Hull/Colliders/Trawler_Hull_MeshCollider33",
+"mesh": "m919e387a2c61",
+"matrix": [
+[
+0.0,
+-0.0,
+1.0,
+0.58359
+],
+[
+-0.0,
+1.0,
+0.0,
+3.0
+],
+[
+-1.0,
+-0.0,
+0.0,
+-0.0
+],
+[
+0.0,
+0.0,
+-0.0,
+1.0
+]
+]
+},
+{
+"path": "Trawler/Trawler_Hull/Colliders/Trawler_Hull_MeshCollider58",
+"mesh": "mc386a1052c61",
+"matrix": [
+[
+0.0,
+-0.0,
+1.0,
+0.58359
+],
+[
+-0.0,
+1.0,
+0.0,
+3.0
+],
+[
+-1.0,
+-0.0,
+0.0,
+-0.0
+],
+[
+0.0,
+0.0,
+-0.0,
+1.0
+]
+]
+},
+{
+"path": "Trawler/Trawler_Hull/Colliders/Trawler_Hull_MeshCollider30",
+"mesh": "m88b8f102c61",
+"matrix": [
+[
+0.0,
+-0.0,
+1.0,
+0.58359
+],
+[
+-0.0,
+1.0,
+0.0,
+3.0
+],
+[
+-1.0,
+-0.0,
+0.0,
+-0.0
+],
+[
+0.0,
+0.0,
+-0.0,
+1.0
+]
+]
+},
+{
+"path": "Trawler/Trawler_Hull/Colliders/Trawler_Hull_MeshCollider43",
+"mesh": "m1476ef372c61",
+"matrix": [
+[
+0.0,
+-0.0,
+1.0,
+0.58359
+],
+[
+-0.0,
+1.0,
+0.0,
+3.0
+],
+[
+-1.0,
+-0.0,
+0.0,
+-0.0
+],
+[
+0.0,
+0.0,
+-0.0,
+1.0
+]
+]
+},
+{
+"path": "Trawler/Trawler_Hull/Colliders/Trawler_Hull_MeshCollider53",
+"mesh": "mccf533112c61",
+"matrix": [
+[
+0.0,
+-0.0,
+1.0,
+0.58359
+],
+[
+-0.0,
+1.0,
+0.0,
+3.0
+],
+[
+-1.0,
+-0.0,
+0.0,
+-0.0
+],
+[
+0.0,
+0.0,
+-0.0,
+1.0
+]
+]
+}
+],
+"spawns": [
+[
+13.16,
+3.25,
+-0.0
+],
+[
+12.7207,
+3.25,
+1.0607
+],
+[
+11.66,
+3.25,
+1.5
+],
+[
+10.5993,
+3.25,
+1.0607
+],
+[
+10.16,
+3.25,
+-0.0
+],
+[
+10.5993,
+3.25,
+-1.0607
+],
+[
+11.66,
+3.25,
+-1.5
+],
+[
+12.7207,
+3.25,
+-1.0607
+]
+],
+"kill": [
+{
+"path": "Managers/KillVolumes/Kill Volume_Left",
+"p": [
+50.0,
+14.5,
+-0.0
+],
+"q": [
+0.5,
+0.5,
+0.5,
+-0.5
+],
+"h": [
+50.0,
+5.0,
+25.0
+]
+},
+{
+"path": "Managers/KillVolumes/Kill Volume_Far",
+"p": [
+0.0,
+14.5,
+50.0
+],
+"q": [
+-0.70711,
+0.0,
+0.0,
+0.70711
+],
+"h": [
+50.0,
+5.0,
+25.0
+]
+},
+{
+"path": "Trawler/Trawler_Hull/HatchKillVolume",
+"p": [
+-7.4164,
+-0.5,
+-0.0
+],
+"q": [
+-0.0,
+0.70711,
+0.0,
+0.70711
+],
+"h": [
+1.0,
+1.1,
+1.0
+]
+},
+{
+"path": "Trawler/Trawler_Hull/UpperCabinKillVolume",
+"p": [
+-1.0164,
+6.74,
+2.11
+],
+"q": [
+-0.70711,
+-0.0,
+0.0,
+0.70711
+],
+"h": [
+1.5,
+1.5,
+1.5
+]
+},
+{
+"path": "Managers/KillVolumes/Kill Volume_Bottom",
+"p": [
+0.0,
+-10.0,
+-0.0
+],
+"q": [
+0.0,
+0.0,
+0.0,
+1.0
+],
+"h": [
+50.0,
+5.0,
+50.0
+]
+},
+{
+"path": "Managers/KillVolumes/Kill Volume_Near",
+"p": [
+0.0,
+14.5,
+-50.0
+],
+"q": [
+-0.70711,
+0.0,
+0.0,
+0.70711
+],
+"h": [
+50.0,
+5.0,
+25.0
+]
+},
+{
+"path": "Trawler/Trawler_Hull/LowerCabinKillVolume",
+"p": [
+-1.4164,
+4.0,
+2.25
+],
+"q": [
+-0.0,
+0.70711,
+0.0,
+0.70711
+],
+"h": [
+1.75,
+1.0,
+1.0
+]
+},
+{
+"path": "Managers/KillVolumes/Kill Volume_Right",
+"p": [
+-50.0,
+14.5,
+-0.0
+],
+"q": [
+0.5,
+0.5,
+0.5,
+-0.5
+],
+"h": [
+50.0,
+5.0,
+25.0
+]
+},
+{
+"path": "Managers/KillVolumes/Kill Volume_Top",
+"p": [
+0.0,
+34.5,
+-0.0
+],
+"q": [
+0.0,
+0.0,
+0.0,
+1.0
+],
+"h": [
+50.0,
+5.0,
+50.0
+]
+},
+{
+"path": "ParentSea/BuoyancyTrigger Beast/KillVolume",
+"p": [
+0.0,
+-4.0,
+-0.0
+],
+"q": [
+0.0,
+0.0,
+0.0,
+1.0
+],
+"h": [
+250.0,
+0.5,
+250.0
+]
+}
+],
+"lightmaps": [],
+"env": {
+"ambientSky": [
+0.212,
+0.227,
+0.259
+],
+"ambientEquator": [
+0.114,
+0.125,
+0.133
+],
+"ambientGround": [
+0.047,
+0.043,
+0.035
+],
+"fog": true,
+"fogColor": [
+1.0,
+0.8431,
+0.8667
+],
+"fogDensity": 0.00019999999494757503,
+"sh": [
+0.19682,
+-0.13694,
+0.00337,
+0.00353,
+0.00273,
+0.0026,
+0.0029,
+0.00372,
+0.00886,
+0.17722,
+0.02718,
+0.01129,
+0.01181,
+0.0093,
+0.00888,
+0.00992,
+0.01145,
+0.03028,
+0.32539,
+0.11304,
+0.02584,
+0.02706,
+0.02222,
+0.02123,
+0.01561,
+0.02187,
+0.04783
+],
+"sky": [
+"sky_0.png",
+"sky_1.png",
+"sky_2.png",
+"sky_3.png",
+"sky_4.png",
+"sky_5.png"
+],
+"skyMean": [
+0.1954,
+0.1755,
+0.3172
+]
+},
+"lights": [
+{
+"type": "sun",
+"color": [
+1.0,
+1.0,
+1.0
+],
+"intensity": 1.0,
+"p": [
+0.0,
+16.9,
+-0.0
+],
+"dir": [
+-0.4183,
+-0.8157,
+0.3996
+],
+"range": 10.0,
+"angle": 30.0,
+"inner": 21.8,
+"shadows": true,
+"mask": 4286578687,
+"name": "Light_City_Directional_01",
+"jitter": null
+},
+{
+"type": "sun",
+"color": [
+1.0,
+1.0,
+1.0
+],
+"intensity": 0.4,
+"p": [
+0.0,
+16.9,
+-0.0
+],
+"dir": [
+0.4942,
+-0.5561,
+0.6682
+],
+"range": 10.0,
+"angle": 30.0,
+"inner": 21.8,
+"shadows": false,
+"mask": 4286578687,
+"name": "Light_City_Directional_01 (1)",
+"jitter": null
+}
+]
+}

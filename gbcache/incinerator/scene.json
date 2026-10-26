@@ -1,0 +1,13203 @@
+{
+"stage": "incinerator",
+"meshes": {
+"m20134808fdd0": {
+"name": "pipeRailing_joint_floor",
+"verts": 60,
+"normals": true,
+"uv0": true,
+"uv1": false,
+"indices": 138,
+"subs": [
+[
+0,
+138
+]
+]
+},
+"m5": {
+"name": "Combined Mesh (root: scene) 5",
+"verts": 1835,
+"normals": true,
+"uv0": true,
+"uv1": true,
+"indices": 3873,
+"subs": [
+[
+0,
+162
+],
+[
+162,
+18
+],
+[
+180,
+150
+],
+[
+330,
+18
+],
+[
+348,
+18
+],
+[
+366,
+18
+],
+[
+384,
+30
+],
+[
+414,
+30
+],
+[
+444,
+150
+],
+[
+594,
+30
+],
+[
+624,
+198
+],
+[
+822,
+18
+],
+[
+840,
+18
+],
+[
+858,
+18
+],
+[
+876,
+30
+],
+[
+906,
+18
+],
+[
+924,
+30
+],
+[
+954,
+18
+],
+[
+972,
+150
+],
+[
+1122,
+18
+],
+[
+1140,
+33
+],
+[
+1173,
+18
+],
+[
+1191,
+18
+],
+[
+1209,
+150
+],
+[
+1359,
+198
+],
+[
+1557,
+30
+],
+[
+1587,
+18
+],
+[
+1605,
+30
+],
+[
+1635,
+84
+],
+[
+1719,
+30
+],
+[
+1749,
+150
+],
+[
+1899,
+18
+],
+[
+1917,
+18
+],
+[
+1935,
+30
+],
+[
+1965,
+150
+],
+[
+2115,
+30
+],
+[
+2145,
+18
+],
+[
+2163,
+162
+],
+[
+2325,
+150
+],
+[
+2475,
+30
+],
+[
+2505,
+30
+],
+[
+2535,
+18
+],
+[
+2553,
+18
+],
+[
+2571,
+18
+],
+[
+2589,
+18
+],
+[
+2607,
+30
+],
+[
+2637,
+18
+],
+[
+2655,
+162
+],
+[
+2817,
+18
+],
+[
+2835,
+30
+],
+[
+2865,
+18
+],
+[
+2883,
+150
+],
+[
+3033,
+12
+],
+[
+3045,
+18
+],
+[
+3063,
+30
+],
+[
+3093,
+18
+],
+[
+3111,
+150
+],
+[
+3261,
+12
+],
+[
+3273,
+18
+],
+[
+3291,
+66
+],
+[
+3357,
+162
+],
+[
+3519,
+30
+],
+[
+3549,
+18
+],
+[
+3567,
+18
+],
+[
+3585,
+18
+],
+[
+3603,
+18
+],
+[
+3621,
+18
+],
+[
+3639,
+18
+],
+[
+3657,
+18
+],
+[
+3675,
+84
+],
+[
+3759,
+30
+],
+[
+3789,
+30
+],
+[
+3819,
+18
+],
+[
+3837,
+18
+],
+[
+3855,
+18
+]
+]
+},
+"m3": {
+"name": "Combined Mesh (root: scene) 6",
+"verts": 370,
+"normals": true,
+"uv0": true,
+"uv1": true,
+"indices": 810,
+"subs": [
+[
+0,
+36
+],
+[
+36,
+36
+],
+[
+72,
+36
+],
+[
+108,
+72
+],
+[
+180,
+72
+],
+[
+252,
+72
+],
+[
+324,
+72
+],
+[
+396,
+300
+],
+[
+696,
+78
+],
+[
+774,
+36
+]
+]
+},
+"m1": {
+"name": "Combined Mesh (root: scene) 2",
+"verts": 60088,
+"normals": true,
+"uv0": true,
+"uv1": true,
+"indices": 120828,
+"subs": [
+[
+0,
+36
+],
+[
+36,
+1032
+],
+[
+1068,
+1176
+],
+[
+2244,
+1032
+],
+[
+3276,
+1032
+],
+[
+4308,
+1032
+],
+[
+5340,
+1032
+],
+[
+6372,
+1032
+],
+[
+7404,
+1800
+],
+[
+9204,
+1176
+],
+[
+10380,
+1944
+],
+[
+12324,
+1032
+],
+[
+13356,
+1176
+],
+[
+14532,
+1032
+],
+[
+15564,
+1032
+],
+[
+16596,
+1032
+],
+[
+17628,
+1800
+],
+[
+19428,
+1176
+],
+[
+20604,
+1800
+],
+[
+22404,
+1800
+],
+[
+24204,
+1032
+],
+[
+25236,
+1944
+],
+[
+27180,
+1176
+],
+[
+28356,
+1032
+],
+[
+29388,
+1032
+],
+[
+30420,
+1032
+],
+[
+31452,
+1032
+],
+[
+32484,
+1032
+],
+[
+33516,
+1032
+],
+[
+34548,
+1032
+],
+[
+35580,
+1800
+],
+[
+37380,
+1032
+],
+[
+38412,
+1176
+],
+[
+39588,
+1800
+],
+[
+41388,
+1032
+],
+[
+42420,
+1032
+],
+[
+43452,
+1944
+],
+[
+45396,
+1176
+],
+[
+46572,
+1800
+],
+[
+48372,
+1032
+],
+[
+49404,
+1032
+],
+[
+50436,
+1032
+],
+[
+51468,
+1032
+],
+[
+52500,
+1032
+],
+[
+53532,
+1032
+],
+[
+54564,
+1944
+],
+[
+56508,
+1176
+],
+[
+57684,
+1800
+],
+[
+59484,
+1032
+],
+[
+60516,
+1032
+],
+[
+61548,
+1944
+],
+[
+63492,
+1032
+],
+[
+64524,
+1032
+],
+[
+65556,
+1800
+],
+[
+67356,
+1800
+],
+[
+69156,
+1176
+],
+[
+70332,
+1032
+],
+[
+71364,
+1176
+],
+[
+72540,
+1176
+],
+[
+73716,
+1800
+],
+[
+75516,
+1944
+],
+[
+77460,
+1032
+],
+[
+78492,
+1032
+],
+[
+79524,
+1176
+],
+[
+80700,
+1176
+],
+[
+81876,
+1032
+],
+[
+82908,
+1176
+],
+[
+84084,
+1032
+],
+[
+85116,
+1800
+],
+[
+86916,
+1032
+],
+[
+87948,
+1944
+],
+[
+89892,
+1032
+],
+[
+90924,
+1944
+],
+[
+92868,
+1032
+],
+[
+93900,
+1800
+],
+[
+95700,
+1032
+],
+[
+96732,
+1800
+],
+[
+98532,
+1032
+],
+[
+99564,
+1800
+],
+[
+101364,
+1800
+],
+[
+103164,
+1032
+],
+[
+104196,
+1800
+],
+[
+105996,
+1176
+],
+[
+107172,
+1032
+],
+[
+108204,
+1800
+],
+[
+110004,
+1032
+],
+[
+111036,
+1032
+],
+[
+112068,
+1032
+],
+[
+113100,
+1032
+],
+[
+114132,
+1800
+],
+[
+115932,
+1032
+],
+[
+116964,
+1800
+],
+[
+118764,
+1032
+],
+[
+119796,
+1032
+]
+]
+},
+"m4": {
+"name": "Combined Mesh (root: scene) 3",
+"verts": 3860,
+"normals": true,
+"uv0": true,
+"uv1": true,
+"indices": 7200,
+"subs": [
+[
+0,
+1800
+],
+[
+1800,
+1800
+],
+[
+3600,
+1800
+],
+[
+5400,
+1800
+]
+]
+},
+"m28": {
+"name": "window_200cm_frame",
+"verts": 56,
+"normals": true,
+"uv0": true,
+"uv1": false,
+"indices": 168,
+"subs": [
+[
+0,
+168
+]
+]
+},
+"m871cf033fdd0": {
+"name": "pipeRailing_joint_wallMid",
+"verts": 60,
+"normals": true,
+"uv0": true,
+"uv1": false,
+"indices": 138,
+"subs": [
+[
+0,
+138
+]
+]
+},
+"m48736f3afdd0": {
+"name": "pipeRailing_joint_wallTop",
+"verts": 60,
+"normals": true,
+"uv0": true,
+"uv1": false,
+"indices": 138,
+"subs": [
+[
+0,
+138
+]
+]
+},
+"m2": {
+"name": "Combined Mesh (root: scene) 4",
+"verts": 564,
+"normals": true,
+"uv0": true,
+"uv1": true,
+"indices": 1080,
+"subs": [
+[
+0,
+861
+],
+[
+861,
+219
+]
+]
+},
+"m831d8e616bf": {
+"name": "door_frame_400cm",
+"verts": 44,
+"normals": true,
+"uv0": true,
+"uv1": false,
+"indices": 84,
+"subs": [
+[
+0,
+84
+]
+]
+},
+"m2a": {
+"name": "Hull 7",
+"verts": 8,
+"normals": false,
+"uv0": false,
+"uv1": false,
+"indices": 36,
+"subs": [
+[
+0,
+36
+]
+]
+},
+"m2b": {
+"name": "Hull 8",
+"verts": 8,
+"normals": false,
+"uv0": false,
+"uv1": false,
+"indices": 36,
+"subs": [
+[
+0,
+36
+]
+]
+}
+},
+"materials": {
+"TX_Incinerator_Diffuse_2_586d48dc": {
+"name": "TX_Incinerator_Diffuse_2",
+"color": [
+1.0,
+1.0,
+1.0,
+1.0
+],
+"map": "TX_Incinerator_Diffuse_2_fe95790f.png",
+"smoothness": 0.0,
+"metallic": 0.0,
+"emission": [
+0.0,
+0.0,
+0.0
+]
+},
+"Void_da1c7ab6": {
+"name": "Void",
+"color": [
+0.0,
+0.0,
+0.0,
+1.0
+],
+"map": null,
+"smoothness": 0.0,
+"metallic": 0.0,
+"emission": [
+0.0,
+0.0,
+0.0
+]
+},
+"Pipe Red_c818d612": {
+"name": "Pipe Red",
+"color": [
+0.3491,
+0.1033,
+0.0013,
+1.0
+],
+"map": null,
+"smoothness": 0.65,
+"metallic": 0.0,
+"emission": [
+0.0,
+0.0,
+0.0
+]
+},
+"Void Incinerator_e": {
+"name": "Void Incinerator",
+"color": [
+0.0849,
+0.0849,
+0.0849,
+1.0
+],
+"map": null,
+"smoothness": 0.0,
+"metallic": 0.0,
+"emission": [
+0.0,
+0.0,
+0.0
+]
+},
+"Brown (100)_e93dc5ba": {
+"name": "Brown (100)",
+"color": [
+0.434,
+0.308,
+0.1777,
+1.0
+],
+"map": null,
+"smoothness": 0.0,
+"metallic": 0.2,
+"emission": [
+0.0,
+0.0,
+0.0
+]
+},
+"Firepit Glow_9": {
+"name": "Firepit Glow",
+"color": [
+0.0,
+0.0,
+0.0,
+0.0
+],
+"map": null,
+"smoothness": 0.0,
+"metallic": 0.0,
+"emission": [
+30.4627,
+10.0257,
+0.0
+]
+}
+},
+"renderers": [
+{
+"path": "Scene/Geometry/pipeRailings/Floor Joints/pipeRailing (Floor Joint) (7)",
+"mesh": "m20134808fdd0",
+"subs": [
+0
+],
+"mats": [
+"TX_Incinerator_Diffuse_2_586d48dc"
+],
+"matrix": [
+[
+1.0,
+0.0,
+-0.0,
+4.75
+],
+[
+0.0,
+1.0,
+0.0,
+0.0
+],
+[
+-0.0,
+-0.0,
+1.0,
+-0.75
+],
+[
+0.0,
+0.0,
+-0.0,
+1.0
+]
+],
+"lightmap": -1,
+"lmso": [
+1.0,
+1.0,
+0.0,
+0.0
+],
+"cast": 1,
+"recv": true,
+"layer": 0
+},
+{
+"path": "Scene/Geometry/StepsLeft/step_200cm (9)/step_200cm",
+"mesh": "m5",
+"subs": [
+58
+],
+"mats": [
+"TX_Incinerator_Diffuse_2_586d48dc"
+],
+"matrix": null,
+"lightmap": 0,
+"lmso": [
+0.09003,
+0.09003,
+0.298131,
+0.300835
+],
+"cast": 1,
+"recv": true,
+"layer": 8
+},
+{
+"path": "Scene/Geometry/Pipes (Small)/Meshes/pipe_40cm_void (1)",
+"mesh": "m3",
+"subs": [
+0
+],
+"mats": [
+"Void_da1c7ab6"
+],
+"matrix": null,
+"lightmap": 0,
+"lmso": [
+0.00386,
+0.00386,
+0.325442,
+0.39136
+],
+"cast": 2,
+"recv": true,
+"layer": 0
+},
+{
+"path": "Scene/Geometry/Pipes (Big)/Meshes/pipe_80cm_straight_2m (4)",
+"mesh": "m1",
+"subs": [
+74
+],
+"mats": [
+"Pipe Red_c818d612"
+],
+"matrix": null,
+"lightmap": 0,
+"lmso": [
+0.020721,
+0.020721,
+-0.000648,
+0.906661
+],
+"cast": 2,
+"recv": true,
+"layer": 0
+},
+{
+"path": "Scene/Geometry/Pipes (Big)/Meshes/pipe_80cm_slope_1m",
+"mesh": "m4",
+"subs": [
+0
+],
+"mats": [
+"Pipe Red_c818d612"
+],
+"matrix": null,
+"lightmap": 0,
+"lmso": [
+0.018008,
+0.018008,
+0.020364,
+0.715763
+],
+"cast": 2,
+"recv": true,
+"layer": 0
+},
+{
+"path": "Scene/Geometry/Pipes (Small)/Meshes/pipe_40cm_angle_90 (10)",
+"mesh": "m1",
+"subs": [
+57
+],
+"mats": [
+"Pipe Red_c818d612"
+],
+"matrix": null,
+"lightmap": 0,
+"lmso": [
+0.013018,
+0.013018,
+0.257975,
+0.643403
+],
+"cast": 2,
+"recv": true,
+"layer": 0
+},
+{
+"path": "Scene/Geometry/Pipes (Small)/Meshes/hidden pipe",
+"mesh": "m1",
+"subs": [
+1
+],
+"mats": [
+"Pipe Red_c818d612"
+],
+"matrix": null,
+"lightmap": 0,
+"lmso": [
+0.017805,
+0.017805,
+0.071985,
+0.697212
+],
+"cast": 3,
+"recv": true,
+"layer": 0
+},
+{
+"path": "Scene/Geometry/pipeRailings/Floor Joints/pipeRailing (Floor Joint) (4)",
+"mesh": "m20134808fdd0",
+"subs": [
+0
+],
+"mats": [
+"TX_Incinerator_Diffuse_2_586d48dc"
+],
+"matrix": [
+[
+1.0,
+0.0,
+-0.0,
+-7.75
+],
+[
+0.0,
+1.0,
+0.0,
+0.0
+],
+[
+-0.0,
+-0.0,
+1.0,
+-2.75
+],
+[
+0.0,
+0.0,
+-0.0,
+1.0
+]
+],
+"lightmap": -1,
+"lmso": [
+1.0,
+1.0,
+0.0,
+0.0
+],
+"cast": 1,
+"recv": true,
+"layer": 0
+},
+{
+"path": "Scene/Geometry/StepsRight/step_200cm (34)/step_200cm",
+"mesh": "m5",
+"subs": [
+1
+],
+"mats": [
+"TX_Incinerator_Diffuse_2_586d48dc"
+],
+"matrix": null,
+"lightmap": 0,
+"lmso": [
+0.084734,
+0.084734,
+0.029175,
+0.719773
+],
+"cast": 1,
+"recv": true,
+"layer": 8
+},
+{
+"path": "Scene/Geometry/StepsRight/step_200cm (32)/step_200cm",
+"mesh": "m5",
+"subs": [
+74
+],
+"mats": [
+"TX_Incinerator_Diffuse_2_586d48dc"
+],
+"matrix": null,
+"lightmap": 0,
+"lmso": [
+0.084734,
+0.084734,
+0.292409,
+0.638719
+],
+"cast": 1,
+"recv": true,
+"layer": 8
+},
+{
+"path": "Scene/Geometry/Pipes (Small)/Meshes/hidden pipe",
+"mesh": "m1",
+"subs": [
+23
+],
+"mats": [
+"Pipe Red_c818d612"
+],
+"matrix": null,
+"lightmap": 0,
+"lmso": [
+0.017805,
+0.017805,
+0.019814,
+0.955382
+],
+"cast": 3,
+"recv": true,
+"layer": 0
+},
+{
+"path": "Scene/Geometry/Pipes (Big)/Meshes/pipe_80cm_straight_1m",
+"mesh": "m1",
+"subs": [
+91
+],
+"mats": [
+"Pipe Red_c818d612"
+],
+"matrix": null,
+"lightmap": 0,
+"lmso": [
+0.015919,
+0.015919,
+0.138749,
+0.697827
+],
+"cast": 2,
+"recv": true,
+"layer": 0
+},
+{
+"path": "Scene/Geometry/Pipes (Small)/Meshes/pipe_40cm_straight_200cm (4)",
+"mesh": "m1",
+"subs": [
+26
+],
+"mats": [
+"Pipe Red_c818d612"
+],
+"matrix": null,
+"lightmap": 0,
+"lmso": [
+0.014592,
+0.014592,
+0.038082,
+0.86616
+],
+"cast": 2,
+"recv": true,
+"layer": 0
+},
+{
+"path": "Scene/Geometry/Pipes (Small)/Meshes/pipe_40cm_straight_300cm (3)",
+"mesh": "m1",
+"subs": [
+48
+],
+"mats": [
+"Pipe Red_c818d612"
+],
+"matrix": null,
+"lightmap": 0,
+"lmso": [
+0.017805,
+0.017805,
+0.019814,
+0.887022
+],
+"cast": 2,
+"recv": true,
+"layer": 0
+},
+{
+"path": "Scene/Geometry/conveyorFrameLeft/conveyor_frameMiddle (15)/conveyor_frameMiddle",
+"mesh": "m5",
+"subs": [
+27
+],
+"mats": [
+"TX_Incinerator_Diffuse_2_586d48dc"
+],
+"matrix": null,
+"lightmap": 0,
+"lmso": [
+0.038374,
+0.038374,
+0.099392,
+0.714849
+],
+"cast": 1,
+"recv": true,
+"layer": 10
+},
+{
+"path": "Scene/Geometry/StepsRight/step_200cm (23)/step_200cm",
+"mesh": "m5",
+"subs": [
+5
+],
+"mats": [
+"TX_Incinerator_Diffuse_2_586d48dc"
+],
+"matrix": null,
+"lightmap": 0,
+"lmso": [
+0.084734,
+0.084734,
+0.239675,
+0.638719
+],
+"cast": 1,
+"recv": true,
+"layer": 8
+},
+{
+"path": "Scene/Geometry/StepsLeft/step_200cm (10)/step_200cm",
+"mesh": "m5",
+"subs": [
+65
+],
+"mats": [
+"TX_Incinerator_Diffuse_2_586d48dc"
+],
+"matrix": null,
+"lightmap": 0,
+"lmso": [
+0.09003,
+0.09003,
+0.294713,
+0.606901
+],
+"cast": 1,
+"recv": true,
+"layer": 8
+},
+{
+"path": "Scene/Geometry/ConveyorLeft/conveyor_rollerMid",
+"mesh": "m5",
+"subs": [
+38
+],
+"mats": [
+"TX_Incinerator_Diffuse_2_586d48dc"
+],
+"matrix": null,
+"lightmap": 0,
+"lmso": [
+0.078125,
+0.078125,
+0.231026,
+0.635985
+],
+"cast": 2,
+"recv": true,
+"layer": 0
+},
+{
+"path": "Scene/Geometry/pipeRailings/Floor Joints/pipeRailing (Floor Joint) (2)",
+"mesh": "m20134808fdd0",
+"subs": [
+0
+],
+"mats": [
+"TX_Incinerator_Diffuse_2_586d48dc"
+],
+"matrix": [
+[
+1.0,
+0.0,
+-0.0,
+-5.25
+],
+[
+0.0,
+1.0,
+0.0,
+0.0
+],
+[
+-0.0,
+-0.0,
+1.0,
+-0.75
+],
+[
+0.0,
+0.0,
+-0.0,
+1.0
+]
+],
+"lightmap": -1,
+"lmso": [
+1.0,
+1.0,
+0.0,
+0.0
+],
+"cast": 1,
+"recv": true,
+"layer": 0
+},
+{
+"path": "Scene/Geometry/Pipes (Small)/Meshes/pipe_40cm_straight_200cm (2)",
+"mesh": "m1",
+"subs": [
+27
+],
+"mats": [
+"Pipe Red_c818d612"
+],
+"matrix": null,
+"lightmap": 0,
+"lmso": [
+0.014592,
+0.014592,
+0.038082,
+0.88025
+],
+"cast": 2,
+"recv": true,
+"layer": 0
+},
+{
+"path": "Scene/Geometry/Pipes (Big)/Meshes/pipe_80cm_straight_2m (1)",
+"mesh": "m1",
+"subs": [
+79
+],
+"mats": [
+"Pipe Red_c818d612"
+],
+"matrix": null,
+"lightmap": 0,
+"lmso": [
+0.021239,
+0.021239,
+-0.000664,
+0.739653
+],
+"cast": 2,
+"recv": true,
+"layer": 0
+},
+{
+"path": "Scene/Geometry/Pipes (Small)/Meshes/pipe_40cm_straight_250cm (8)",
+"mesh": "m1",
+"subs": [
+40
+],
+"mats": [
+"Pipe Red_c818d612"
+],
+"matrix": null,
+"lightmap": 0,
+"lmso": [
+0.016822,
+0.016822,
+0.282666,
+0.697273
+],
+"cast": 2,
+"recv": true,
+"layer": 0
+},
+{
+"path": "Scene/Geometry/Pipes (Small)/Meshes/pipe_40cm_straight_300cm (14)",
+"mesh": "m1",
+"subs": [
+85
+],
+"mats": [
+"Pipe Red_c818d612"
+],
+"matrix": null,
+"lightmap": 0,
+"lmso": [
+0.072838,
+0.072838,
+0.062188,
+0.525594
+],
+"cast": 2,
+"recv": true,
+"layer": 0
+},
+{
+"path": "Scene/Geometry/Pipes (Big)/Meshes/pipe_80cm_straight_1m (6)",
+"mesh": "m1",
+"subs": [
+78
+],
+"mats": [
+"Pipe Red_c818d612"
+],
+"matrix": null,
+"lightmap": 0,
+"lmso": [
+0.015919,
+0.015919,
+0.106705,
+0.697827
+],
+"cast": 2,
+"recv": true,
+"layer": 0
+},
+{
+"path": "Scene/Geometry/conveyor_frameUnder",
+"mesh": "m5",
+"subs": [
+57
+],
+"mats": [
+"TX_Incinerator_Diffuse_2_586d48dc"
+],
+"matrix": null,
+"lightmap": 0,
+"lmso": [
+0.29229,
+0.29229,
+0.204545,
+0.407767
+],
+"cast": 2,
+"recv": true,
+"layer": 10
+},
+{
+"path": "Scene/Geometry/Pipes (Big)/Meshes/pipe_80cm_straight_2m (1)",
+"mesh": "m1",
+"subs": [
+47
+],
+"mats": [
+"Pipe Red_c818d612"
+],
+"matrix": null,
+"lightmap": 0,
+"lmso": [
+0.021239,
+0.021239,
+-0.000664,
+0.781645
+],
+"cast": 2,
+"recv": true,
+"layer": 0
+},
+{
+"path": "Scene/Geometry/Pipes (Big)/Meshes/hidden pipe",
+"mesh": "m1",
+"subs": [
+68
+],
+"mats": [
+"Pipe Red_c818d612"
+],
+"matrix": null,
+"lightmap": 0,
+"lmso": [
+0.021239,
+0.021239,
+-0.000664,
+0.697661
+],
+"cast": 3,
+"recv": true,
+"layer": 0
+},
+{
+"path": "Scene/Geometry/StepsRight/step_200cm (21)/step_200cm",
+"mesh": "m5",
+"subs": [
+32
+],
+"mats": [
+"TX_Incinerator_Diffuse_2_586d48dc"
+],
+"matrix": null,
+"lightmap": 0,
+"lmso": [
+0.084734,
+0.084734,
+0.029175,
+0.675828
+],
+"cast": 1,
+"recv": true,
+"layer": 8
+},
+{
+"path": "Scene/Geometry/Pipes (Big)/Meshes/pipe_80cm_angle_45 (1)",
+"mesh": "m1",
+"subs": [
+70
+],
+"mats": [
+"Pipe Red_c818d612"
+],
+"matrix": null,
+"lightmap": 0,
+"lmso": [
+0.016953,
+0.016953,
+0.020397,
+0.733797
+],
+"cast": 2,
+"recv": true,
+"layer": 0
+},
+{
+"path": "Scene/Geometry/Pipes (Big)/Meshes/pipe_80cm_void (1)",
+"mesh": "m3",
+"subs": [
+5
+],
+"mats": [
+"Void_da1c7ab6"
+],
+"matrix": null,
+"lightmap": 0,
+"lmso": [
+0.007694,
+0.007694,
+0.054626,
+0.821379
+],
+"cast": 2,
+"recv": true,
+"layer": 0
+},
+{
+"path": "Scene/Geometry/Pipes (Big)/Meshes/pipe_80cm_straight_1m (1)",
+"mesh": "m1",
+"subs": [
+89
+],
+"mats": [
+"Pipe Red_c818d612"
+],
+"matrix": null,
+"lightmap": 0,
+"lmso": [
+0.015919,
+0.015919,
+0.122727,
+0.697827
+],
+"cast": 2,
+"recv": true,
+"layer": 0
+},
+{
+"path": "Scene/Geometry/Pipes (Big)/Meshes/pipe_80cm_straight_1m (7)",
+"mesh": "m1",
+"subs": [
+81
+],
+"mats": [
+"Pipe Red_c818d612"
+],
+"matrix": null,
+"lightmap": 0,
+"lmso": [
+0.015919,
+0.015919,
+0.170793,
+0.697827
+],
+"cast": 2,
+"recv": true,
+"layer": 0
+},
+{
+"path": "Scene/Geometry/StepsRight/step_200cm (28)/step_200cm",
+"mesh": "m5",
+"subs": [
+19
+],
+"mats": [
+"TX_Incinerator_Diffuse_2_586d48dc"
+],
+"matrix": null,
+"lightmap": 0,
+"lmso": [
+0.084734,
+0.084734,
+0.004272,
+0.913979
+],
+"cast": 1,
+"recv": true,
+"layer": 8
+},
+{
+"path": "Scene/Geometry/conveyorFrameLeft/conveyor_frameEnd (3)/conveyor_frameEnd",
+"mesh": "m5",
+"subs": [
+37
+],
+"mats": [
+"TX_Incinerator_Diffuse_2_586d48dc"
+],
+"matrix": null,
+"lightmap": 0,
+"lmso": [
+0.061036,
+0.061036,
+0.010602,
+0.679777
+],
+"cast": 1,
+"recv": true,
+"layer": 10
+},
+{
+"path": "Scene/Geometry/StepsLeft/step_200cm (2)/step_200cm",
+"mesh": "m5",
+"subs": [
+26
+],
+"mats": [
+"TX_Incinerator_Diffuse_2_586d48dc"
+],
+"matrix": null,
+"lightmap": 0,
+"lmso": [
+0.09003,
+0.09003,
+-0.006626,
+0.909185
+],
+"cast": 1,
+"recv": true,
+"layer": 8
+},
+{
+"path": "Scene/Geometry/conveyorFrameLeft/conveyor_frameMiddle (17)/conveyor_frameMiddle",
+"mesh": "m5",
+"subs": [
+40
+],
+"mats": [
+"TX_Incinerator_Diffuse_2_586d48dc"
+],
+"matrix": null,
+"lightmap": 0,
+"lmso": [
+0.038374,
+0.038374,
+0.077987,
+0.714849
+],
+"cast": 1,
+"recv": true,
+"layer": 10
+},
+{
+"path": "Scene/Geometry/conveyorFrameLeft/conveyor_frameEnd (2)/conveyor_frameEnd",
+"mesh": "m5",
+"subs": [
+47
+],
+"mats": [
+"TX_Incinerator_Diffuse_2_586d48dc"
+],
+"matrix": null,
+"lightmap": 0,
+"lmso": [
+0.061036,
+0.061036,
+0.0565,
+0.679777
+],
+"cast": 1,
+"recv": true,
+"layer": 10
+},
+{
+"path": "Scene/Geometry/Pipes (Small)/Meshes/pipe_40cm_void (2)",
+"mesh": "m3",
+"subs": [
+1
+],
+"mats": [
+"Void_da1c7ab6"
+],
+"matrix": null,
+"lightmap": 0,
+"lmso": [
+0.00386,
+0.00386,
+0.329241,
+0.397311
+],
+"cast": 2,
+"recv": true,
+"layer": 0
+},
+{
+"path": "Scene/Geometry/ConveyorLeft/conveyor_rollerMid",
+"mesh": "m5",
+"subs": [
+30
+],
+"mats": [
+"TX_Incinerator_Diffuse_2_586d48dc"
+],
+"matrix": null,
+"lightmap": 0,
+"lmso": [
+0.078125,
+0.078125,
+0.110909,
+0.655961
+],
+"cast": 2,
+"recv": true,
+"layer": 0
+},
+{
+"path": "Scene/Geometry/conveyorFrameRight/conveyor_frameMiddle (3)/conveyor_frameMiddle",
+"mesh": "m5",
+"subs": [
+14
+],
+"mats": [
+"TX_Incinerator_Diffuse_2_586d48dc"
+],
+"matrix": null,
+"lightmap": 0,
+"lmso": [
+0.038374,
+0.038374,
+0.067284,
+0.714849
+],
+"cast": 1,
+"recv": true,
+"layer": 10
+},
+{
+"path": "Scene/Geometry/window_200cm/window_200cm_frame",
+"mesh": "m28",
+"subs": [
+0
+],
+"mats": [
+"TX_Incinerator_Diffuse_2_586d48dc"
+],
+"matrix": [
+[
+1.0,
+0.0,
+-0.0,
+5.99999
+],
+[
+0.0,
+-0.0,
+-1.0,
+0.5
+],
+[
+-0.0,
+1.0,
+-0.0,
+1.25
+],
+[
+0.0,
+0.0,
+-0.0,
+1.0
+]
+],
+"lightmap": -1,
+"lmso": [
+1.0,
+1.0,
+0.0,
+0.0
+],
+"cast": 1,
+"recv": true,
+"layer": 0
+},
+{
+"path": "Scene/Geometry/StepsLeft/step_200cm (13)/step_200cm",
+"mesh": "m5",
+"subs": [
+41
+],
+"mats": [
+"TX_Incinerator_Diffuse_2_586d48dc"
+],
+"matrix": null,
+"lightmap": 0,
+"lmso": [
+0.09003,
+0.09003,
+0.298131,
+0.263726
+],
+"cast": 1,
+"recv": true,
+"layer": 8
+},
+{
+"path": "Scene/Geometry/StepsRight/step_200cm (24)/step_200cm",
+"mesh": "m5",
+"subs": [
+12
+],
+"mats": [
+"TX_Incinerator_Diffuse_2_586d48dc"
+],
+"matrix": null,
+"lightmap": 0,
+"lmso": [
+0.084734,
+0.084734,
+0.029175,
+0.649461
+],
+"cast": 1,
+"recv": true,
+"layer": 8
+},
+{
+"path": "Scene/Geometry/Pipes (Small)/Meshes/pipe_40cm_straight_50cm (1)",
+"mesh": "m1",
+"subs": [
+15
+],
+"mats": [
+"Pipe Red_c818d612"
+],
+"matrix": null,
+"lightmap": 0,
+"lmso": [
+0.008082,
+0.008082,
+0.054602,
+0.813054
+],
+"cast": 2,
+"recv": true,
+"layer": 0
+},
+{
+"path": "Scene/Geometry/Pipes (Small)/Meshes/pipe_40cm_straight_300cm (8)",
+"mesh": "m1",
+"subs": [
+34
+],
+"mats": [
+"Pipe Red_c818d612"
+],
+"matrix": null,
+"lightmap": 0,
+"lmso": [
+0.017805,
+0.017805,
+0.019814,
+0.972472
+],
+"cast": 2,
+"recv": true,
+"layer": 0
+},
+{
+"path": "Scene/Geometry/Pipes (Small)/Meshes/pipe_40cm_angle_90 (6)",
+"mesh": "m1",
+"subs": [
+66
+],
+"mats": [
+"Pipe Red_c818d612"
+],
+"matrix": null,
+"lightmap": 0,
+"lmso": [
+0.013018,
+0.013018,
+0.319987,
+0.643403
+],
+"cast": 2,
+"recv": true,
+"layer": 0
+},
+{
+"path": "Scene/Geometry/Pipes (Big)/Meshes/hidden pipe",
+"mesh": "m1",
+"subs": [
+84
+],
+"mats": [
+"Pipe Red_c818d612"
+],
+"matrix": null,
+"lightmap": 0,
+"lmso": [
+0.021239,
+0.021239,
+-0.000664,
+0.760649
+],
+"cast": 3,
+"recv": true,
+"layer": 0
+},
+{
+"path": "Scene/Geometry/StepsLeft/step_200cm (6)/step_200cm",
+"mesh": "m5",
+"subs": [
+62
+],
+"mats": [
+"TX_Incinerator_Diffuse_2_586d48dc"
+],
+"matrix": null,
+"lightmap": 0,
+"lmso": [
+0.09003,
+0.09003,
+0.228777,
+0.633925
+],
+"cast": 1,
+"recv": true,
+"layer": 8
+},
+{
+"path": "Scene/Geometry/StepsRight/step_200cm (35)/step_200cm",
+"mesh": "m5",
+"subs": [
+73
+],
+"mats": [
+"TX_Incinerator_Diffuse_2_586d48dc"
+],
+"matrix": null,
+"lightmap": 0,
+"lmso": [
+0.084734,
+0.084734,
+0.28362,
+0.638719
+],
+"cast": 1,
+"recv": true,
+"layer": 0
+},
+{
+"path": "Scene/Geometry/StepsRight/step_200cm (26)/step_200cm",
+"mesh": "m5",
+"subs": [
+72
+],
+"mats": [
+"TX_Incinerator_Diffuse_2_586d48dc"
+],
+"matrix": null,
+"lightmap": 0,
+"lmso": [
+0.084734,
+0.084734,
+0.029175,
+0.667039
+],
+"cast": 1,
+"recv": true,
+"layer": 8
+},
+{
+"path": "Scene/Geometry/Enviroment/incinerator_voidAlt",
+"mesh": "m3",
+"subs": [
+7,
+8
+],
+"mats": [
+"Void Incinerator_e",
+"Void Incinerator_e"
+],
+"matrix": null,
+"lightmap": -1,
+"lmso": [
+1.0,
+1.0,
+0.0,
+0.0
+],
+"cast": 0,
+"recv": false,
+"layer": 10
+},
+{
+"path": "Scene/Geometry/StepsRight/step_200cm (22)/step_200cm",
+"mesh": "m5",
+"subs": [
+68
+],
+"mats": [
+"TX_Incinerator_Diffuse_2_586d48dc"
+],
+"matrix": null,
+"lightmap": 0,
+"lmso": [
+0.084734,
+0.084734,
+0.257253,
+0.638719
+],
+"cast": 1,
+"recv": true,
+"layer": 8
+},
+{
+"path": "Scene/Geometry/Pipes (Big)/Meshes/pipe_80cm_angle_45",
+"mesh": "m1",
+"subs": [
+60
+],
+"mats": [
+"Pipe Red_c818d612"
+],
+"matrix": null,
+"lightmap": 0,
+"lmso": [
+0.016953,
+0.016953,
+0.317522,
+0.529617
+],
+"cast": 2,
+"recv": true,
+"layer": 0
+},
+{
+"path": "Scene/Geometry/pipeRailings/Wall Joints/pipeRailling (Wall Joint)/pipeRailing_joint_wallMid",
+"mesh": "m871cf033fdd0",
+"subs": [
+0
+],
+"mats": [
+"TX_Incinerator_Diffuse_2_586d48dc"
+],
+"matrix": [
+[
+0.0,
+1.0,
+-0.0,
+-11.0
+],
+[
+-1.0,
+0.0,
+-0.0,
+0.0
+],
+[
+-0.0,
+-0.0,
+1.0,
+-2.75
+],
+[
+0.0,
+0.0,
+-0.0,
+1.0
+]
+],
+"lightmap": -1,
+"lmso": [
+1.0,
+1.0,
+0.0,
+0.0
+],
+"cast": 1,
+"recv": true,
+"layer": 0
+},
+{
+"path": "Scene/Geometry/StepsRight/step_200cm (31)/step_200cm",
+"mesh": "m5",
+"subs": [
+3
+],
+"mats": [
+"TX_Incinerator_Diffuse_2_586d48dc"
+],
+"matrix": null,
+"lightmap": 0,
+"lmso": [
+0.084734,
+0.084734,
+0.248464,
+0.638719
+],
+"cast": 1,
+"recv": true,
+"layer": 8
+},
+{
+"path": "Scene/Geometry/pipeRailings/Floor Joints/pipeRailing (Floor Joint) (10)",
+"mesh": "m20134808fdd0",
+"subs": [
+0
+],
+"mats": [
+"TX_Incinerator_Diffuse_2_586d48dc"
+],
+"matrix": [
+[
+1.0,
+0.0,
+-0.0,
+7.25
+],
+[
+0.0,
+1.0,
+0.0,
+0.0
+],
+[
+-0.0,
+-0.0,
+1.0,
+-2.75
+],
+[
+0.0,
+0.0,
+-0.0,
+1.0
+]
+],
+"lightmap": -1,
+"lmso": [
+1.0,
+1.0,
+0.0,
+0.0
+],
+"cast": 1,
+"recv": true,
+"layer": 0
+},
+{
+"path": "Scene/Geometry/Pipes (Small)/Meshes/pipe_40cm_straight_200cm (7)",
+"mesh": "m1",
+"subs": [
+93
+],
+"mats": [
+"Pipe Red_c818d612"
+],
+"matrix": null,
+"lightmap": 0,
+"lmso": [
+0.014592,
+0.014592,
+0.038082,
+0.852071
+],
+"cast": 2,
+"recv": true,
+"layer": 0
+},
+{
+"path": "Scene/Geometry/Enviroment/incinerator_forthWall",
+"mesh": "m5",
+"subs": [
+20
+],
+"mats": [
+"TX_Incinerator_Diffuse_2_586d48dc"
+],
+"matrix": null,
+"lightmap": 0,
+"lmso": [
+6.025393,
+6.025393,
+-2.587563,
+-5.337307
+],
+"cast": 0,
+"recv": true,
+"layer": 0
+},
+{
+"path": "Scene/Geometry/conveyorFrameRight/conveyor_frameEnd/conveyor_frameEnd",
+"mesh": "m5",
+"subs": [
+60
+],
+"mats": [
+"TX_Incinerator_Diffuse_2_586d48dc"
+],
+"matrix": null,
+"lightmap": 0,
+"lmso": [
+0.061036,
+0.061036,
+0.033063,
+0.679777
+],
+"cast": 1,
+"recv": true,
+"layer": 10
+},
+{
+"path": "Scene/Geometry/Pipes (Big)/Meshes/pipe_80cm_slope_1m",
+"mesh": "m4",
+"subs": [
+2
+],
+"mats": [
+"Pipe Red_c818d612"
+],
+"matrix": null,
+"lightmap": 0,
+"lmso": [
+0.018008,
+0.018008,
+-0.000563,
+0.947762
+],
+"cast": 2,
+"recv": true,
+"layer": 0
+},
+{
+"path": "Scene/Geometry/pipeRailings/Floor Joints/pipeRailing (Floor Joint) (6)",
+"mesh": "m20134808fdd0",
+"subs": [
+0
+],
+"mats": [
+"TX_Incinerator_Diffuse_2_586d48dc"
+],
+"matrix": [
+[
+1.0,
+0.0,
+-0.0,
+2.25
+],
+[
+0.0,
+1.0,
+0.0,
+0.0
+],
+[
+-0.0,
+-0.0,
+1.0,
+-0.75
+],
+[
+0.0,
+0.0,
+-0.0,
+1.0
+]
+],
+"lightmap": -1,
+"lmso": [
+1.0,
+1.0,
+0.0,
+0.0
+],
+"cast": 1,
+"recv": true,
+"layer": 0
+},
+{
+"path": "Scene/Geometry/StepsLeft/step_200cm (15)/step_200cm",
+"mesh": "m5",
+"subs": [
+63
+],
+"mats": [
+"TX_Incinerator_Diffuse_2_586d48dc"
+],
+"matrix": null,
+"lightmap": 0,
+"lmso": [
+0.09003,
+0.09003,
+0.200945,
+0.633925
+],
+"cast": 1,
+"recv": true,
+"layer": 8
+},
+{
+"path": "Scene/Geometry/StepsRight/step_200cm (33)/step_200cm",
+"mesh": "m5",
+"subs": [
+31
+],
+"mats": [
+"TX_Incinerator_Diffuse_2_586d48dc"
+],
+"matrix": null,
+"lightmap": 0,
+"lmso": [
+0.084734,
+0.084734,
+0.029175,
+0.710984
+],
+"cast": 1,
+"recv": true,
+"layer": 8
+},
+{
+"path": "Scene/Geometry/pipeRailings/Floor Joints/pipeRailing (Floor Joint) (11)",
+"mesh": "m20134808fdd0",
+"subs": [
+0
+],
+"mats": [
+"TX_Incinerator_Diffuse_2_586d48dc"
+],
+"matrix": [
+[
+1.0,
+0.0,
+-0.0,
+7.25
+],
+[
+0.0,
+1.0,
+0.0,
+0.0
+],
+[
+-0.0,
+-0.0,
+1.0,
+-7.25
+],
+[
+0.0,
+0.0,
+-0.0,
+1.0
+]
+],
+"lightmap": -1,
+"lmso": [
+1.0,
+1.0,
+0.0,
+0.0
+],
+"cast": 1,
+"recv": true,
+"layer": 0
+},
+{
+"path": "Scene/Geometry/ConveyorLeft/conveyor_rollerEnd",
+"mesh": "m5",
+"subs": [
+24
+],
+"mats": [
+"TX_Incinerator_Diffuse_2_586d48dc"
+],
+"matrix": null,
+"lightmap": 0,
+"lmso": [
+0.089844,
+0.089844,
+0.061799,
+0.632706
+],
+"cast": 2,
+"recv": true,
+"layer": 0
+},
+{
+"path": "Scene/Geometry/Pipes (Small)/Meshes/pipe_40cm_straight_250cm (10)",
+"mesh": "m1",
+"subs": [
+75
+],
+"mats": [
+"Pipe Red_c818d612"
+],
+"matrix": null,
+"lightmap": 0,
+"lmso": [
+0.016822,
+0.016822,
+0.037942,
+0.730298
+],
+"cast": 2,
+"recv": true,
+"layer": 0
+},
+{
+"path": "Scene/Geometry/Pipes (Small)/Meshes/pipe_40cm_straight_100cm (3)",
+"mesh": "m1",
+"subs": [
+49
+],
+"mats": [
+"Pipe Red_c818d612"
+],
+"matrix": null,
+"lightmap": 0,
+"lmso": [
+0.043674,
+0.043674,
+-0.00273,
+0.65512
+],
+"cast": 2,
+"recv": true,
+"layer": 0
+},
+{
+"path": "Scene/Geometry/Pipes (Small)/Meshes/pipe_40cm_straight_200cm (3)",
+"mesh": "m1",
+"subs": [
+62
+],
+"mats": [
+"Pipe Red_c818d612"
+],
+"matrix": null,
+"lightmap": 0,
+"lmso": [
+0.014592,
+0.014592,
+0.038082,
+0.89434
+],
+"cast": 2,
+"recv": true,
+"layer": 0
+},
+{
+"path": "Scene/Geometry/Pipes (Big)/Meshes/pipe_80cm_straight_2m (3)",
+"mesh": "m1",
+"subs": [
+8
+],
+"mats": [
+"Pipe Red_c818d612"
+],
+"matrix": null,
+"lightmap": 0,
+"lmso": [
+0.020721,
+0.020721,
+-0.000648,
+0.865646
+],
+"cast": 2,
+"recv": true,
+"layer": 0
+},
+{
+"path": "Scene/Geometry/Pipes (Small)/Meshes/pipe_40cm_straight_300cm (7)",
+"mesh": "m1",
+"subs": [
+41
+],
+"mats": [
+"Pipe Red_c818d612"
+],
+"matrix": null,
+"lightmap": 0,
+"lmso": [
+0.017805,
+0.017805,
+0.019814,
+0.921202
+],
+"cast": 2,
+"recv": true,
+"layer": 0
+},
+{
+"path": "Scene/Geometry/pipeRailings/Floor Joints/pipeRailing (Floor Joint) (5)",
+"mesh": "m20134808fdd0",
+"subs": [
+0
+],
+"mats": [
+"TX_Incinerator_Diffuse_2_586d48dc"
+],
+"matrix": [
+[
+1.0,
+0.0,
+-0.0,
+-0.25
+],
+[
+0.0,
+1.0,
+0.0,
+0.0
+],
+[
+-0.0,
+-0.0,
+1.0,
+-0.75
+],
+[
+0.0,
+0.0,
+-0.0,
+1.0
+]
+],
+"lightmap": -1,
+"lmso": [
+1.0,
+1.0,
+0.0,
+0.0
+],
+"cast": 1,
+"recv": true,
+"layer": 0
+},
+{
+"path": "Scene/Geometry/pipeRailings/Floor Joints/pipeRailing (Floor Joint) (9)",
+"mesh": "m20134808fdd0",
+"subs": [
+0
+],
+"mats": [
+"TX_Incinerator_Diffuse_2_586d48dc"
+],
+"matrix": [
+[
+1.0,
+0.0,
+-0.0,
+9.75
+],
+[
+0.0,
+1.0,
+0.0,
+0.0
+],
+[
+-0.0,
+-0.0,
+1.0,
+-2.75
+],
+[
+0.0,
+0.0,
+-0.0,
+1.0
+]
+],
+"lightmap": -1,
+"lmso": [
+1.0,
+1.0,
+0.0,
+0.0
+],
+"cast": 1,
+"recv": true,
+"layer": 0
+},
+{
+"path": "Scene/Geometry/StepsLeft/step_200cm (16)/step_200cm",
+"mesh": "m5",
+"subs": [
+48
+],
+"mats": [
+"TX_Incinerator_Diffuse_2_586d48dc"
+],
+"matrix": null,
+"lightmap": 0,
+"lmso": [
+0.09003,
+0.09003,
+0.173113,
+0.633925
+],
+"cast": 1,
+"recv": true,
+"layer": 8
+},
+{
+"path": "Scene/Geometry/Pipes (Small)/Meshes/pipe_40cm_straight_300cm",
+"mesh": "m1",
+"subs": [
+56
+],
+"mats": [
+"Pipe Red_c818d612"
+],
+"matrix": null,
+"lightmap": 0,
+"lmso": [
+0.017805,
+0.017805,
+0.019814,
+0.938292
+],
+"cast": 2,
+"recv": true,
+"layer": 0
+},
+{
+"path": "Scene/Geometry/ConveyorRight/conveyor_rollerMid",
+"mesh": "m5",
+"subs": [
+56
+],
+"mats": [
+"TX_Incinerator_Diffuse_2_586d48dc"
+],
+"matrix": null,
+"lightmap": 0,
+"lmso": [
+0.078125,
+0.078125,
+0.190987,
+0.655961
+],
+"cast": 2,
+"recv": true,
+"layer": 0
+},
+{
+"path": "Scene/Geometry/Pipes (Small)/Meshes/pipe_40cm_angle_90 (7)",
+"mesh": "m1",
+"subs": [
+58
+],
+"mats": [
+"Pipe Red_c818d612"
+],
+"matrix": null,
+"lightmap": 0,
+"lmso": [
+0.013018,
+0.013018,
+0.195964,
+0.643403
+],
+"cast": 2,
+"recv": true,
+"layer": 0
+},
+{
+"path": "Scene/Geometry/conveyorFrameLeft/conveyor_frameMiddle (10)/conveyor_frameMiddle",
+"mesh": "m5",
+"subs": [
+54
+],
+"mats": [
+"TX_Incinerator_Diffuse_2_586d48dc"
+],
+"matrix": null,
+"lightmap": 0,
+"lmso": [
+0.038374,
+0.038374,
+0.142202,
+0.714849
+],
+"cast": 1,
+"recv": true,
+"layer": 10
+},
+{
+"path": "Scene/Geometry/Pipes (Small)/Meshes/pipe_40cm_straight_300cm (4)",
+"mesh": "m1",
+"subs": [
+80
+],
+"mats": [
+"Pipe Red_c818d612"
+],
+"matrix": null,
+"lightmap": 0,
+"lmso": [
+0.017805,
+0.017805,
+0.019814,
+0.869933
+],
+"cast": 2,
+"recv": true,
+"layer": 0
+},
+{
+"path": "Scene/Geometry/Pipes (Big)/Meshes/pipe_80cm_straight_2m (3)",
+"mesh": "m1",
+"subs": [
+18
+],
+"mats": [
+"Pipe Red_c818d612"
+],
+"matrix": null,
+"lightmap": 0,
+"lmso": [
+0.020721,
+0.020721,
+-0.000648,
+0.886154
+],
+"cast": 2,
+"recv": true,
+"layer": 0
+},
+{
+"path": "Scene/Geometry/Pipes (Small)/Meshes/pipe_40cm_angle_90 (1)",
+"mesh": "m1",
+"subs": [
+55
+],
+"mats": [
+"Pipe Red_c818d612"
+],
+"matrix": null,
+"lightmap": 0,
+"lmso": [
+0.013018,
+0.013018,
+0.208659,
+0.643403
+],
+"cast": 2,
+"recv": true,
+"layer": 0
+},
+{
+"path": "Scene/Geometry/Pipes (Big)/Meshes/pipe_80cm_straight_1m (5)",
+"mesh": "m1",
+"subs": [
+30
+],
+"mats": [
+"Pipe Red_c818d612"
+],
+"matrix": null,
+"lightmap": 0,
+"lmso": [
+0.015919,
+0.015919,
+0.186815,
+0.697827
+],
+"cast": 2,
+"recv": true,
+"layer": 0
+},
+{
+"path": "Scene/Geometry/ConveyorLeft/conveyor_rollerMid",
+"mesh": "m5",
+"subs": [
+23
+],
+"mats": [
+"TX_Incinerator_Diffuse_2_586d48dc"
+],
+"matrix": null,
+"lightmap": 0,
+"lmso": [
+0.078125,
+0.078125,
+0.150948,
+0.635985
+],
+"cast": 2,
+"recv": true,
+"layer": 0
+},
+{
+"path": "Scene/Geometry/Pipes (Small)/Meshes/pipe_40cm_straight_200cm",
+"mesh": "m1",
+"subs": [
+77
+],
+"mats": [
+"Pipe Red_c818d612"
+],
+"matrix": null,
+"lightmap": 0,
+"lmso": [
+0.014592,
+0.014592,
+0.038082,
+0.837981
+],
+"cast": 2,
+"recv": true,
+"layer": 0
+},
+{
+"path": "Scene/Geometry/StepsRight/step_200cm (30)/step_200cm",
+"mesh": "m5",
+"subs": [
+50
+],
+"mats": [
+"TX_Incinerator_Diffuse_2_586d48dc"
+],
+"matrix": null,
+"lightmap": 0,
+"lmso": [
+0.084734,
+0.084734,
+0.301198,
+0.638719
+],
+"cast": 1,
+"recv": true,
+"layer": 8
+},
+{
+"path": "Scene/Geometry/StepsRight/step_200cm (29)/step_200cm",
+"mesh": "m5",
+"subs": [
+46
+],
+"mats": [
+"TX_Incinerator_Diffuse_2_586d48dc"
+],
+"matrix": null,
+"lightmap": 0,
+"lmso": [
+0.084734,
+0.084734,
+0.029175,
+0.702195
+],
+"cast": 1,
+"recv": true,
+"layer": 8
+},
+{
+"path": "Scene/Geometry/conveyorFrameLeft/conveyor_frameMiddle (14)/conveyor_frameMiddle",
+"mesh": "m5",
+"subs": [
+33
+],
+"mats": [
+"TX_Incinerator_Diffuse_2_586d48dc"
+],
+"matrix": null,
+"lightmap": 0,
+"lmso": [
+0.038374,
+0.038374,
+0.056582,
+0.714849
+],
+"cast": 1,
+"recv": true,
+"layer": 10
+},
+{
+"path": "Scene/Geometry/Pipes (Small)/Meshes/hidden pipe",
+"mesh": "m1",
+"subs": [
+39
+],
+"mats": [
+"Pipe Red_c818d612"
+],
+"matrix": null,
+"lightmap": 0,
+"lmso": [
+0.017805,
+0.017805,
+0.019814,
+0.835753
+],
+"cast": 3,
+"recv": true,
+"layer": 0
+},
+{
+"path": "Scene/Geometry/pipeRailings/Wall Joints/pipeRailling (Wall Joint) (1)/pipeRailing_joint_wallTop",
+"mesh": "m48736f3afdd0",
+"subs": [
+0
+],
+"mats": [
+"TX_Incinerator_Diffuse_2_586d48dc"
+],
+"matrix": [
+[
+0.0,
+-1.0,
+0.0,
+11.0
+],
+[
+-1.0,
+-0.0,
+0.0,
+0.0
+],
+[
+-0.0,
+-0.0,
+-1.0,
+-2.75
+],
+[
+0.0,
+0.0,
+-0.0,
+1.0
+]
+],
+"lightmap": -1,
+"lmso": [
+1.0,
+1.0,
+0.0,
+0.0
+],
+"cast": 1,
+"recv": true,
+"layer": 0
+},
+{
+"path": "Scene/Geometry/Pipes (Small)/Meshes/pipe_40cm_angle_90 (4)",
+"mesh": "m1",
+"subs": [
+2
+],
+"mats": [
+"Pipe Red_c818d612"
+],
+"matrix": null,
+"lightmap": 0,
+"lmso": [
+0.013018,
+0.013018,
+0.321452,
+0.657036
+],
+"cast": 2,
+"recv": true,
+"layer": 0
+},
+{
+"path": "Scene/Geometry/StepsLeft/step_200cm (4)/step_200cm",
+"mesh": "m5",
+"subs": [
+43
+],
+"mats": [
+"TX_Incinerator_Diffuse_2_586d48dc"
+],
+"matrix": null,
+"lightmap": 0,
+"lmso": [
+0.09003,
+0.09003,
+0.154558,
+0.633925
+],
+"cast": 1,
+"recv": true,
+"layer": 8
+},
+{
+"path": "Scene/Geometry/StepsLeft/step_200cm (3)/step_200cm",
+"mesh": "m5",
+"subs": [
+36
+],
+"mats": [
+"TX_Incinerator_Diffuse_2_586d48dc"
+],
+"matrix": null,
+"lightmap": 0,
+"lmso": [
+0.09003,
+0.09003,
+0.191667,
+0.633925
+],
+"cast": 1,
+"recv": true,
+"layer": 8
+},
+{
+"path": "Scene/Geometry/Pipes (Small)/Meshes/pipe_40cm_straight_100cm",
+"mesh": "m1",
+"subs": [
+7
+],
+"mats": [
+"Pipe Red_c818d612"
+],
+"matrix": null,
+"lightmap": 0,
+"lmso": [
+0.010784,
+0.010784,
+0.221494,
+0.643542
+],
+"cast": 2,
+"recv": true,
+"layer": 0
+},
+{
+"path": "Scene/Geometry/pipeRailings/Floor Joints/pipeRailing (Floor Joint) (14)",
+"mesh": "m20134808fdd0",
+"subs": [
+0
+],
+"mats": [
+"TX_Incinerator_Diffuse_2_586d48dc"
+],
+"matrix": [
+[
+1.0,
+0.0,
+-0.0,
+-5.25
+],
+[
+0.0,
+1.0,
+0.0,
+0.0
+],
+[
+-0.0,
+-0.0,
+1.0,
+-7.25
+],
+[
+0.0,
+0.0,
+-0.0,
+1.0
+]
+],
+"lightmap": -1,
+"lmso": [
+1.0,
+1.0,
+0.0,
+0.0
+],
+"cast": 1,
+"recv": true,
+"layer": 0
+},
+{
+"path": "Scene/Geometry/conveyor_frameUnder (1)",
+"mesh": "m5",
+"subs": [
+52
+],
+"mats": [
+"TX_Incinerator_Diffuse_2_586d48dc"
+],
+"matrix": null,
+"lightmap": 0,
+"lmso": [
+0.29229,
+0.29229,
+0.204545,
+0.389403
+],
+"cast": 2,
+"recv": true,
+"layer": 10
+},
+{
+"path": "Scene/Geometry/Pipes (Small)/Meshes/pipe_40cm_straight_300cm (6)",
+"mesh": "m1",
+"subs": [
+43
+],
+"mats": [
+"Pipe Red_c818d612"
+],
+"matrix": null,
+"lightmap": 0,
+"lmso": [
+0.017805,
+0.017805,
+0.019814,
+0.852843
+],
+"cast": 2,
+"recv": true,
+"layer": 0
+},
+{
+"path": "Scene/Geometry/Pipes (Small)/Meshes/pipe_40cm_straight_250cm",
+"mesh": "m1",
+"subs": [
+51
+],
+"mats": [
+"Pipe Red_c818d612"
+],
+"matrix": null,
+"lightmap": 0,
+"lmso": [
+0.016822,
+0.016822,
+0.25044,
+0.697273
+],
+"cast": 2,
+"recv": true,
+"layer": 0
+},
+{
+"path": "Scene/Geometry/Pipes (Small)/Meshes/pipe_40cm_straight_300cm (11)",
+"mesh": "m1",
+"subs": [
+14
+],
+"mats": [
+"Pipe Red_c818d612"
+],
+"matrix": null,
+"lightmap": 0,
+"lmso": [
+0.017805,
+0.017805,
+0.037881,
+0.697212
+],
+"cast": 2,
+"recv": true,
+"layer": 0
+},
+{
+"path": "Scene/Geometry/Pipes (Big)/Meshes/pipe_80cm_void",
+"mesh": "m3",
+"subs": [
+3
+],
+"mats": [
+"Void_da1c7ab6"
+],
+"matrix": null,
+"lightmap": 0,
+"lmso": [
+0.007694,
+0.007694,
+0.054626,
+0.844816
+],
+"cast": 2,
+"recv": true,
+"layer": 0
+},
+{
+"path": "Scene/Geometry/pipeRailings/Wall Joints/pipeRailling (Wall Joint) (4)/pipeRailing_joint_wallMid",
+"mesh": "m871cf033fdd0",
+"subs": [
+0
+],
+"mats": [
+"TX_Incinerator_Diffuse_2_586d48dc"
+],
+"matrix": [
+[
+0.0,
+-0.0,
+-1.0,
+7.25
+],
+[
+-1.0,
+-0.0,
+-0.0,
+0.0
+],
+[
+-0.0,
+1.0,
+-0.0,
+-9.0
+],
+[
+0.0,
+0.0,
+-0.0,
+1.0
+]
+],
+"lightmap": -1,
+"lmso": [
+1.0,
+1.0,
+0.0,
+0.0
+],
+"cast": 1,
+"recv": true,
+"layer": 0
+},
+{
+"path": "Scene/Geometry/ConveyorRight/conveyor_rollerMid",
+"mesh": "m5",
+"subs": [
+34
+],
+"mats": [
+"TX_Incinerator_Diffuse_2_586d48dc"
+],
+"matrix": null,
+"lightmap": 0,
+"lmso": [
+0.078125,
+0.078125,
+0.190987,
+0.635985
+],
+"cast": 2,
+"recv": true,
+"layer": 0
+},
+{
+"path": "Scene/Geometry/Pipes (Small)/Meshes/pipe_40cm_straight_250cm (7)",
+"mesh": "m1",
+"subs": [
+29
+],
+"mats": [
+"Pipe Red_c818d612"
+],
+"matrix": null,
+"lightmap": 0,
+"lmso": [
+0.016822,
+0.016822,
+0.234327,
+0.697273
+],
+"cast": 2,
+"recv": true,
+"layer": 0
+},
+{
+"path": "Scene/Geometry/door_floorMarker_400cm",
+"mesh": "m5",
+"subs": [
+59
+],
+"mats": [
+"TX_Incinerator_Diffuse_2_586d48dc"
+],
+"matrix": null,
+"lightmap": 0,
+"lmso": [
+0.184983,
+0.184983,
+-0.131081,
+0.816654
+],
+"cast": 0,
+"recv": true,
+"layer": 0
+},
+{
+"path": "Scene/Geometry/Door (Windowed)/door_frame_200cm/door_frame_200cm",
+"mesh": "m5",
+"subs": [
+69
+],
+"mats": [
+"TX_Incinerator_Diffuse_2_586d48dc"
+],
+"matrix": null,
+"lightmap": 0,
+"lmso": [
+0.153591,
+0.153591,
+-0.007423,
+0.656483
+],
+"cast": 2,
+"recv": true,
+"layer": 0
+},
+{
+"path": "Scene/Geometry/pipeRailings/Floor Joints/pipeRailing (Floor Joint) (13)",
+"mesh": "m20134808fdd0",
+"subs": [
+0
+],
+"mats": [
+"TX_Incinerator_Diffuse_2_586d48dc"
+],
+"matrix": [
+[
+1.0,
+0.0,
+-0.0,
+-7.75
+],
+[
+0.0,
+1.0,
+0.0,
+0.0
+],
+[
+-0.0,
+-0.0,
+1.0,
+-7.25
+],
+[
+0.0,
+0.0,
+-0.0,
+1.0
+]
+],
+"lightmap": -1,
+"lmso": [
+1.0,
+1.0,
+0.0,
+0.0
+],
+"cast": 1,
+"recv": true,
+"layer": 0
+},
+{
+"path": "Scene/Geometry/StepsRight/step_200cm (20)/step_200cm",
+"mesh": "m5",
+"subs": [
+67
+],
+"mats": [
+"TX_Incinerator_Diffuse_2_586d48dc"
+],
+"matrix": null,
+"lightmap": 0,
+"lmso": [
+0.084734,
+0.084734,
+0.029175,
+0.65825
+],
+"cast": 1,
+"recv": true,
+"layer": 8
+},
+{
+"path": "Scene/Geometry/conveyorFrameRight/conveyor_frameMiddle (9)/conveyor_frameMiddle",
+"mesh": "m5",
+"subs": [
+35
+],
+"mats": [
+"TX_Incinerator_Diffuse_2_586d48dc"
+],
+"matrix": null,
+"lightmap": 0,
+"lmso": [
+0.038374,
+0.038374,
+0.029766,
+0.976578
+],
+"cast": 1,
+"recv": true,
+"layer": 10
+},
+{
+"path": "Scene/Geometry/pipeRailings/Wall Joints/pipeRailling (Wall Joint) (1)/pipeRailing_joint_wallMid",
+"mesh": "m871cf033fdd0",
+"subs": [
+0
+],
+"mats": [
+"TX_Incinerator_Diffuse_2_586d48dc"
+],
+"matrix": [
+[
+0.0,
+-1.0,
+0.0,
+11.0
+],
+[
+-1.0,
+-0.0,
+0.0,
+0.0
+],
+[
+-0.0,
+-0.0,
+-1.0,
+-2.75
+],
+[
+0.0,
+0.0,
+-0.0,
+1.0
+]
+],
+"lightmap": -1,
+"lmso": [
+1.0,
+1.0,
+0.0,
+0.0
+],
+"cast": 1,
+"recv": true,
+"layer": 0
+},
+{
+"path": "Scene/Geometry/conveyorFrameRight/conveyor_frameMiddle/conveyor_frameMiddle",
+"mesh": "m5",
+"subs": [
+61
+],
+"mats": [
+"TX_Incinerator_Diffuse_2_586d48dc"
+],
+"matrix": null,
+"lightmap": 0,
+"lmso": [
+0.038374,
+0.038374,
+0.152904,
+0.714849
+],
+"cast": 1,
+"recv": true,
+"layer": 10
+},
+{
+"path": "Scene/Geometry/pipeRailings/Wall Joints/pipeRailling (Wall Joint) (4)/pipeRailing_joint_wallTop",
+"mesh": "m48736f3afdd0",
+"subs": [
+0
+],
+"mats": [
+"TX_Incinerator_Diffuse_2_586d48dc"
+],
+"matrix": [
+[
+0.0,
+-0.0,
+-1.0,
+7.25
+],
+[
+-1.0,
+-0.0,
+-0.0,
+0.0
+],
+[
+-0.0,
+1.0,
+-0.0,
+-9.0
+],
+[
+0.0,
+0.0,
+-0.0,
+1.0
+]
+],
+"lightmap": -1,
+"lmso": [
+1.0,
+1.0,
+0.0,
+0.0
+],
+"cast": 1,
+"recv": true,
+"layer": 0
+},
+{
+"path": "Scene/Back Wall",
+"mesh": "m1",
+"subs": [
+0
+],
+"mats": [
+"Brown (100)_e93dc5ba"
+],
+"matrix": null,
+"lightmap": 0,
+"lmso": [
+0.093465,
+0.093465,
+0.231555,
+0.335558
+],
+"cast": 1,
+"recv": true,
+"layer": 0
+},
+{
+"path": "Scene/Geometry/StepsLeft/step_200cm (14)/step_200cm",
+"mesh": "m5",
+"subs": [
+66
+],
+"mats": [
+"TX_Incinerator_Diffuse_2_586d48dc"
+],
+"matrix": null,
+"lightmap": 0,
+"lmso": [
+0.09003,
+0.09003,
+0.210222,
+0.633925
+],
+"cast": 1,
+"recv": true,
+"layer": 8
+},
+{
+"path": "Scene/Geometry/Pipes (Small)/Meshes/pipe_40cm_straight_250cm (2)",
+"mesh": "m1",
+"subs": [
+4
+],
+"mats": [
+"Pipe Red_c818d612"
+],
+"matrix": null,
+"lightmap": 0,
+"lmso": [
+0.016822,
+0.016822,
+0.29878,
+0.697273
+],
+"cast": 2,
+"recv": true,
+"layer": 0
+},
+{
+"path": "Scene/Geometry/Pipes (Big)/Meshes/pipe_80cm_slope_1m",
+"mesh": "m4",
+"subs": [
+1
+],
+"mats": [
+"Pipe Red_c818d612"
+],
+"matrix": null,
+"lightmap": 0,
+"lmso": [
+0.018008,
+0.018008,
+-0.000563,
+0.965763
+],
+"cast": 2,
+"recv": true,
+"layer": 0
+},
+{
+"path": "Scene/Geometry/StepsLeft/step_200cm (5)/step_200cm",
+"mesh": "m5",
+"subs": [
+13
+],
+"mats": [
+"TX_Incinerator_Diffuse_2_586d48dc"
+],
+"matrix": null,
+"lightmap": 0,
+"lmso": [
+0.09003,
+0.09003,
+0.163835,
+0.633925
+],
+"cast": 1,
+"recv": true,
+"layer": 8
+},
+{
+"path": "Scene/Geometry/Pipes (Small)/Meshes/pipe_40cm_angle_90 (13)",
+"mesh": "m1",
+"subs": [
+46
+],
+"mats": [
+"Pipe Red_c818d612"
+],
+"matrix": null,
+"lightmap": 0,
+"lmso": [
+0.053699,
+0.053699,
+0.279359,
+0.593685
+],
+"cast": 2,
+"recv": true,
+"layer": 0
+},
+{
+"path": "Scene/Geometry/Pipes (Small)/Meshes/pipe_40cm_straight_250cm (13)",
+"mesh": "m1",
+"subs": [
+25
+],
+"mats": [
+"Pipe Red_c818d612"
+],
+"matrix": null,
+"lightmap": 0,
+"lmso": [
+0.067288,
+0.067288,
+0.190799,
+0.525941
+],
+"cast": 2,
+"recv": true,
+"layer": 0
+},
+{
+"path": "Scene/Geometry/Pipes (Small)/Meshes/pipe_40cm_straight_250cm (3)",
+"mesh": "m1",
+"subs": [
+88
+],
+"mats": [
+"Pipe Red_c818d612"
+],
+"matrix": null,
+"lightmap": 0,
+"lmso": [
+0.016822,
+0.016822,
+0.037942,
+0.746232
+],
+"cast": 2,
+"recv": true,
+"layer": 0
+},
+{
+"path": "Scene/Geometry/Pipes (Small)/Meshes/pipe_40cm_straight_250cm (1)",
+"mesh": "m1",
+"subs": [
+11
+],
+"mats": [
+"Pipe Red_c818d612"
+],
+"matrix": null,
+"lightmap": 0,
+"lmso": [
+0.016822,
+0.016822,
+0.037942,
+0.714363
+],
+"cast": 2,
+"recv": true,
+"layer": 0
+},
+{
+"path": "Scene/Geometry/StepsLeft/step_200cm (7)/step_200cm",
+"mesh": "m5",
+"subs": [
+4
+],
+"mats": [
+"TX_Incinerator_Diffuse_2_586d48dc"
+],
+"matrix": null,
+"lightmap": 0,
+"lmso": [
+0.09003,
+0.09003,
+0.298131,
+0.28228
+],
+"cast": 1,
+"recv": true,
+"layer": 8
+},
+{
+"path": "Scene/Geometry/Pipes (Small)/Meshes/pipe_40cm_straight_250cm (4)",
+"mesh": "m1",
+"subs": [
+44
+],
+"mats": [
+"Pipe Red_c818d612"
+],
+"matrix": null,
+"lightmap": 0,
+"lmso": [
+0.016822,
+0.016822,
+0.037942,
+0.778102
+],
+"cast": 2,
+"recv": true,
+"layer": 0
+},
+{
+"path": "Scene/Geometry/conveyorFrameLeft/conveyor_frameMiddle (11)/conveyor_frameMiddle",
+"mesh": "m5",
+"subs": [
+9
+],
+"mats": [
+"TX_Incinerator_Diffuse_2_586d48dc"
+],
+"matrix": null,
+"lightmap": 0,
+"lmso": [
+0.038374,
+0.038374,
+0.029766,
+0.933609
+],
+"cast": 1,
+"recv": true,
+"layer": 10
+},
+{
+"path": "Scene/Geometry/Pipes (Small)/Meshes/pipe_40cm_straight_300cm (2)",
+"mesh": "m1",
+"subs": [
+31
+],
+"mats": [
+"Pipe Red_c818d612"
+],
+"matrix": null,
+"lightmap": 0,
+"lmso": [
+0.017805,
+0.017805,
+0.054933,
+0.697212
+],
+"cast": 2,
+"recv": true,
+"layer": 0
+},
+{
+"path": "Scene/Geometry/Pipes (Big)/Meshes/pipe_80cm_void (3)",
+"mesh": "m3",
+"subs": [
+6
+],
+"mats": [
+"Void_da1c7ab6"
+],
+"matrix": null,
+"lightmap": 0,
+"lmso": [
+0.007694,
+0.007694,
+0.054626,
+0.829191
+],
+"cast": 2,
+"recv": true,
+"layer": 0
+},
+{
+"path": "Scene/Geometry/Pipes (Small)/Meshes/pipe_40cm_angle_90 (9)",
+"mesh": "m1",
+"subs": [
+37
+],
+"mats": [
+"Pipe Red_c818d612"
+],
+"matrix": null,
+"lightmap": 0,
+"lmso": [
+0.013018,
+0.013018,
+0.307292,
+0.643403
+],
+"cast": 2,
+"recv": true,
+"layer": 0
+},
+{
+"path": "Scene/Geometry/conveyorFrameRight/conveyor_frameMiddle (4)/conveyor_frameMiddle",
+"mesh": "m5",
+"subs": [
+45
+],
+"mats": [
+"TX_Incinerator_Diffuse_2_586d48dc"
+],
+"matrix": null,
+"lightmap": 0,
+"lmso": [
+0.038374,
+0.038374,
+0.131499,
+0.714849
+],
+"cast": 1,
+"recv": true,
+"layer": 10
+},
+{
+"path": "Scene/Geometry/Pipes (Small)/Meshes/pipe_40cm_straight_250cm (15)",
+"mesh": "m1",
+"subs": [
+28
+],
+"mats": [
+"Pipe Red_c818d612"
+],
+"matrix": null,
+"lightmap": 0,
+"lmso": [
+0.067288,
+0.067288,
+0.252323,
+0.525941
+],
+"cast": 2,
+"recv": true,
+"layer": 0
+},
+{
+"path": "Scene/Geometry/Pipes (Small)/Meshes/pipe_40cm_straight_300cm (12)",
+"mesh": "m1",
+"subs": [
+61
+],
+"mats": [
+"Pipe Red_c818d612"
+],
+"matrix": null,
+"lightmap": 0,
+"lmso": [
+0.072838,
+0.072838,
+-0.004552,
+0.525594
+],
+"cast": 2,
+"recv": true,
+"layer": 0
+},
+{
+"path": "Scene/Geometry/StepsRight/step_200cm (18)/step_200cm",
+"mesh": "m5",
+"subs": [
+44
+],
+"mats": [
+"TX_Incinerator_Diffuse_2_586d48dc"
+],
+"matrix": null,
+"lightmap": 0,
+"lmso": [
+0.084734,
+0.084734,
+0.266042,
+0.638719
+],
+"cast": 1,
+"recv": true,
+"layer": 8
+},
+{
+"path": "Scene/Geometry/pipeRailings/Wall Joints/pipeRailling (Wall Joint) (3)/pipeRailing_joint_wallMid",
+"mesh": "m871cf033fdd0",
+"subs": [
+0
+],
+"mats": [
+"TX_Incinerator_Diffuse_2_586d48dc"
+],
+"matrix": [
+[
+0.0,
+1.0,
+-0.0,
+-11.0
+],
+[
+-1.0,
+0.0,
+-0.0,
+0.0
+],
+[
+-0.0,
+-0.0,
+1.0,
+-7.25
+],
+[
+0.0,
+0.0,
+-0.0,
+1.0
+]
+],
+"lightmap": -1,
+"lmso": [
+1.0,
+1.0,
+0.0,
+0.0
+],
+"cast": 1,
+"recv": true,
+"layer": 0
+},
+{
+"path": "Scene/Geometry/Pipes (Small)/Meshes/pipe_40cm_angle_90 (14)",
+"mesh": "m1",
+"subs": [
+17
+],
+"mats": [
+"Pipe Red_c818d612"
+],
+"matrix": null,
+"lightmap": 0,
+"lmso": [
+0.053699,
+0.053699,
+0.230042,
+0.593685
+],
+"cast": 2,
+"recv": true,
+"layer": 0
+},
+{
+"path": "Scene/Geometry/conveyorFrameRight/conveyor_frameMiddle (6)/conveyor_frameMiddle",
+"mesh": "m5",
+"subs": [
+7
+],
+"mats": [
+"TX_Incinerator_Diffuse_2_586d48dc"
+],
+"matrix": null,
+"lightmap": 0,
+"lmso": [
+0.038374,
+0.038374,
+0.029766,
+0.955094
+],
+"cast": 1,
+"recv": true,
+"layer": 10
+},
+{
+"path": "Scene/Geometry/StepsRight/step_200cm (25)/step_200cm",
+"mesh": "m5",
+"subs": [
+17
+],
+"mats": [
+"TX_Incinerator_Diffuse_2_586d48dc"
+],
+"matrix": null,
+"lightmap": 0,
+"lmso": [
+0.084734,
+0.084734,
+0.274831,
+0.638719
+],
+"cast": 1,
+"recv": true,
+"layer": 8
+},
+{
+"path": "Scene/Geometry/Pipes (Big)/Meshes/pipe_80cm_straight_2m (1)",
+"mesh": "m1",
+"subs": [
+54
+],
+"mats": [
+"Pipe Red_c818d612"
+],
+"matrix": null,
+"lightmap": 0,
+"lmso": [
+0.021239,
+0.021239,
+-0.000664,
+0.844633
+],
+"cast": 2,
+"recv": true,
+"layer": 0
+},
+{
+"path": "Scene/Geometry/Pipes (Big)/Meshes/pipe_80cm_straight_1m (4)",
+"mesh": "m1",
+"subs": [
+19
+],
+"mats": [
+"Pipe Red_c818d612"
+],
+"matrix": null,
+"lightmap": 0,
+"lmso": [
+0.015919,
+0.015919,
+0.154771,
+0.697827
+],
+"cast": 2,
+"recv": true,
+"layer": 0
+},
+{
+"path": "Scene/Geometry/StepsLeft/step_200cm (1)/step_200cm",
+"mesh": "m5",
+"subs": [
+64
+],
+"mats": [
+"TX_Incinerator_Diffuse_2_586d48dc"
+],
+"matrix": null,
+"lightmap": 0,
+"lmso": [
+0.09003,
+0.09003,
+0.219499,
+0.633925
+],
+"cast": 1,
+"recv": true,
+"layer": 8
+},
+{
+"path": "Scene/Geometry/Pipes (Small)/Meshes/pipe_40cm_straight_300cm (10)",
+"mesh": "m1",
+"subs": [
+20
+],
+"mats": [
+"Pipe Red_c818d612"
+],
+"matrix": null,
+"lightmap": 0,
+"lmso": [
+0.017805,
+0.017805,
+0.019814,
+0.904112
+],
+"cast": 2,
+"recv": true,
+"layer": 0
+},
+{
+"path": "Scene/Geometry/pipeRailings/Wall Joints/pipeRailling (Wall Joint) (2)/pipeRailing_joint_wallMid",
+"mesh": "m871cf033fdd0",
+"subs": [
+0
+],
+"mats": [
+"TX_Incinerator_Diffuse_2_586d48dc"
+],
+"matrix": [
+[
+0.0,
+-1.0,
+0.0,
+11.0
+],
+[
+-1.0,
+-0.0,
+0.0,
+0.0
+],
+[
+-0.0,
+-0.0,
+-1.0,
+-7.25
+],
+[
+0.0,
+0.0,
+-0.0,
+1.0
+]
+],
+"lightmap": -1,
+"lmso": [
+1.0,
+1.0,
+0.0,
+0.0
+],
+"cast": 1,
+"recv": true,
+"layer": 0
+},
+{
+"path": "Scene/Geometry/pipeRailings/Floor Joints/pipeRailing (Floor Joint) (15)",
+"mesh": "m20134808fdd0",
+"subs": [
+0
+],
+"mats": [
+"TX_Incinerator_Diffuse_2_586d48dc"
+],
+"matrix": [
+[
+1.0,
+0.0,
+-0.0,
+-10.25
+],
+[
+0.0,
+1.0,
+0.0,
+0.0
+],
+[
+-0.0,
+-0.0,
+1.0,
+-7.25
+],
+[
+0.0,
+0.0,
+-0.0,
+1.0
+]
+],
+"lightmap": -1,
+"lmso": [
+1.0,
+1.0,
+0.0,
+0.0
+],
+"cast": 1,
+"recv": true,
+"layer": 0
+},
+{
+"path": "Scene/Geometry/Pipes (Small)/Meshes/pipe_40cm_straight_50cm (2)",
+"mesh": "m1",
+"subs": [
+13
+],
+"mats": [
+"Pipe Red_c818d612"
+],
+"matrix": null,
+"lightmap": 0,
+"lmso": [
+0.033407,
+0.033407,
+0.296586,
+0.395464
+],
+"cast": 2,
+"recv": true,
+"layer": 0
+},
+{
+"path": "Scene/Geometry/Pipes (Big)/Meshes/pipe_80cm_slope_1m",
+"mesh": "m4",
+"subs": [
+3
+],
+"mats": [
+"Pipe Red_c818d612"
+],
+"matrix": null,
+"lightmap": 0,
+"lmso": [
+0.018008,
+0.018008,
+0.020364,
+0.697762
+],
+"cast": 2,
+"recv": true,
+"layer": 0
+},
+{
+"path": "Scene/Geometry/Pipes (Small)/Meshes/pipe_40cm_straight_250cm (12)",
+"mesh": "m1",
+"subs": [
+87
+],
+"mats": [
+"Pipe Red_c818d612"
+],
+"matrix": null,
+"lightmap": 0,
+"lmso": [
+0.067288,
+0.067288,
+0.227728,
+0.460241
+],
+"cast": 2,
+"recv": true,
+"layer": 0
+},
+{
+"path": "Scene/Geometry/Enviroment/incinerator_lowWall",
+"mesh": "m2",
+"subs": [
+1
+],
+"mats": [
+"TX_Incinerator_Diffuse_2_586d48dc"
+],
+"matrix": null,
+"lightmap": 0,
+"lmso": [
+0.067431,
+0.067431,
+0.118832,
+0.592827
+],
+"cast": 1,
+"recv": true,
+"layer": 10
+},
+{
+"path": "Scene/Geometry/Pipes (Small)/Meshes/pipe_40cm_angle_90 (2)",
+"mesh": "m1",
+"subs": [
+9
+],
+"mats": [
+"Pipe Red_c818d612"
+],
+"matrix": null,
+"lightmap": 0,
+"lmso": [
+0.013018,
+0.013018,
+0.281901,
+0.643403
+],
+"cast": 2,
+"recv": true,
+"layer": 0
+},
+{
+"path": "Scene/Geometry/pipeRailings/Wall Joints/pipeRailling (Wall Joint) (2)/pipeRailing_joint_wallTop",
+"mesh": "m48736f3afdd0",
+"subs": [
+0
+],
+"mats": [
+"TX_Incinerator_Diffuse_2_586d48dc"
+],
+"matrix": [
+[
+0.0,
+-1.0,
+0.0,
+11.0
+],
+[
+-1.0,
+-0.0,
+0.0,
+0.0
+],
+[
+-0.0,
+-0.0,
+-1.0,
+-7.25
+],
+[
+0.0,
+0.0,
+-0.0,
+1.0
+]
+],
+"lightmap": -1,
+"lmso": [
+1.0,
+1.0,
+0.0,
+0.0
+],
+"cast": 1,
+"recv": true,
+"layer": 0
+},
+{
+"path": "Scene/Geometry/StepsRight/step_200cm (19)/step_200cm",
+"mesh": "m5",
+"subs": [
+22
+],
+"mats": [
+"TX_Incinerator_Diffuse_2_586d48dc"
+],
+"matrix": null,
+"lightmap": 0,
+"lmso": [
+0.084734,
+0.084734,
+0.029175,
+0.684617
+],
+"cast": 1,
+"recv": true,
+"layer": 8
+},
+{
+"path": "Scene/Geometry/StepsLeft/step_200cm (8)/step_200cm",
+"mesh": "m5",
+"subs": [
+42
+],
+"mats": [
+"TX_Incinerator_Diffuse_2_586d48dc"
+],
+"matrix": null,
+"lightmap": 0,
+"lmso": [
+0.09003,
+0.09003,
+0.298131,
+0.254448
+],
+"cast": 1,
+"recv": true,
+"layer": 8
+},
+{
+"path": "Scene/Geometry/Pipes (Big)/Meshes/pipe_80cm_straight_1m (3)",
+"mesh": "m1",
+"subs": [
+38
+],
+"mats": [
+"Pipe Red_c818d612"
+],
+"matrix": null,
+"lightmap": 0,
+"lmso": [
+0.015919,
+0.015919,
+0.218859,
+0.697827
+],
+"cast": 2,
+"recv": true,
+"layer": 0
+},
+{
+"path": "Scene/Geometry/Pipes (Big)/Meshes/pipe_80cm_angle_45 (1)",
+"mesh": "m1",
+"subs": [
+36
+],
+"mats": [
+"Pipe Red_c818d612"
+],
+"matrix": null,
+"lightmap": 0,
+"lmso": [
+0.016953,
+0.016953,
+0.317522,
+0.563796
+],
+"cast": 2,
+"recv": true,
+"layer": 0
+},
+{
+"path": "Scene/Geometry/Pipes (Small)/Meshes/pipe_40cm_void",
+"mesh": "m3",
+"subs": [
+2
+],
+"mats": [
+"Void_da1c7ab6"
+],
+"matrix": null,
+"lightmap": 0,
+"lmso": [
+0.00386,
+0.00386,
+0.329837,
+0.39136
+],
+"cast": 2,
+"recv": true,
+"layer": 0
+},
+{
+"path": "Scene/Geometry/pipeRailings/Floor Joints/pipeRailing (Floor Joint) (12)",
+"mesh": "m20134808fdd0",
+"subs": [
+0
+],
+"mats": [
+"TX_Incinerator_Diffuse_2_586d48dc"
+],
+"matrix": [
+[
+1.0,
+0.0,
+-0.0,
+9.75
+],
+[
+0.0,
+1.0,
+0.0,
+0.0
+],
+[
+-0.0,
+-0.0,
+1.0,
+-7.25
+],
+[
+0.0,
+0.0,
+-0.0,
+1.0
+]
+],
+"lightmap": -1,
+"lmso": [
+1.0,
+1.0,
+0.0,
+0.0
+],
+"cast": 1,
+"recv": true,
+"layer": 0
+},
+{
+"path": "Scene/Geometry/Pipes (Small)/Meshes/pipe_40cm_straight_50cm (3)",
+"mesh": "m1",
+"subs": [
+42
+],
+"mats": [
+"Pipe Red_c818d612"
+],
+"matrix": null,
+"lightmap": 0,
+"lmso": [
+0.033407,
+0.033407,
+0.296586,
+0.426714
+],
+"cast": 2,
+"recv": true,
+"layer": 0
+},
+{
+"path": "Scene/Geometry/Door (Double)/door_frame_200cm (1)/door_frame_200cm",
+"mesh": "m5",
+"subs": [
+28
+],
+"mats": [
+"TX_Incinerator_Diffuse_2_586d48dc"
+],
+"matrix": null,
+"lightmap": 0,
+"lmso": [
+0.153591,
+0.153591,
+0.271636,
+0.442812
+],
+"cast": 1,
+"recv": true,
+"layer": 10
+},
+{
+"path": "Scene/Geometry/Pipes (Small)/Meshes/pipe_40cm_straight_50cm",
+"mesh": "m1",
+"subs": [
+69
+],
+"mats": [
+"Pipe Red_c818d612"
+],
+"matrix": null,
+"lightmap": 0,
+"lmso": [
+0.008082,
+0.008082,
+0.054602,
+0.804753
+],
+"cast": 2,
+"recv": true,
+"layer": 0
+},
+{
+"path": "Scene/Geometry/Pipes (Small)/Meshes/pipe_40cm_angle_90 (12)",
+"mesh": "m1",
+"subs": [
+12
+],
+"mats": [
+"Pipe Red_c818d612"
+],
+"matrix": null,
+"lightmap": 0,
+"lmso": [
+0.053699,
+0.053699,
+0.180726,
+0.593685
+],
+"cast": 2,
+"recv": true,
+"layer": 0
+},
+{
+"path": "Scene/Geometry/door_frame_400cm/door_frame_400cm",
+"mesh": "m831d8e616bf",
+"subs": [
+0
+],
+"mats": [
+"TX_Incinerator_Diffuse_2_586d48dc"
+],
+"matrix": [
+[
+1.0,
+0.0,
+-0.0,
+-6.5
+],
+[
+0.0,
+1.0,
+0.0,
+0.00234
+],
+[
+-0.0,
+-0.0,
+1.0,
+7.0
+],
+[
+0.0,
+0.0,
+-0.0,
+1.0
+]
+],
+"lightmap": -1,
+"lmso": [
+1.0,
+1.0,
+0.0,
+0.0
+],
+"cast": 1,
+"recv": true,
+"layer": 10
+},
+{
+"path": "Scene/Geometry/Pipes (Big)/Meshes/pipe_80cm_straight_2m (3)",
+"mesh": "m1",
+"subs": [
+76
+],
+"mats": [
+"Pipe Red_c818d612"
+],
+"matrix": null,
+"lightmap": 0,
+"lmso": [
+0.020721,
+0.020721,
+-0.000648,
+0.927169
+],
+"cast": 2,
+"recv": true,
+"layer": 0
+},
+{
+"path": "Scene/Geometry/Pipes (Big)/Meshes/hidden pipe",
+"mesh": "m1",
+"subs": [
+16
+],
+"mats": [
+"Pipe Red_c818d612"
+],
+"matrix": null,
+"lightmap": 0,
+"lmso": [
+0.021239,
+0.021239,
+-0.000664,
+0.823637
+],
+"cast": 3,
+"recv": true,
+"layer": 0
+},
+{
+"path": "Scene/Geometry/Pipes (Small)/Meshes/pipe_40cm_straight_100cm (1)",
+"mesh": "m1",
+"subs": [
+65
+],
+"mats": [
+"Pipe Red_c818d612"
+],
+"matrix": null,
+"lightmap": 0,
+"lmso": [
+0.010784,
+0.010784,
+0.27081,
+0.643542
+],
+"cast": 2,
+"recv": true,
+"layer": 0
+},
+{
+"path": "Scene/Geometry/Pipes (Small)/Meshes/pipe_40cm_angle_90 (3)",
+"mesh": "m1",
+"subs": [
+64
+],
+"mats": [
+"Pipe Red_c818d612"
+],
+"matrix": null,
+"lightmap": 0,
+"lmso": [
+0.013018,
+0.013018,
+0.321452,
+0.675401
+],
+"cast": 2,
+"recv": true,
+"layer": 0
+},
+{
+"path": "Scene/Geometry/pipeRailings/Wall Joints/pipeRailling (Wall Joint) (3)/pipeRailing_joint_wallTop",
+"mesh": "m48736f3afdd0",
+"subs": [
+0
+],
+"mats": [
+"TX_Incinerator_Diffuse_2_586d48dc"
+],
+"matrix": [
+[
+0.0,
+1.0,
+-0.0,
+-11.0
+],
+[
+-1.0,
+0.0,
+-0.0,
+0.0
+],
+[
+-0.0,
+-0.0,
+1.0,
+-7.25
+],
+[
+0.0,
+0.0,
+-0.0,
+1.0
+]
+],
+"lightmap": -1,
+"lmso": [
+1.0,
+1.0,
+0.0,
+0.0
+],
+"cast": 1,
+"recv": true,
+"layer": 0
+},
+{
+"path": "Scene/Geometry/Pipes (Small)/Meshes/pipe_40cm_straight_100cm (2)",
+"mesh": "m1",
+"subs": [
+3
+],
+"mats": [
+"Pipe Red_c818d612"
+],
+"matrix": null,
+"lightmap": 0,
+"lmso": [
+0.043674,
+0.043674,
+0.290727,
+0.461717
+],
+"cast": 2,
+"recv": true,
+"layer": 0
+},
+{
+"path": "Scene/Geometry/pipeRailings/Floor Joints/pipeRailing (Floor Joint) (0)",
+"mesh": "m20134808fdd0",
+"subs": [
+0
+],
+"mats": [
+"TX_Incinerator_Diffuse_2_586d48dc"
+],
+"matrix": [
+[
+1.0,
+0.0,
+-0.0,
+-10.25
+],
+[
+0.0,
+1.0,
+0.0,
+0.0
+],
+[
+-0.0,
+-0.0,
+1.0,
+-2.75
+],
+[
+0.0,
+0.0,
+-0.0,
+1.0
+]
+],
+"lightmap": -1,
+"lmso": [
+1.0,
+1.0,
+0.0,
+0.0
+],
+"cast": 1,
+"recv": true,
+"layer": 0
+},
+{
+"path": "Scene/Geometry/ConveyorRight/conveyor_rollerMid",
+"mesh": "m5",
+"subs": [
+2
+],
+"mats": [
+"TX_Incinerator_Diffuse_2_586d48dc"
+],
+"matrix": null,
+"lightmap": 0,
+"lmso": [
+0.078125,
+0.078125,
+0.231026,
+0.655961
+],
+"cast": 2,
+"recv": true,
+"layer": 0
+},
+{
+"path": "Scene/Fire Pit/Pit Glow NEW",
+"mesh": "m3",
+"subs": [
+9
+],
+"mats": [
+"Firepit Glow_9"
+],
+"matrix": null,
+"lightmap": -1,
+"lmso": [
+1.0,
+1.0,
+0.0,
+0.0
+],
+"cast": 0,
+"recv": false,
+"layer": 0
+},
+{
+"path": "Scene/Geometry/Pipes (Small)/Meshes/pipe_40cm_straight_250cm (11)",
+"mesh": "m1",
+"subs": [
+83
+],
+"mats": [
+"Pipe Red_c818d612"
+],
+"matrix": null,
+"lightmap": 0,
+"lmso": [
+0.067288,
+0.067288,
+-0.004206,
+0.592836
+],
+"cast": 2,
+"recv": true,
+"layer": 0
+},
+{
+"path": "Scene/Geometry/ConveyorRight/conveyor_rollerMid",
+"mesh": "m5",
+"subs": [
+18
+],
+"mats": [
+"TX_Incinerator_Diffuse_2_586d48dc"
+],
+"matrix": null,
+"lightmap": 0,
+"lmso": [
+0.078125,
+0.078125,
+0.110909,
+0.635985
+],
+"cast": 2,
+"recv": true,
+"layer": 0
+},
+{
+"path": "Scene/Geometry/Pipes (Small)/Meshes/pipe_40cm_straight_200cm (6)",
+"mesh": "m1",
+"subs": [
+71
+],
+"mats": [
+"Pipe Red_c818d612"
+],
+"matrix": null,
+"lightmap": 0,
+"lmso": [
+0.014592,
+0.014592,
+0.038082,
+0.809801
+],
+"cast": 2,
+"recv": true,
+"layer": 0
+},
+{
+"path": "Scene/Geometry/Pipes (Small)/Meshes/pipe_40cm_straight_200cm (1)",
+"mesh": "m1",
+"subs": [
+86
+],
+"mats": [
+"Pipe Red_c818d612"
+],
+"matrix": null,
+"lightmap": 0,
+"lmso": [
+0.014592,
+0.014592,
+0.038082,
+0.90843
+],
+"cast": 2,
+"recv": true,
+"layer": 0
+},
+{
+"path": "Scene/Geometry/Pipes (Small)/Meshes/pipe_40cm_straight_200cm (5)",
+"mesh": "m1",
+"subs": [
+73
+],
+"mats": [
+"Pipe Red_c818d612"
+],
+"matrix": null,
+"lightmap": 0,
+"lmso": [
+0.014592,
+0.014592,
+0.038082,
+0.823891
+],
+"cast": 2,
+"recv": true,
+"layer": 0
+},
+{
+"path": "Scene/Geometry/conveyorFrameRight/conveyor_frameMiddle (8)/conveyor_frameMiddle",
+"mesh": "m5",
+"subs": [
+29
+],
+"mats": [
+"TX_Incinerator_Diffuse_2_586d48dc"
+],
+"matrix": null,
+"lightmap": 0,
+"lmso": [
+0.038374,
+0.038374,
+0.029766,
+0.922867
+],
+"cast": 1,
+"recv": true,
+"layer": 10
+},
+{
+"path": "Scene/Geometry/Enviroment/incinerator_enviroment",
+"mesh": "m2",
+"subs": [
+0
+],
+"mats": [
+"TX_Incinerator_Diffuse_2_586d48dc"
+],
+"matrix": null,
+"lightmap": 0,
+"lmso": [
+0.36985,
+0.36985,
+-0.023116,
+-0.023116
+],
+"cast": 1,
+"recv": true,
+"layer": 10
+},
+{
+"path": "Scene/Geometry/ConveyorRight/conveyor_rollerEnd",
+"mesh": "m5",
+"subs": [
+10
+],
+"mats": [
+"TX_Incinerator_Diffuse_2_586d48dc"
+],
+"matrix": null,
+"lightmap": 0,
+"lmso": [
+0.089844,
+0.089844,
+0.0159,
+0.632706
+],
+"cast": 2,
+"recv": true,
+"layer": 0
+},
+{
+"path": "Scene/Geometry/pipeRailings/Floor Joints/pipeRailing (Floor Joint) (1)",
+"mesh": "m20134808fdd0",
+"subs": [
+0
+],
+"mats": [
+"TX_Incinerator_Diffuse_2_586d48dc"
+],
+"matrix": [
+[
+1.0,
+0.0,
+-0.0,
+-5.25
+],
+[
+0.0,
+1.0,
+0.0,
+0.0
+],
+[
+-0.0,
+-0.0,
+1.0,
+-2.75
+],
+[
+0.0,
+0.0,
+-0.0,
+1.0
+]
+],
+"lightmap": -1,
+"lmso": [
+1.0,
+1.0,
+0.0,
+0.0
+],
+"cast": 1,
+"recv": true,
+"layer": 0
+},
+{
+"path": "Scene/Geometry/StepsRight/step_200cm (27)/step_200cm",
+"mesh": "m5",
+"subs": [
+21
+],
+"mats": [
+"TX_Incinerator_Diffuse_2_586d48dc"
+],
+"matrix": null,
+"lightmap": 0,
+"lmso": [
+0.084734,
+0.084734,
+0.029175,
+0.693406
+],
+"cast": 1,
+"recv": true,
+"layer": 8
+},
+{
+"path": "Scene/Geometry/StepsLeft/step_200cm/step_200cm",
+"mesh": "m5",
+"subs": [
+53
+],
+"mats": [
+"TX_Incinerator_Diffuse_2_586d48dc"
+],
+"matrix": null,
+"lightmap": 0,
+"lmso": [
+0.09003,
+0.09003,
+0.145281,
+0.633925
+],
+"cast": 1,
+"recv": true,
+"layer": 0
+},
+{
+"path": "Scene/Geometry/conveyorFrameLeft/conveyor_frameMiddle (13)/conveyor_frameMiddle",
+"mesh": "m5",
+"subs": [
+6
+],
+"mats": [
+"TX_Incinerator_Diffuse_2_586d48dc"
+],
+"matrix": null,
+"lightmap": 0,
+"lmso": [
+0.038374,
+0.038374,
+0.029766,
+0.944352
+],
+"cast": 1,
+"recv": true,
+"layer": 10
+},
+{
+"path": "Scene/Geometry/pipeRailings/Floor Joints/pipeRailing (Floor Joint) (8)",
+"mesh": "m20134808fdd0",
+"subs": [
+0
+],
+"mats": [
+"TX_Incinerator_Diffuse_2_586d48dc"
+],
+"matrix": [
+[
+1.0,
+0.0,
+-0.0,
+7.25
+],
+[
+0.0,
+1.0,
+0.0,
+0.0
+],
+[
+-0.0,
+-0.0,
+1.0,
+-0.75
+],
+[
+0.0,
+0.0,
+-0.0,
+1.0
+]
+],
+"lightmap": -1,
+"lmso": [
+1.0,
+1.0,
+0.0,
+0.0
+],
+"cast": 1,
+"recv": true,
+"layer": 0
+},
+{
+"path": "Scene/Geometry/Pipes (Small)/Meshes/pipe_40cm_straight_250cm (9)",
+"mesh": "m1",
+"subs": [
+35
+],
+"mats": [
+"Pipe Red_c818d612"
+],
+"matrix": null,
+"lightmap": 0,
+"lmso": [
+0.016822,
+0.016822,
+0.037942,
+0.762167
+],
+"cast": 2,
+"recv": true,
+"layer": 0
+},
+{
+"path": "Scene/Geometry/Pipes (Big)/Meshes/pipe_80cm_void (2)",
+"mesh": "m3",
+"subs": [
+4
+],
+"mats": [
+"Void_da1c7ab6"
+],
+"matrix": null,
+"lightmap": 0,
+"lmso": [
+0.007694,
+0.007694,
+0.054626,
+0.837004
+],
+"cast": 2,
+"recv": true,
+"layer": 0
+},
+{
+"path": "Scene/Geometry/Pipes (Small)/Meshes/pipe_40cm_angle_90",
+"mesh": "m1",
+"subs": [
+32
+],
+"mats": [
+"Pipe Red_c818d612"
+],
+"matrix": null,
+"lightmap": 0,
+"lmso": [
+0.013018,
+0.013018,
+0.232585,
+0.643403
+],
+"cast": 2,
+"recv": true,
+"layer": 0
+},
+{
+"path": "Scene/Geometry/StepsLeft/step_200cm (12)/step_200cm",
+"mesh": "m5",
+"subs": [
+11
+],
+"mats": [
+"TX_Incinerator_Diffuse_2_586d48dc"
+],
+"matrix": null,
+"lightmap": 0,
+"lmso": [
+0.09003,
+0.09003,
+0.298131,
+0.291558
+],
+"cast": 1,
+"recv": true,
+"layer": 8
+},
+{
+"path": "Scene/Geometry/ConveyorLeft/conveyor_rollerMid",
+"mesh": "m5",
+"subs": [
+51
+],
+"mats": [
+"TX_Incinerator_Diffuse_2_586d48dc"
+],
+"matrix": null,
+"lightmap": 0,
+"lmso": [
+0.078125,
+0.078125,
+0.150948,
+0.655961
+],
+"cast": 2,
+"recv": true,
+"layer": 0
+},
+{
+"path": "Scene/Geometry/conveyorFrameRight/conveyor_frameMiddle (5)/conveyor_frameMiddle",
+"mesh": "m5",
+"subs": [
+39
+],
+"mats": [
+"TX_Incinerator_Diffuse_2_586d48dc"
+],
+"matrix": null,
+"lightmap": 0,
+"lmso": [
+0.038374,
+0.038374,
+0.029766,
+0.98732
+],
+"cast": 1,
+"recv": true,
+"layer": 10
+},
+{
+"path": "Scene/Geometry/conveyorFrameRight/conveyor_frameMiddle (1)/conveyor_frameMiddle",
+"mesh": "m5",
+"subs": [
+71
+],
+"mats": [
+"TX_Incinerator_Diffuse_2_586d48dc"
+],
+"matrix": null,
+"lightmap": 0,
+"lmso": [
+0.038374,
+0.038374,
+0.04588,
+0.714849
+],
+"cast": 1,
+"recv": true,
+"layer": 10
+},
+{
+"path": "Scene/Geometry/Pipes (Small)/Meshes/pipe_40cm_straight_300cm (9)",
+"mesh": "m1",
+"subs": [
+5
+],
+"mats": [
+"Pipe Red_c818d612"
+],
+"matrix": null,
+"lightmap": 0,
+"lmso": [
+0.017805,
+0.017805,
+0.019814,
+0.818663
+],
+"cast": 2,
+"recv": true,
+"layer": 0
+},
+{
+"path": "Scene/Geometry/Pipes (Small)/Meshes/pipe_40cm_straight_300cm (1)",
+"mesh": "m1",
+"subs": [
+52
+],
+"mats": [
+"Pipe Red_c818d612"
+],
+"matrix": null,
+"lightmap": 0,
+"lmso": [
+0.017805,
+0.017805,
+0.089037,
+0.697212
+],
+"cast": 2,
+"recv": true,
+"layer": 0
+},
+{
+"path": "Scene/Geometry/pipeRailings/Floor Joints/pipeRailing (Floor Joint) (3)",
+"mesh": "m20134808fdd0",
+"subs": [
+0
+],
+"mats": [
+"TX_Incinerator_Diffuse_2_586d48dc"
+],
+"matrix": [
+[
+1.0,
+0.0,
+-0.0,
+-2.75
+],
+[
+0.0,
+1.0,
+0.0,
+0.0
+],
+[
+-0.0,
+-0.0,
+1.0,
+-0.75
+],
+[
+0.0,
+0.0,
+-0.0,
+1.0
+]
+],
+"lightmap": -1,
+"lmso": [
+1.0,
+1.0,
+0.0,
+0.0
+],
+"cast": 1,
+"recv": true,
+"layer": 0
+},
+{
+"path": "Scene/Geometry/Pipes (Big)/Meshes/pipe_80cm_angle_45",
+"mesh": "m1",
+"subs": [
+21
+],
+"mats": [
+"Pipe Red_c818d612"
+],
+"matrix": null,
+"lightmap": 0,
+"lmso": [
+0.016953,
+0.016953,
+0.317522,
+0.546707
+],
+"cast": 2,
+"recv": true,
+"layer": 0
+},
+{
+"path": "Scene/Geometry/Pipes (Small)/Meshes/pipe_40cm_angle_90 (5)",
+"mesh": "m1",
+"subs": [
+82
+],
+"mats": [
+"Pipe Red_c818d612"
+],
+"matrix": null,
+"lightmap": 0,
+"lmso": [
+0.013018,
+0.013018,
+0.24528,
+0.643403
+],
+"cast": 2,
+"recv": true,
+"layer": 0
+},
+{
+"path": "Scene/Geometry/Pipes (Big)/Meshes/hidden pipe",
+"mesh": "m1",
+"subs": [
+59
+],
+"mats": [
+"Pipe Red_c818d612"
+],
+"matrix": null,
+"lightmap": 0,
+"lmso": [
+0.021239,
+0.021239,
+-0.000664,
+0.718657
+],
+"cast": 3,
+"recv": true,
+"layer": 0
+},
+{
+"path": "Scene/Geometry/pipeRailings/Wall Joints/pipeRailling (Wall Joint) (5)/pipeRailing_joint_wallMid",
+"mesh": "m871cf033fdd0",
+"subs": [
+0
+],
+"mats": [
+"TX_Incinerator_Diffuse_2_586d48dc"
+],
+"matrix": [
+[
+0.0,
+-0.0,
+-1.0,
+-5.25
+],
+[
+-1.0,
+-0.0,
+-0.0,
+0.0
+],
+[
+-0.0,
+1.0,
+-0.0,
+-9.0
+],
+[
+0.0,
+0.0,
+-0.0,
+1.0
+]
+],
+"lightmap": -1,
+"lmso": [
+1.0,
+1.0,
+0.0,
+0.0
+],
+"cast": 1,
+"recv": true,
+"layer": 0
+},
+{
+"path": "Scene/Geometry/conveyorFrameRight/conveyor_frameEnd (1)/conveyor_frameEnd",
+"mesh": "m5",
+"subs": [
+0
+],
+"mats": [
+"TX_Incinerator_Diffuse_2_586d48dc"
+],
+"matrix": null,
+"lightmap": 0,
+"lmso": [
+0.061036,
+0.061036,
+0.078961,
+0.679777
+],
+"cast": 1,
+"recv": true,
+"layer": 10
+},
+{
+"path": "Scene/Geometry/Pipes (Small)/Meshes/pipe_40cm_angle_90 (11)",
+"mesh": "m1",
+"subs": [
+63
+],
+"mats": [
+"Pipe Red_c818d612"
+],
+"matrix": null,
+"lightmap": 0,
+"lmso": [
+0.013018,
+0.013018,
+0.183268,
+0.643403
+],
+"cast": 2,
+"recv": true,
+"layer": 0
+},
+{
+"path": "Scene/Geometry/conveyorFrameLeft/conveyor_frameMiddle (12)/conveyor_frameMiddle",
+"mesh": "m5",
+"subs": [
+16
+],
+"mats": [
+"TX_Incinerator_Diffuse_2_586d48dc"
+],
+"matrix": null,
+"lightmap": 0,
+"lmso": [
+0.038374,
+0.038374,
+0.029766,
+0.965836
+],
+"cast": 1,
+"recv": true,
+"layer": 10
+},
+{
+"path": "Scene/Geometry/ConveyorRight/conveyor_rollerMid",
+"mesh": "m5",
+"subs": [
+8
+],
+"mats": [
+"TX_Incinerator_Diffuse_2_586d48dc"
+],
+"matrix": null,
+"lightmap": 0,
+"lmso": [
+0.078125,
+0.078125,
+0.272042,
+0.483057
+],
+"cast": 2,
+"recv": true,
+"layer": 0
+},
+{
+"path": "Scene/Geometry/conveyorFrameLeft/conveyor_frameMiddle (16)/conveyor_frameMiddle",
+"mesh": "m5",
+"subs": [
+49
+],
+"mats": [
+"TX_Incinerator_Diffuse_2_586d48dc"
+],
+"matrix": null,
+"lightmap": 0,
+"lmso": [
+0.038374,
+0.038374,
+0.110094,
+0.714849
+],
+"cast": 1,
+"recv": true,
+"layer": 10
+},
+{
+"path": "Scene/Geometry/pipeRailings/Wall Joints/pipeRailling (Wall Joint)/pipeRailing_joint_wallTop",
+"mesh": "m48736f3afdd0",
+"subs": [
+0
+],
+"mats": [
+"TX_Incinerator_Diffuse_2_586d48dc"
+],
+"matrix": [
+[
+0.0,
+1.0,
+-0.0,
+-11.0
+],
+[
+-1.0,
+0.0,
+-0.0,
+0.0
+],
+[
+-0.0,
+-0.0,
+1.0,
+-2.75
+],
+[
+0.0,
+0.0,
+-0.0,
+1.0
+]
+],
+"lightmap": -1,
+"lmso": [
+1.0,
+1.0,
+0.0,
+0.0
+],
+"cast": 1,
+"recv": true,
+"layer": 0
+},
+{
+"path": "Scene/Geometry/Pipes (Small)/Meshes/pipe_40cm_straight_250cm (6)",
+"mesh": "m1",
+"subs": [
+67
+],
+"mats": [
+"Pipe Red_c818d612"
+],
+"matrix": null,
+"lightmap": 0,
+"lmso": [
+0.016822,
+0.016822,
+0.266553,
+0.697273
+],
+"cast": 2,
+"recv": true,
+"layer": 0
+},
+{
+"path": "Scene/Geometry/Pipes (Big)/Meshes/pipe_80cm_angle_45 (1)",
+"mesh": "m1",
+"subs": [
+45
+],
+"mats": [
+"Pipe Red_c818d612"
+],
+"matrix": null,
+"lightmap": 0,
+"lmso": [
+0.016953,
+0.016953,
+0.020397,
+0.802156
+],
+"cast": 2,
+"recv": true,
+"layer": 0
+},
+{
+"path": "Scene/Geometry/Pipes (Small)/Meshes/pipe_40cm_straight_250cm (16)",
+"mesh": "m1",
+"subs": [
+90
+],
+"mats": [
+"Pipe Red_c818d612"
+],
+"matrix": null,
+"lightmap": 0,
+"lmso": [
+0.067288,
+0.067288,
+0.129276,
+0.525941
+],
+"cast": 2,
+"recv": true,
+"layer": 0
+},
+{
+"path": "Scene/Geometry/Pipes (Big)/Meshes/pipe_80cm_straight_2m (1)",
+"mesh": "m1",
+"subs": [
+53
+],
+"mats": [
+"Pipe Red_c818d612"
+],
+"matrix": null,
+"lightmap": 0,
+"lmso": [
+0.021239,
+0.021239,
+-0.000664,
+0.802641
+],
+"cast": 2,
+"recv": true,
+"layer": 0
+},
+{
+"path": "Scene/Geometry/conveyorFrameRight/conveyor_frameMiddle (2)/conveyor_frameMiddle",
+"mesh": "m5",
+"subs": [
+25
+],
+"mats": [
+"TX_Incinerator_Diffuse_2_586d48dc"
+],
+"matrix": null,
+"lightmap": 0,
+"lmso": [
+0.038374,
+0.038374,
+0.120797,
+0.714849
+],
+"cast": 1,
+"recv": true,
+"layer": 10
+},
+{
+"path": "Scene/Geometry/Pipes (Big)/Meshes/pipe_80cm_angle_45",
+"mesh": "m1",
+"subs": [
+50
+],
+"mats": [
+"Pipe Red_c818d612"
+],
+"matrix": null,
+"lightmap": 0,
+"lmso": [
+0.016953,
+0.016953,
+0.020397,
+0.785066
+],
+"cast": 2,
+"recv": true,
+"layer": 0
+},
+{
+"path": "Scene/Geometry/conveyorFrameRight/conveyor_frameMiddle (7)/conveyor_frameMiddle",
+"mesh": "m5",
+"subs": [
+70
+],
+"mats": [
+"TX_Incinerator_Diffuse_2_586d48dc"
+],
+"matrix": null,
+"lightmap": 0,
+"lmso": [
+0.038374,
+0.038374,
+0.088689,
+0.714849
+],
+"cast": 1,
+"recv": true,
+"layer": 10
+},
+{
+"path": "Scene/Geometry/Pipes (Small)/Meshes/pipe_40cm_angle_90 (8)",
+"mesh": "m1",
+"subs": [
+22
+],
+"mats": [
+"Pipe Red_c818d612"
+],
+"matrix": null,
+"lightmap": 0,
+"lmso": [
+0.013018,
+0.013018,
+0.294597,
+0.643403
+],
+"cast": 2,
+"recv": true,
+"layer": 0
+},
+{
+"path": "Scene/Geometry/Pipes (Small)/Meshes/pipe_40cm_straight_250cm (5)",
+"mesh": "m1",
+"subs": [
+6
+],
+"mats": [
+"Pipe Red_c818d612"
+],
+"matrix": null,
+"lightmap": 0,
+"lmso": [
+0.016822,
+0.016822,
+0.314893,
+0.697273
+],
+"cast": 2,
+"recv": true,
+"layer": 0
+},
+{
+"path": "Scene/Geometry/Pipes (Big)/Meshes/pipe_80cm_straight_1m (2)",
+"mesh": "m1",
+"subs": [
+33
+],
+"mats": [
+"Pipe Red_c818d612"
+],
+"matrix": null,
+"lightmap": 0,
+"lmso": [
+0.015919,
+0.015919,
+0.202837,
+0.697827
+],
+"cast": 2,
+"recv": true,
+"layer": 0
+},
+{
+"path": "Scene/Geometry/pipeRailings/Wall Joints/pipeRailling (Wall Joint) (5)/pipeRailing_joint_wallTop",
+"mesh": "m48736f3afdd0",
+"subs": [
+0
+],
+"mats": [
+"TX_Incinerator_Diffuse_2_586d48dc"
+],
+"matrix": [
+[
+0.0,
+-0.0,
+-1.0,
+-5.25
+],
+[
+-1.0,
+-0.0,
+-0.0,
+0.0
+],
+[
+-0.0,
+1.0,
+-0.0,
+-9.0
+],
+[
+0.0,
+0.0,
+-0.0,
+1.0
+]
+],
+"lightmap": -1,
+"lmso": [
+1.0,
+1.0,
+0.0,
+0.0
+],
+"cast": 1,
+"recv": true,
+"layer": 0
+},
+{
+"path": "Scene/Geometry/Pipes (Small)/Meshes/pipe_40cm_straight_300cm (13)",
+"mesh": "m1",
+"subs": [
+92
+],
+"mats": [
+"Pipe Red_c818d612"
+],
+"matrix": null,
+"lightmap": 0,
+"lmso": [
+0.072838,
+0.072838,
+0.227381,
+0.393
+],
+"cast": 2,
+"recv": true,
+"layer": 0
+},
+{
+"path": "Scene/Geometry/Pipes (Small)/Meshes/pipe_40cm_straight_250cm (14)",
+"mesh": "m1",
+"subs": [
+24
+],
+"mats": [
+"Pipe Red_c818d612"
+],
+"matrix": null,
+"lightmap": 0,
+"lmso": [
+0.067288,
+0.067288,
+0.057318,
+0.592836
+],
+"cast": 2,
+"recv": true,
+"layer": 0
+},
+{
+"path": "Scene/Geometry/Pipes (Big)/Meshes/pipe_80cm_angle_45",
+"mesh": "m1",
+"subs": [
+10
+],
+"mats": [
+"Pipe Red_c818d612"
+],
+"matrix": null,
+"lightmap": 0,
+"lmso": [
+0.016953,
+0.016953,
+0.020397,
+0.767977
+],
+"cast": 2,
+"recv": true,
+"layer": 0
+},
+{
+"path": "Scene/Geometry/StepsLeft/step_200cm (11)/step_200cm",
+"mesh": "m5",
+"subs": [
+15
+],
+"mats": [
+"TX_Incinerator_Diffuse_2_586d48dc"
+],
+"matrix": null,
+"lightmap": 0,
+"lmso": [
+0.09003,
+0.09003,
+0.18239,
+0.633925
+],
+"cast": 1,
+"recv": true,
+"layer": 8
+},
+{
+"path": "Scene/Geometry/Pipes (Big)/Meshes/pipe_80cm_angle_45 (1)",
+"mesh": "m1",
+"subs": [
+72
+],
+"mats": [
+"Pipe Red_c818d612"
+],
+"matrix": null,
+"lightmap": 0,
+"lmso": [
+0.016953,
+0.016953,
+0.020397,
+0.750887
+],
+"cast": 2,
+"recv": true,
+"layer": 0
+},
+{
+"path": "Scene/Geometry/StepsLeft/step_200cm (17)/step_200cm",
+"mesh": "m5",
+"subs": [
+55
+],
+"mats": [
+"TX_Incinerator_Diffuse_2_586d48dc"
+],
+"matrix": null,
+"lightmap": 0,
+"lmso": [
+0.09003,
+0.09003,
+0.298131,
+0.273003
+],
+"cast": 1,
+"recv": true,
+"layer": 8
+}
+],
+"colliders": [
+{
+"path": "Scene/Geometry/Enviroment/incinerator_lowWall/Collider",
+"p": [
+4.5,
+3.3,
+1.1
+],
+"q": [
+0.70711,
+0.0,
+0.0,
+0.70711
+],
+"h": [
+4.5,
+0.1,
+0.3
+]
+},
+{
+"path": "Scene/Geometry/conveyorFrameLeft/conveyor_frameMiddle (15)/Collision",
+"p": [
+12.0,
+0.125,
+-3.125
+],
+"q": [
+-0.0,
+-0.70711,
+0.70711,
+0.0
+],
+"h": [
+1.0,
+0.125,
+0.125
+]
+},
+{
+"path": "Scene/Geometry/StepsRight/step_200cm (21)/Collision",
+"p": [
+-10.1,
+1.45,
+3.8318
+],
+"q": [
+0.0,
+0.0,
+0.0,
+1.0
+],
+"h": [
+0.9,
+0.0827,
+0.1652
+]
+},
+{
+"path": "Scene/Geometry/Pipes (Small)/Grabable Colliders/Collision (39)",
+"p": [
+10.75,
+6.25,
+8.0
+],
+"q": [
+0.70711,
+0.70711,
+-0.0,
+0.0
+],
+"h": [
+0.75,
+0.25,
+0.1
+]
+},
+{
+"path": "Scene/Geometry/Enviroment/Collision/Walls/Collision (19)",
+"p": [
+8.75,
+1.0,
+5.0
+],
+"q": [
+0.0,
+0.0,
+0.0,
+1.0
+],
+"h": [
+0.25,
+1.0,
+4.0
+]
+},
+{
+"path": "Scene/Geometry/StepsRight/step_200cm (20)/Collision",
+"p": [
+-10.1,
+1.614,
+4.1658
+],
+"q": [
+0.0,
+0.0,
+0.0,
+1.0
+],
+"h": [
+0.9,
+0.0827,
+0.1652
+]
+},
+{
+"path": "Scene/Geometry/pipeRailings/Floor Joints/pipeRailing (Floor Joint) (7)",
+"p": [
+4.75,
+0.05,
+-0.75
+],
+"q": [
+-0.0,
+0.0,
+0.0,
+1.0
+],
+"h": [
+0.07,
+0.05,
+0.07
+]
+},
+{
+"path": "Scene/Geometry/conveyorFrameRight/conveyor_frameEnd (1)/Collision (2)",
+"p": [
+-2.6178,
+0.1327,
+-6.875
+],
+"q": [
+0.64597,
+0.28763,
+0.28763,
+0.64597
+],
+"h": [
+0.0725,
+0.125,
+0.0939
+]
+},
+{
+"path": "Scene/Geometry/Pipes (Big)/Grabable Collision/Collision (7)",
+"p": [
+-1.25,
+3.938,
+6.45
+],
+"q": [
+0.70711,
+0.0,
+0.0,
+0.70711
+],
+"h": [
+1.0,
+0.5,
+0.1
+]
+},
+{
+"path": "Scene/Geometry/StepsRight/step_200cm (23)/Collision",
+"p": [
+-10.1,
+1.283,
+3.4973
+],
+"q": [
+0.0,
+0.0,
+0.0,
+1.0
+],
+"h": [
+0.9,
+0.0827,
+0.1652
+]
+},
+{
+"path": "Scene/Geometry/StepsLeft/Ball_Proxy",
+"p": [
+9.995,
+1.399,
+3.6253
+],
+"q": [
+0.52589,
+0.0,
+0.0,
+0.85055
+],
+"h": [
+1.05,
+3.4245,
+0.0731
+]
+},
+{
+"path": "Scene/Geometry/Door (Double)/door_frame_200cm (1)/Collision",
+"p": [
+2.05,
+4.0,
+9.25
+],
+"q": [
+0.70711,
+0.0,
+0.0,
+0.70711
+],
+"h": [
+0.05,
+0.1,
+1.0
+]
+},
+{
+"path": "Scene/Geometry/conveyorFrameRight/conveyor_frameEnd/Collision (3)",
+"p": [
+-2.6178,
+-0.3835,
+-3.125
+],
+"q": [
+0.29183,
+0.64408,
+0.64408,
+0.29183
+],
+"h": [
+0.0725,
+0.125,
+0.0939
+]
+},
+{
+"path": "Scene/Geometry/Pipes (Big)/Grabable Collision/Collision (4)",
+"p": [
+-7.75,
+7.0,
+8.3
+],
+"q": [
+0.70711,
+0.0,
+0.0,
+0.70711
+],
+"h": [
+1.0,
+0.5,
+0.1
+]
+},
+{
+"path": "Scene/Geometry/StepsLeft/step_200cm (5)/Collision",
+"p": [
+10.0,
+1.787,
+4.4997
+],
+"q": [
+0.0,
+0.0,
+0.0,
+1.0
+],
+"h": [
+1.0,
+0.0827,
+0.1652
+]
+},
+{
+"path": "Scene/Geometry/pipeRailings/Floor Joints/pipeRailing (Floor Joint) (4)",
+"p": [
+-7.75,
+0.05,
+-2.75
+],
+"q": [
+-0.0,
+0.0,
+0.0,
+1.0
+],
+"h": [
+0.07,
+0.05,
+0.07
+]
+},
+{
+"path": "Scene/Geometry/Pipes (Small)/Grabable Colliders/Collision (41)",
+"p": [
+10.75,
+6.25,
+2.5
+],
+"q": [
+0.70711,
+0.70711,
+-0.0,
+0.0
+],
+"h": [
+0.75,
+0.25,
+0.1
+]
+},
+{
+"path": "Scene/Geometry/Pipes (Big)/Grabable Collision/Collision (5)",
+"p": [
+-7.75,
+5.996,
+7.801
+],
+"q": [
+0.92388,
+0.0,
+-0.0,
+0.38268
+],
+"h": [
+1.0,
+0.5,
+0.1
+]
+},
+{
+"path": "Scene/Geometry/curtain (1)/incinerator_curtain_skinnedMesh/incinerator_curtain_boneG00",
+"p": [
+-11.1,
+1.1875,
+-3.75
+],
+"q": [
+-0.0,
+0.70711,
+-0.70711,
+-0.0
+],
+"h": [
+0.05,
+0.225,
+0.3
+]
+},
+{
+"path": "Scene/Geometry/Enviroment/Collision/Fire Pit/Collision (6)",
+"p": [
+1.0,
+-5.0,
+-1.25
+],
+"q": [
+0.0,
+0.0,
+0.0,
+1.0
+],
+"h": [
+5.5,
+4.0,
+0.25
+]
+},
+{
+"path": "Scene/Geometry/curtain/incinerator_curtain_skinnedMesh/incinerator_curtain_boneD01",
+"p": [
+11.2,
+0.5725,
+-4.75
+],
+"q": [
+0.70711,
+0.0,
+0.0,
+0.70711
+],
+"h": [
+0.05,
+0.225,
+0.3
+]
+},
+{
+"path": "Scene/Geometry/curtain/incinerator_curtain_skinnedMesh/incinerator_curtain_boneB01",
+"p": [
+11.2,
+0.5725,
+-3.75
+],
+"q": [
+0.70711,
+0.0,
+0.0,
+0.70711
+],
+"h": [
+0.05,
+0.225,
+0.3
+]
+},
+{
+"path": "Scene/Geometry/curtain (1)/incinerator_curtain_skinnedMesh/incinerator_curtain_boneB01",
+"p": [
+-11.1,
+0.5725,
+-6.25
+],
+"q": [
+-0.0,
+0.70711,
+-0.70711,
+-0.0
+],
+"h": [
+0.05,
+0.225,
+0.3
+]
+},
+{
+"path": "Scene/Geometry/Enviroment/Collision/Fire Pit/Collision (4)",
+"p": [
+-4.75,
+-5.25,
+-4.99
+],
+"q": [
+0.0,
+0.0,
+0.0,
+1.0
+],
+"h": [
+0.25,
+4.25,
+4.0
+]
+},
+{
+"path": "Scene/Geometry/pipeRailings/Floor Joints/pipeRailing (Floor Joint) (2)",
+"p": [
+-5.25,
+0.05,
+-0.75
+],
+"q": [
+-0.0,
+0.0,
+0.0,
+1.0
+],
+"h": [
+0.07,
+0.05,
+0.07
+]
+},
+{
+"path": "Scene/Geometry/Enviroment/Collision/Floor/Collision (38)",
+"p": [
+-10.0,
+-0.122,
+4.669
+],
+"q": [
+-0.22967,
+0.0,
+0.0,
+0.97327
+],
+"h": [
+1.0,
+1.75,
+3.5
+]
+},
+{
+"path": "Scene/Geometry/curtain/incinerator_curtain_skinnedMesh/incinerator_curtain_boneE01",
+"p": [
+11.2,
+0.5725,
+-5.25
+],
+"q": [
+0.70711,
+0.0,
+0.0,
+0.70711
+],
+"h": [
+0.05,
+0.225,
+0.3
+]
+},
+{
+"path": "Scene/Geometry/curtain (1)/incinerator_curtain_skinnedMesh/incinerator_curtain_boneE01",
+"p": [
+-11.1,
+0.5725,
+-4.75
+],
+"q": [
+-0.0,
+0.70711,
+-0.70711,
+-0.0
+],
+"h": [
+0.05,
+0.225,
+0.3
+]
+},
+{
+"path": "Scene/Geometry/StepsRight/step_200cm (19)/Collision",
+"p": [
+-10.1,
+0.256,
+1.4953
+],
+"q": [
+0.0,
+0.0,
+0.0,
+1.0
+],
+"h": [
+0.9,
+0.0827,
+0.1652
+]
+},
+{
+"path": "Scene/Geometry/Pipes (Small)/Grabable Colliders/Collision (45)",
+"p": [
+10.75,
+6.0,
+-2.25
+],
+"q": [
+0.5,
+0.5,
+0.5,
+-0.5
+],
+"h": [
+0.25,
+0.25,
+0.1
+]
+},
+{
+"path": "Scene/Geometry/conveyorFrameLeft/conveyor_frameMiddle (17)/Collision",
+"p": [
+8.0,
+0.125,
+-3.125
+],
+"q": [
+-0.0,
+-0.70711,
+0.70711,
+0.0
+],
+"h": [
+1.0,
+0.125,
+0.125
+]
+},
+{
+"path": "Scene/Geometry/door_frame_400cm/Collision (2)",
+"p": [
+-4.5,
+2.45,
+7.25
+],
+"q": [
+0.5,
+0.5,
+0.5,
+0.5
+],
+"h": [
+0.05,
+0.1,
+2.0
+]
+},
+{
+"path": "Scene/Geometry/Pipes (Big)/Grabable Collision/Collision (6)",
+"p": [
+-7.75,
+4.995,
+6.8
+],
+"q": [
+0.92388,
+0.0,
+-0.0,
+0.38268
+],
+"h": [
+1.0,
+0.5,
+0.1
+]
+},
+{
+"path": "Scene/Geometry/StepsLeft/step_200cm (9)/Collision",
+"p": [
+10.0,
+0.772,
+2.4988
+],
+"q": [
+0.0,
+0.0,
+0.0,
+1.0
+],
+"h": [
+1.0,
+0.0827,
+0.1652
+]
+},
+{
+"path": "Scene/Geometry/Enviroment/Collision/Walls/Collision (10)",
+"p": [
+7.5,
+4.5,
+12.0
+],
+"q": [
+0.0,
+0.0,
+0.0,
+1.0
+],
+"h": [
+3.5,
+4.5,
+3.0
+]
+},
+{
+"path": "Scene/Geometry/StepsLeft/step_200cm (1)/Collision",
+"p": [
+10.0,
+2.751,
+6.4988
+],
+"q": [
+0.0,
+0.0,
+0.0,
+1.0
+],
+"h": [
+1.0,
+0.0827,
+0.1652
+]
+},
+{
+"path": "Scene/Geometry/curtain (1)/incinerator_curtain_skinnedMesh/incinerator_curtain_boneG01",
+"p": [
+-11.1,
+0.5725,
+-3.75
+],
+"q": [
+-0.0,
+0.70711,
+-0.70711,
+-0.0
+],
+"h": [
+0.05,
+0.225,
+0.3
+]
+},
+{
+"path": "Scene/Geometry/conveyorFrameLeft/conveyor_frameEnd (3)/Collision (2)",
+"p": [
+4.6178,
+0.1327,
+-6.875
+],
+"q": [
+-0.28763,
+-0.64597,
+0.64597,
+0.28763
+],
+"h": [
+0.0725,
+0.125,
+0.0939
+]
+},
+{
+"path": "Scene/Geometry/StepsRight/step_200cm (25)/Collision",
+"p": [
+-10.1,
+0.428,
+1.8287
+],
+"q": [
+0.0,
+0.0,
+0.0,
+1.0
+],
+"h": [
+0.9,
+0.0827,
+0.1652
+]
+},
+{
+"path": "Scene/Geometry/Door (Windowed)/door_frame_200cm/Collision (3)",
+"p": [
+4.5,
+0.025,
+1.25
+],
+"q": [
+0.5,
+0.5,
+0.5,
+0.5
+],
+"h": [
+0.025,
+0.1,
+1.0
+]
+},
+{
+"path": "Scene/Geometry/conveyorFrameLeft/conveyor_frameEnd (2)/Collision",
+"p": [
+5.82,
+-0.125,
+-3.125
+],
+"q": [
+-0.0,
+-0.70711,
+0.70711,
+0.0
+],
+"h": [
+1.18,
+0.125,
+0.375
+]
+},
+{
+"path": "Scene/Geometry/curtain (1)/incinerator_curtain_skinnedMesh/incinerator_curtain_boneB00",
+"p": [
+-11.1,
+1.1875,
+-6.25
+],
+"q": [
+-0.0,
+0.70711,
+-0.70711,
+-0.0
+],
+"h": [
+0.05,
+0.225,
+0.3
+]
+},
+{
+"path": "Scene/Geometry/Pipes (Small)/Grabable Colliders/Collision (49)",
+"p": [
+10.75,
+0.05,
+-1.75
+],
+"q": [
+0.5,
+0.5,
+0.5,
+-0.5
+],
+"h": [
+0.75,
+0.25,
+0.05
+]
+},
+{
+"path": "Scene/Geometry/Pipes (Small)/Grabable Colliders/Collision (26)",
+"p": [
+-2.5,
+4.75,
+8.75
+],
+"q": [
+0.5,
+0.5,
+0.5,
+0.5
+],
+"h": [
+0.75,
+0.25,
+0.1
+]
+},
+{
+"path": "Scene/Geometry/Enviroment/Collision/Walls/Collision (20)",
+"p": [
+0.25,
+1.0,
+5.0
+],
+"q": [
+0.0,
+0.0,
+0.0,
+1.0
+],
+"h": [
+0.25,
+1.0,
+4.0
+]
+},
+{
+"path": "Scene/Geometry/Pipes (Big)/Grabable Collision/Collision (8)",
+"p": [
+-7.75,
+1.939,
+6.45
+],
+"q": [
+0.70711,
+0.0,
+0.0,
+0.70711
+],
+"h": [
+1.0,
+0.5,
+0.1
+]
+},
+{
+"path": "Scene/Geometry/curtain/incinerator_curtain_skinnedMesh/incinerator_curtain_boneE00",
+"p": [
+11.2,
+1.1875,
+-5.25
+],
+"q": [
+0.70711,
+0.0,
+0.0,
+0.70711
+],
+"h": [
+0.05,
+0.225,
+0.3
+]
+},
+{
+"path": "Scene/Geometry/Enviroment/Collision/Fire Pit/Collision (5)",
+"p": [
+1.0,
+-8.6,
+-5.0
+],
+"q": [
+0.0,
+0.0,
+0.0,
+1.0
+],
+"h": [
+5.5,
+0.65,
+4.0
+]
+},
+{
+"path": "Scene/Geometry/Enviroment/Collision/Floor/Collision (2)",
+"p": [
+11.21,
+-4.75,
+-4.99
+],
+"q": [
+0.0,
+0.0,
+0.0,
+1.0
+],
+"h": [
+4.25,
+4.75,
+4.0
+]
+},
+{
+"path": "Scene/Geometry/Enviroment/Collision/Walls/Collision (26)",
+"p": [
+7.0,
+0.25,
+1.25
+],
+"q": [
+-0.0,
+0.0,
+0.0,
+1.0
+],
+"h": [
+1.0,
+0.25,
+0.25
+]
+},
+{
+"path": "Scene/Geometry/conveyorFrameLeft/conveyor_frameEnd (3)/Collision",
+"p": [
+5.82,
+-0.125,
+-6.875
+],
+"q": [
+-0.0,
+-0.70711,
+0.70711,
+0.0
+],
+"h": [
+1.18,
+0.125,
+0.375
+]
+},
+{
+"path": "Scene/Geometry/Enviroment/Collision/Walls/Collision (33)",
+"p": [
+-6.75,
+1.25,
+7.25
+],
+"q": [
+-0.0,
+0.0,
+0.0,
+1.0
+],
+"h": [
+0.25,
+1.25,
+0.25
+]
+},
+{
+"path": "Scene/Geometry/Enviroment/Collision/Walls/Collision (45)",
+"p": [
+15.2715,
+5.25,
+-4.9865
+],
+"q": [
+0.0,
+0.0,
+0.0,
+1.0
+],
+"h": [
+0.2285,
+3.75,
+2.022
+]
+},
+{
+"path": "Scene/Geometry/Door (Double)/door_frame_200cm (1)/Collision (2)",
+"p": [
+3.0,
+4.95,
+9.25
+],
+"q": [
+0.5,
+0.5,
+0.5,
+0.5
+],
+"h": [
+0.05,
+0.1,
+1.0
+]
+},
+{
+"path": "Scene/Geometry/conveyorFrameRight/conveyor_frameMiddle (4)/Collision",
+"p": [
+-14.0,
+0.125,
+-6.875
+],
+"q": [
+0.70711,
+0.0,
+0.0,
+0.70711
+],
+"h": [
+1.0,
+0.125,
+0.125
+]
+},
+{
+"path": "Scene/Geometry/curtain/incinerator_curtain_skinnedMesh/incinerator_curtain_boneG00",
+"p": [
+11.2,
+1.1875,
+-6.25
+],
+"q": [
+0.70711,
+0.0,
+0.0,
+0.70711
+],
+"h": [
+0.05,
+0.225,
+0.3
+]
+},
+{
+"path": "Scene/Geometry/Enviroment/Collision/Fire Pit/Collision (40)",
+"p": [
+1.0,
+-0.655,
+-1.048
+],
+"q": [
+0.22971,
+0.0,
+0.0,
+0.97326
+],
+"h": [
+6.0,
+0.5249,
+0.25
+]
+},
+{
+"path": "Scene/Geometry/Pipes (Small)/Grabable Colliders/Collision (23)",
+"p": [
+-8.5,
+5.25,
+8.75
+],
+"q": [
+0.5,
+0.5,
+0.5,
+0.5
+],
+"h": [
+0.25,
+0.25,
+0.1
+]
+},
+{
+"path": "Scene/Geometry/Pipes (Big)/None Grabable Collision/Upper Gap",
+"p": [
+-1.2939,
+7.5847,
+8.262
+],
+"q": [
+0.70711,
+0.0,
+0.0,
+0.70711
+],
+"h": [
+0.5371,
+0.361,
+1.4277
+]
+},
+{
+"path": "Scene/Geometry/curtain/incinerator_curtain_skinnedMesh/incinerator_curtain_boneD00",
+"p": [
+11.2,
+1.1875,
+-4.75
+],
+"q": [
+0.70711,
+0.0,
+0.0,
+0.70711
+],
+"h": [
+0.05,
+0.225,
+0.3
+]
+},
+{
+"path": "Scene/Geometry/curtain/incinerator_curtain_skinnedMesh/ActorBlocker",
+"p": [
+11.3,
+0.8,
+-5.0
+],
+"q": [
+0.70711,
+0.0,
+0.0,
+0.70711
+],
+"h": [
+0.25,
+2.0,
+0.75
+]
+},
+{
+"path": "Scene/Geometry/conveyorFrameRight/conveyor_frameEnd/Collision (1)",
+"p": [
+-2.5716,
+-0.125,
+-3.125
+],
+"q": [
+0.70711,
+0.0,
+0.0,
+0.70711
+],
+"h": [
+0.0725,
+0.125,
+0.25
+]
+},
+{
+"path": "Scene/Geometry/pipeRailings/Wall Joints/pipeRailling (Wall Joint)/pipeRailing_joint_wallMid",
+"p": [
+-10.96,
+0.3281,
+-2.75
+],
+"q": [
+0.0,
+0.0,
+-0.70711,
+0.70711
+],
+"h": [
+0.07,
+0.045,
+0.07
+]
+},
+{
+"path": "Scene/Geometry/conveyorFrameRight/conveyor_frameMiddle (9)/Collision",
+"p": [
+-6.0,
+0.125,
+-3.125
+],
+"q": [
+0.70711,
+0.0,
+0.0,
+0.70711
+],
+"h": [
+1.0,
+0.125,
+0.125
+]
+},
+{
+"path": "Scene/Geometry/StepsRight/step_200cm (32)/Collision",
+"p": [
+-10.1,
+2.579,
+6.1632
+],
+"q": [
+0.0,
+0.0,
+0.0,
+1.0
+],
+"h": [
+0.9,
+0.0827,
+0.1652
+]
+},
+{
+"path": "Scene/Geometry/pipeRailings/Floor Joints/pipeRailing (Floor Joint) (10)",
+"p": [
+7.25,
+0.05,
+-2.75
+],
+"q": [
+-0.0,
+0.0,
+0.0,
+1.0
+],
+"h": [
+0.07,
+0.05,
+0.07
+]
+},
+{
+"path": "Scene/Geometry/Pipes (Small)/Grabable Colliders/Collision (21)",
+"p": [
+-9.5,
+4.25,
+8.75
+],
+"q": [
+0.5,
+0.5,
+0.5,
+0.5
+],
+"h": [
+0.25,
+0.25,
+0.1
+]
+},
+{
+"path": "Scene/Geometry/Enviroment/Collision/Walls/Top Area Blockers/Collision (2)",
+"p": [
+0.0,
+8.5,
+10.51
+],
+"q": [
+0.70711,
+0.0,
+0.0,
+0.70711
+],
+"h": [
+15.0,
+1.5,
+4.0
+]
+},
+{
+"path": "Scene/Geometry/Enviroment/Collision/Walls/Collision (9)",
+"p": [
+-4.5,
+6.0,
+12.0
+],
+"q": [
+0.0,
+0.0,
+0.0,
+1.0
+],
+"h": [
+6.5,
+3.0,
+3.0
+]
+},
+{
+"path": "Scene/Geometry/Pipes (Small)/Grabable Colliders/Collision (47)",
+"p": [
+10.75,
+5.0,
+-1.75
+],
+"q": [
+0.5,
+0.5,
+0.5,
+-0.5
+],
+"h": [
+0.75,
+0.25,
+0.1
+]
+},
+{
+"path": "Scene/Geometry/Enviroment/Collision/Walls/Collision (24)",
+"p": [
+3.25,
+1.0,
+1.25
+],
+"q": [
+-0.0,
+0.0,
+0.0,
+1.0
+],
+"h": [
+0.25,
+1.0,
+0.25
+]
+},
+{
+"path": "Scene/Geometry/pipeRailings/Floor Joints/pipeRailing (Floor Joint) (6)",
+"p": [
+2.25,
+0.05,
+-0.75
+],
+"q": [
+-0.0,
+0.0,
+0.0,
+1.0
+],
+"h": [
+0.07,
+0.05,
+0.07
+]
+},
+{
+"path": "Scene/Geometry/Enviroment/Collision/Walls/Collision (30)",
+"p": [
+-8.0,
+1.25,
+9.75
+],
+"q": [
+0.0,
+0.0,
+0.0,
+1.0
+],
+"h": [
+1.0,
+1.25,
+2.75
+]
+},
+{
+"path": "Scene/Geometry/Enviroment/Collision/Floor/Collision (44)",
+"p": [
+-7.39,
+3.026,
+8.0
+],
+"q": [
+0.37183,
+0.60145,
+-0.37183,
+0.60145
+],
+"h": [
+1.0,
+0.5597,
+0.25
+]
+},
+{
+"path": "Scene/Geometry/StepsRight/step_200cm (28)/Collision",
+"p": [
+-10.1,
+2.289,
+5.4955
+],
+"q": [
+0.0,
+0.0,
+0.0,
+1.0
+],
+"h": [
+0.9,
+0.0827,
+0.1652
+]
+},
+{
+"path": "Scene/Geometry/conveyorFrameLeft/conveyor_frameEnd (3)/Collision (1)",
+"p": [
+4.5716,
+-0.125,
+-6.875
+],
+"q": [
+-0.0,
+-0.70711,
+0.70711,
+0.0
+],
+"h": [
+0.0725,
+0.125,
+0.25
+]
+},
+{
+"path": "Scene/Geometry/conveyorFrameRight/conveyor_frameMiddle (7)/Collision",
+"p": [
+-10.0,
+0.125,
+-3.125
+],
+"q": [
+0.70711,
+0.0,
+0.0,
+0.70711
+],
+"h": [
+1.0,
+0.125,
+0.125
+]
+},
+{
+"path": "Scene/Geometry/Pipes (Small)/Grabable Colliders/Collision (28)",
+"p": [
+0.0,
+4.75,
+8.75
+],
+"q": [
+0.5,
+0.5,
+0.5,
+0.5
+],
+"h": [
+0.25,
+0.25,
+0.1
+]
+},
+{
+"path": "Scene/Geometry/StepsRight/step_200cm (24)/Collision",
+"p": [
+-10.1,
+0.602,
+2.1624
+],
+"q": [
+0.0,
+0.0,
+0.0,
+1.0
+],
+"h": [
+0.9,
+0.0827,
+0.1652
+]
+},
+{
+"path": "Scene/Geometry/pipeRailings/Floor Joints/pipeRailing (Floor Joint) (11)",
+"p": [
+7.25,
+0.05,
+-7.25
+],
+"q": [
+-0.0,
+0.0,
+0.0,
+1.0
+],
+"h": [
+0.07,
+0.05,
+0.07
+]
+},
+{
+"path": "Scene/Geometry/conveyorFrameRight/conveyor_frameMiddle (5)/Collision",
+"p": [
+-14.0,
+0.125,
+-3.125
+],
+"q": [
+0.70711,
+0.0,
+0.0,
+0.70711
+],
+"h": [
+1.0,
+0.125,
+0.125
+]
+},
+{
+"path": "Scene/Geometry/Pipes (Small)/Grabable Colliders/Collision (19)",
+"p": [
+-9.75,
+5.5,
+8.75
+],
+"q": [
+0.70711,
+0.0,
+0.0,
+0.70711
+],
+"h": [
+0.25,
+0.25,
+0.1
+]
+},
+{
+"path": "Scene/Geometry/pipeRailings/Floor Joints/pipeRailing (Floor Joint) (5)",
+"p": [
+-0.25,
+0.05,
+-0.75
+],
+"q": [
+-0.0,
+0.0,
+0.0,
+1.0
+],
+"h": [
+0.07,
+0.05,
+0.07
+]
+},
+{
+"path": "Scene/Geometry/pipeRailings/Floor Joints/pipeRailing (Floor Joint) (9)",
+"p": [
+9.75,
+0.05,
+-2.75
+],
+"q": [
+-0.0,
+0.0,
+0.0,
+1.0
+],
+"h": [
+0.07,
+0.05,
+0.07
+]
+},
+{
+"path": "Scene/Geometry/StepsLeft/step_200cm (12)/Collision",
+"p": [
+10.0,
+1.283,
+3.4973
+],
+"q": [
+0.0,
+0.0,
+0.0,
+1.0
+],
+"h": [
+1.0,
+0.0827,
+0.1652
+]
+},
+{
+"path": "Scene/Geometry/Door (Double)/door_frame_200cm (1)/Collision (1)",
+"p": [
+3.95,
+4.0,
+9.25
+],
+"q": [
+0.70711,
+0.0,
+0.0,
+0.70711
+],
+"h": [
+0.05,
+0.1,
+1.0
+]
+},
+{
+"path": "Scene/Geometry/conveyorFrameRight/conveyor_frameMiddle (8)/Collision",
+"p": [
+-8.0,
+0.125,
+-3.125
+],
+"q": [
+0.70711,
+0.0,
+0.0,
+0.70711
+],
+"h": [
+1.0,
+0.125,
+0.125
+]
+},
+{
+"path": "Scene/Geometry/curtain (1)/incinerator_curtain_skinnedMesh/incinerator_curtain_boneF00",
+"p": [
+-11.1,
+1.1875,
+-4.25
+],
+"q": [
+-0.0,
+0.70711,
+-0.70711,
+-0.0
+],
+"h": [
+0.05,
+0.225,
+0.3
+]
+},
+{
+"path": "Scene/Geometry/Enviroment/Collision/Walls/Collision (27)",
+"p": [
+4.5,
+1.0,
+6.75
+],
+"q": [
+-0.0,
+0.0,
+0.0,
+1.0
+],
+"h": [
+4.0,
+1.0,
+0.25
+]
+},
+{
+"path": "Scene/Geometry/Pipes (Big)/None Grabable Collision/Upper Gap",
+"p": [
+-7.7939,
+7.5847,
+8.262
+],
+"q": [
+0.70711,
+0.0,
+0.0,
+0.70711
+],
+"h": [
+0.5371,
+0.361,
+1.4277
+]
+},
+{
+"path": "Scene/Geometry/door_frame_400cm/Collision (1)",
+"p": [
+-2.55,
+1.25,
+7.25
+],
+"q": [
+0.70711,
+0.0,
+0.0,
+0.70711
+],
+"h": [
+0.05,
+0.1,
+1.25
+]
+},
+{
+"path": "Scene/Geometry/Enviroment/Collision/Fire Pit/Collision (3)",
+"p": [
+6.75,
+-5.22,
+-4.99
+],
+"q": [
+0.0,
+0.0,
+0.0,
+1.0
+],
+"h": [
+0.25,
+4.25,
+4.0
+]
+},
+{
+"path": "Scene/Geometry/conveyor_frameUnder/Collision (1)",
+"p": [
+-2.949,
+-0.32,
+-5.013
+],
+"q": [
+0.61543,
+0.3482,
+0.3482,
+0.61543
+],
+"h": [
+0.1825,
+1.75,
+0.05
+]
+},
+{
+"path": "Scene/Geometry/Enviroment/Collision/Walls/Collision (13)",
+"p": [
+13.25,
+0.75,
+-8.0
+],
+"q": [
+0.0,
+0.0,
+0.0,
+1.0
+],
+"h": [
+2.25,
+0.75,
+1.0
+]
+},
+{
+"path": "Scene/Geometry/Enviroment/Collision/Walls/Collision (12)",
+"p": [
+13.25,
+5.25,
+-8.0397
+],
+"q": [
+0.0,
+0.0,
+0.0,
+1.0
+],
+"h": [
+2.25,
+3.75,
+0.9603
+]
+},
+{
+"path": "Scene/Geometry/StepsLeft/step_200cm (8)/Collision",
+"p": [
+10.0,
+0.942,
+2.8321
+],
+"q": [
+0.0,
+0.0,
+0.0,
+1.0
+],
+"h": [
+1.0,
+0.0827,
+0.1652
+]
+},
+{
+"path": "Scene/Geometry/StepsRight/step_200cm (34)/Collision",
+"p": [
+-10.1,
+2.751,
+6.4988
+],
+"q": [
+0.0,
+0.0,
+0.0,
+1.0
+],
+"h": [
+0.9,
+0.0827,
+0.1652
+]
+},
+{
+"path": "Scene/Geometry/conveyorFrameLeft/conveyor_frameMiddle (12)/Collision",
+"p": [
+12.0,
+0.125,
+-6.875
+],
+"q": [
+-0.0,
+-0.70711,
+0.70711,
+0.0
+],
+"h": [
+1.0,
+0.125,
+0.125
+]
+},
+{
+"path": "Scene/Geometry/Door (Windowed)/door_frame_200cm/Collision (1)",
+"p": [
+5.45,
+1.0,
+1.25
+],
+"q": [
+0.70711,
+0.0,
+0.0,
+0.70711
+],
+"h": [
+0.05,
+0.1,
+1.0
+]
+},
+{
+"path": "Scene/Geometry/Enviroment/Collision/Walls/Collision (32)",
+"p": [
+-2.25,
+1.25,
+7.25
+],
+"q": [
+-0.0,
+0.0,
+0.0,
+1.0
+],
+"h": [
+0.25,
+1.25,
+0.25
+]
+},
+{
+"path": "Scene/Geometry/StepsLeft/step_200cm (6)/Collision",
+"p": [
+10.0,
+2.12,
+5.1642
+],
+"q": [
+0.0,
+0.0,
+0.0,
+1.0
+],
+"h": [
+1.0,
+0.0827,
+0.1652
+]
+},
+{
+"path": "Scene/Geometry/StepsLeft/step_200cm (11)/Collision",
+"p": [
+10.0,
+0.602,
+2.1624
+],
+"q": [
+0.0,
+0.0,
+0.0,
+1.0
+],
+"h": [
+1.0,
+0.0827,
+0.1652
+]
+},
+{
+"path": "Scene/Geometry/Pipes (Small)/Grabable Colliders/Collision (32)",
+"p": [
+0.25,
+6.0,
+8.75
+],
+"q": [
+0.70711,
+0.0,
+0.0,
+0.70711
+],
+"h": [
+0.25,
+0.25,
+0.1
+]
+},
+{
+"path": "Scene/Geometry/door_frame_400cm/Collision",
+"p": [
+-6.45,
+1.25,
+7.25
+],
+"q": [
+0.70711,
+0.0,
+0.0,
+0.70711
+],
+"h": [
+0.05,
+0.1,
+1.25
+]
+},
+{
+"path": "Scene/Geometry/Enviroment/Collision/Walls/Collision (48)",
+"p": [
+-11.2696,
+5.25,
+-5.9973
+],
+"q": [
+0.0,
+0.0,
+0.0,
+1.0
+],
+"h": [
+0.2604,
+3.75,
+3.0028
+]
+},
+{
+"path": "Scene/Geometry/StepsLeft/step_200cm/Collision",
+"p": [
+10.0,
+2.914,
+6.8312
+],
+"q": [
+0.0,
+0.0,
+0.0,
+1.0
+],
+"h": [
+1.0,
+0.0827,
+0.1652
+]
+},
+{
+"path": "Scene/Geometry/Enviroment/Collision/Floor/Collision",
+"p": [
+0.0,
+-0.5,
+6.96
+],
+"q": [
+0.0,
+0.0,
+0.0,
+1.0
+],
+"h": [
+15.5,
+0.5,
+8.0
+]
+},
+{
+"path": "Scene/Geometry/pipeRailings/Wall Joints/pipeRailling (Wall Joint) (1)/pipeRailing_joint_wallTop",
+"p": [
+10.96,
+0.6563,
+-2.75
+],
+"q": [
+0.70711,
+-0.70711,
+0.0,
+-0.0
+],
+"h": [
+0.07,
+0.045,
+0.07
+]
+},
+{
+"path": "Scene/Geometry/Enviroment/Collision/Walls/Collision (15)",
+"p": [
+-13.25,
+5.25,
+-7.9877
+],
+"q": [
+0.0,
+0.0,
+0.0,
+1.0
+],
+"h": [
+2.25,
+3.75,
+1.0123
+]
+},
+{
+"path": "Scene/Geometry/conveyorFrameRight/conveyor_frameMiddle (3)/Collision",
+"p": [
+-12.0,
+0.125,
+-6.875
+],
+"q": [
+0.70711,
+0.0,
+0.0,
+0.70711
+],
+"h": [
+1.0,
+0.125,
+0.125
+]
+},
+{
+"path": "Scene/Geometry/conveyor_frameUnder/Collision",
+"p": [
+-3.874,
+-0.345,
+-5.013
+],
+"q": [
+0.70711,
+0.0,
+0.0,
+0.70711
+],
+"h": [
+0.875,
+1.75,
+0.155
+]
+},
+{
+"path": "Scene/Geometry/Pipes (Small)/Grabable Colliders/Collision (31)",
+"p": [
+0.75,
+5.5,
+8.75
+],
+"q": [
+0.70711,
+0.0,
+0.0,
+0.70711
+],
+"h": [
+0.25,
+0.25,
+0.1
+]
+},
+{
+"path": "Scene/Geometry/Enviroment/Collision/Fire Pit/Collision (42)",
+"p": [
+-4.972,
+-0.616,
+-5.0
+],
+"q": [
+0.16243,
+-0.6882,
+0.16243,
+0.6882
+],
+"h": [
+4.0,
+0.5597,
+0.25
+]
+},
+{
+"path": "Scene/Geometry/conveyorFrameLeft/conveyor_frameEnd (2)/Collision (2)",
+"p": [
+4.6178,
+0.1327,
+-3.125
+],
+"q": [
+-0.28763,
+-0.64597,
+0.64597,
+0.28763
+],
+"h": [
+0.0725,
+0.125,
+0.0939
+]
+},
+{
+"path": "Scene/Geometry/conveyorFrameRight/conveyor_frameMiddle (6)/Collision",
+"p": [
+-12.0,
+0.125,
+-3.125
+],
+"q": [
+0.70711,
+0.0,
+0.0,
+0.70711
+],
+"h": [
+1.0,
+0.125,
+0.125
+]
+},
+{
+"path": "Scene/Geometry/Door (Windowed)/door_frame_200cm/Collision",
+"p": [
+3.55,
+1.0,
+1.25
+],
+"q": [
+0.70711,
+0.0,
+0.0,
+0.70711
+],
+"h": [
+0.05,
+0.1,
+1.0
+]
+},
+{
+"path": "Scene/Geometry/Enviroment/Collision/Walls/Collision (47)",
+"p": [
+11.2415,
+5.25,
+-4.9865
+],
+"q": [
+0.0,
+0.0,
+0.0,
+1.0
+],
+"h": [
+0.2285,
+3.75,
+2.022
+]
+},
+{
+"path": "Scene/Geometry/pipeRailings/Floor Joints/pipeRailing (Floor Joint) (14)",
+"p": [
+-5.25,
+0.05,
+-7.25
+],
+"q": [
+-0.0,
+0.0,
+0.0,
+1.0
+],
+"h": [
+0.07,
+0.05,
+0.07
+]
+},
+{
+"path": "Scene/Geometry/StepsRight/step_200cm (27)/Collision",
+"p": [
+-10.1,
+0.942,
+2.8321
+],
+"q": [
+0.0,
+0.0,
+0.0,
+1.0
+],
+"h": [
+0.9,
+0.0827,
+0.1652
+]
+},
+{
+"path": "Scene/Geometry/Enviroment/Collision/Walls/Top Area Blockers/RoofBlocker",
+"p": [
+0.0,
+12.0,
+2.0
+],
+"q": [
+-0.70711,
+0.0,
+0.0,
+0.70711
+],
+"h": [
+15.0,
+11.0,
+3.0
+]
+},
+{
+"path": "Scene/Geometry/curtain/incinerator_curtain_skinnedMesh/incinerator_curtain_boneF01",
+"p": [
+11.2,
+0.5725,
+-5.75
+],
+"q": [
+0.70711,
+0.0,
+0.0,
+0.70711
+],
+"h": [
+0.05,
+0.225,
+0.3
+]
+},
+{
+"path": "Scene/Geometry/conveyorFrameLeft/conveyor_frameMiddle (13)/Collision",
+"p": [
+14.0,
+0.125,
+-6.875
+],
+"q": [
+-0.0,
+-0.70711,
+0.70711,
+0.0
+],
+"h": [
+1.0,
+0.125,
+0.125
+]
+},
+{
+"path": "Scene/Geometry/Enviroment/4thWall",
+"p": [
+0.0,
+0.0,
+-9.5
+],
+"q": [
+0.0,
+0.0,
+0.0,
+1.0
+],
+"h": [
+11.47,
+9.01,
+0.5
+]
+},
+{
+"path": "Scene/Geometry/Enviroment/Collision/Walls/Collision (31)",
+"p": [
+-4.5,
+1.25,
+13.75
+],
+"q": [
+0.0,
+0.0,
+0.0,
+1.0
+],
+"h": [
+2.5,
+1.25,
+1.25
+]
+},
+{
+"path": "Scene/Geometry/curtain (1)/incinerator_curtain_skinnedMesh/incinerator_curtain_boneC00",
+"p": [
+-11.1,
+1.1875,
+-5.75
+],
+"q": [
+-0.0,
+0.70711,
+-0.70711,
+-0.0
+],
+"h": [
+0.05,
+0.225,
+0.3
+]
+},
+{
+"path": "Scene/Geometry/Enviroment/incinerator_lowWall/Collider",
+"p": [
+0.1,
+3.3,
+4.1
+],
+"q": [
+0.70711,
+0.0,
+0.0,
+0.70711
+],
+"h": [
+0.1,
+3.1,
+0.3
+]
+},
+{
+"path": "Scene/Geometry/Enviroment/Collision/Floor/Collision (43)",
+"p": [
+-1.607,
+3.026,
+8.0
+],
+"q": [
+0.37183,
+-0.60145,
+0.37183,
+0.60145
+],
+"h": [
+1.0,
+0.5597,
+0.25
+]
+},
+{
+"path": "Scene/Ball Only Collider",
+"p": [
+8.0,
+-0.1,
+-5.0
+],
+"q": [
+0.0,
+0.0,
+0.0,
+1.0
+],
+"h": [
+3.25,
+0.25,
+1.85
+]
+},
+{
+"path": "Scene/Geometry/pipeRailings/Wall Joints/pipeRailling (Wall Joint) (4)/pipeRailing_joint_wallMid",
+"p": [
+7.25,
+0.3281,
+-8.96
+],
+"q": [
+0.5,
+-0.5,
+-0.5,
+0.5
+],
+"h": [
+0.07,
+0.045,
+0.07
+]
+},
+{
+"path": "Scene/Geometry/Enviroment/Collision/Walls/Collision (25)",
+"p": [
+2.0,
+0.25,
+1.25
+],
+"q": [
+-0.0,
+0.0,
+0.0,
+1.0
+],
+"h": [
+1.0,
+0.25,
+0.25
+]
+},
+{
+"path": "Scene/Geometry/Enviroment/Collision/Walls/Collision (22)",
+"p": [
+8.5,
+1.0,
+1.25
+],
+"q": [
+-0.0,
+0.0,
+0.0,
+1.0
+],
+"h": [
+0.5,
+1.0,
+0.25
+]
+},
+{
+"path": "Scene/Geometry/Pipes (Small)/Grabable Colliders/Collision (25)",
+"p": [
+-4.5,
+4.75,
+8.75
+],
+"q": [
+0.5,
+0.5,
+0.5,
+0.5
+],
+"h": [
+0.75,
+0.25,
+0.1
+]
+},
+{
+"path": "Scene/Geometry/Pipes (Small)/Grabable Colliders/Collision (18)",
+"p": [
+-9.75,
+6.0,
+8.75
+],
+"q": [
+0.70711,
+0.0,
+0.0,
+0.70711
+],
+"h": [
+0.75,
+0.25,
+0.1
+]
+},
+{
+"path": "Scene/Geometry/conveyorFrameLeft/conveyor_frameMiddle (16)/Collision",
+"p": [
+10.0,
+0.125,
+-3.125
+],
+"q": [
+-0.0,
+-0.70711,
+0.70711,
+0.0
+],
+"h": [
+1.0,
+0.125,
+0.125
+]
+},
+{
+"path": "Scene/Geometry/pipeRailings/Floor Joints/pipeRailing (Floor Joint) (13)",
+"p": [
+-7.75,
+0.05,
+-7.25
+],
+"q": [
+-0.0,
+0.0,
+0.0,
+1.0
+],
+"h": [
+0.07,
+0.05,
+0.07
+]
+},
+{
+"path": "Scene/Geometry/StepsRight/step_200cm (22)/Collision",
+"p": [
+-10.1,
+1.114,
+3.1653
+],
+"q": [
+0.0,
+0.0,
+0.0,
+1.0
+],
+"h": [
+0.9,
+0.0827,
+0.1652
+]
+},
+{
+"path": "Scene/Geometry/Enviroment/incinerator_lowWall/Collider",
+"p": [
+-0.4,
+3.3,
+7.1
+],
+"q": [
+0.70711,
+0.0,
+0.0,
+0.70711
+],
+"h": [
+0.6,
+0.1,
+0.3
+]
+},
+{
+"path": "Scene/Geometry/Pipes (Small)/Grabable Colliders/Collision (48)",
+"p": [
+10.75,
+2.5,
+-1.75
+],
+"q": [
+0.5,
+0.5,
+0.5,
+-0.5
+],
+"h": [
+0.75,
+0.25,
+0.1
+]
+},
+{
+"path": "Scene/Geometry/pipeRailings/Wall Joints/pipeRailling (Wall Joint) (1)/pipeRailing_joint_wallMid",
+"p": [
+10.96,
+0.3281,
+-2.75
+],
+"q": [
+0.70711,
+-0.70711,
+0.0,
+-0.0
+],
+"h": [
+0.07,
+0.045,
+0.07
+]
+},
+{
+"path": "Scene/Geometry/conveyorFrameLeft/conveyor_frameEnd (3)/Collision (3)",
+"p": [
+4.6178,
+-0.3835,
+-6.875
+],
+"q": [
+-0.64408,
+-0.29183,
+0.29183,
+0.64408
+],
+"h": [
+0.0725,
+0.125,
+0.0939
+]
+},
+{
+"path": "Scene/Geometry/pipeRailings/Wall Joints/pipeRailling (Wall Joint) (4)/pipeRailing_joint_wallTop",
+"p": [
+7.25,
+0.6563,
+-8.96
+],
+"q": [
+0.5,
+-0.5,
+-0.5,
+0.5
+],
+"h": [
+0.07,
+0.045,
+0.07
+]
+},
+{
+"path": "Scene/Back Wall",
+"p": [
+4.5,
+1.25,
+5.5
+],
+"q": [
+0.0,
+0.0,
+0.0,
+1.0
+],
+"h": [
+4.0,
+1.25,
+1.0
+]
+},
+{
+"path": "Scene/Geometry/door_frame_400cm/Collision (5)",
+"p": [
+-4.5,
+0.0006,
+7.4202
+],
+"q": [
+-0.41436,
+-0.57298,
+0.41436,
+0.57298
+],
+"h": [
+0.025,
+0.0805,
+2.0
+]
+},
+{
+"path": "Scene/Geometry/Pipes (Small)/Grabable Colliders/Collision (44)",
+"p": [
+10.75,
+6.75,
+-1.5
+],
+"q": [
+0.70711,
+0.70711,
+-0.0,
+0.0
+],
+"h": [
+0.25,
+0.25,
+0.1
+]
+},
+{
+"path": "Scene/Geometry/conveyorFrameRight/conveyor_frameEnd (1)/Collision (1)",
+"p": [
+-2.5716,
+-0.125,
+-6.875
+],
+"q": [
+0.70711,
+0.0,
+0.0,
+0.70711
+],
+"h": [
+0.0725,
+0.125,
+0.25
+]
+},
+{
+"path": "Scene/Geometry/StepsLeft/step_200cm (2)/Collision",
+"p": [
+10.0,
+2.428,
+5.828
+],
+"q": [
+0.0,
+0.0,
+0.0,
+1.0
+],
+"h": [
+1.0,
+0.0827,
+0.1652
+]
+},
+{
+"path": "Scene/Geometry/door_frame_400cm/Collision (3)",
+"p": [
+-4.5,
+-0.0,
+7.25
+],
+"q": [
+0.5,
+0.5,
+0.5,
+0.5
+],
+"h": [
+0.025,
+0.1,
+2.0
+]
+},
+{
+"path": "Scene/Geometry/curtain (1)/incinerator_curtain_skinnedMesh/incinerator_curtain_boneF01",
+"p": [
+-11.1,
+0.5725,
+-4.25
+],
+"q": [
+-0.0,
+0.70711,
+-0.70711,
+-0.0
+],
+"h": [
+0.05,
+0.225,
+0.3
+]
+},
+{
+"path": "Scene/Geometry/Pipes (Small)/Grabable Colliders/Collision (42)",
+"p": [
+10.75,
+6.25,
+-0.5
+],
+"q": [
+0.70711,
+0.70711,
+-0.0,
+0.0
+],
+"h": [
+0.75,
+0.25,
+0.1
+]
+},
+{
+"path": "Scene/Geometry/Door (Double)/door_frame_200cm (1)/Collision (5)",
+"p": [
+3.0,
+3.0006,
+9.4202
+],
+"q": [
+-0.41436,
+-0.57298,
+0.41436,
+0.57298
+],
+"h": [
+0.025,
+0.0805,
+1.0
+]
+},
+{
+"path": "Scene/Geometry/Pipes (Small)/Grabable Colliders/Collision (35)",
+"p": [
+2.0,
+6.25,
+8.75
+],
+"q": [
+0.5,
+0.5,
+0.5,
+0.5
+],
+"h": [
+0.75,
+0.25,
+0.1
+]
+},
+{
+"path": "Scene/Geometry/Enviroment/Collision/Walls/Collision (21)",
+"p": [
+0.5,
+1.0,
+1.25
+],
+"q": [
+-0.0,
+0.0,
+0.0,
+1.0
+],
+"h": [
+0.5,
+1.0,
+0.25
+]
+},
+{
+"path": "Scene/Geometry/curtain/incinerator_curtain_skinnedMesh/incinerator_curtain_boneA01",
+"p": [
+11.2,
+0.5725,
+-3.25
+],
+"q": [
+0.70711,
+0.0,
+0.0,
+0.70711
+],
+"h": [
+0.05,
+0.225,
+0.3
+]
+},
+{
+"path": "Scene/Geometry/Pipes (Big)/Grabable Collision/Collision (9)",
+"p": [
+-1.25,
+2.94,
+6.45
+],
+"q": [
+0.70711,
+0.0,
+0.0,
+0.70711
+],
+"h": [
+1.0,
+0.5,
+0.1
+]
+},
+{
+"path": "Scene/Geometry/StepsLeft/step_200cm (7)/Collision",
+"p": [
+10.0,
+2.289,
+5.4955
+],
+"q": [
+0.0,
+0.0,
+0.0,
+1.0
+],
+"h": [
+1.0,
+0.0827,
+0.1652
+]
+},
+{
+"path": "Scene/Geometry/Enviroment/Collision/Walls/Collision (46)",
+"p": [
+-15.2396,
+5.25,
+-5.9973
+],
+"q": [
+0.0,
+0.0,
+0.0,
+1.0
+],
+"h": [
+0.2604,
+3.75,
+3.0028
+]
+},
+{
+"path": "Scene/Geometry/Pipes (Small)/Grabable Colliders/Collision (30)",
+"p": [
+1.25,
+5.0,
+8.75
+],
+"q": [
+0.70711,
+0.0,
+0.0,
+0.70711
+],
+"h": [
+0.25,
+0.25,
+0.1
+]
+},
+{
+"path": "Scene/Geometry/curtain (1)/incinerator_curtain_skinnedMesh/incinerator_curtain_boneA01",
+"p": [
+-11.1,
+0.5725,
+-6.75
+],
+"q": [
+-0.0,
+0.70711,
+-0.70711,
+-0.0
+],
+"h": [
+0.05,
+0.225,
+0.3
+]
+},
+{
+"path": "Scene/Geometry/Pipes (Small)/Grabable Colliders/Collision (33)",
+"p": [
+1.0,
+6.75,
+8.75
+],
+"q": [
+0.5,
+0.5,
+0.5,
+0.5
+],
+"h": [
+0.25,
+0.25,
+0.1
+]
+},
+{
+"path": "Scene/Geometry/pipeRailings/Wall Joints/pipeRailling (Wall Joint) (3)/pipeRailing_joint_wallMid",
+"p": [
+-10.96,
+0.3281,
+-7.25
+],
+"q": [
+0.0,
+0.0,
+-0.70711,
+0.70711
+],
+"h": [
+0.07,
+0.045,
+0.07
+]
+},
+{
+"path": "Scene/Geometry/Enviroment/Collision/Floor/Collision (37)",
+"p": [
+10.0,
+2.75,
+8.0
+],
+"q": [
+-0.0,
+0.0,
+0.0,
+1.0
+],
+"h": [
+1.0,
+0.25,
+1.0
+]
+},
+{
+"path": "Scene/Geometry/StepsRight/step_200cm (26)/Collision",
+"p": [
+-10.1,
+0.772,
+2.4988
+],
+"q": [
+0.0,
+0.0,
+0.0,
+1.0
+],
+"h": [
+0.9,
+0.0827,
+0.1652
+]
+},
+{
+"path": "Scene/Geometry/Enviroment/Collision/Fire Pit/Collision (41)",
+"p": [
+6.961,
+-0.636,
+-5.01
+],
+"q": [
+0.16243,
+0.6882,
+-0.16243,
+0.6882
+],
+"h": [
+4.0,
+0.5,
+0.25
+]
+},
+{
+"path": "Scene/Geometry/pipeRailings/Wall Joints/pipeRailling (Wall Joint) (2)/pipeRailing_joint_wallMid",
+"p": [
+10.96,
+0.3281,
+-7.25
+],
+"q": [
+0.70711,
+-0.70711,
+0.0,
+-0.0
+],
+"h": [
+0.07,
+0.045,
+0.07
+]
+},
+{
+"path": "Scene/Geometry/Pipes (Small)/Grabable Colliders/Collision (46)",
+"p": [
+10.75,
+5.5,
+-1.75
+],
+"q": [
+0.5,
+0.5,
+0.5,
+-0.5
+],
+"h": [
+0.25,
+0.25,
+0.1
+]
+},
+{
+"path": "Scene/Geometry/pipeRailings/Floor Joints/pipeRailing (Floor Joint) (15)",
+"p": [
+-10.25,
+0.05,
+-7.25
+],
+"q": [
+-0.0,
+0.0,
+0.0,
+1.0
+],
+"h": [
+0.07,
+0.05,
+0.07
+]
+},
+{
+"path": "Scene/Geometry/Pipes (Big)/None Grabable Collision/Angled Gap",
+"p": [
+-1.2939,
+5.5499,
+7.3687
+],
+"q": [
+0.92335,
+0.0,
+-0.0,
+0.38397
+],
+"h": [
+0.5371,
+0.361,
+1.4301
+]
+},
+{
+"path": "Scene/Geometry/Enviroment/Collision/Floor/Collision (35)",
+"p": [
+3.0,
+2.75,
+10.75
+],
+"q": [
+-0.0,
+0.0,
+0.0,
+1.0
+],
+"h": [
+2.5,
+0.25,
+1.75
+]
+},
+{
+"path": "Scene/Geometry/Pipes (Small)/Grabable Colliders/Collision (37)",
+"p": [
+7.5,
+6.25,
+8.75
+],
+"q": [
+0.5,
+0.5,
+0.5,
+0.5
+],
+"h": [
+0.75,
+0.25,
+0.1
+]
+},
+{
+"path": "Scene/Geometry/Pipes (Big)/Grabable Collision/Collision (5)",
+"p": [
+-1.25,
+5.996,
+7.801
+],
+"q": [
+0.92388,
+0.0,
+-0.0,
+0.38268
+],
+"h": [
+1.0,
+0.5,
+0.1
+]
+},
+{
+"path": "Scene/Geometry/Enviroment/incinerator_lowWall/Collider",
+"p": [
+8.9,
+3.3,
+4.0
+],
+"q": [
+0.70711,
+0.0,
+0.0,
+0.70711
+],
+"h": [
+0.1,
+3.0,
+0.3
+]
+},
+{
+"path": "Scene/Geometry/Pipes (Small)/Grabable Colliders/Collision (27)",
+"p": [
+-0.5,
+5.25,
+8.75
+],
+"q": [
+0.5,
+0.5,
+0.5,
+0.5
+],
+"h": [
+0.25,
+0.25,
+0.1
+]
+},
+{
+"path": "Scene/Geometry/curtain/incinerator_curtain_skinnedMesh/incinerator_curtain_boneC01",
+"p": [
+11.2,
+0.5725,
+-4.25
+],
+"q": [
+0.70711,
+0.0,
+0.0,
+0.70711
+],
+"h": [
+0.05,
+0.225,
+0.3
+]
+},
+{
+"path": "Scene/Geometry/conveyorFrameRight/conveyor_frameMiddle/Collision",
+"p": [
+-6.0,
+0.125,
+-6.875
+],
+"q": [
+0.70711,
+0.0,
+0.0,
+0.70711
+],
+"h": [
+1.0,
+0.125,
+0.125
+]
+},
+{
+"path": "Scene/Geometry/door_frame_400cm/Collision (4)",
+"p": [
+-4.5,
+0.0007,
+7.082
+],
+"q": [
+0.41436,
+0.57298,
+0.41436,
+0.57298
+],
+"h": [
+0.025,
+0.0805,
+2.0
+]
+},
+{
+"path": "Scene/Geometry/pipeRailings/Wall Joints/pipeRailling (Wall Joint) (2)/pipeRailing_joint_wallTop",
+"p": [
+10.96,
+0.6563,
+-7.25
+],
+"q": [
+0.70711,
+-0.70711,
+0.0,
+-0.0
+],
+"h": [
+0.07,
+0.045,
+0.07
+]
+},
+{
+"path": "Scene/Geometry/Pipes (Big)/Grabable Collision/Collision (4)",
+"p": [
+-1.25,
+7.0,
+8.3
+],
+"q": [
+0.70711,
+0.0,
+0.0,
+0.70711
+],
+"h": [
+1.0,
+0.5,
+0.1
+]
+},
+{
+"path": "Scene/Geometry/conveyorFrameRight/conveyor_frameMiddle (2)/Collision",
+"p": [
+-10.0,
+0.125,
+-6.875
+],
+"q": [
+0.70711,
+0.0,
+0.0,
+0.70711
+],
+"h": [
+1.0,
+0.125,
+0.125
+]
+},
+{
+"path": "Scene/Geometry/conveyor_frameUnder (1)/Collision (1)",
+"p": [
+4.949,
+-0.32,
+-5.013
+],
+"q": [
+-0.3482,
+-0.61543,
+0.61543,
+0.3482
+],
+"h": [
+0.1825,
+1.75,
+0.05
+]
+},
+{
+"path": "Scene/Geometry/StepsRight/step_200cm (33)/Collision",
+"p": [
+-10.1,
+2.428,
+5.828
+],
+"q": [
+0.0,
+0.0,
+0.0,
+1.0
+],
+"h": [
+0.9,
+0.0827,
+0.1652
+]
+},
+{
+"path": "Scene/Geometry/pipeRailings/Floor Joints/pipeRailing (Floor Joint) (12)",
+"p": [
+9.75,
+0.05,
+-7.25
+],
+"q": [
+-0.0,
+0.0,
+0.0,
+1.0
+],
+"h": [
+0.07,
+0.05,
+0.07
+]
+},
+{
+"path": "Scene/Geometry/Pipes (Big)/Grabable Collision/Collision (10)",
+"p": [
+-7.75,
+2.94,
+6.45
+],
+"q": [
+0.70711,
+0.0,
+0.0,
+0.70711
+],
+"h": [
+1.0,
+0.5,
+0.1
+]
+},
+{
+"path": "Scene/Geometry/StepsRight/step_200cm (31)/Collision",
+"p": [
+-10.1,
+1.951,
+4.8321
+],
+"q": [
+0.0,
+0.0,
+0.0,
+1.0
+],
+"h": [
+0.9,
+0.0827,
+0.1652
+]
+},
+{
+"path": "Scene/Geometry/Pipes (Small)/Grabable Colliders/Collision (34)",
+"p": [
+1.5,
+6.25,
+8.75
+],
+"q": [
+0.5,
+0.5,
+0.5,
+0.5
+],
+"h": [
+0.25,
+0.25,
+0.1
+]
+},
+{
+"path": "Scene/Geometry/StepsLeft/step_200cm (4)/Collision",
+"p": [
+10.0,
+1.951,
+4.8321
+],
+"q": [
+0.0,
+0.0,
+0.0,
+1.0
+],
+"h": [
+1.0,
+0.0827,
+0.1652
+]
+},
+{
+"path": "Scene/Geometry/Pipes (Small)/Grabable Colliders/Collision (20)",
+"p": [
+-10.25,
+5.0,
+8.75
+],
+"q": [
+0.70711,
+0.0,
+0.0,
+0.70711
+],
+"h": [
+0.25,
+0.25,
+0.1
+]
+},
+{
+"path": "Scene/Geometry/pipeRailings/Wall Joints/pipeRailling (Wall Joint) (3)/pipeRailing_joint_wallTop",
+"p": [
+-10.96,
+0.6563,
+-7.25
+],
+"q": [
+0.0,
+0.0,
+-0.70711,
+0.70711
+],
+"h": [
+0.07,
+0.045,
+0.07
+]
+},
+{
+"path": "Scene/Geometry/conveyor_frameUnder (1)/Collision",
+"p": [
+5.874,
+-0.345,
+-5.013
+],
+"q": [
+-0.0,
+-0.70711,
+0.70711,
+0.0
+],
+"h": [
+0.875,
+1.75,
+0.155
+]
+},
+{
+"path": "Scene/Geometry/pipeRailings/Floor Joints/pipeRailing (Floor Joint) (0)",
+"p": [
+-10.25,
+0.05,
+-2.75
+],
+"q": [
+-0.0,
+0.0,
+0.0,
+1.0
+],
+"h": [
+0.07,
+0.05,
+0.07
+]
+},
+{
+"path": "Scene/Geometry/curtain (1)/incinerator_curtain_skinnedMesh/incinerator_curtain_boneA00",
+"p": [
+-11.1,
+1.1875,
+-6.75
+],
+"q": [
+-0.0,
+0.70711,
+-0.70711,
+-0.0
+],
+"h": [
+0.05,
+0.225,
+0.3
+]
+},
+{
+"path": "Scene/Geometry/Enviroment/Collision/Walls/Collision (29)",
+"p": [
+-1.0,
+1.25,
+9.75
+],
+"q": [
+0.0,
+0.0,
+0.0,
+1.0
+],
+"h": [
+1.0,
+1.25,
+2.75
+]
+},
+{
+"path": "Scene/Geometry/Pipes (Big)/Grabable Collision/Collision (6)",
+"p": [
+-1.25,
+4.995,
+6.8
+],
+"q": [
+0.92388,
+0.0,
+-0.0,
+0.38268
+],
+"h": [
+1.0,
+0.5,
+0.1
+]
+},
+{
+"path": "Scene/Geometry/Pipes (Big)/None Grabable Collision/Lower Gap",
+"p": [
+-7.7939,
+2.4398,
+6.463
+],
+"q": [
+0.70711,
+0.0,
+0.0,
+0.70711
+],
+"h": [
+0.5371,
+0.361,
+2.3308
+]
+},
+{
+"path": "Scene/Geometry/Door (Windowed)/door_frame_200cm/Collision (5)",
+"p": [
+4.5,
+0.0006,
+1.4202
+],
+"q": [
+-0.41436,
+-0.57298,
+0.41436,
+0.57298
+],
+"h": [
+0.025,
+0.0805,
+1.0
+]
+},
+{
+"path": "Scene/Geometry/curtain/incinerator_curtain_skinnedMesh/incinerator_curtain_boneF00",
+"p": [
+11.2,
+1.1875,
+-5.75
+],
+"q": [
+0.70711,
+0.0,
+0.0,
+0.70711
+],
+"h": [
+0.05,
+0.225,
+0.3
+]
+},
+{
+"path": "Scene/Geometry/curtain (1)/incinerator_curtain_skinnedMesh/ActorBlocker",
+"p": [
+-11.2,
+0.8,
+-5.0
+],
+"q": [
+-0.0,
+0.70711,
+-0.70711,
+-0.0
+],
+"h": [
+0.25,
+2.0,
+0.75
+]
+},
+{
+"path": "Scene/Geometry/Enviroment/incinerator_lowWall/Collider",
+"p": [
+-4.5,
+3.8,
+7.1
+],
+"q": [
+0.70711,
+0.0,
+0.0,
+0.70711
+],
+"h": [
+2.6379,
+0.1,
+0.3
+]
+},
+{
+"path": "Scene/Geometry/Pipes (Small)/Grabable Colliders/Collision (38)",
+"p": [
+10.0,
+6.25,
+8.75
+],
+"q": [
+0.5,
+0.5,
+0.5,
+0.5
+],
+"h": [
+0.75,
+0.25,
+0.1
+]
+},
+{
+"path": "Scene/Geometry/Enviroment/Collision/Walls/Collision (17)",
+"p": [
+15.25,
+0.5,
+-6.0
+],
+"q": [
+0.0,
+0.0,
+0.0,
+1.0
+],
+"h": [
+0.25,
+1.0,
+3.0
+]
+},
+{
+"path": "Scene/Geometry/conveyorFrameLeft/conveyor_frameMiddle (11)/Collision",
+"p": [
+10.0,
+0.125,
+-6.875
+],
+"q": [
+-0.0,
+-0.70711,
+0.70711,
+0.0
+],
+"h": [
+1.0,
+0.125,
+0.125
+]
+},
+{
+"path": "Scene/Geometry/conveyorFrameLeft/conveyor_frameMiddle (14)/Collision",
+"p": [
+14.0,
+0.125,
+-3.125
+],
+"q": [
+-0.0,
+-0.70711,
+0.70711,
+0.0
+],
+"h": [
+1.0,
+0.125,
+0.125
+]
+},
+{
+"path": "Scene/Geometry/StepsLeft/step_200cm (14)/Collision",
+"p": [
+10.0,
+1.45,
+3.8318
+],
+"q": [
+0.0,
+0.0,
+0.0,
+1.0
+],
+"h": [
+1.0,
+0.0827,
+0.1652
+]
+},
+{
+"path": "Scene/Geometry/curtain (1)/incinerator_curtain_skinnedMesh/incinerator_curtain_boneE00",
+"p": [
+-11.1,
+1.1875,
+-4.75
+],
+"q": [
+-0.0,
+0.70711,
+-0.70711,
+-0.0
+],
+"h": [
+0.05,
+0.225,
+0.3
+]
+},
+{
+"path": "Scene/Geometry/StepsLeft/step_200cm (10)/Collision",
+"p": [
+10.0,
+0.428,
+1.8287
+],
+"q": [
+0.0,
+0.0,
+0.0,
+1.0
+],
+"h": [
+1.0,
+0.0827,
+0.1652
+]
+},
+{
+"path": "Scene/Geometry/Enviroment/Collision/Floor/Collision (34)",
+"p": [
+-4.5,
+3.25,
+8.0
+],
+"q": [
+-0.0,
+0.0,
+0.0,
+1.0
+],
+"h": [
+2.5,
+0.25,
+1.0
+]
+},
+{
+"path": "Scene/Geometry/conveyorFrameRight/conveyor_frameEnd (1)/Collision",
+"p": [
+-3.82,
+-0.125,
+-6.875
+],
+"q": [
+0.70711,
+0.0,
+0.0,
+0.70711
+],
+"h": [
+1.18,
+0.125,
+0.375
+]
+},
+{
+"path": "Scene/Geometry/Pipes (Small)/Grabable Colliders/Collision (24)",
+"p": [
+-6.5,
+4.75,
+8.75
+],
+"q": [
+0.5,
+0.5,
+0.5,
+0.5
+],
+"h": [
+0.75,
+0.25,
+0.1
+]
+},
+{
+"path": "Scene/Geometry/conveyorFrameRight/conveyor_frameEnd (1)/Collision (3)",
+"p": [
+-2.6178,
+-0.3835,
+-6.875
+],
+"q": [
+0.29183,
+0.64408,
+0.64408,
+0.29183
+],
+"h": [
+0.0725,
+0.125,
+0.0939
+]
+},
+{
+"path": "Scene/Geometry/conveyorFrameRight/conveyor_frameEnd/Collision (2)",
+"p": [
+-2.6178,
+0.1327,
+-3.125
+],
+"q": [
+0.64597,
+0.28763,
+0.28763,
+0.64597
+],
+"h": [
+0.0725,
+0.125,
+0.0939
+]
+},
+{
+"path": "Scene/Geometry/pipeRailings/Floor Joints/pipeRailing (Floor Joint) (1)",
+"p": [
+-5.25,
+0.05,
+-2.75
+],
+"q": [
+-0.0,
+0.0,
+0.0,
+1.0
+],
+"h": [
+0.07,
+0.05,
+0.07
+]
+},
+{
+"path": "Scene/Geometry/Pipes (Small)/Grabable Colliders/Collision (40)",
+"p": [
+10.75,
+6.25,
+5.0
+],
+"q": [
+0.70711,
+0.70711,
+-0.0,
+0.0
+],
+"h": [
+0.75,
+0.25,
+0.1
+]
+},
+{
+"path": "Scene/Geometry/Pipes (Big)/None Grabable Collision/Angled Gap",
+"p": [
+-7.7939,
+5.5499,
+7.3687
+],
+"q": [
+0.92335,
+0.0,
+-0.0,
+0.38397
+],
+"h": [
+0.5371,
+0.361,
+1.4301
+]
+},
+{
+"path": "Scene/Geometry/pipeRailings/Floor Joints/pipeRailing (Floor Joint) (8)",
+"p": [
+7.25,
+0.05,
+-0.75
+],
+"q": [
+-0.0,
+0.0,
+0.0,
+1.0
+],
+"h": [
+0.07,
+0.05,
+0.07
+]
+},
+{
+"path": "Scene/Geometry/curtain/incinerator_curtain_skinnedMesh/incinerator_curtain_boneC00",
+"p": [
+11.2,
+1.1875,
+-4.25
+],
+"q": [
+0.70711,
+0.0,
+0.0,
+0.70711
+],
+"h": [
+0.05,
+0.225,
+0.3
+]
+},
+{
+"path": "Scene/Geometry/Pipes (Small)/Grabable Colliders/Collision (22)",
+"p": [
+-9.0,
+4.75,
+8.75
+],
+"q": [
+0.5,
+0.5,
+0.5,
+0.5
+],
+"h": [
+0.25,
+0.25,
+0.1
+]
+},
+{
+"path": "Scene/Geometry/conveyorFrameRight/conveyor_frameEnd/Collision",
+"p": [
+-3.82,
+-0.125,
+-3.125
+],
+"q": [
+0.70711,
+0.0,
+0.0,
+0.70711
+],
+"h": [
+1.18,
+0.125,
+0.375
+]
+},
+{
+"path": "Scene/Geometry/Pipes (Big)/Grabable Collision/Collision (8)",
+"p": [
+-1.25,
+1.939,
+6.45
+],
+"q": [
+0.70711,
+0.0,
+0.0,
+0.70711
+],
+"h": [
+1.0,
+0.5,
+0.1
+]
+},
+{
+"path": "Scene/Geometry/StepsRight/step_200cm (35)/Collision",
+"p": [
+-10.1,
+2.914,
+6.8312
+],
+"q": [
+0.0,
+0.0,
+0.0,
+1.0
+],
+"h": [
+0.9,
+0.0827,
+0.1652
+]
+},
+{
+"path": "Scene/Geometry/curtain/incinerator_curtain_skinnedMesh/incinerator_curtain_boneH00",
+"p": [
+11.2,
+1.1875,
+-6.75
+],
+"q": [
+0.70711,
+0.0,
+0.0,
+0.70711
+],
+"h": [
+0.05,
+0.225,
+0.3
+]
+},
+{
+"path": "Scene/Geometry/Enviroment/Collision/Floor/Collision (1)",
+"p": [
+-10.25,
+-4.75,
+-4.99
+],
+"q": [
+0.0,
+0.0,
+0.0,
+1.0
+],
+"h": [
+5.25,
+4.75,
+4.0
+]
+},
+{
+"path": "Scene/Geometry/Pipes (Big)/None Grabable Collision/Lower Gap (2)",
+"p": [
+-8.4629,
+1.8481,
+6.463
+],
+"q": [
+0.70711,
+0.0,
+0.0,
+0.70711
+],
+"h": [
+0.5371,
+0.361,
+1.7391
+]
+},
+{
+"path": "Scene/Geometry/Door (Double)/door_frame_200cm (1)/Collision (3)",
+"p": [
+3.0,
+3.025,
+9.25
+],
+"q": [
+0.5,
+0.5,
+0.5,
+0.5
+],
+"h": [
+0.025,
+0.1,
+1.0
+]
+},
+{
+"path": "Scene/Geometry/Pipes (Big)/None Grabable Collision/Lower Gap (1)",
+"p": [
+-0.5129,
+1.8481,
+6.463
+],
+"q": [
+0.70711,
+0.0,
+0.0,
+0.70711
+],
+"h": [
+0.5371,
+0.361,
+1.7391
+]
+},
+{
+"path": "Scene/Geometry/StepsLeft/step_200cm (3)/Collision",
+"p": [
+10.0,
+2.579,
+6.1632
+],
+"q": [
+0.0,
+0.0,
+0.0,
+1.0
+],
+"h": [
+1.0,
+0.0827,
+0.1652
+]
+},
+{
+"path": "Scene/Geometry/Enviroment/Collision/Walls/Top Area Blockers/Collision (1)",
+"p": [
+-12.501,
+8.5,
+0.0
+],
+"q": [
+0.70711,
+0.0,
+0.0,
+0.70711
+],
+"h": [
+1.5,
+10.0,
+4.0
+]
+},
+{
+"path": "Scene/Geometry/pipeRailings/Floor Joints/pipeRailing (Floor Joint) (3)",
+"p": [
+-2.75,
+0.05,
+-0.75
+],
+"q": [
+-0.0,
+0.0,
+0.0,
+1.0
+],
+"h": [
+0.07,
+0.05,
+0.07
+]
+},
+{
+"path": "Scene/Geometry/conveyorFrameLeft/conveyor_frameEnd (2)/Collision (1)",
+"p": [
+4.5716,
+-0.125,
+-3.125
+],
+"q": [
+-0.0,
+-0.70711,
+0.70711,
+0.0
+],
+"h": [
+0.0725,
+0.125,
+0.25
+]
+},
+{
+"path": "Scene/Geometry/conveyorFrameLeft/conveyor_frameMiddle (10)/Collision",
+"p": [
+8.0,
+0.125,
+-6.875
+],
+"q": [
+-0.0,
+-0.70711,
+0.70711,
+0.0
+],
+"h": [
+1.0,
+0.125,
+0.125
+]
+},
+{
+"path": "Scene/Geometry/StepsRight/step_200cm (30)/Collision",
+"p": [
+-10.1,
+1.787,
+4.4997
+],
+"q": [
+0.0,
+0.0,
+0.0,
+1.0
+],
+"h": [
+0.9,
+0.0827,
+0.1652
+]
+},
+{
+"path": "Scene/Geometry/Pipes (Small)/Grabable Colliders/Collision (43)",
+"p": [
+10.75,
+6.25,
+-1.0
+],
+"q": [
+0.70711,
+0.70711,
+-0.0,
+0.0
+],
+"h": [
+0.25,
+0.25,
+0.1
+]
+},
+{
+"path": "Scene/Geometry/Pipes (Small)/Grabable Colliders/Collision (29)",
+"p": [
+0.5,
+4.25,
+8.75
+],
+"q": [
+0.5,
+0.5,
+0.5,
+0.5
+],
+"h": [
+0.25,
+0.25,
+0.1
+]
+},
+{
+"path": "Scene/Geometry/StepsLeft/step_200cm (16)/Collision",
+"p": [
+10.0,
+0.256,
+1.4953
+],
+"q": [
+0.0,
+0.0,
+0.0,
+1.0
+],
+"h": [
+1.0,
+0.0827,
+0.1652
+]
+},
+{
+"path": "Scene/Geometry/curtain (1)/incinerator_curtain_skinnedMesh/incinerator_curtain_boneD01",
+"p": [
+-11.1,
+0.5725,
+-5.25
+],
+"q": [
+-0.0,
+0.70711,
+-0.70711,
+-0.0
+],
+"h": [
+0.05,
+0.225,
+0.3
+]
+},
+{
+"path": "Scene/Geometry/Enviroment/Collision/Walls/Collision (36)",
+"p": [
+3.0,
+4.0,
+12.75
+],
+"q": [
+-0.0,
+0.0,
+0.0,
+1.0
+],
+"h": [
+1.0,
+1.0,
+0.25
+]
+},
+{
+"path": "Scene/Geometry/Door (Windowed)/door_frame_200cm/Collision (2)",
+"p": [
+4.5,
+1.95,
+1.25
+],
+"q": [
+0.5,
+0.5,
+0.5,
+0.5
+],
+"h": [
+0.05,
+0.1,
+1.0
+]
+},
+{
+"path": "Scene/Geometry/curtain/incinerator_curtain_skinnedMesh/incinerator_curtain_boneA00",
+"p": [
+11.2,
+1.1875,
+-3.25
+],
+"q": [
+0.70711,
+0.0,
+0.0,
+0.70711
+],
+"h": [
+0.05,
+0.225,
+0.3
+]
+},
+{
+"path": "Scene/Geometry/pipeRailings/Wall Joints/pipeRailling (Wall Joint) (5)/pipeRailing_joint_wallMid",
+"p": [
+-5.25,
+0.3281,
+-8.96
+],
+"q": [
+0.5,
+-0.5,
+-0.5,
+0.5
+],
+"h": [
+0.07,
+0.045,
+0.07
+]
+},
+{
+"path": "Scene/Geometry/Pipes (Big)/Grabable Collision/Collision (7)",
+"p": [
+-7.75,
+3.938,
+6.45
+],
+"q": [
+0.70711,
+0.0,
+0.0,
+0.70711
+],
+"h": [
+1.0,
+0.5,
+0.1
+]
+},
+{
+"path": "Scene/Geometry/Enviroment/incinerator_lowWall/Collider",
+"p": [
+-8.6,
+3.3,
+7.1
+],
+"q": [
+0.70711,
+0.0,
+0.0,
+0.70711
+],
+"h": [
+0.6,
+0.1,
+0.3
+]
+},
+{
+"path": "Scene/Geometry/Pipes (Big)/None Grabable Collision/Lower Gap",
+"p": [
+-1.2939,
+2.4398,
+6.463
+],
+"q": [
+0.70711,
+0.0,
+0.0,
+0.70711
+],
+"h": [
+0.5371,
+0.361,
+2.3308
+]
+},
+{
+"path": "Scene/Geometry/Enviroment/Collision/Walls/Collision (18)",
+"p": [
+4.5,
+2.5,
+5.0
+],
+"q": [
+0.0,
+0.0,
+0.0,
+1.0
+],
+"h": [
+4.5,
+0.5,
+4.0
+]
+},
+{
+"path": "Scene/Geometry/curtain (1)/incinerator_curtain_skinnedMesh/incinerator_curtain_boneC01",
+"p": [
+-11.1,
+0.5725,
+-5.75
+],
+"q": [
+-0.0,
+0.70711,
+-0.70711,
+-0.0
+],
+"h": [
+0.05,
+0.225,
+0.3
+]
+},
+{
+"path": "Scene/Geometry/StepsLeft/step_200cm (13)/Collision",
+"p": [
+10.0,
+1.114,
+3.1653
+],
+"q": [
+0.0,
+0.0,
+0.0,
+1.0
+],
+"h": [
+1.0,
+0.0827,
+0.1652
+]
+},
+{
+"path": "Scene/Geometry/Enviroment/Collision/Floor/Collision (39)",
+"p": [
+10.0,
+-0.122,
+4.669
+],
+"q": [
+-0.22967,
+0.0,
+0.0,
+0.97327
+],
+"h": [
+1.0,
+1.75,
+3.5
+]
+},
+{
+"path": "Scene/Geometry/Enviroment/Collision/Walls/Collision (8)",
+"p": [
+13.25,
+4.5,
+6.0
+],
+"q": [
+0.0,
+0.0,
+0.0,
+1.0
+],
+"h": [
+2.25,
+4.5,
+9.0
+]
+},
+{
+"path": "Scene/Geometry/pipeRailings/Wall Joints/pipeRailling (Wall Joint)/pipeRailing_joint_wallTop",
+"p": [
+-10.96,
+0.6563,
+-2.75
+],
+"q": [
+0.0,
+0.0,
+-0.70711,
+0.70711
+],
+"h": [
+0.07,
+0.045,
+0.07
+]
+},
+{
+"path": "Scene/Geometry/Door (Double)/door_frame_200cm (1)/Collision (4)",
+"p": [
+3.0,
+3.0007,
+9.082
+],
+"q": [
+0.41436,
+0.57298,
+0.41436,
+0.57298
+],
+"h": [
+0.025,
+0.0805,
+1.0
+]
+},
+{
+"path": "Scene/Geometry/curtain (1)/incinerator_curtain_skinnedMesh/incinerator_curtain_boneD00",
+"p": [
+-11.1,
+1.1875,
+-5.25
+],
+"q": [
+-0.0,
+0.70711,
+-0.70711,
+-0.0
+],
+"h": [
+0.05,
+0.225,
+0.3
+]
+},
+{
+"path": "Scene/Geometry/pipeRailings/Wall Joints/pipeRailling (Wall Joint) (5)/pipeRailing_joint_wallTop",
+"p": [
+-5.25,
+0.6563,
+-8.96
+],
+"q": [
+0.5,
+-0.5,
+-0.5,
+0.5
+],
+"h": [
+0.07,
+0.045,
+0.07
+]
+},
+{
+"path": "Scene/Geometry/Enviroment/Collision/Walls/Collision (23)",
+"p": [
+5.75,
+1.0,
+1.25
+],
+"q": [
+-0.0,
+0.0,
+0.0,
+1.0
+],
+"h": [
+0.25,
+1.0,
+0.25
+]
+},
+{
+"path": "Scene/Ball Only Collider",
+"p": [
+-6.8,
+-0.1,
+-5.0
+],
+"q": [
+0.0,
+0.0,
+0.0,
+1.0
+],
+"h": [
+4.0,
+0.25,
+1.85
+]
+},
+{
+"path": "Scene/Geometry/Pipes (Small)/Grabable Colliders/Collision (36)",
+"p": [
+4.5,
+6.25,
+8.75
+],
+"q": [
+0.5,
+0.5,
+0.5,
+0.5
+],
+"h": [
+0.75,
+0.25,
+0.1
+]
+},
+{
+"path": "Scene/Geometry/Enviroment/Collision/Walls/Collision (11)",
+"p": [
+3.0,
+7.0,
+12.0
+],
+"q": [
+0.0,
+0.0,
+0.0,
+1.0
+],
+"h": [
+1.0,
+2.0,
+3.0
+]
+},
+{
+"path": "Scene/Geometry/StepsLeft/step_200cm (15)/Collision",
+"p": [
+10.0,
+1.614,
+4.1658
+],
+"q": [
+0.0,
+0.0,
+0.0,
+1.0
+],
+"h": [
+1.0,
+0.0827,
+0.1652
+]
+},
+{
+"path": "Scene/Geometry/conveyorFrameLeft/conveyor_frameEnd (2)/Collision (3)",
+"p": [
+4.6178,
+-0.3835,
+-3.125
+],
+"q": [
+-0.64408,
+-0.29183,
+0.29183,
+0.64408
+],
+"h": [
+0.0725,
+0.125,
+0.0939
+]
+},
+{
+"path": "Scene/Geometry/curtain/incinerator_curtain_skinnedMesh/incinerator_curtain_boneB00",
+"p": [
+11.2,
+1.1875,
+-3.75
+],
+"q": [
+0.70711,
+0.0,
+0.0,
+0.70711
+],
+"h": [
+0.05,
+0.225,
+0.3
+]
+},
+{
+"path": "Scene/Geometry/curtain (1)/incinerator_curtain_skinnedMesh/incinerator_curtain_boneH00",
+"p": [
+-11.1,
+1.1875,
+-3.25
+],
+"q": [
+-0.0,
+0.70711,
+-0.70711,
+-0.0
+],
+"h": [
+0.05,
+0.225,
+0.3
+]
+},
+{
+"path": "Scene/Geometry/Enviroment/Collision/Walls/Collision (16)",
+"p": [
+-15.25,
+0.5,
+-6.0
+],
+"q": [
+0.0,
+0.0,
+0.0,
+1.0
+],
+"h": [
+0.25,
+1.0,
+3.0
+]
+},
+{
+"path": "Scene/Geometry/conveyorFrameRight/conveyor_frameMiddle (1)/Collision",
+"p": [
+-8.0,
+0.125,
+-6.875
+],
+"q": [
+0.70711,
+0.0,
+0.0,
+0.70711
+],
+"h": [
+1.0,
+0.125,
+0.125
+]
+},
+{
+"path": "Scene/Geometry/curtain/incinerator_curtain_skinnedMesh/incinerator_curtain_boneG01",
+"p": [
+11.2,
+0.5725,
+-6.25
+],
+"q": [
+0.70711,
+0.0,
+0.0,
+0.70711
+],
+"h": [
+0.05,
+0.225,
+0.3
+]
+},
+{
+"path": "Scene/Geometry/Enviroment/Collision/Walls/Collision (14)",
+"p": [
+-13.25,
+0.75,
+-8.0
+],
+"q": [
+0.0,
+0.0,
+0.0,
+1.0
+],
+"h": [
+2.25,
+0.75,
+1.0
+]
+},
+{
+"path": "Scene/Geometry/curtain/incinerator_curtain_skinnedMesh/incinerator_curtain_boneH01",
+"p": [
+11.2,
+0.5725,
+-6.75
+],
+"q": [
+0.70711,
+0.0,
+0.0,
+0.70711
+],
+"h": [
+0.05,
+0.225,
+0.3
+]
+},
+{
+"path": "Scene/Geometry/Enviroment/Collision/Walls/Collision (7)",
+"p": [
+-13.25,
+4.5,
+6.0
+],
+"q": [
+0.0,
+0.0,
+0.0,
+1.0
+],
+"h": [
+2.25,
+4.5,
+9.0
+]
+},
+{
+"path": "Scene/Geometry/Enviroment/Collision/Walls/Top Area Blockers/Collision",
+"p": [
+12.501,
+8.5,
+0.0
+],
+"q": [
+0.70711,
+0.0,
+0.0,
+0.70711
+],
+"h": [
+1.5,
+10.0,
+4.0
+]
+},
+{
+"path": "Scene/Geometry/Door (Windowed)/door_frame_200cm/Collision (4)",
+"p": [
+4.5,
+0.0007,
+1.082
+],
+"q": [
+0.41436,
+0.57298,
+0.41436,
+0.57298
+],
+"h": [
+0.025,
+0.0805,
+1.0
+]
+},
+{
+"path": "Scene/Geometry/StepsRight/step_200cm (29)/Collision",
+"p": [
+-10.1,
+2.12,
+5.1642
+],
+"q": [
+0.0,
+0.0,
+0.0,
+1.0
+],
+"h": [
+0.9,
+0.0827,
+0.1652
+]
+},
+{
+"path": "Scene/Geometry/curtain (1)/incinerator_curtain_skinnedMesh/incinerator_curtain_boneH01",
+"p": [
+-11.1,
+0.5725,
+-3.25
+],
+"q": [
+-0.0,
+0.70711,
+-0.70711,
+-0.0
+],
+"h": [
+0.05,
+0.225,
+0.3
+]
+},
+{
+"path": "Scene/Geometry/StepsRight/step_200cm (18)/Collision",
+"p": [
+-10.1,
+0.083,
+1.1722
+],
+"q": [
+0.0,
+0.0,
+0.0,
+1.0
+],
+"h": [
+0.9,
+0.0827,
+0.1652
+]
+},
+{
+"path": "Scene/Geometry/StepsLeft/step_200cm (17)/Collision",
+"p": [
+10.0,
+0.083,
+1.1722
+],
+"q": [
+0.0,
+0.0,
+0.0,
+1.0
+],
+"h": [
+1.0,
+0.0827,
+0.1652
+]
+},
+{
+"path": "Scene/Geometry/StepsRight/Ball_Proxy",
+"p": [
+-9.98,
+1.4381,
+3.6728
+],
+"q": [
+0.52589,
+0.0,
+0.0,
+0.85055
+],
+"h": [
+1.0,
+3.3561,
+0.073
+]
+},
+{
+"path": "Scene/Geometry/Enviroment/Collision/Floor/Collision (28)",
+"p": [
+-5.5,
+2.75,
+11.0
+],
+"q": [
+-0.0,
+0.0,
+0.0,
+1.0
+],
+"h": [
+5.5,
+0.25,
+4.0
+]
+}
+],
+"capsules": [
+{
+"path": "Scene/Geometry/ConveyorLeft/MoveSystem/RollerCollider (8)",
+"p": [
+8.0,
+0.0,
+-5.0
+],
+"q": [
+-0.0,
+0.7071,
+0.70711,
+0.0
+],
+"r": 0.2,
+"hh": 1.8
+},
+{
+"path": "Scene/Convayor Collision Ball Proxy (1)",
+"p": [
+9.03,
+0.0,
+-3.0
+],
+"q": [
+0.0,
+0.0,
+0.70711,
+0.70711
+],
+"r": 0.2,
+"hh": 1.8
+},
+{
+"path": "Scene/Geometry/ConveyorRight/MoveSystem/RollerCollider (8)",
+"p": [
+-6.0,
+0.0,
+-5.0
+],
+"q": [
+-0.70711,
+0.0,
+0.0,
+0.7071
+],
+"r": 0.2,
+"hh": 1.8
+},
+{
+"path": "Scene/Geometry/ConveyorLeft/MoveSystem/RollerCollider (21)",
+"p": [
+13.2,
+0.0,
+-5.0
+],
+"q": [
+-0.0,
+0.7071,
+0.70711,
+0.0
+],
+"r": 0.2,
+"hh": 1.8
+},
+{
+"path": "Scene/Geometry/ConveyorRight/MoveSystem/RollerCollider (5)",
+"p": [
+-4.8,
+0.0,
+-5.0
+],
+"q": [
+-0.70711,
+0.0,
+0.0,
+0.7071
+],
+"r": 0.2,
+"hh": 1.8
+},
+{
+"path": "Scene/Geometry/ConveyorRight/MoveSystem/RollerCollider (14)",
+"p": [
+-8.4,
+0.0,
+-5.0
+],
+"q": [
+-0.70711,
+0.0,
+0.0,
+0.7071
+],
+"r": 0.2,
+"hh": 1.8
+},
+{
+"path": "Scene/Geometry/Pipes (Big)/None Grabable Collision/Lower Verticle Pipe",
+"p": [
+-1.75,
+2.129,
+6.455
+],
+"q": [
+1.0,
+0.0,
+-0.0,
+0.0
+],
+"r": 0.4,
+"hh": 2.6
+},
+{
+"path": "Scene/Geometry/ConveyorRight/MoveSystem/RollerCollider (11)",
+"p": [
+-7.2,
+0.0,
+-5.0
+],
+"q": [
+-0.70711,
+0.0,
+0.0,
+0.7071
+],
+"r": 0.2,
+"hh": 1.8
+},
+{
+"path": "Scene/Geometry/ConveyorRight/MoveSystem/RollerCollider (26)",
+"p": [
+-13.2,
+0.0,
+-5.0
+],
+"q": [
+-0.70711,
+0.0,
+0.0,
+0.7071
+],
+"r": 0.2,
+"hh": 1.8
+},
+{
+"path": "Scene/Geometry/ConveyorLeft/MoveSystem/RollerCollider (7)",
+"p": [
+7.6,
+0.0,
+-5.0
+],
+"q": [
+-0.0,
+0.7071,
+0.70711,
+0.0
+],
+"r": 0.2,
+"hh": 1.8
+},
+{
+"path": "Scene/Geometry/ConveyorRight/MoveSystem/RollerCollider (21)",
+"p": [
+-11.2,
+0.0,
+-5.0
+],
+"q": [
+-0.70711,
+0.0,
+0.0,
+0.7071
+],
+"r": 0.2,
+"hh": 1.8
+},
+{
+"path": "Scene/Geometry/ConveyorRight/MoveSystem/RollerCollider (7)",
+"p": [
+-5.6,
+0.0,
+-5.0
+],
+"q": [
+-0.70711,
+0.0,
+0.0,
+0.7071
+],
+"r": 0.2,
+"hh": 1.8
+},
+{
+"path": "Scene/Geometry/ConveyorRight/MoveSystem/RollerCollider (2)",
+"p": [
+-3.6,
+0.0,
+-5.0
+],
+"q": [
+-0.70711,
+0.0,
+0.0,
+0.7071
+],
+"r": 0.2,
+"hh": 1.8
+},
+{
+"path": "Scene/Geometry/Pipes (Small)/None Grabable Colliders/Collision (11)",
+"p": [
+6.02,
+5.75,
+8.75
+],
+"q": [
+0.70711,
+0.70711,
+-0.0,
+0.0
+],
+"r": 0.2,
+"hh": 4.7685
+},
+{
+"path": "Scene/Geometry/ConveyorRight/MoveSystem/RollerCollider (18)",
+"p": [
+-10.0,
+0.0,
+-5.0
+],
+"q": [
+-0.70711,
+0.0,
+0.0,
+0.7071
+],
+"r": 0.2,
+"hh": 1.8
+},
+{
+"path": "Scene/Geometry/Pipes (Small)/None Grabable Colliders/Collision (15)",
+"p": [
+10.75,
+3.48,
+-2.25
+],
+"q": [
+-0.0,
+-0.70711,
+-0.0,
+0.70711
+],
+"r": 0.2,
+"hh": 3.288
+},
+{
+"path": "Scene/Geometry/ConveyorLeft/MoveSystem/RollerCollider (16)",
+"p": [
+11.2,
+0.0,
+-5.0
+],
+"q": [
+-0.0,
+0.7071,
+0.70711,
+0.0
+],
+"r": 0.2,
+"hh": 1.8
+},
+{
+"path": "Scene/Geometry/ConveyorRight/MoveSystem/RollerCollider (6)",
+"p": [
+-5.2,
+0.0,
+-5.0
+],
+"q": [
+-0.70711,
+0.0,
+0.0,
+0.7071
+],
+"r": 0.2,
+"hh": 1.8
+},
+{
+"path": "Scene/Geometry/Pipes (Big)/None Grabable Collision/Lower Verticle Pipe",
+"p": [
+-8.25,
+2.129,
+6.455
+],
+"q": [
+1.0,
+0.0,
+-0.0,
+0.0
+],
+"r": 0.4,
+"hh": 2.6
+},
+{
+"path": "Scene/Geometry/ConveyorRight/MoveSystem/RollerCollider (19)",
+"p": [
+-10.4,
+0.0,
+-5.0
+],
+"q": [
+-0.70711,
+0.0,
+0.0,
+0.7071
+],
+"r": 0.2,
+"hh": 1.8
+},
+{
+"path": "Scene/Geometry/ConveyorLeft/MoveSystem/RollerCollider (9)",
+"p": [
+8.4,
+0.0,
+-5.0
+],
+"q": [
+-0.0,
+0.7071,
+0.70711,
+0.0
+],
+"r": 0.2,
+"hh": 1.8
+},
+{
+"path": "Scene/Geometry/ConveyorLeft/MoveSystem/RollerCollider (17)",
+"p": [
+11.6,
+0.0,
+-5.0
+],
+"q": [
+-0.0,
+0.7071,
+0.70711,
+0.0
+],
+"r": 0.2,
+"hh": 1.8
+},
+{
+"path": "Scene/Geometry/ConveyorLeft/MoveSystem/RollerCollider (4)",
+"p": [
+6.4,
+0.0,
+-5.0
+],
+"q": [
+-0.0,
+0.7071,
+0.70711,
+0.0
+],
+"r": 0.2,
+"hh": 1.8
+},
+{
+"path": "Scene/Geometry/Pipes (Small)/None Grabable Colliders/Collision (6)",
+"p": [
+1.25,
+5.0,
+8.75
+],
+"q": [
+0.0,
+1.0,
+-0.0,
+0.0
+],
+"r": 0.2,
+"hh": 0.7505
+},
+{
+"path": "Scene/Geometry/Pipes (Big)/None Grabable Collision/Angled Pipe",
+"p": [
+-0.75,
+5.56,
+7.365
+],
+"q": [
+0.38268,
+0.0,
+0.0,
+0.92388
+],
+"r": 0.4,
+"hh": 1.35
+},
+{
+"path": "Scene/Convayor Collision Ball Proxy (2)",
+"p": [
+9.03,
+0.0,
+-7.0
+],
+"q": [
+0.0,
+0.0,
+0.70711,
+0.70711
+],
+"r": 0.2,
+"hh": 1.8
+},
+{
+"path": "Scene/Geometry/Pipes (Big)/None Grabable Collision/Angled Pipe",
+"p": [
+-7.25,
+5.56,
+7.365
+],
+"q": [
+0.38268,
+0.0,
+0.0,
+0.92388
+],
+"r": 0.4,
+"hh": 1.35
+},
+{
+"path": "Scene/Geometry/Pipes (Big)/None Grabable Collision/Upper Verticle Pipe",
+"p": [
+-8.25,
+7.963,
+8.3
+],
+"q": [
+0.0,
+0.0,
+0.0,
+1.0
+],
+"r": 0.4,
+"hh": 1.35
+},
+{
+"path": "Scene/Geometry/ConveyorRight/MoveSystem/RollerCollider (1)",
+"p": [
+-3.2,
+0.0,
+-5.0
+],
+"q": [
+-0.70711,
+0.0,
+0.0,
+0.7071
+],
+"r": 0.2,
+"hh": 1.8
+},
+{
+"path": "Scene/Geometry/Pipes (Small)/None Grabable Colliders/Collision (12)",
+"p": [
+10.75,
+5.75,
+3.76
+],
+"q": [
+-0.5,
+0.5,
+0.5,
+-0.5
+],
+"r": 0.2,
+"hh": 5.0169
+},
+{
+"path": "Scene/Geometry/Pipes (Small)/None Grabable Colliders/Collision (7)",
+"p": [
+0.75,
+5.5,
+8.75
+],
+"q": [
+0.0,
+1.0,
+-0.0,
+0.0
+],
+"r": 0.2,
+"hh": 0.7505
+},
+{
+"path": "Scene/Geometry/Pipes (Big)/None Grabable Collision/Upper Verticle Pipe",
+"p": [
+-0.75,
+7.963,
+8.3
+],
+"q": [
+0.0,
+0.0,
+0.0,
+1.0
+],
+"r": 0.4,
+"hh": 1.35
+},
+{
+"path": "Scene/Geometry/ConveyorLeft/MoveSystem/RollerCollider (14)",
+"p": [
+10.4,
+0.0,
+-5.0
+],
+"q": [
+-0.0,
+0.7071,
+0.70711,
+0.0
+],
+"r": 0.2,
+"hh": 1.8
+},
+{
+"path": "Scene/Geometry/Pipes (Small)/None Grabable Colliders/Collision (9)",
+"p": [
+5.52,
+6.75,
+8.75
+],
+"q": [
+0.70711,
+0.70711,
+-0.0,
+0.0
+],
+"r": 0.2,
+"hh": 5.25
+},
+{
+"path": "Scene/Geometry/ConveyorLeft/MoveSystem/RollerCollider (13)",
+"p": [
+10.0,
+0.0,
+-5.0
+],
+"q": [
+-0.0,
+0.7071,
+0.70711,
+0.0
+],
+"r": 0.2,
+"hh": 1.8
+},
+{
+"path": "Scene/Convayor Collision Ball Proxy (0)",
+"p": [
+-7.97,
+0.0,
+-7.0
+],
+"q": [
+0.0,
+0.0,
+0.70711,
+0.70711
+],
+"r": 0.2,
+"hh": 2.8
+},
+{
+"path": "Scene/Geometry/Pipes (Small)/None Grabable Colliders/Collision (2)",
+"p": [
+-9.25,
+7.026,
+8.75
+],
+"q": [
+1.0,
+0.0,
+-0.0,
+0.0
+],
+"r": 0.2,
+"hh": 1.77
+},
+{
+"path": "Scene/Geometry/ConveyorRight/MoveSystem/RollerCollider (4)",
+"p": [
+-4.4,
+0.0,
+-5.0
+],
+"q": [
+-0.70711,
+0.0,
+0.0,
+0.7071
+],
+"r": 0.2,
+"hh": 1.8
+},
+{
+"path": "Scene/Geometry/Pipes (Big)/None Grabable Collision/Lower Verticle Pipe",
+"p": [
+-0.75,
+2.129,
+6.455
+],
+"q": [
+1.0,
+0.0,
+-0.0,
+0.0
+],
+"r": 0.4,
+"hh": 2.6
+},
+{
+"path": "Scene/Geometry/ConveyorRight/MoveSystem/RollerCollider (12)",
+"p": [
+-7.6,
+0.0,
+-5.0
+],
+"q": [
+-0.70711,
+0.0,
+0.0,
+0.7071
+],
+"r": 0.2,
+"hh": 1.8
+},
+{
+"path": "Scene/Geometry/ConveyorLeft/MoveSystem/RollerCollider (19)",
+"p": [
+12.4,
+0.0,
+-5.0
+],
+"q": [
+-0.0,
+0.7071,
+0.70711,
+0.0
+],
+"r": 0.2,
+"hh": 1.8
+},
+{
+"path": "Scene/Geometry/ConveyorLeft/MoveSystem/RollerCollider (10)",
+"p": [
+8.8,
+0.0,
+-5.0
+],
+"q": [
+-0.0,
+0.7071,
+0.70711,
+0.0
+],
+"r": 0.2,
+"hh": 1.8
+},
+{
+"path": "Scene/Geometry/ConveyorLeft/MoveSystem/RollerCollider (2)",
+"p": [
+5.6,
+0.0,
+-5.0
+],
+"q": [
+-0.0,
+0.7071,
+0.70711,
+0.0
+],
+"r": 0.2,
+"hh": 1.8
+},
+{
+"path": "Scene/Geometry/Pipes (Small)/None Grabable Colliders/Collision",
+"p": [
+-9.75,
+6.773,
+8.75
+],
+"q": [
+1.0,
+0.0,
+-0.0,
+0.0
+],
+"r": 0.2,
+"hh": 2.0184
+},
+{
+"path": "Scene/Geometry/ConveyorLeft/MoveSystem/RollerCollider (22)",
+"p": [
+13.6,
+0.0,
+-5.0
+],
+"q": [
+-0.0,
+0.7071,
+0.70711,
+0.0
+],
+"r": 0.2,
+"hh": 1.8
+},
+{
+"path": "Scene/Geometry/ConveyorRight/MoveSystem/RollerCollider (23)",
+"p": [
+-12.0,
+0.0,
+-5.0
+],
+"q": [
+-0.70711,
+0.0,
+0.0,
+0.7071
+],
+"r": 0.2,
+"hh": 1.8
+},
+{
+"path": "Scene/Geometry/Pipes (Small)/None Grabable Colliders/Collision (8)",
+"p": [
+0.25,
+6.0,
+8.75
+],
+"q": [
+0.0,
+1.0,
+-0.0,
+0.0
+],
+"r": 0.2,
+"hh": 0.7505
+},
+{
+"path": "Scene/Geometry/Pipes (Small)/None Grabable Colliders/Collision (4)",
+"p": [
+-4.5,
+4.75,
+8.75
+],
+"q": [
+0.70711,
+0.70711,
+-0.0,
+0.0
+],
+"r": 0.2,
+"hh": 5.25
+},
+{
+"path": "Scene/Geometry/ConveyorLeft/MoveSystem/RollerCollider (6)",
+"p": [
+7.2,
+0.0,
+-5.0
+],
+"q": [
+-0.0,
+0.7071,
+0.70711,
+0.0
+],
+"r": 0.2,
+"hh": 1.8
+},
+{
+"path": "Scene/Geometry/ConveyorRight/MoveSystem/RollerCollider (13)",
+"p": [
+-8.0,
+0.0,
+-5.0
+],
+"q": [
+-0.70711,
+0.0,
+0.0,
+0.7071
+],
+"r": 0.2,
+"hh": 1.8
+},
+{
+"path": "Scene/Geometry/Pipes (Small)/None Grabable Colliders/Collision (10)",
+"p": [
+5.78,
+6.25,
+8.75
+],
+"q": [
+0.70711,
+0.70711,
+-0.0,
+0.0
+],
+"r": 0.2,
+"hh": 5.03
+},
+{
+"path": "Scene/Geometry/ConveyorLeft/MoveSystem/RollerCollider (5)",
+"p": [
+6.8,
+0.0,
+-5.0
+],
+"q": [
+-0.0,
+0.7071,
+0.70711,
+0.0
+],
+"r": 0.2,
+"hh": 1.8
+},
+{
+"path": "Scene/Geometry/Pipes (Big)/None Grabable Collision/Lower Verticle Pipe",
+"p": [
+-7.25,
+2.129,
+6.455
+],
+"q": [
+1.0,
+0.0,
+-0.0,
+0.0
+],
+"r": 0.4,
+"hh": 2.6
+},
+{
+"path": "Scene/Geometry/ConveyorRight/MoveSystem/RollerCollider (28)",
+"p": [
+-14.0,
+0.0,
+-5.0
+],
+"q": [
+-0.70711,
+0.0,
+0.0,
+0.7071
+],
+"r": 0.2,
+"hh": 1.8
+},
+{
+"path": "Scene/Geometry/ConveyorLeft/MoveSystem/RollerCollider (3)",
+"p": [
+6.0,
+0.0,
+-5.0
+],
+"q": [
+-0.0,
+0.7071,
+0.70711,
+0.0
+],
+"r": 0.2,
+"hh": 1.8
+},
+{
+"path": "Scene/Geometry/ConveyorRight/MoveSystem/RollerCollider (22)",
+"p": [
+-11.6,
+0.0,
+-5.0
+],
+"q": [
+-0.70711,
+0.0,
+0.0,
+0.7071
+],
+"r": 0.2,
+"hh": 1.8
+},
+{
+"path": "Scene/Geometry/ConveyorRight/MoveSystem/RollerCollider (29)",
+"p": [
+-14.4,
+0.0,
+-5.0
+],
+"q": [
+-0.70711,
+0.0,
+0.0,
+0.7071
+],
+"r": 0.2,
+"hh": 1.8
+},
+{
+"path": "Scene/Geometry/ConveyorLeft/MoveSystem/RollerCollider (18)",
+"p": [
+12.0,
+0.0,
+-5.0
+],
+"q": [
+-0.0,
+0.7071,
+0.70711,
+0.0
+],
+"r": 0.2,
+"hh": 1.8
+},
+{
+"path": "Scene/Geometry/Pipes (Big)/None Grabable Collision/Angled Pipe",
+"p": [
+-8.25,
+5.56,
+7.365
+],
+"q": [
+0.38268,
+0.0,
+0.0,
+0.92388
+],
+"r": 0.4,
+"hh": 1.35
+},
+{
+"path": "Scene/Geometry/ConveyorLeft/MoveSystem/RollerCollider (12)",
+"p": [
+9.6,
+0.0,
+-5.0
+],
+"q": [
+-0.0,
+0.7071,
+0.70711,
+0.0
+],
+"r": 0.2,
+"hh": 1.8
+},
+{
+"path": "Scene/Geometry/Pipes (Big)/None Grabable Collision/Upper Verticle Pipe",
+"p": [
+-7.25,
+7.963,
+8.3
+],
+"q": [
+0.0,
+0.0,
+0.0,
+1.0
+],
+"r": 0.4,
+"hh": 1.35
+},
+{
+"path": "Scene/Geometry/ConveyorRight/MoveSystem/RollerCollider (16)",
+"p": [
+-9.2,
+0.0,
+-5.0
+],
+"q": [
+-0.70711,
+0.0,
+0.0,
+0.7071
+],
+"r": 0.2,
+"hh": 1.8
+},
+{
+"path": "Scene/Convayor Collision Ball Proxy (4)",
+"p": [
+-7.97,
+0.0,
+-3.0
+],
+"q": [
+0.0,
+0.0,
+0.70711,
+0.70711
+],
+"r": 0.2,
+"hh": 2.8
+},
+{
+"path": "Scene/Geometry/ConveyorRight/MoveSystem/RollerCollider (25)",
+"p": [
+-12.8,
+0.0,
+-5.0
+],
+"q": [
+-0.70711,
+0.0,
+0.0,
+0.7071
+],
+"r": 0.2,
+"hh": 1.8
+},
+{
+"path": "Scene/Geometry/Pipes (Small)/None Grabable Colliders/Collision (13)",
+"p": [
+10.75,
+6.25,
+3.51
+],
+"q": [
+-0.5,
+0.5,
+0.5,
+-0.5
+],
+"r": 0.2,
+"hh": 5.25
+},
+{
+"path": "Scene/Geometry/Pipes (Big)/None Grabable Collision/Angled Pipe",
+"p": [
+-1.75,
+5.56,
+7.365
+],
+"q": [
+0.38268,
+0.0,
+0.0,
+0.92388
+],
+"r": 0.4,
+"hh": 1.35
+},
+{
+"path": "Scene/Geometry/Pipes (Small)/None Grabable Colliders/Collision (1)",
+"p": [
+-10.25,
+6.524,
+8.75
+],
+"q": [
+1.0,
+0.0,
+-0.0,
+0.0
+],
+"r": 0.2,
+"hh": 2.2707
+},
+{
+"path": "Scene/Geometry/ConveyorRight/MoveSystem/RollerCollider (20)",
+"p": [
+-10.8,
+0.0,
+-5.0
+],
+"q": [
+-0.70711,
+0.0,
+0.0,
+0.7071
+],
+"r": 0.2,
+"hh": 1.8
+},
+{
+"path": "Scene/Geometry/Pipes (Small)/None Grabable Colliders/Collision (3)",
+"p": [
+-4.5,
+5.25,
+8.75
+],
+"q": [
+0.70711,
+0.70711,
+-0.0,
+0.0
+],
+"r": 0.2,
+"hh": 4.7251
+},
+{
+"path": "Scene/Geometry/Pipes (Small)/None Grabable Colliders/Collision (14)",
+"p": [
+10.75,
+6.75,
+3.25
+],
+"q": [
+-0.5,
+0.5,
+0.5,
+-0.5
+],
+"r": 0.2,
+"hh": 5.5225
+},
+{
+"path": "Scene/Geometry/ConveyorLeft/MoveSystem/RollerCollider (24)",
+"p": [
+14.4,
+0.0,
+-5.0
+],
+"q": [
+-0.0,
+0.7071,
+0.70711,
+0.0
+],
+"r": 0.2,
+"hh": 1.8
+},
+{
+"path": "Scene/Geometry/ConveyorRight/MoveSystem/RollerCollider (27)",
+"p": [
+-13.6,
+0.0,
+-5.0
+],
+"q": [
+-0.70711,
+0.0,
+0.0,
+0.7071
+],
+"r": 0.2,
+"hh": 1.8
+},
+{
+"path": "Scene/Geometry/ConveyorLeft/MoveSystem/RollerCollider (1)",
+"p": [
+5.2,
+0.0,
+-5.0
+],
+"q": [
+-0.0,
+0.7071,
+0.70711,
+0.0
+],
+"r": 0.2,
+"hh": 1.8
+},
+{
+"path": "Scene/Geometry/ConveyorRight/MoveSystem/RollerCollider (17)",
+"p": [
+-9.6,
+0.0,
+-5.0
+],
+"q": [
+-0.70711,
+0.0,
+0.0,
+0.7071
+],
+"r": 0.2,
+"hh": 1.8
+},
+{
+"path": "Scene/Geometry/ConveyorRight/MoveSystem/RollerCollider (0)",
+"p": [
+-2.8,
+0.0,
+-5.0
+],
+"q": [
+-0.70711,
+0.0,
+0.0,
+0.7071
+],
+"r": 0.2,
+"hh": 1.8
+},
+{
+"path": "Scene/Geometry/Pipes (Big)/None Grabable Collision/Upper Verticle Pipe",
+"p": [
+-1.75,
+7.963,
+8.3
+],
+"q": [
+0.0,
+0.0,
+0.0,
+1.0
+],
+"r": 0.4,
+"hh": 1.35
+},
+{
+"path": "Scene/Geometry/ConveyorLeft/MoveSystem/RollerCollider (20)",
+"p": [
+12.8,
+0.0,
+-5.0
+],
+"q": [
+-0.0,
+0.7071,
+0.70711,
+0.0
+],
+"r": 0.2,
+"hh": 1.8
+},
+{
+"path": "Scene/Geometry/ConveyorRight/MoveSystem/RollerCollider (24)",
+"p": [
+-12.4,
+0.0,
+-5.0
+],
+"q": [
+-0.70711,
+0.0,
+0.0,
+0.7071
+],
+"r": 0.2,
+"hh": 1.8
+},
+{
+"path": "Scene/Geometry/ConveyorRight/MoveSystem/RollerCollider (15)",
+"p": [
+-8.8,
+0.0,
+-5.0
+],
+"q": [
+-0.70711,
+0.0,
+0.0,
+0.7071
+],
+"r": 0.2,
+"hh": 1.8
+},
+{
+"path": "Scene/Geometry/Pipes (Small)/None Grabable Colliders/Collision (5)",
+"p": [
+-4.5,
+4.25,
+8.75
+],
+"q": [
+0.70711,
+0.70711,
+-0.0,
+0.0
+],
+"r": 0.2,
+"hh": 5.75
+},
+{
+"path": "Scene/Geometry/Pipes (Small)/None Grabable Colliders/Collision (16)",
+"p": [
+10.75,
+3.225,
+-1.75
+],
+"q": [
+0.0,
+-0.70711,
+0.0,
+0.70711
+],
+"r": 0.2,
+"hh": 3.0264
+},
+{
+"path": "Scene/Geometry/ConveyorRight/MoveSystem/RollerCollider (30)",
+"p": [
+-14.8,
+0.0,
+-5.0
+],
+"q": [
+-0.70711,
+0.0,
+0.0,
+0.7071
+],
+"r": 0.2,
+"hh": 1.8
+},
+{
+"path": "Scene/Geometry/ConveyorLeft/MoveSystem/RollerCollider (0)",
+"p": [
+4.8,
+0.0,
+-5.0
+],
+"q": [
+-0.0,
+0.7071,
+0.70711,
+0.0
+],
+"r": 0.2,
+"hh": 1.8
+},
+{
+"path": "Scene/Geometry/ConveyorLeft/MoveSystem/RollerCollider (23)",
+"p": [
+14.0,
+0.0,
+-5.0
+],
+"q": [
+-0.0,
+0.7071,
+0.70711,
+0.0
+],
+"r": 0.2,
+"hh": 1.8
+},
+{
+"path": "Scene/Geometry/ConveyorLeft/MoveSystem/RollerCollider (25)",
+"p": [
+14.8,
+0.0,
+-5.0
+],
+"q": [
+-0.0,
+0.7071,
+0.70711,
+0.0
+],
+"r": 0.2,
+"hh": 1.8
+},
+{
+"path": "Scene/Geometry/ConveyorRight/MoveSystem/RollerCollider (9)",
+"p": [
+-6.4,
+0.0,
+-5.0
+],
+"q": [
+-0.70711,
+0.0,
+0.0,
+0.7071
+],
+"r": 0.2,
+"hh": 1.8
+},
+{
+"path": "Scene/Geometry/Pipes (Small)/None Grabable Colliders/Collision (17)",
+"p": [
+10.75,
+2.98,
+-1.25
+],
+"q": [
+0.0,
+-0.70711,
+0.0,
+0.70711
+],
+"r": 0.2,
+"hh": 2.7809
+},
+{
+"path": "Scene/Geometry/ConveyorLeft/MoveSystem/RollerCollider (11)",
+"p": [
+9.2,
+0.0,
+-5.0
+],
+"q": [
+-0.0,
+0.7071,
+0.70711,
+0.0
+],
+"r": 0.2,
+"hh": 1.8
+},
+{
+"path": "Scene/Geometry/ConveyorRight/MoveSystem/RollerCollider (3)",
+"p": [
+-4.0,
+0.0,
+-5.0
+],
+"q": [
+-0.70711,
+0.0,
+0.0,
+0.7071
+],
+"r": 0.2,
+"hh": 1.8
+},
+{
+"path": "Scene/Geometry/ConveyorLeft/MoveSystem/RollerCollider (15)",
+"p": [
+10.8,
+0.0,
+-5.0
+],
+"q": [
+-0.0,
+0.7071,
+0.70711,
+0.0
+],
+"r": 0.2,
+"hh": 1.8
+},
+{
+"path": "Scene/Geometry/ConveyorRight/MoveSystem/RollerCollider (10)",
+"p": [
+-6.8,
+0.0,
+-5.0
+],
+"q": [
+-0.70711,
+0.0,
+0.0,
+0.7071
+],
+"r": 0.2,
+"hh": 1.8
+}
+],
+"trimeshes": [
+{
+"path": "Scene/Geometry/Enviroment/incinerator_lowWall/Collider",
+"mesh": "m2a",
+"matrix": [
+[
+1.0,
+0.0,
+-0.0,
+0.0
+],
+[
+0.0,
+0.0,
+-1.0,
+0.0
+],
+[
+-0.0,
+1.0,
+0.0,
+-0.0
+],
+[
+0.0,
+0.0,
+-0.0,
+1.0
+]
+]
+},
+{
+"path": "Scene/Geometry/Enviroment/incinerator_lowWall/Collider",
+"mesh": "m2a",
+"matrix": [
+[
+1.0,
+0.0,
+-0.0,
+0.0
+],
+[
+0.0,
+0.0,
+-1.0,
+0.0
+],
+[
+-0.0,
+1.0,
+0.0,
+-0.0
+],
+[
+0.0,
+0.0,
+-0.0,
+1.0
+]
+]
+},
+{
+"path": "Scene/Geometry/Enviroment/incinerator_lowWall/Collider",
+"mesh": "m2b",
+"matrix": [
+[
+1.0,
+0.0,
+-0.0,
+0.0
+],
+[
+0.0,
+0.0,
+-1.0,
+0.0
+],
+[
+-0.0,
+1.0,
+0.0,
+-0.0
+],
+[
+0.0,
+0.0,
+-0.0,
+1.0
+]
+]
+},
+{
+"path": "Scene/Geometry/window_200cm/window_200cm_frame",
+"mesh": "m28",
+"matrix": [
+[
+1.0,
+0.0,
+-0.0,
+5.99999
+],
+[
+0.0,
+-0.0,
+-1.0,
+0.5
+],
+[
+-0.0,
+1.0,
+-0.0,
+1.25
+],
+[
+0.0,
+0.0,
+-0.0,
+1.0
+]
+]
+}
+],
+"spawns": [],
+"kill": [
+{
+"path": "Managers/KillVolumes/Kill Volume (4)",
+"p": [
+0.0,
+3.0,
+18.0
+],
+"q": [
+0.0,
+0.0,
+0.0,
+1.0
+],
+"h": [
+17.0,
+10.0,
+5.0
+]
+},
+{
+"path": "Managers/KillVolumes/Kill Volume",
+"p": [
+-22.0,
+3.0,
+-0.0
+],
+"q": [
+0.0,
+0.0,
+0.0,
+1.0
+],
+"h": [
+5.0,
+10.0,
+15.0
+]
+},
+{
+"path": "Managers/KillVolumes/Kill Volume (2)",
+"p": [
+0.0,
+15.0,
+-0.0
+],
+"q": [
+0.0,
+0.0,
+0.0,
+1.0
+],
+"h": [
+17.0,
+5.0,
+15.0
+]
+},
+{
+"path": "Managers/KillVolumes/Kill Volume (1)",
+"p": [
+0.0,
+-10.0,
+-0.0
+],
+"q": [
+0.0,
+0.0,
+0.0,
+1.0
+],
+"h": [
+17.0,
+5.0,
+15.0
+]
+},
+{
+"path": "Managers/KillVolumes/Kill Volume",
+"p": [
+22.0,
+3.0,
+-0.0
+],
+"q": [
+0.0,
+0.0,
+0.0,
+1.0
+],
+"h": [
+5.0,
+10.0,
+15.0
+]
+},
+{
+"path": "Scene/TriggerVolumes/Pit_Kill",
+"p": [
+0.86,
+-4.19,
+-5.32
+],
+"q": [
+0.0,
+0.0,
+0.0,
+1.0
+],
+"h": [
+5.79,
+1.25,
+3.85
+]
+},
+{
+"path": "Managers/KillVolumes/Kill Volume (3)",
+"p": [
+0.0,
+3.0,
+-17.0
+],
+"q": [
+0.0,
+0.0,
+0.0,
+1.0
+],
+"h": [
+17.0,
+10.0,
+5.0
+]
+}
+],
+"lightmaps": [
+"lightmap_0.png"
+],
+"env": {
+"ambientSky": [
+0.4623,
+0.1353,
+0.0
+],
+"ambientEquator": [
+0.114,
+0.125,
+0.133
+],
+"ambientGround": [
+0.047,
+0.043,
+0.035
+],
+"fog": false,
+"fogColor": [
+1.0,
+1.0,
+1.0
+],
+"fogDensity": 0.009999999776482582
+},
+"lights": [
+{
+"type": "spot",
+"color": [
+0.8431,
+0.9987,
+1.0
+],
+"intensity": 100.0,
+"p": [
+4.5,
+2.45,
+3.3
+],
+"dir": [
+0.0,
+-0.3054,
+-0.9522
+],
+"range": 7.0,
+"angle": 111.0,
+"inner": 105.0,
+"shadows": true,
+"mask": 4294967295,
+"name": "House Light Shadowcaster",
+"jitter": null
+},
+{
+"type": "spot",
+"color": [
+0.9057,
+0.3658,
+0.0
+],
+"intensity": 2000.0,
+"p": [
+1.0,
+-1.05,
+-23.2
+],
+"dir": [
+-0.0,
+-0.0,
+1.0
+],
+"range": 37.9,
+"angle": 65.16,
+"inner": 52.13,
+"shadows": true,
+"mask": 4221566519,
+"name": "Fire Pit Light long",
+"jitter": {
+"range": [
+0.75,
+0.25,
+0.75
+],
+"every": [
+0.1,
+0.45
+]
+}
+}
+]
+}

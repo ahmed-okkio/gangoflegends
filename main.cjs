@@ -46,7 +46,7 @@ app.whenReady().then(() => {
     width: 1400, height: 860, backgroundColor: '#0b1426', autoHideMenuBar: true, show: !smoke,
     title: 'Gang of Legends', webPreferences: { backgroundThrottling: false, offscreen: !!smoke },
   });
-  const updates = app.isPackaged && !smoke;
+  const updates = app.isPackaged && !smoke && process.platform !== 'darwin'; // unsigned Mac builds can't self-install: Mac players download the new .dmg
   // v feeds the lobby version check; u=1 makes the page start behind the "checking for updates" screen
   win.loadFile(path.join(__dirname, 'index.html'), { query: { v: app.getVersion(), u: updates ? '1' : '0', rv: via ? JSON.stringify(via) : '' }, hash: smoke ? (process.env.SMOKE_HASH ?? 'practice-girders') : dev ? `practice-${process.env.DEV_MAP || 'girders'}` : '' });
   if (dev) win.webContents.openDevTools({ mode: 'detach' });

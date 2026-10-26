@@ -1,0 +1,13603 @@
+{
+"stage": "subway",
+"meshes": {
+"m1": {
+"name": "Combined Mesh (root: scene) 2",
+"verts": 14077,
+"normals": true,
+"uv0": true,
+"uv1": true,
+"indices": 23319,
+"subs": [
+[
+0,
+24
+],
+[
+24,
+168
+],
+[
+192,
+6
+],
+[
+198,
+168
+],
+[
+366,
+6
+],
+[
+372,
+168
+],
+[
+540,
+6
+],
+[
+546,
+24
+],
+[
+570,
+24
+],
+[
+594,
+24
+],
+[
+618,
+168
+],
+[
+786,
+6
+],
+[
+792,
+24
+],
+[
+816,
+168
+],
+[
+984,
+6
+],
+[
+990,
+168
+],
+[
+1158,
+6
+],
+[
+1164,
+108
+],
+[
+1272,
+54
+],
+[
+1326,
+54
+],
+[
+1380,
+108
+],
+[
+1488,
+54
+],
+[
+1542,
+54
+],
+[
+1596,
+54
+],
+[
+1650,
+108
+],
+[
+1758,
+54
+],
+[
+1812,
+54
+],
+[
+1866,
+108
+],
+[
+1974,
+54
+],
+[
+2028,
+108
+],
+[
+2136,
+54
+],
+[
+2190,
+54
+],
+[
+2244,
+108
+],
+[
+2352,
+54
+],
+[
+2406,
+108
+],
+[
+2514,
+108
+],
+[
+2622,
+108
+],
+[
+2730,
+108
+],
+[
+2838,
+54
+],
+[
+2892,
+108
+],
+[
+3000,
+54
+],
+[
+3054,
+54
+],
+[
+3108,
+108
+],
+[
+3216,
+54
+],
+[
+3270,
+54
+],
+[
+3324,
+108
+],
+[
+3432,
+108
+],
+[
+3540,
+54
+],
+[
+3594,
+108
+],
+[
+3702,
+108
+],
+[
+3810,
+108
+],
+[
+3918,
+54
+],
+[
+3972,
+54
+],
+[
+4026,
+108
+],
+[
+4134,
+54
+],
+[
+4188,
+108
+],
+[
+4296,
+54
+],
+[
+4350,
+108
+],
+[
+4458,
+54
+],
+[
+4512,
+54
+],
+[
+4566,
+108
+],
+[
+4674,
+108
+],
+[
+4782,
+108
+],
+[
+4890,
+108
+],
+[
+4998,
+108
+],
+[
+5106,
+54
+],
+[
+5160,
+54
+],
+[
+5214,
+54
+],
+[
+5268,
+54
+],
+[
+5322,
+108
+],
+[
+5430,
+108
+],
+[
+5538,
+108
+],
+[
+5646,
+54
+],
+[
+5700,
+54
+],
+[
+5754,
+54
+],
+[
+5808,
+54
+],
+[
+5862,
+108
+],
+[
+5970,
+54
+],
+[
+6024,
+54
+],
+[
+6078,
+54
+],
+[
+6132,
+108
+],
+[
+6240,
+54
+],
+[
+6294,
+108
+],
+[
+6402,
+54
+],
+[
+6456,
+108
+],
+[
+6564,
+108
+],
+[
+6672,
+108
+],
+[
+6780,
+54
+],
+[
+6834,
+54
+],
+[
+6888,
+54
+],
+[
+6942,
+108
+],
+[
+7050,
+54
+],
+[
+7104,
+108
+],
+[
+7212,
+108
+],
+[
+7320,
+108
+],
+[
+7428,
+54
+],
+[
+7482,
+108
+],
+[
+7590,
+108
+],
+[
+7698,
+54
+],
+[
+7752,
+54
+],
+[
+7806,
+54
+],
+[
+7860,
+108
+],
+[
+7968,
+54
+],
+[
+8022,
+108
+],
+[
+8130,
+108
+],
+[
+8238,
+108
+],
+[
+8346,
+108
+],
+[
+8454,
+108
+],
+[
+8562,
+108
+],
+[
+8670,
+54
+],
+[
+8724,
+108
+],
+[
+8832,
+54
+],
+[
+8886,
+108
+],
+[
+8994,
+108
+],
+[
+9102,
+108
+],
+[
+9210,
+54
+],
+[
+9264,
+108
+],
+[
+9372,
+54
+],
+[
+9426,
+54
+],
+[
+9480,
+54
+],
+[
+9534,
+108
+],
+[
+9642,
+108
+],
+[
+9750,
+54
+],
+[
+9804,
+54
+],
+[
+9858,
+54
+],
+[
+9912,
+30
+],
+[
+9942,
+12
+],
+[
+9954,
+624
+],
+[
+10578,
+240
+],
+[
+10818,
+30
+],
+[
+10848,
+12
+],
+[
+10860,
+30
+],
+[
+10890,
+12
+],
+[
+10902,
+30
+],
+[
+10932,
+12
+],
+[
+10944,
+30
+],
+[
+10974,
+12
+],
+[
+10986,
+624
+],
+[
+11610,
+240
+],
+[
+11850,
+30
+],
+[
+11880,
+12
+],
+[
+11892,
+624
+],
+[
+12516,
+240
+],
+[
+12756,
+624
+],
+[
+13380,
+240
+],
+[
+13620,
+30
+],
+[
+13650,
+12
+],
+[
+13662,
+624
+],
+[
+14286,
+240
+],
+[
+14526,
+624
+],
+[
+15150,
+240
+],
+[
+15390,
+30
+],
+[
+15420,
+12
+],
+[
+15432,
+624
+],
+[
+16056,
+240
+],
+[
+16296,
+624
+],
+[
+16920,
+240
+],
+[
+17160,
+30
+],
+[
+17190,
+12
+],
+[
+17202,
+624
+],
+[
+17826,
+240
+],
+[
+18066,
+30
+],
+[
+18096,
+12
+],
+[
+18108,
+30
+],
+[
+18138,
+12
+],
+[
+18150,
+624
+],
+[
+18774,
+240
+],
+[
+19014,
+30
+],
+[
+19044,
+12
+],
+[
+19056,
+30
+],
+[
+19086,
+12
+],
+[
+19098,
+624
+],
+[
+19722,
+240
+],
+[
+19962,
+30
+],
+[
+19992,
+12
+],
+[
+20004,
+30
+],
+[
+20034,
+12
+],
+[
+20046,
+30
+],
+[
+20076,
+12
+],
+[
+20088,
+624
+],
+[
+20712,
+240
+],
+[
+20952,
+30
+],
+[
+20982,
+12
+],
+[
+20994,
+30
+],
+[
+21024,
+12
+],
+[
+21036,
+30
+],
+[
+21066,
+12
+],
+[
+21078,
+624
+],
+[
+21702,
+240
+],
+[
+21942,
+624
+],
+[
+22566,
+240
+],
+[
+22806,
+30
+],
+[
+22836,
+12
+],
+[
+22848,
+72
+],
+[
+22920,
+18
+],
+[
+22938,
+18
+],
+[
+22956,
+75
+],
+[
+23031,
+6
+],
+[
+23037,
+66
+],
+[
+23103,
+6
+],
+[
+23109,
+66
+],
+[
+23175,
+6
+],
+[
+23181,
+66
+],
+[
+23247,
+6
+],
+[
+23253,
+66
+]
+]
+},
+"m3": {
+"name": "Combined Mesh (root: scene) 4",
+"verts": 309,
+"normals": true,
+"uv0": true,
+"uv1": true,
+"indices": 663,
+"subs": [
+[
+0,
+192
+],
+[
+192,
+156
+],
+[
+348,
+15
+],
+[
+363,
+60
+],
+[
+423,
+18
+],
+[
+441,
+198
+],
+[
+639,
+12
+],
+[
+651,
+12
+]
+]
+},
+"me93d6c4a0e39": {
+"name": "subway_lightRope_segment",
+"verts": 71,
+"normals": true,
+"uv0": true,
+"uv1": true,
+"indices": 180,
+"subs": [
+[
+0,
+180
+]
+]
+},
+"m2": {
+"name": "Combined Mesh (root: scene) 3",
+"verts": 770,
+"normals": true,
+"uv0": true,
+"uv1": true,
+"indices": 3684,
+"subs": [
+[
+0,
+84
+],
+[
+84,
+600
+],
+[
+684,
+600
+],
+[
+1284,
+600
+],
+[
+1884,
+600
+],
+[
+2484,
+600
+],
+[
+3084,
+600
+]
+]
+},
+"m80dfeaa80e39": {
+"name": "subway_void",
+"verts": 386,
+"normals": true,
+"uv0": true,
+"uv1": true,
+"indices": 852,
+"subs": [
+[
+0,
+852
+]
+]
+},
+"ma4d3fb1c0e39": {
+"name": "subway_lightFitting",
+"verts": 36,
+"normals": true,
+"uv0": true,
+"uv1": true,
+"indices": 60,
+"subs": [
+[
+0,
+60
+]
+]
+},
+"mf0013cc40e39": {
+"name": "subway_pipes",
+"verts": 60,
+"normals": true,
+"uv0": true,
+"uv1": true,
+"indices": 108,
+"subs": [
+[
+0,
+108
+]
+]
+},
+"m18d": {
+"name": "subway_hall",
+"verts": 4,
+"normals": true,
+"uv0": true,
+"uv1": false,
+"indices": 6,
+"subs": [
+[
+0,
+6
+]
+]
+},
+"m194": {
+"name": "subway_hall",
+"verts": 24,
+"normals": true,
+"uv0": true,
+"uv1": false,
+"indices": 60,
+"subs": [
+[
+0,
+60
+]
+]
+},
+"m18c": {
+"name": "subway_platform",
+"verts": 52,
+"normals": true,
+"uv0": true,
+"uv1": true,
+"indices": 90,
+"subs": [
+[
+0,
+60
+],
+[
+60,
+24
+],
+[
+84,
+6
+]
+]
+},
+"m191": {
+"name": "subway_hall",
+"verts": 20,
+"normals": true,
+"uv0": true,
+"uv1": false,
+"indices": 48,
+"subs": [
+[
+0,
+48
+]
+]
+},
+"m197": {
+"name": "Hull 5",
+"verts": 8,
+"normals": false,
+"uv0": false,
+"uv1": false,
+"indices": 36,
+"subs": [
+[
+0,
+36
+]
+]
+},
+"m198": {
+"name": "Hull 6",
+"verts": 8,
+"normals": false,
+"uv0": false,
+"uv1": false,
+"indices": 36,
+"subs": [
+[
+0,
+36
+]
+]
+},
+"mf25838450e39": {
+"name": "subway_meshCollider",
+"verts": 24,
+"normals": true,
+"uv0": true,
+"uv1": true,
+"indices": 36,
+"subs": [
+[
+0,
+36
+]
+]
+},
+"m20436a3a0e39": {
+"name": "subway_meshCollider",
+"verts": 37,
+"normals": true,
+"uv0": true,
+"uv1": true,
+"indices": 60,
+"subs": [
+[
+0,
+60
+]
+]
+},
+"m9f457f410e39": {
+"name": "subway_meshCollider",
+"verts": 36,
+"normals": true,
+"uv0": true,
+"uv1": true,
+"indices": 60,
+"subs": [
+[
+0,
+60
+]
+]
+},
+"m891778200e39": {
+"name": "subway_meshCollider",
+"verts": 24,
+"normals": true,
+"uv0": true,
+"uv1": true,
+"indices": 36,
+"subs": [
+[
+0,
+36
+]
+]
+},
+"mad6eadc50e39": {
+"name": "subway_meshCollider",
+"verts": 32,
+"normals": true,
+"uv0": true,
+"uv1": true,
+"indices": 48,
+"subs": [
+[
+0,
+42
+],
+[
+42,
+6
+]
+]
+},
+"mb914dd450e39": {
+"name": "subway_meshCollider",
+"verts": 30,
+"normals": true,
+"uv0": true,
+"uv1": true,
+"indices": 48,
+"subs": [
+[
+0,
+36
+],
+[
+36,
+12
+]
+]
+},
+"mf3c0994f0e39": {
+"name": "subway_meshCollider",
+"verts": 50,
+"normals": true,
+"uv0": true,
+"uv1": true,
+"indices": 72,
+"subs": [
+[
+0,
+15
+],
+[
+15,
+57
+]
+]
+},
+"m6a21c4ea0e39": {
+"name": "subway_meshCollider",
+"verts": 24,
+"normals": true,
+"uv0": true,
+"uv1": true,
+"indices": 36,
+"subs": [
+[
+0,
+6
+],
+[
+6,
+30
+]
+]
+},
+"m6e4269d00e39": {
+"name": "subway_meshCollider",
+"verts": 24,
+"normals": true,
+"uv0": true,
+"uv1": true,
+"indices": 36,
+"subs": [
+[
+0,
+6
+],
+[
+6,
+30
+]
+]
+},
+"m180e03fb0e39": {
+"name": "subway_meshCollider",
+"verts": 24,
+"normals": true,
+"uv0": true,
+"uv1": true,
+"indices": 36,
+"subs": [
+[
+0,
+6
+],
+[
+6,
+30
+]
+]
+},
+"m7f01d6300e39": {
+"name": "subway_meshCollider",
+"verts": 24,
+"normals": true,
+"uv0": true,
+"uv1": true,
+"indices": 36,
+"subs": [
+[
+0,
+36
+]
+]
+},
+"mb556766f0e39": {
+"name": "subway_meshCollider",
+"verts": 24,
+"normals": true,
+"uv0": true,
+"uv1": true,
+"indices": 36,
+"subs": [
+[
+0,
+36
+]
+]
+},
+"mdb22b5a00e39": {
+"name": "subway_meshCollider",
+"verts": 24,
+"normals": true,
+"uv0": true,
+"uv1": true,
+"indices": 36,
+"subs": [
+[
+0,
+36
+]
+]
+},
+"ma0fd63320e39": {
+"name": "subway_meshCollider",
+"verts": 24,
+"normals": true,
+"uv0": true,
+"uv1": true,
+"indices": 36,
+"subs": [
+[
+0,
+36
+]
+]
+},
+"m102af9e70e39": {
+"name": "subway_meshCollider",
+"verts": 24,
+"normals": true,
+"uv0": true,
+"uv1": true,
+"indices": 36,
+"subs": [
+[
+0,
+36
+]
+]
+},
+"m5a6aa24c0e39": {
+"name": "subway_meshCollider",
+"verts": 24,
+"normals": true,
+"uv0": true,
+"uv1": true,
+"indices": 36,
+"subs": [
+[
+0,
+36
+]
+]
+},
+"ma920473c0e39": {
+"name": "subway_meshCollider",
+"verts": 24,
+"normals": true,
+"uv0": true,
+"uv1": true,
+"indices": 36,
+"subs": [
+[
+0,
+36
+]
+]
+},
+"m437b17880e39": {
+"name": "subway_meshCollider",
+"verts": 24,
+"normals": true,
+"uv0": true,
+"uv1": true,
+"indices": 36,
+"subs": [
+[
+0,
+36
+]
+]
+},
+"mbedd27d20e39": {
+"name": "subway_meshCollider",
+"verts": 24,
+"normals": true,
+"uv0": true,
+"uv1": true,
+"indices": 36,
+"subs": [
+[
+0,
+36
+]
+]
+},
+"m2577e6c10e39": {
+"name": "subway_meshCollider",
+"verts": 24,
+"normals": true,
+"uv0": true,
+"uv1": true,
+"indices": 36,
+"subs": [
+[
+0,
+36
+]
+]
+},
+"mf96b882d0e39": {
+"name": "subway_meshCollider",
+"verts": 24,
+"normals": true,
+"uv0": true,
+"uv1": true,
+"indices": 36,
+"subs": [
+[
+0,
+36
+]
+]
+},
+"m8e3066240e39": {
+"name": "subway_meshCollider",
+"verts": 24,
+"normals": true,
+"uv0": true,
+"uv1": true,
+"indices": 36,
+"subs": [
+[
+0,
+36
+]
+]
+},
+"mb199f30a0e39": {
+"name": "subway_meshCollider",
+"verts": 24,
+"normals": true,
+"uv0": true,
+"uv1": true,
+"indices": 36,
+"subs": [
+[
+0,
+6
+],
+[
+6,
+30
+]
+]
+},
+"m4406af550e39": {
+"name": "subway_meshCollider",
+"verts": 24,
+"normals": true,
+"uv0": true,
+"uv1": true,
+"indices": 36,
+"subs": [
+[
+0,
+6
+],
+[
+6,
+30
+]
+]
+},
+"m78eb8a10e39": {
+"name": "subway_meshCollider",
+"verts": 24,
+"normals": true,
+"uv0": true,
+"uv1": true,
+"indices": 36,
+"subs": [
+[
+0,
+6
+],
+[
+6,
+30
+]
+]
+},
+"m474c66180e39": {
+"name": "subway_meshCollider",
+"verts": 50,
+"normals": true,
+"uv0": true,
+"uv1": true,
+"indices": 72,
+"subs": [
+[
+0,
+15
+],
+[
+15,
+57
+]
+]
+},
+"mc267aa980e39": {
+"name": "subway_meshCollider",
+"verts": 24,
+"normals": true,
+"uv0": true,
+"uv1": true,
+"indices": 36,
+"subs": [
+[
+0,
+6
+],
+[
+6,
+30
+]
+]
+},
+"m957a60d00e39": {
+"name": "subway_meshCollider",
+"verts": 24,
+"normals": true,
+"uv0": true,
+"uv1": true,
+"indices": 36,
+"subs": [
+[
+0,
+6
+],
+[
+6,
+30
+]
+]
+},
+"m8a0cd86e0e39": {
+"name": "subway_meshCollider",
+"verts": 24,
+"normals": true,
+"uv0": true,
+"uv1": true,
+"indices": 36,
+"subs": [
+[
+0,
+6
+],
+[
+6,
+30
+]
+]
+},
+"m88a77750e39": {
+"name": "subway_meshCollider",
+"verts": 24,
+"normals": true,
+"uv0": true,
+"uv1": true,
+"indices": 36,
+"subs": [
+[
+0,
+6
+],
+[
+6,
+30
+]
+]
+},
+"m4448d4f0e39": {
+"name": "subway_meshCollider",
+"verts": 24,
+"normals": true,
+"uv0": true,
+"uv1": true,
+"indices": 36,
+"subs": [
+[
+0,
+6
+],
+[
+6,
+30
+]
+]
+},
+"m9034dd2d0e39": {
+"name": "subway_meshCollider",
+"verts": 24,
+"normals": true,
+"uv0": true,
+"uv1": true,
+"indices": 36,
+"subs": [
+[
+0,
+6
+],
+[
+6,
+30
+]
+]
+},
+"m195": {
+"name": "train_door_01",
+"verts": 48,
+"normals": true,
+"uv0": true,
+"uv1": false,
+"indices": 96,
+"subs": [
+[
+0,
+96
+]
+]
+},
+"m196": {
+"name": "train_doorWindow_01",
+"verts": 8,
+"normals": true,
+"uv0": true,
+"uv1": false,
+"indices": 12,
+"subs": [
+[
+0,
+12
+]
+]
+},
+"m193": {
+"name": "train_doorWindow_02",
+"verts": 12,
+"normals": true,
+"uv0": true,
+"uv1": false,
+"indices": 12,
+"subs": [
+[
+0,
+12
+]
+]
+},
+"m190": {
+"name": "train_Lights",
+"verts": 8,
+"normals": true,
+"uv0": true,
+"uv1": false,
+"indices": 12,
+"subs": [
+[
+0,
+12
+]
+]
+},
+"m18e": {
+"name": "train",
+"verts": 5838,
+"normals": true,
+"uv0": true,
+"uv1": false,
+"indices": 10863,
+"subs": [
+[
+0,
+10755
+],
+[
+10755,
+108
+]
+]
+},
+"m18f": {
+"name": "train_windows",
+"verts": 264,
+"normals": true,
+"uv0": true,
+"uv1": false,
+"indices": 420,
+"subs": [
+[
+0,
+420
+]
+]
+},
+"m192": {
+"name": "train_door_02",
+"verts": 57,
+"normals": true,
+"uv0": true,
+"uv1": false,
+"indices": 96,
+"subs": [
+[
+0,
+96
+]
+]
+}
+},
+"materials": {
+"TX_subwayTrain_9": {
+"name": "TX_subwayTrain",
+"color": [
+0.6471,
+0.6471,
+0.6471,
+1.0
+],
+"map": "TX_subwayTrain_5e.png",
+"smoothness": 0.6,
+"metallic": 1.0,
+"emission": [
+0.0,
+0.0,
+0.0
+]
+},
+"Subway_Glass_14": {
+"name": "Subway_Glass",
+"color": [
+1.0,
+1.0,
+1.0,
+0.284
+],
+"map": null,
+"smoothness": 0.423,
+"metallic": 1.0,
+"emission": [
+0.0,
+0.0,
+0.0
+]
+},
+"Subway_TrackRail_10": {
+"name": "Subway_TrackRail",
+"color": [
+0.1961,
+0.1961,
+0.1961,
+1.0
+],
+"map": null,
+"smoothness": 0.75,
+"metallic": 0.0,
+"emission": [
+0.0,
+0.0,
+0.0
+]
+},
+"Subway_MainTile_15": {
+"name": "Subway_MainTile",
+"color": [
+0.4006,
+0.3775,
+0.4151,
+1.0
+],
+"map": null,
+"smoothness": 0.72,
+"metallic": 0.0,
+"emission": [
+0.0,
+0.0,
+0.0
+]
+},
+"Wall_a87a25cc": {
+"name": "Wall",
+"color": [
+0.6509,
+0.6104,
+0.6104,
+1.0
+],
+"map": "Floor_cf7f14ce.png",
+"smoothness": 0.2,
+"metallic": 0.0,
+"emission": [
+0.0,
+0.0,
+0.0
+]
+},
+"Subway_TiledWall_11": {
+"name": "Subway_TiledWall",
+"color": [
+0.588,
+0.588,
+0.588,
+1.0
+],
+"map": null,
+"smoothness": 0.6,
+"metallic": 0.0,
+"emission": [
+0.0,
+0.0,
+0.0
+]
+},
+"Subway_Room_b": {
+"name": "Subway_Room",
+"color": [
+0.1569,
+0.1569,
+0.1569,
+1.0
+],
+"map": null,
+"smoothness": 0.0,
+"metallic": 0.0,
+"emission": [
+0.0,
+0.0,
+0.0
+]
+},
+"Wall 1_c": {
+"name": "Wall 1",
+"color": [
+0.0,
+0.0,
+0.0,
+1.0
+],
+"map": "Floor_cf7f14ce.png",
+"smoothness": 0.2,
+"metallic": 0.0,
+"emission": [
+0.0,
+0.0,
+0.0
+]
+},
+"Subway_Wall_4": {
+"name": "Subway_Wall",
+"color": [
+0.2925,
+0.288,
+0.288,
+1.0
+],
+"map": null,
+"smoothness": 0.2,
+"metallic": 0.0,
+"emission": [
+0.0,
+0.0,
+0.0
+]
+},
+"Subway_TrackSupports_12": {
+"name": "Subway_TrackSupports",
+"color": [
+0.2941,
+0.251,
+0.2076,
+1.0
+],
+"map": null,
+"smoothness": 0.2,
+"metallic": 0.0,
+"emission": [
+0.0,
+0.0,
+0.0
+]
+},
+"Subway_Supports_6": {
+"name": "Subway_Supports",
+"color": [
+0.4811,
+0.1929,
+0.2519,
+1.0
+],
+"map": null,
+"smoothness": 0.153,
+"metallic": 0.225,
+"emission": [
+0.0,
+0.0,
+0.0
+]
+},
+"Void_da1c7ab6": {
+"name": "Void",
+"color": [
+0.0,
+0.0,
+0.0,
+1.0
+],
+"map": null,
+"smoothness": 0.0,
+"metallic": 0.0,
+"emission": [
+0.0,
+0.0,
+0.0
+]
+},
+"Material #46_5cf0f48a": {
+"name": "Material #46",
+"color": [
+0.0784,
+0.0784,
+0.0784,
+1.0
+],
+"map": null,
+"smoothness": 0.5,
+"metallic": 0.0,
+"emission": [
+0.0,
+0.0,
+0.0
+]
+},
+"Subway_EdgeTile_d": {
+"name": "Subway_EdgeTile",
+"color": [
+0.6604,
+0.5499,
+0.3333,
+1.0
+],
+"map": null,
+"smoothness": 0.74,
+"metallic": 0.0,
+"emission": [
+0.0,
+0.0,
+0.0
+]
+},
+"SolidBlack_f": {
+"name": "SolidBlack",
+"color": [
+0.0,
+0.0,
+0.0,
+1.0
+],
+"map": null,
+"smoothness": 0.5,
+"metallic": 0.0,
+"emission": [
+0.0,
+0.0,
+0.0
+]
+},
+"TRIM_945e8b1": {
+"name": "TRIM",
+"color": [
+0.0784,
+0.0784,
+0.0784,
+1.0
+],
+"map": null,
+"smoothness": 0.5,
+"metallic": 0.0,
+"emission": [
+0.0,
+0.0,
+0.0
+]
+},
+"Subway_Lights_7": {
+"name": "Subway_Lights",
+"color": [
+0.5,
+0.5,
+0.5,
+1.0
+],
+"map": null,
+"smoothness": 0.423,
+"metallic": 0.427,
+"emission": [
+1.7411,
+1.7411,
+1.7411
+]
+}
+},
+"renderers": [
+{
+"path": "subway/subway_staircase_base/subway_starcase_step (4)",
+"mesh": "m1",
+"subs": [
+131,
+132
+],
+"mats": [
+"Subway_TrackRail_10",
+"Subway_MainTile_15"
+],
+"matrix": null,
+"lightmap": 0,
+"lmso": [
+0.015381,
+0.015381,
+0.199234,
+0.389776
+],
+"cast": 1,
+"recv": true,
+"layer": 8
+},
+{
+"path": "subway/subway_staircase_base/subway_starcase_step (10)",
+"mesh": "m1",
+"subs": [
+183,
+184
+],
+"mats": [
+"Subway_TrackRail_10",
+"Subway_MainTile_15"
+],
+"matrix": null,
+"lightmap": 0,
+"lmso": [
+0.015381,
+0.015381,
+0.870621,
+0.162369
+],
+"cast": 1,
+"recv": true,
+"layer": 8
+},
+{
+"path": "subway/subway_endWall_right",
+"mesh": "m3",
+"subs": [
+5,
+6,
+7
+],
+"mats": [
+"Wall_a87a25cc",
+"Subway_TiledWall_11",
+"Subway_Room_b"
+],
+"matrix": null,
+"lightmap": 0,
+"lmso": [
+0.102173,
+0.102173,
+0.884094,
+-0.006386
+],
+"cast": 1,
+"recv": true,
+"layer": 0
+},
+{
+"path": "subway/subway_tunnel (2)",
+"mesh": "m1",
+"subs": [
+197,
+198
+],
+"mats": [
+"Wall 1_c",
+"Subway_Wall_4"
+],
+"matrix": null,
+"lightmap": 0,
+"lmso": [
+0.292786,
+0.292786,
+0.242931,
+-0.018299
+],
+"cast": 1,
+"recv": true,
+"layer": 0
+},
+{
+"path": "subway/subway_tunnel (0)",
+"mesh": "m1",
+"subs": [
+201,
+202
+],
+"mats": [
+"Wall 1_c",
+"Subway_Wall_4"
+],
+"matrix": null,
+"lightmap": 0,
+"lmso": [
+0.292786,
+0.292786,
+-0.018299,
+0.155832
+],
+"cast": 1,
+"recv": true,
+"layer": 0
+},
+{
+"path": "subway/subway_endWall_left",
+"mesh": "m3",
+"subs": [
+1,
+2,
+3,
+4
+],
+"mats": [
+"Wall_a87a25cc",
+"Subway_TiledWall_11",
+"Wall_a87a25cc",
+"Subway_Room_b"
+],
+"matrix": null,
+"lightmap": 0,
+"lmso": [
+0.122803,
+0.122803,
+0.776016,
+-0.007675
+],
+"cast": 1,
+"recv": true,
+"layer": 0
+},
+{
+"path": "subway/subway_staircase_base/subway_starcase_step (19)",
+"mesh": "m1",
+"subs": [
+173,
+174
+],
+"mats": [
+"Subway_TrackRail_10",
+"Subway_MainTile_15"
+],
+"matrix": null,
+"lightmap": 0,
+"lmso": [
+0.015381,
+0.015381,
+0.117691,
+0.389776
+],
+"cast": 1,
+"recv": true,
+"layer": 8
+},
+{
+"path": "subway/subway_beam (2)/subway_lightRope_segment (10)",
+"mesh": "me93d6c4a0e39",
+"subs": [
+0
+],
+"mats": [
+"Subway_TrackRail_10"
+],
+"matrix": [
+[
+0.5,
+0.0,
+-0.0,
+7.5
+],
+[
+0.0,
+-0.0,
+-0.5,
+4.5
+],
+[
+-0.0,
+0.5,
+-0.0,
+0.5
+],
+[
+0.0,
+0.0,
+-0.0,
+1.0
+]
+],
+"lightmap": -1,
+"lmso": [
+1.0,
+1.0,
+0.0,
+0.0
+],
+"cast": 1,
+"recv": true,
+"layer": 0
+},
+{
+"path": "subway/subway_staircase_base/subway_starcase_step (14)",
+"mesh": "m1",
+"subs": [
+181,
+182
+],
+"mats": [
+"Subway_TrackRail_10",
+"Subway_MainTile_15"
+],
+"matrix": null,
+"lightmap": 0,
+"lmso": [
+0.015381,
+0.015381,
+0.981315,
+0.059662
+],
+"cast": 1,
+"recv": true,
+"layer": 8
+},
+{
+"path": "subway/Track (Front)/subway_track (5)",
+"mesh": "m1",
+"subs": [
+187,
+188
+],
+"mats": [
+"Subway_TrackRail_10",
+"Subway_TrackSupports_12"
+],
+"matrix": null,
+"lightmap": 0,
+"lmso": [
+0.046388,
+0.046388,
+-0.002899,
+0.855155
+],
+"cast": 1,
+"recv": true,
+"layer": 0
+},
+{
+"path": "subway/subway_beam (2)/subway_lightRope_segment (8)",
+"mesh": "me93d6c4a0e39",
+"subs": [
+0
+],
+"mats": [
+"Subway_TrackRail_10"
+],
+"matrix": [
+[
+0.5,
+0.0,
+-0.0,
+7.5
+],
+[
+0.0,
+-0.0,
+-0.5,
+4.25
+],
+[
+-0.0,
+0.5,
+-0.0,
+-0.5
+],
+[
+0.0,
+0.0,
+-0.0,
+1.0
+]
+],
+"lightmap": -1,
+"lmso": [
+1.0,
+1.0,
+0.0,
+0.0
+],
+"cast": 1,
+"recv": true,
+"layer": 0
+},
+{
+"path": "subway/subway_staircase_base/subway_starcase_step (17)",
+"mesh": "m1",
+"subs": [
+191,
+192
+],
+"mats": [
+"Subway_TrackRail_10",
+"Subway_MainTile_15"
+],
+"matrix": null,
+"lightmap": 0,
+"lmso": [
+0.015381,
+0.015381,
+0.103043,
+0.389776
+],
+"cast": 1,
+"recv": true,
+"layer": 8
+},
+{
+"path": "subway/subway_beam (0)/subway_lightRope_segment (4)",
+"mesh": "me93d6c4a0e39",
+"subs": [
+0
+],
+"mats": [
+"Subway_TrackRail_10"
+],
+"matrix": [
+[
+0.5,
+0.0,
+-0.0,
+-7.5
+],
+[
+0.0,
+-0.0,
+-0.5,
+5.25
+],
+[
+-0.0,
+0.5,
+-0.0,
+0.5
+],
+[
+0.0,
+0.0,
+-0.0,
+1.0
+]
+],
+"lightmap": -1,
+"lmso": [
+1.0,
+1.0,
+0.0,
+0.0
+],
+"cast": 1,
+"recv": true,
+"layer": 0
+},
+{
+"path": "subway/subway_beam (0)/subway_support (1)",
+"mesh": "m1",
+"subs": [
+1,
+2
+],
+"mats": [
+"Subway_Supports_6",
+"Void_da1c7ab6"
+],
+"matrix": null,
+"lightmap": 0,
+"lmso": [
+0.036009,
+0.036009,
+0.954635,
+0.13773
+],
+"cast": 2,
+"recv": true,
+"layer": 0
+},
+{
+"path": "subway/subway_staircase_base/subway_starcase_step (6)",
+"mesh": "m1",
+"subs": [
+135,
+136
+],
+"mats": [
+"Subway_TrackRail_10",
+"Subway_MainTile_15"
+],
+"matrix": null,
+"lightmap": 0,
+"lmso": [
+0.015381,
+0.015381,
+0.841324,
+0.162369
+],
+"cast": 1,
+"recv": true,
+"layer": 8
+},
+{
+"path": "subway/Track (Back)/subway_track (6)",
+"mesh": "m1",
+"subs": [
+137,
+138
+],
+"mats": [
+"Subway_TrackRail_10",
+"Subway_TrackSupports_12"
+],
+"matrix": null,
+"lightmap": 0,
+"lmso": [
+0.046388,
+0.046388,
+0.126007,
+0.733296
+],
+"cast": 1,
+"recv": true,
+"layer": 0
+},
+{
+"path": "subway/subway_staircase_base/subway_starcase_step (16)",
+"mesh": "m1",
+"subs": [
+151,
+152
+],
+"mats": [
+"Subway_TrackRail_10",
+"Subway_MainTile_15"
+],
+"matrix": null,
+"lightmap": 0,
+"lmso": [
+0.015381,
+0.015381,
+0.812027,
+0.162369
+],
+"cast": 1,
+"recv": true,
+"layer": 8
+},
+{
+"path": "subway/subway_starcase_top",
+"mesh": "m1",
+"subs": [
+193,
+194
+],
+"mats": [
+"Material #46_5cf0f48a",
+"Subway_MainTile_15"
+],
+"matrix": null,
+"lightmap": 0,
+"lmso": [
+0.062764,
+0.062764,
+0.19342,
+0.53843
+],
+"cast": 2,
+"recv": true,
+"layer": 0
+},
+{
+"path": "subway/subway_tunnel (3)",
+"mesh": "m1",
+"subs": [
+203,
+204
+],
+"mats": [
+"Wall 1_c",
+"Subway_Wall_4"
+],
+"matrix": null,
+"lightmap": 0,
+"lmso": [
+0.292786,
+0.292786,
+-0.018299,
+-0.018299
+],
+"cast": 1,
+"recv": true,
+"layer": 0
+},
+{
+"path": "subway/Track (Front)/subway_track (2)",
+"mesh": "m1",
+"subs": [
+155,
+156
+],
+"mats": [
+"Subway_TrackRail_10",
+"Subway_TrackSupports_12"
+],
+"matrix": null,
+"lightmap": 0,
+"lmso": [
+0.046388,
+0.046388,
+0.209503,
+0.397853
+],
+"cast": 1,
+"recv": true,
+"layer": 0
+},
+{
+"path": "subway/Track (Back)/subway_track (5)",
+"mesh": "m1",
+"subs": [
+127,
+128
+],
+"mats": [
+"Subway_TrackRail_10",
+"Subway_TrackSupports_12"
+],
+"matrix": null,
+"lightmap": 0,
+"lmso": [
+0.046388,
+0.046388,
+-0.002899,
+0.733296
+],
+"cast": 1,
+"recv": true,
+"layer": 0
+},
+{
+"path": "subway/subway_beam (0)/subway_lightRope_segment (5)",
+"mesh": "me93d6c4a0e39",
+"subs": [
+0
+],
+"mats": [
+"Subway_TrackRail_10"
+],
+"matrix": [
+[
+0.5,
+0.0,
+-0.0,
+-7.5
+],
+[
+0.0,
+-0.0,
+-0.5,
+5.0
+],
+[
+-0.0,
+0.5,
+-0.0,
+0.5
+],
+[
+0.0,
+0.0,
+-0.0,
+1.0
+]
+],
+"lightmap": -1,
+"lmso": [
+1.0,
+1.0,
+0.0,
+0.0
+],
+"cast": 1,
+"recv": true,
+"layer": 0
+},
+{
+"path": "subway/subway_beam (1)/subway_lightRope_segment (11)",
+"mesh": "me93d6c4a0e39",
+"subs": [
+0
+],
+"mats": [
+"Subway_TrackRail_10"
+],
+"matrix": [
+[
+0.5,
+0.0,
+-0.0,
+0.0
+],
+[
+0.0,
+-0.0,
+-0.5,
+4.25
+],
+[
+-0.0,
+0.5,
+-0.0,
+0.5
+],
+[
+0.0,
+0.0,
+-0.0,
+1.0
+]
+],
+"lightmap": -1,
+"lmso": [
+1.0,
+1.0,
+0.0,
+0.0
+],
+"cast": 1,
+"recv": true,
+"layer": 0
+},
+{
+"path": "subway/subway_beam (0)/subway_lightRope_segment (0)",
+"mesh": "me93d6c4a0e39",
+"subs": [
+0
+],
+"mats": [
+"Subway_TrackRail_10"
+],
+"matrix": [
+[
+0.5,
+0.0,
+-0.0,
+-7.5
+],
+[
+0.0,
+-0.0,
+-0.5,
+5.5
+],
+[
+-0.0,
+0.5,
+-0.0,
+-0.5
+],
+[
+0.0,
+0.0,
+-0.0,
+1.0
+]
+],
+"lightmap": -1,
+"lmso": [
+1.0,
+1.0,
+0.0,
+0.0
+],
+"cast": 1,
+"recv": true,
+"layer": 0
+},
+{
+"path": "subway/Track (Front)/subway_track (1)",
+"mesh": "m1",
+"subs": [
+159,
+160
+],
+"mats": [
+"Subway_TrackRail_10",
+"Subway_TrackSupports_12"
+],
+"matrix": null,
+"lightmap": 0,
+"lmso": [
+0.046388,
+0.046388,
+0.04007,
+0.733296
+],
+"cast": 1,
+"recv": true,
+"layer": 0
+},
+{
+"path": "subway/subway_beam (0)",
+"mesh": "m1",
+"subs": [
+8
+],
+"mats": [
+"Subway_Supports_6"
+],
+"matrix": null,
+"lightmap": 0,
+"lmso": [
+0.036255,
+0.036255,
+0.210136,
+0.450909
+],
+"cast": 1,
+"recv": true,
+"layer": 0
+},
+{
+"path": "subway/subway_platformEnd",
+"mesh": "m3",
+"subs": [
+0
+],
+"mats": [
+"Subway_EdgeTile_d"
+],
+"matrix": null,
+"lightmap": 0,
+"lmso": [
+0.012942,
+0.012942,
+0.211593,
+0.464169
+],
+"cast": 1,
+"recv": true,
+"layer": 0
+},
+{
+"path": "Managers/Void/Void Cube",
+"mesh": "m2",
+"subs": [
+6
+],
+"mats": [
+"Void_da1c7ab6"
+],
+"matrix": null,
+"lightmap": -1,
+"lmso": [
+1.0,
+1.0,
+0.0,
+0.0
+],
+"cast": 0,
+"recv": true,
+"layer": 0
+},
+{
+"path": "Managers/Void/Void Cube (3)",
+"mesh": "m2",
+"subs": [
+1
+],
+"mats": [
+"Void_da1c7ab6"
+],
+"matrix": null,
+"lightmap": -1,
+"lmso": [
+1.0,
+1.0,
+0.0,
+0.0
+],
+"cast": 0,
+"recv": true,
+"layer": 0
+},
+{
+"path": "subway/subway_beam (1)/subway_support (0)",
+"mesh": "m1",
+"subs": [
+5,
+6
+],
+"mats": [
+"Subway_Supports_6",
+"Void_da1c7ab6"
+],
+"matrix": null,
+"lightmap": 0,
+"lmso": [
+0.036009,
+0.036009,
+0.06353,
+0.658261
+],
+"cast": 2,
+"recv": true,
+"layer": 0
+},
+{
+"path": "subway/subway_beam (1)/subway_lightRope_segment (5)",
+"mesh": "me93d6c4a0e39",
+"subs": [
+0
+],
+"mats": [
+"Subway_TrackRail_10"
+],
+"matrix": [
+[
+0.5,
+0.0,
+-0.0,
+0.0
+],
+[
+0.0,
+-0.0,
+-0.5,
+5.0
+],
+[
+-0.0,
+0.5,
+-0.0,
+0.5
+],
+[
+0.0,
+0.0,
+-0.0,
+1.0
+]
+],
+"lightmap": -1,
+"lmso": [
+1.0,
+1.0,
+0.0,
+0.0
+],
+"cast": 1,
+"recv": true,
+"layer": 0
+},
+{
+"path": "subway/subway_beam (2)/subway_lightRope_segment (3)",
+"mesh": "me93d6c4a0e39",
+"subs": [
+0
+],
+"mats": [
+"Subway_TrackRail_10"
+],
+"matrix": [
+[
+0.5,
+0.0,
+-0.0,
+7.5
+],
+[
+0.0,
+-0.0,
+-0.5,
+5.5
+],
+[
+-0.0,
+0.5,
+-0.0,
+0.5
+],
+[
+0.0,
+0.0,
+-0.0,
+1.0
+]
+],
+"lightmap": -1,
+"lmso": [
+1.0,
+1.0,
+0.0,
+0.0
+],
+"cast": 1,
+"recv": true,
+"layer": 0
+},
+{
+"path": "subway/subway_beam (1)/subway_lightRope_segment (8)",
+"mesh": "me93d6c4a0e39",
+"subs": [
+0
+],
+"mats": [
+"Subway_TrackRail_10"
+],
+"matrix": [
+[
+0.5,
+0.0,
+-0.0,
+0.0
+],
+[
+0.0,
+-0.0,
+-0.5,
+4.25
+],
+[
+-0.0,
+0.5,
+-0.0,
+-0.5
+],
+[
+0.0,
+0.0,
+-0.0,
+1.0
+]
+],
+"lightmap": -1,
+"lmso": [
+1.0,
+1.0,
+0.0,
+0.0
+],
+"cast": 1,
+"recv": true,
+"layer": 0
+},
+{
+"path": "subway/subway_void",
+"mesh": "m80dfeaa80e39",
+"subs": [
+0
+],
+"mats": [
+"Void_da1c7ab6"
+],
+"matrix": [
+[
+1.0,
+0.0,
+-0.0,
+0.0
+],
+[
+0.0,
+-0.0,
+-1.0,
+-1.5
+],
+[
+-0.0,
+1.0,
+-0.0,
+0.0
+],
+[
+0.0,
+0.0,
+-0.0,
+1.0
+]
+],
+"lightmap": -1,
+"lmso": [
+1.0,
+1.0,
+0.0,
+0.0
+],
+"cast": 1,
+"recv": true,
+"layer": 0
+},
+{
+"path": "subway/subway_staircase_base/subway_starcase_step (11)",
+"mesh": "m1",
+"subs": [
+163,
+164
+],
+"mats": [
+"Subway_TrackRail_10",
+"Subway_MainTile_15"
+],
+"matrix": null,
+"lightmap": 0,
+"lmso": [
+0.015381,
+0.015381,
+0.826675,
+0.162369
+],
+"cast": 1,
+"recv": true,
+"layer": 8
+},
+{
+"path": "subway/subway_beam (1)/subway_lightRope_segment (10)",
+"mesh": "me93d6c4a0e39",
+"subs": [
+0
+],
+"mats": [
+"Subway_TrackRail_10"
+],
+"matrix": [
+[
+0.5,
+0.0,
+-0.0,
+0.0
+],
+[
+0.0,
+-0.0,
+-0.5,
+4.5
+],
+[
+-0.0,
+0.5,
+-0.0,
+0.5
+],
+[
+0.0,
+0.0,
+-0.0,
+1.0
+]
+],
+"lightmap": -1,
+"lmso": [
+1.0,
+1.0,
+0.0,
+0.0
+],
+"cast": 1,
+"recv": true,
+"layer": 0
+},
+{
+"path": "Lighting & Effects/LightSetup/subway_lightFitting_shadowcaster",
+"mesh": "ma4d3fb1c0e39",
+"subs": [
+0
+],
+"mats": [
+"SolidBlack_f"
+],
+"matrix": [
+[
+1.0,
+0.0,
+-0.0,
+-7.5
+],
+[
+0.0,
+-0.0,
+-1.0,
+4.65
+],
+[
+-0.0,
+1.0,
+-0.0,
+-0.0
+],
+[
+0.0,
+0.0,
+-0.0,
+1.0
+]
+],
+"lightmap": 0,
+"lmso": [
+0.014574,
+0.014574,
+0.981365,
+0.014714
+],
+"cast": 3,
+"recv": true,
+"layer": 0
+},
+{
+"path": "subway/subway_staircase_base/subway_starcase_step (5)",
+"mesh": "m1",
+"subs": [
+177,
+178
+],
+"mats": [
+"Subway_TrackRail_10",
+"Subway_MainTile_15"
+],
+"matrix": null,
+"lightmap": 0,
+"lmso": [
+0.015381,
+0.015381,
+0.213882,
+0.389776
+],
+"cast": 1,
+"recv": true,
+"layer": 8
+},
+{
+"path": "Managers/Void/Void Cube (4)",
+"mesh": "m2",
+"subs": [
+4
+],
+"mats": [
+"Void_da1c7ab6"
+],
+"matrix": null,
+"lightmap": -1,
+"lmso": [
+1.0,
+1.0,
+0.0,
+0.0
+],
+"cast": 0,
+"recv": true,
+"layer": 0
+},
+{
+"path": "subway/Track (Back)/subway_track (3)",
+"mesh": "m1",
+"subs": [
+153,
+154
+],
+"mats": [
+"Subway_TrackRail_10",
+"Subway_TrackSupports_12"
+],
+"matrix": null,
+"lightmap": 0,
+"lmso": [
+0.046388,
+0.046388,
+-0.002899,
+0.814535
+],
+"cast": 1,
+"recv": true,
+"layer": 0
+},
+{
+"path": "subway/subway_beam (2)/subway_lightRope_segment (1)",
+"mesh": "me93d6c4a0e39",
+"subs": [
+0
+],
+"mats": [
+"Subway_TrackRail_10"
+],
+"matrix": [
+[
+0.5,
+0.0,
+-0.0,
+7.5
+],
+[
+0.0,
+-0.0,
+-0.5,
+5.25
+],
+[
+-0.0,
+0.5,
+-0.0,
+-0.5
+],
+[
+0.0,
+0.0,
+-0.0,
+1.0
+]
+],
+"lightmap": -1,
+"lmso": [
+1.0,
+1.0,
+0.0,
+0.0
+],
+"cast": 1,
+"recv": true,
+"layer": 0
+},
+{
+"path": "subway/subway_beam (1)/subway_support (1)",
+"mesh": "m1",
+"subs": [
+10,
+11
+],
+"mats": [
+"Subway_Supports_6",
+"Void_da1c7ab6"
+],
+"matrix": null,
+"lightmap": 0,
+"lmso": [
+0.036009,
+0.036009,
+0.096734,
+0.658261
+],
+"cast": 2,
+"recv": true,
+"layer": 0
+},
+{
+"path": "subway/subway_beam (1)/subway_lightRope_segment (3)",
+"mesh": "me93d6c4a0e39",
+"subs": [
+0
+],
+"mats": [
+"Subway_TrackRail_10"
+],
+"matrix": [
+[
+0.5,
+0.0,
+-0.0,
+0.0
+],
+[
+0.0,
+-0.0,
+-0.5,
+5.5
+],
+[
+-0.0,
+0.5,
+-0.0,
+0.5
+],
+[
+0.0,
+0.0,
+-0.0,
+1.0
+]
+],
+"lightmap": -1,
+"lmso": [
+1.0,
+1.0,
+0.0,
+0.0
+],
+"cast": 1,
+"recv": true,
+"layer": 0
+},
+{
+"path": "Managers/Void/Void Cube (2)",
+"mesh": "m2",
+"subs": [
+2
+],
+"mats": [
+"Void_da1c7ab6"
+],
+"matrix": null,
+"lightmap": -1,
+"lmso": [
+1.0,
+1.0,
+0.0,
+0.0
+],
+"cast": 0,
+"recv": true,
+"layer": 0
+},
+{
+"path": "subway/subway_staircase_base/subway_starcase_step (9)",
+"mesh": "m1",
+"subs": [
+185,
+186
+],
+"mats": [
+"Subway_TrackRail_10",
+"Subway_MainTile_15"
+],
+"matrix": null,
+"lightmap": 0,
+"lmso": [
+0.015381,
+0.015381,
+0.981315,
+0.066371
+],
+"cast": 1,
+"recv": true,
+"layer": 8
+},
+{
+"path": "subway/subway_beam (2)/subway_lightRope_segment (0)",
+"mesh": "me93d6c4a0e39",
+"subs": [
+0
+],
+"mats": [
+"Subway_TrackRail_10"
+],
+"matrix": [
+[
+0.5,
+0.0,
+-0.0,
+7.5
+],
+[
+0.0,
+-0.0,
+-0.5,
+5.5
+],
+[
+-0.0,
+0.5,
+-0.0,
+-0.5
+],
+[
+0.0,
+0.0,
+-0.0,
+1.0
+]
+],
+"lightmap": -1,
+"lmso": [
+1.0,
+1.0,
+0.0,
+0.0
+],
+"cast": 1,
+"recv": true,
+"layer": 0
+},
+{
+"path": "subway/subway_beam (1)/subway_lightRope_segment (6)",
+"mesh": "me93d6c4a0e39",
+"subs": [
+0
+],
+"mats": [
+"Subway_TrackRail_10"
+],
+"matrix": [
+[
+0.5,
+0.0,
+-0.0,
+0.0
+],
+[
+0.0,
+-0.0,
+-0.5,
+4.5
+],
+[
+-0.0,
+0.5,
+-0.0,
+-0.5
+],
+[
+0.0,
+0.0,
+-0.0,
+1.0
+]
+],
+"lightmap": -1,
+"lmso": [
+1.0,
+1.0,
+0.0,
+0.0
+],
+"cast": 1,
+"recv": true,
+"layer": 0
+},
+{
+"path": "subway/subway_beam (2)/subway_lightRope_segment (2)",
+"mesh": "me93d6c4a0e39",
+"subs": [
+0
+],
+"mats": [
+"Subway_TrackRail_10"
+],
+"matrix": [
+[
+0.5,
+0.0,
+-0.0,
+7.5
+],
+[
+0.0,
+-0.0,
+-0.5,
+5.0
+],
+[
+-0.0,
+0.5,
+-0.0,
+-0.5
+],
+[
+0.0,
+0.0,
+-0.0,
+1.0
+]
+],
+"lightmap": -1,
+"lmso": [
+1.0,
+1.0,
+0.0,
+0.0
+],
+"cast": 1,
+"recv": true,
+"layer": 0
+},
+{
+"path": "subway/subway_tunnel (1)",
+"mesh": "m1",
+"subs": [
+199,
+200
+],
+"mats": [
+"Wall 1_c",
+"Subway_Wall_4"
+],
+"matrix": null,
+"lightmap": 0,
+"lmso": [
+0.292786,
+0.292786,
+0.504162,
+-0.018299
+],
+"cast": 1,
+"recv": true,
+"layer": 0
+},
+{
+"path": "subway/Track (Front)/subway_track (0)",
+"mesh": "m1",
+"subs": [
+141,
+142
+],
+"mats": [
+"Subway_TrackRail_10",
+"Subway_TrackSupports_12"
+],
+"matrix": null,
+"lightmap": 0,
+"lmso": [
+0.046388,
+0.046388,
+0.211945,
+0.733296
+],
+"cast": 1,
+"recv": true,
+"layer": 0
+},
+{
+"path": "subway/Track (Back)/subway_track (0)",
+"mesh": "m1",
+"subs": [
+179,
+180
+],
+"mats": [
+"Subway_TrackRail_10",
+"Subway_TrackSupports_12"
+],
+"matrix": null,
+"lightmap": 0,
+"lmso": [
+0.046388,
+0.046388,
+0.196671,
+0.615137
+],
+"cast": 1,
+"recv": true,
+"layer": 0
+},
+{
+"path": "subway/subway_beam (2)",
+"mesh": "m1",
+"subs": [
+7
+],
+"mats": [
+"Subway_Supports_6"
+],
+"matrix": null,
+"lightmap": 0,
+"lmso": [
+0.036255,
+0.036255,
+0.210136,
+0.439106
+],
+"cast": 1,
+"recv": true,
+"layer": 0
+},
+{
+"path": "subway/subway_staircase_base",
+"mesh": "m1",
+"subs": [
+195,
+196
+],
+"mats": [
+"Subway_TiledWall_11",
+"Material #46_5cf0f48a"
+],
+"matrix": null,
+"lightmap": 0,
+"lmso": [
+0.038977,
+0.038977,
+0.217291,
+0.691284
+],
+"cast": 2,
+"recv": true,
+"layer": 0
+},
+{
+"path": "Lighting & Effects/LightSetup/subway_lightFitting_shadowcaster",
+"mesh": "ma4d3fb1c0e39",
+"subs": [
+0
+],
+"mats": [
+"SolidBlack_f"
+],
+"matrix": [
+[
+1.0,
+0.0,
+-0.0,
+7.5
+],
+[
+0.0,
+-0.0,
+-1.0,
+3.9
+],
+[
+-0.0,
+1.0,
+-0.0,
+-0.0
+],
+[
+0.0,
+0.0,
+-0.0,
+1.0
+]
+],
+"lightmap": 0,
+"lmso": [
+0.014574,
+0.014574,
+0.981365,
+0.04024
+],
+"cast": 3,
+"recv": true,
+"layer": 0
+},
+{
+"path": "subway/subway_beam (1)",
+"mesh": "m1",
+"subs": [
+12
+],
+"mats": [
+"Subway_Supports_6"
+],
+"matrix": null,
+"lightmap": 0,
+"lmso": [
+0.036255,
+0.036255,
+0.210136,
+0.509906
+],
+"cast": 1,
+"recv": true,
+"layer": 0
+},
+{
+"path": "subway/subway_beam (0)/subway_lightRope_segment (3)",
+"mesh": "me93d6c4a0e39",
+"subs": [
+0
+],
+"mats": [
+"Subway_TrackRail_10"
+],
+"matrix": [
+[
+0.5,
+0.0,
+-0.0,
+-7.5
+],
+[
+0.0,
+-0.0,
+-0.5,
+5.5
+],
+[
+-0.0,
+0.5,
+-0.0,
+0.5
+],
+[
+0.0,
+0.0,
+-0.0,
+1.0
+]
+],
+"lightmap": -1,
+"lmso": [
+1.0,
+1.0,
+0.0,
+0.0
+],
+"cast": 1,
+"recv": true,
+"layer": 0
+},
+{
+"path": "subway/subway_beam (2)/subway_support (1)",
+"mesh": "m1",
+"subs": [
+15,
+16
+],
+"mats": [
+"Subway_Supports_6",
+"Void_da1c7ab6"
+],
+"matrix": null,
+"lightmap": 0,
+"lmso": [
+0.036009,
+0.036009,
+0.888229,
+0.13773
+],
+"cast": 2,
+"recv": true,
+"layer": 0
+},
+{
+"path": "subway/subway_pipes (0)",
+"mesh": "mf0013cc40e39",
+"subs": [
+0
+],
+"mats": [
+"TRIM_945e8b1"
+],
+"matrix": [
+[
+1.0,
+0.0,
+-0.0,
+27.0
+],
+[
+0.0,
+-0.0,
+-1.0,
+-1.5
+],
+[
+-0.0,
+1.0,
+-0.0,
+-4.0
+],
+[
+0.0,
+0.0,
+-0.0,
+1.0
+]
+],
+"lightmap": -1,
+"lmso": [
+1.0,
+1.0,
+0.0,
+0.0
+],
+"cast": 1,
+"recv": true,
+"layer": 0
+},
+{
+"path": "subway/subway_beam (2)/subway_lightRope_segment (5)",
+"mesh": "me93d6c4a0e39",
+"subs": [
+0
+],
+"mats": [
+"Subway_TrackRail_10"
+],
+"matrix": [
+[
+0.5,
+0.0,
+-0.0,
+7.5
+],
+[
+0.0,
+-0.0,
+-0.5,
+5.0
+],
+[
+-0.0,
+0.5,
+-0.0,
+0.5
+],
+[
+0.0,
+0.0,
+-0.0,
+1.0
+]
+],
+"lightmap": -1,
+"lmso": [
+1.0,
+1.0,
+0.0,
+0.0
+],
+"cast": 1,
+"recv": true,
+"layer": 0
+},
+{
+"path": "subway/subway_staircase_base/subway_starcase_step (12)",
+"mesh": "m1",
+"subs": [
+157,
+158
+],
+"mats": [
+"Subway_TrackRail_10",
+"Subway_MainTile_15"
+],
+"matrix": null,
+"lightmap": 0,
+"lmso": [
+0.015381,
+0.015381,
+0.184586,
+0.389776
+],
+"cast": 1,
+"recv": true,
+"layer": 8
+},
+{
+"path": "subway/subway_beam (1)/subway_lightRope_segment (1)",
+"mesh": "me93d6c4a0e39",
+"subs": [
+0
+],
+"mats": [
+"Subway_TrackRail_10"
+],
+"matrix": [
+[
+0.5,
+0.0,
+-0.0,
+0.0
+],
+[
+0.0,
+-0.0,
+-0.5,
+5.25
+],
+[
+-0.0,
+0.5,
+-0.0,
+-0.5
+],
+[
+0.0,
+0.0,
+-0.0,
+1.0
+]
+],
+"lightmap": -1,
+"lmso": [
+1.0,
+1.0,
+0.0,
+0.0
+],
+"cast": 1,
+"recv": true,
+"layer": 0
+},
+{
+"path": "subway/subway_beam (2)/subway_lightRope_segment (6)",
+"mesh": "me93d6c4a0e39",
+"subs": [
+0
+],
+"mats": [
+"Subway_TrackRail_10"
+],
+"matrix": [
+[
+0.5,
+0.0,
+-0.0,
+7.5
+],
+[
+0.0,
+-0.0,
+-0.5,
+4.5
+],
+[
+-0.0,
+0.5,
+-0.0,
+-0.5
+],
+[
+0.0,
+0.0,
+-0.0,
+1.0
+]
+],
+"lightmap": -1,
+"lmso": [
+1.0,
+1.0,
+0.0,
+0.0
+],
+"cast": 1,
+"recv": true,
+"layer": 0
+},
+{
+"path": "subway/subway_beam (0)/subway_support (1)/subway_sideBeam",
+"mesh": "m1",
+"subs": [
+9
+],
+"mats": [
+"Subway_Supports_6"
+],
+"matrix": null,
+"lightmap": 0,
+"lmso": [
+0.013184,
+0.013184,
+0.244781,
+0.440548
+],
+"cast": 2,
+"recv": true,
+"layer": 0
+},
+{
+"path": "Managers/Void/Void Cube (5)",
+"mesh": "m2",
+"subs": [
+3
+],
+"mats": [
+"Void_da1c7ab6"
+],
+"matrix": null,
+"lightmap": -1,
+"lmso": [
+1.0,
+1.0,
+0.0,
+0.0
+],
+"cast": 0,
+"recv": true,
+"layer": 0
+},
+{
+"path": "subway/subway_beam (1)/subway_lightRope_segment (2)",
+"mesh": "me93d6c4a0e39",
+"subs": [
+0
+],
+"mats": [
+"Subway_TrackRail_10"
+],
+"matrix": [
+[
+0.5,
+0.0,
+-0.0,
+0.0
+],
+[
+0.0,
+-0.0,
+-0.5,
+5.0
+],
+[
+-0.0,
+0.5,
+-0.0,
+-0.5
+],
+[
+0.0,
+0.0,
+-0.0,
+1.0
+]
+],
+"lightmap": -1,
+"lmso": [
+1.0,
+1.0,
+0.0,
+0.0
+],
+"cast": 1,
+"recv": true,
+"layer": 0
+},
+{
+"path": "subway/subway_beam (2)/subway_lightRope_segment (9)",
+"mesh": "me93d6c4a0e39",
+"subs": [
+0
+],
+"mats": [
+"Subway_TrackRail_10"
+],
+"matrix": [
+[
+0.5,
+0.0,
+-0.0,
+7.5
+],
+[
+0.0,
+-0.0,
+-0.5,
+4.75
+],
+[
+-0.0,
+0.5,
+-0.0,
+0.5
+],
+[
+0.0,
+0.0,
+-0.0,
+1.0
+]
+],
+"lightmap": -1,
+"lmso": [
+1.0,
+1.0,
+0.0,
+0.0
+],
+"cast": 1,
+"recv": true,
+"layer": 0
+},
+{
+"path": "subway/subway_beam (2)/subway_lightRope_segment (4)",
+"mesh": "me93d6c4a0e39",
+"subs": [
+0
+],
+"mats": [
+"Subway_TrackRail_10"
+],
+"matrix": [
+[
+0.5,
+0.0,
+-0.0,
+7.5
+],
+[
+0.0,
+-0.0,
+-0.5,
+5.25
+],
+[
+-0.0,
+0.5,
+-0.0,
+0.5
+],
+[
+0.0,
+0.0,
+-0.0,
+1.0
+]
+],
+"lightmap": -1,
+"lmso": [
+1.0,
+1.0,
+0.0,
+0.0
+],
+"cast": 1,
+"recv": true,
+"layer": 0
+},
+{
+"path": "subway/subway_beam (2)/subway_support (0)",
+"mesh": "m1",
+"subs": [
+13,
+14
+],
+"mats": [
+"Subway_Supports_6",
+"Void_da1c7ab6"
+],
+"matrix": null,
+"lightmap": 0,
+"lmso": [
+0.036009,
+0.036009,
+0.130425,
+0.658261
+],
+"cast": 2,
+"recv": true,
+"layer": 0
+},
+{
+"path": "subway/subway_beam (0)/subway_support (0)/subway_sideBeam",
+"mesh": "m1",
+"subs": [
+0
+],
+"mats": [
+"Subway_Supports_6"
+],
+"matrix": null,
+"lightmap": 0,
+"lmso": [
+0.013184,
+0.013184,
+0.244781,
+0.452351
+],
+"cast": 2,
+"recv": true,
+"layer": 0
+},
+{
+"path": "subway/Track (Back)/subway_track (4)",
+"mesh": "m1",
+"subs": [
+171,
+172
+],
+"mats": [
+"Subway_TrackRail_10",
+"Subway_TrackSupports_12"
+],
+"matrix": null,
+"lightmap": 0,
+"lmso": [
+0.046388,
+0.046388,
+-0.002899,
+0.773916
+],
+"cast": 1,
+"recv": true,
+"layer": 0
+},
+{
+"path": "subway/subway_beam (1)/subway_lightRope_segment (7)",
+"mesh": "me93d6c4a0e39",
+"subs": [
+0
+],
+"mats": [
+"Subway_TrackRail_10"
+],
+"matrix": [
+[
+0.5,
+0.0,
+-0.0,
+0.0
+],
+[
+0.0,
+-0.0,
+-0.5,
+4.75
+],
+[
+-0.0,
+0.5,
+-0.0,
+-0.5
+],
+[
+0.0,
+0.0,
+-0.0,
+1.0
+]
+],
+"lightmap": -1,
+"lmso": [
+1.0,
+1.0,
+0.0,
+0.0
+],
+"cast": 1,
+"recv": true,
+"layer": 0
+},
+{
+"path": "subway/subway_beam (0)/subway_lightRope_segment (1)",
+"mesh": "me93d6c4a0e39",
+"subs": [
+0
+],
+"mats": [
+"Subway_TrackRail_10"
+],
+"matrix": [
+[
+0.5,
+0.0,
+-0.0,
+-7.5
+],
+[
+0.0,
+-0.0,
+-0.5,
+5.25
+],
+[
+-0.0,
+0.5,
+-0.0,
+-0.5
+],
+[
+0.0,
+0.0,
+-0.0,
+1.0
+]
+],
+"lightmap": -1,
+"lmso": [
+1.0,
+1.0,
+0.0,
+0.0
+],
+"cast": 1,
+"recv": true,
+"layer": 0
+},
+{
+"path": "subway/subway_staircase_base/subway_starcase_step (18)",
+"mesh": "m1",
+"subs": [
+175,
+176
+],
+"mats": [
+"Subway_TrackRail_10",
+"Subway_MainTile_15"
+],
+"matrix": null,
+"lightmap": 0,
+"lmso": [
+0.015381,
+0.015381,
+0.797379,
+0.162369
+],
+"cast": 1,
+"recv": true,
+"layer": 8
+},
+{
+"path": "subway/subway_staircase_base/subway_starcase_step (13)",
+"mesh": "m1",
+"subs": [
+169,
+170
+],
+"mats": [
+"Subway_TrackRail_10",
+"Subway_MainTile_15"
+],
+"matrix": null,
+"lightmap": 0,
+"lmso": [
+0.015381,
+0.015381,
+0.981315,
+0.052953
+],
+"cast": 1,
+"recv": true,
+"layer": 8
+},
+{
+"path": "subway/subway_beam (1)/subway_lightRope_segment (0)",
+"mesh": "me93d6c4a0e39",
+"subs": [
+0
+],
+"mats": [
+"Subway_TrackRail_10"
+],
+"matrix": [
+[
+0.5,
+0.0,
+-0.0,
+0.0
+],
+[
+0.0,
+-0.0,
+-0.5,
+5.5
+],
+[
+-0.0,
+0.5,
+-0.0,
+-0.5
+],
+[
+0.0,
+0.0,
+-0.0,
+1.0
+]
+],
+"lightmap": -1,
+"lmso": [
+1.0,
+1.0,
+0.0,
+0.0
+],
+"cast": 1,
+"recv": true,
+"layer": 0
+},
+{
+"path": "subway/subway_staircase_base/subway_starcase_step (7)",
+"mesh": "m1",
+"subs": [
+133,
+134
+],
+"mats": [
+"Subway_TrackRail_10",
+"Subway_MainTile_15"
+],
+"matrix": null,
+"lightmap": 0,
+"lmso": [
+0.015381,
+0.015381,
+0.169937,
+0.389776
+],
+"cast": 1,
+"recv": true,
+"layer": 8
+},
+{
+"path": "subway/subway_staircase_base/subway_starcase_step (15)",
+"mesh": "m1",
+"subs": [
+139,
+140
+],
+"mats": [
+"Subway_TrackRail_10",
+"Subway_MainTile_15"
+],
+"matrix": null,
+"lightmap": 0,
+"lmso": [
+0.015381,
+0.015381,
+0.132339,
+0.389776
+],
+"cast": 1,
+"recv": true,
+"layer": 8
+},
+{
+"path": "subway/Track (Front)/subway_track (6)",
+"mesh": "m1",
+"subs": [
+165,
+166
+],
+"mats": [
+"Subway_TrackRail_10",
+"Subway_TrackSupports_12"
+],
+"matrix": null,
+"lightmap": 0,
+"lmso": [
+0.046388,
+0.046388,
+0.209503,
+0.468653
+],
+"cast": 1,
+"recv": true,
+"layer": 0
+},
+{
+"path": "subway/subway_beam (1)/subway_lightRope_segment (9)",
+"mesh": "me93d6c4a0e39",
+"subs": [
+0
+],
+"mats": [
+"Subway_TrackRail_10"
+],
+"matrix": [
+[
+0.5,
+0.0,
+-0.0,
+0.0
+],
+[
+0.0,
+-0.0,
+-0.5,
+4.75
+],
+[
+-0.0,
+0.5,
+-0.0,
+0.5
+],
+[
+0.0,
+0.0,
+-0.0,
+1.0
+]
+],
+"lightmap": -1,
+"lmso": [
+1.0,
+1.0,
+0.0,
+0.0
+],
+"cast": 1,
+"recv": true,
+"layer": 0
+},
+{
+"path": "subway/subway_beam (2)/subway_lightRope_segment (7)",
+"mesh": "me93d6c4a0e39",
+"subs": [
+0
+],
+"mats": [
+"Subway_TrackRail_10"
+],
+"matrix": [
+[
+0.5,
+0.0,
+-0.0,
+7.5
+],
+[
+0.0,
+-0.0,
+-0.5,
+4.75
+],
+[
+-0.0,
+0.5,
+-0.0,
+-0.5
+],
+[
+0.0,
+0.0,
+-0.0,
+1.0
+]
+],
+"lightmap": -1,
+"lmso": [
+1.0,
+1.0,
+0.0,
+0.0
+],
+"cast": 1,
+"recv": true,
+"layer": 0
+},
+{
+"path": "Lighting & Effects/LightSetup/subway_lightFitting_shadowcaster",
+"mesh": "ma4d3fb1c0e39",
+"subs": [
+0
+],
+"mats": [
+"SolidBlack_f"
+],
+"matrix": [
+[
+1.0,
+0.0,
+-0.0,
+0.0
+],
+[
+0.0,
+-0.0,
+-1.0,
+3.9
+],
+[
+-0.0,
+1.0,
+-0.0,
+-0.0
+],
+[
+0.0,
+0.0,
+-0.0,
+1.0
+]
+],
+"lightmap": 0,
+"lmso": [
+0.014574,
+0.014574,
+0.981365,
+0.027477
+],
+"cast": 3,
+"recv": true,
+"layer": 0
+},
+{
+"path": "subway/Track (Front)/subway_track (3)",
+"mesh": "m1",
+"subs": [
+143,
+144
+],
+"mats": [
+"Subway_TrackRail_10",
+"Subway_TrackSupports_12"
+],
+"matrix": null,
+"lightmap": 0,
+"lmso": [
+0.046388,
+0.046388,
+0.168976,
+0.733296
+],
+"cast": 1,
+"recv": true,
+"layer": 0
+},
+{
+"path": "subway/subway_beam (0)/subway_lightRope_segment (2)",
+"mesh": "me93d6c4a0e39",
+"subs": [
+0
+],
+"mats": [
+"Subway_TrackRail_10"
+],
+"matrix": [
+[
+0.5,
+0.0,
+-0.0,
+-7.5
+],
+[
+0.0,
+-0.0,
+-0.5,
+5.0
+],
+[
+-0.0,
+0.5,
+-0.0,
+-0.5
+],
+[
+0.0,
+0.0,
+-0.0,
+1.0
+]
+],
+"lightmap": -1,
+"lmso": [
+1.0,
+1.0,
+0.0,
+0.0
+],
+"cast": 1,
+"recv": true,
+"layer": 0
+},
+{
+"path": "subway/Track (Front)/subway_track (4)",
+"mesh": "m1",
+"subs": [
+147,
+148
+],
+"mats": [
+"Subway_TrackRail_10",
+"Subway_TrackSupports_12"
+],
+"matrix": null,
+"lightmap": 0,
+"lmso": [
+0.046388,
+0.046388,
+0.173859,
+0.69082
+],
+"cast": 1,
+"recv": true,
+"layer": 0
+},
+{
+"path": "subway/subway_staircase_base/subway_starcase_step (1)",
+"mesh": "m1",
+"subs": [
+145,
+146
+],
+"mats": [
+"Subway_TrackRail_10",
+"Subway_MainTile_15"
+],
+"matrix": null,
+"lightmap": 0,
+"lmso": [
+0.015381,
+0.015381,
+0.981315,
+0.073079
+],
+"cast": 1,
+"recv": true,
+"layer": 8
+},
+{
+"path": "subway/subway_staircase_base/subway_starcase_step (0)",
+"mesh": "m1",
+"subs": [
+125,
+126
+],
+"mats": [
+"Subway_TrackRail_10",
+"Subway_MainTile_15"
+],
+"matrix": null,
+"lightmap": 0,
+"lmso": [
+0.015381,
+0.015381,
+0.146988,
+0.389776
+],
+"cast": 1,
+"recv": true,
+"layer": 8
+},
+{
+"path": "subway/subway_staircase_base/subway_starcase_step (8)",
+"mesh": "m1",
+"subs": [
+161,
+162
+],
+"mats": [
+"Subway_TrackRail_10",
+"Subway_MainTile_15"
+],
+"matrix": null,
+"lightmap": 0,
+"lmso": [
+0.015381,
+0.015381,
+0.981315,
+0.079788
+],
+"cast": 1,
+"recv": true,
+"layer": 8
+},
+{
+"path": "subway/Track (Back)/subway_track (1)",
+"mesh": "m1",
+"subs": [
+189,
+190
+],
+"mats": [
+"Subway_TrackRail_10",
+"Subway_TrackSupports_12"
+],
+"matrix": null,
+"lightmap": 0,
+"lmso": [
+0.046388,
+0.046388,
+0.083038,
+0.733296
+],
+"cast": 1,
+"recv": true,
+"layer": 0
+},
+{
+"path": "subway/subway_staircase_base/subway_starcase_step (3)",
+"mesh": "m1",
+"subs": [
+167,
+168
+],
+"mats": [
+"Subway_TrackRail_10",
+"Subway_MainTile_15"
+],
+"matrix": null,
+"lightmap": 0,
+"lmso": [
+0.015381,
+0.015381,
+0.78273,
+0.162369
+],
+"cast": 1,
+"recv": true,
+"layer": 8
+},
+{
+"path": "Managers/Void/Void Cube (1)",
+"mesh": "m2",
+"subs": [
+5
+],
+"mats": [
+"Void_da1c7ab6"
+],
+"matrix": null,
+"lightmap": -1,
+"lmso": [
+1.0,
+1.0,
+0.0,
+0.0
+],
+"cast": 0,
+"recv": true,
+"layer": 0
+},
+{
+"path": "subway/subway_beam (2)/subway_lightRope_segment (11)",
+"mesh": "me93d6c4a0e39",
+"subs": [
+0
+],
+"mats": [
+"Subway_TrackRail_10"
+],
+"matrix": [
+[
+0.5,
+0.0,
+-0.0,
+7.5
+],
+[
+0.0,
+-0.0,
+-0.5,
+4.25
+],
+[
+-0.0,
+0.5,
+-0.0,
+0.5
+],
+[
+0.0,
+0.0,
+-0.0,
+1.0
+]
+],
+"lightmap": -1,
+"lmso": [
+1.0,
+1.0,
+0.0,
+0.0
+],
+"cast": 1,
+"recv": true,
+"layer": 0
+},
+{
+"path": "subway/subway_staircase_base/subway_starcase_step (2)",
+"mesh": "m1",
+"subs": [
+129,
+130
+],
+"mats": [
+"Subway_TrackRail_10",
+"Subway_MainTile_15"
+],
+"matrix": null,
+"lightmap": 0,
+"lmso": [
+0.015381,
+0.015381,
+0.855972,
+0.162369
+],
+"cast": 1,
+"recv": true,
+"layer": 8
+},
+{
+"path": "subway/Track (Back)/subway_track (2)",
+"mesh": "m1",
+"subs": [
+149,
+150
+],
+"mats": [
+"Subway_TrackRail_10",
+"Subway_TrackSupports_12"
+],
+"matrix": null,
+"lightmap": 0,
+"lmso": [
+0.046388,
+0.046388,
+0.13089,
+0.69082
+],
+"cast": 1,
+"recv": true,
+"layer": 0
+},
+{
+"path": "subway/subway_beam (0)/subway_support (0)",
+"mesh": "m1",
+"subs": [
+3,
+4
+],
+"mats": [
+"Subway_Supports_6",
+"Void_da1c7ab6"
+],
+"matrix": null,
+"lightmap": 0,
+"lmso": [
+0.036009,
+0.036009,
+0.921432,
+0.13773
+],
+"cast": 2,
+"recv": true,
+"layer": 0
+},
+{
+"path": "subway/subway_beam (1)/subway_lightRope_segment (4)",
+"mesh": "me93d6c4a0e39",
+"subs": [
+0
+],
+"mats": [
+"Subway_TrackRail_10"
+],
+"matrix": [
+[
+0.5,
+0.0,
+-0.0,
+0.0
+],
+[
+0.0,
+-0.0,
+-0.5,
+5.25
+],
+[
+-0.0,
+0.5,
+-0.0,
+0.5
+],
+[
+0.0,
+0.0,
+-0.0,
+1.0
+]
+],
+"lightmap": -1,
+"lmso": [
+1.0,
+1.0,
+0.0,
+0.0
+],
+"cast": 1,
+"recv": true,
+"layer": 0
+},
+{
+"path": "subway/subway_hall_floor (3)",
+"mesh": "m18d",
+"subs": [
+0
+],
+"mats": [
+"Wall 1_c"
+],
+"matrix": [
+[
+-1.0,
+0.0,
+-0.0,
+8.0
+],
+[
+0.0,
+-0.0,
+-1.0,
+-1.5
+],
+[
+-0.0,
+-1.0,
+-0.0,
+-0.0
+],
+[
+0.0,
+0.0,
+-0.0,
+1.0
+]
+],
+"lightmap": 0,
+"lmso": [
+0.008227,
+0.008227,
+0.232559,
+0.319614
+],
+"cast": 0,
+"recv": true,
+"layer": 0
+},
+{
+"path": "subway/subway_hall_ceiling (1)",
+"mesh": "m194",
+"subs": [
+0
+],
+"mats": [
+"Subway_Wall_4"
+],
+"matrix": [
+[
+1.0,
+0.0,
+-0.0,
+0.0
+],
+[
+0.0,
+-0.0,
+-1.0,
+-1.5
+],
+[
+-0.0,
+1.0,
+-0.0,
+-0.0
+],
+[
+0.0,
+0.0,
+-0.0,
+1.0
+]
+],
+"lightmap": 0,
+"lmso": [
+0.051517,
+0.051517,
+0.680663,
+0.11084
+],
+"cast": 0,
+"recv": true,
+"layer": 0
+},
+{
+"path": "subway/subway_hall_floor",
+"mesh": "m18d",
+"subs": [
+0
+],
+"mats": [
+"Wall 1_c"
+],
+"matrix": [
+[
+1.0,
+0.0,
+-0.0,
+8.0
+],
+[
+0.0,
+-0.0,
+-1.0,
+-1.5
+],
+[
+-0.0,
+1.0,
+-0.0,
+-0.0
+],
+[
+0.0,
+0.0,
+-0.0,
+1.0
+]
+],
+"lightmap": 0,
+"lmso": [
+0.008227,
+0.008227,
+0.194336,
+0.589388
+],
+"cast": 0,
+"recv": true,
+"layer": 0
+},
+{
+"path": "subway/subway_hall_floor (1)",
+"mesh": "m18d",
+"subs": [
+0
+],
+"mats": [
+"Wall 1_c"
+],
+"matrix": [
+[
+1.0,
+0.0,
+-0.0,
+0.0
+],
+[
+0.0,
+-0.0,
+-1.0,
+-1.5
+],
+[
+-0.0,
+1.0,
+-0.0,
+-0.0
+],
+[
+0.0,
+0.0,
+-0.0,
+1.0
+]
+],
+"lightmap": 0,
+"lmso": [
+0.008227,
+0.008227,
+0.165664,
+0.319614
+],
+"cast": 0,
+"recv": true,
+"layer": 0
+},
+{
+"path": "subway/subway_platform_8s (3)",
+"mesh": "m18c",
+"subs": [
+0,
+1,
+2
+],
+"mats": [
+"Subway_EdgeTile_d",
+"Subway_Wall_4",
+"Subway_MainTile_15"
+],
+"matrix": [
+[
+1.0,
+0.0,
+-0.0,
+-9.0
+],
+[
+0.0,
+-0.0,
+-1.0,
+0.0
+],
+[
+-0.0,
+1.0,
+-0.0,
+-0.0
+],
+[
+0.0,
+0.0,
+-0.0,
+1.0
+]
+],
+"lightmap": 0,
+"lmso": [
+0.076984,
+0.076984,
+-0.000688,
+0.617348
+],
+"cast": 1,
+"recv": true,
+"layer": 0
+},
+{
+"path": "subway/subway_hall_wall (2)",
+"mesh": "m191",
+"subs": [
+0
+],
+"mats": [
+"Subway_Wall_4"
+],
+"matrix": [
+[
+1.0,
+0.0,
+-0.0,
+-8.0
+],
+[
+0.0,
+-0.0,
+-1.0,
+-1.5
+],
+[
+-0.0,
+1.0,
+-0.0,
+-0.0
+],
+[
+0.0,
+0.0,
+-0.0,
+1.0
+]
+],
+"lightmap": 0,
+"lmso": [
+0.034914,
+0.034914,
+0.070801,
+0.400752
+],
+"cast": 0,
+"recv": true,
+"layer": 0
+},
+{
+"path": "subway/subway_hall_floor (4)",
+"mesh": "m18d",
+"subs": [
+0
+],
+"mats": [
+"Wall 1_c"
+],
+"matrix": [
+[
+-1.0,
+0.0,
+-0.0,
+0.0
+],
+[
+0.0,
+-0.0,
+-1.0,
+-1.5
+],
+[
+-0.0,
+-1.0,
+-0.0,
+-0.0
+],
+[
+0.0,
+0.0,
+-0.0,
+1.0
+]
+],
+"lightmap": 0,
+"lmso": [
+0.008227,
+0.008227,
+0.127441,
+0.589388
+],
+"cast": 0,
+"recv": true,
+"layer": 0
+},
+{
+"path": "subway/subway_hall_ceiling (2)",
+"mesh": "m194",
+"subs": [
+0
+],
+"mats": [
+"Subway_Wall_4"
+],
+"matrix": [
+[
+1.0,
+0.0,
+-0.0,
+-8.0
+],
+[
+0.0,
+-0.0,
+-1.0,
+-1.5
+],
+[
+-0.0,
+1.0,
+-0.0,
+-0.0
+],
+[
+0.0,
+0.0,
+-0.0,
+1.0
+]
+],
+"lightmap": 0,
+"lmso": [
+0.051517,
+0.051517,
+0.787451,
+0.087491
+],
+"cast": 0,
+"recv": true,
+"layer": 0
+},
+{
+"path": "subway/subway_hall_wall (5)",
+"mesh": "m191",
+"subs": [
+0
+],
+"mats": [
+"Subway_Wall_4"
+],
+"matrix": [
+[
+-1.0,
+0.0,
+-0.0,
+-8.0
+],
+[
+0.0,
+-0.0,
+-1.0,
+-1.5
+],
+[
+-0.0,
+-1.0,
+-0.0,
+-0.0
+],
+[
+0.0,
+0.0,
+-0.0,
+1.0
+]
+],
+"lightmap": 0,
+"lmso": [
+0.034914,
+0.034914,
+0.141602,
+0.471552
+],
+"cast": 0,
+"recv": true,
+"layer": 0
+},
+{
+"path": "subway/subway_platform_8s (1)",
+"mesh": "m18c",
+"subs": [
+0,
+1,
+2
+],
+"mats": [
+"Subway_EdgeTile_d",
+"Subway_Wall_4",
+"Subway_MainTile_15"
+],
+"matrix": [
+[
+1.0,
+0.0,
+-0.0,
+3.0
+],
+[
+0.0,
+-0.0,
+-1.0,
+0.0
+],
+[
+-0.0,
+1.0,
+-0.0,
+-0.0
+],
+[
+0.0,
+0.0,
+-0.0,
+1.0
+]
+],
+"lightmap": 0,
+"lmso": [
+0.076984,
+0.076984,
+0.130874,
+0.541665
+],
+"cast": 1,
+"recv": true,
+"layer": 0
+},
+{
+"path": "subway/subway_hall_floor (2)",
+"mesh": "m18d",
+"subs": [
+0
+],
+"mats": [
+"Wall 1_c"
+],
+"matrix": [
+[
+1.0,
+0.0,
+-0.0,
+-8.0
+],
+[
+0.0,
+-0.0,
+-1.0,
+-1.5
+],
+[
+-0.0,
+1.0,
+-0.0,
+-0.0
+],
+[
+0.0,
+0.0,
+-0.0,
+1.0
+]
+],
+"lightmap": 0,
+"lmso": [
+0.008227,
+0.008227,
+0.128555,
+0.665072
+],
+"cast": 0,
+"recv": true,
+"layer": 0
+},
+{
+"path": "subway/subway_hall_wall (3)",
+"mesh": "m191",
+"subs": [
+0
+],
+"mats": [
+"Subway_Wall_4"
+],
+"matrix": [
+[
+-1.0,
+0.0,
+-0.0,
+8.0
+],
+[
+0.0,
+-0.0,
+-1.0,
+-1.5
+],
+[
+-0.0,
+-1.0,
+-0.0,
+-0.0
+],
+[
+0.0,
+0.0,
+-0.0,
+1.0
+]
+],
+"lightmap": 0,
+"lmso": [
+0.034914,
+0.034914,
+0.0,
+0.400752
+],
+"cast": 0,
+"recv": true,
+"layer": 0
+},
+{
+"path": "subway/subway_hall_wall (1)",
+"mesh": "m191",
+"subs": [
+0
+],
+"mats": [
+"Subway_Wall_4"
+],
+"matrix": [
+[
+1.0,
+0.0,
+-0.0,
+0.0
+],
+[
+0.0,
+-0.0,
+-1.0,
+-1.5
+],
+[
+-0.0,
+1.0,
+-0.0,
+-0.0
+],
+[
+0.0,
+0.0,
+-0.0,
+1.0
+]
+],
+"lightmap": 0,
+"lmso": [
+0.034914,
+0.034914,
+0.0,
+0.471552
+],
+"cast": 0,
+"recv": true,
+"layer": 0
+},
+{
+"path": "subway/subway_platform_8s (2)",
+"mesh": "m18c",
+"subs": [
+0,
+1,
+2
+],
+"mats": [
+"Subway_EdgeTile_d",
+"Subway_Wall_4",
+"Subway_MainTile_15"
+],
+"matrix": [
+[
+1.0,
+0.0,
+-0.0,
+-3.0
+],
+[
+0.0,
+-0.0,
+-1.0,
+0.0
+],
+[
+-0.0,
+1.0,
+-0.0,
+-0.0
+],
+[
+0.0,
+0.0,
+-0.0,
+1.0
+]
+],
+"lightmap": 0,
+"lmso": [
+0.076984,
+0.076984,
+0.065093,
+0.541665
+],
+"cast": 1,
+"recv": true,
+"layer": 0
+},
+{
+"path": "subway/subway_platform_8s",
+"mesh": "m18c",
+"subs": [
+0,
+1,
+2
+],
+"mats": [
+"Subway_EdgeTile_d",
+"Subway_Wall_4",
+"Subway_MainTile_15"
+],
+"matrix": [
+[
+1.0,
+0.0,
+-0.0,
+9.0
+],
+[
+0.0,
+-0.0,
+-1.0,
+0.0
+],
+[
+-0.0,
+1.0,
+-0.0,
+-0.0
+],
+[
+0.0,
+0.0,
+-0.0,
+1.0
+]
+],
+"lightmap": 0,
+"lmso": [
+0.076984,
+0.076984,
+-0.000688,
+0.541665
+],
+"cast": 1,
+"recv": true,
+"layer": 0
+},
+{
+"path": "subway/subway_hall_wall (4)",
+"mesh": "m191",
+"subs": [
+0
+],
+"mats": [
+"Subway_Wall_4"
+],
+"matrix": [
+[
+-1.0,
+0.0,
+-0.0,
+0.0
+],
+[
+0.0,
+-0.0,
+-1.0,
+-1.5
+],
+[
+-0.0,
+-1.0,
+-0.0,
+-0.0
+],
+[
+0.0,
+0.0,
+-0.0,
+1.0
+]
+],
+"lightmap": 0,
+"lmso": [
+0.034914,
+0.034914,
+0.070801,
+0.471552
+],
+"cast": 0,
+"recv": true,
+"layer": 0
+},
+{
+"path": "subway/subway_hall_floor (5)",
+"mesh": "m18d",
+"subs": [
+0
+],
+"mats": [
+"Wall 1_c"
+],
+"matrix": [
+[
+-1.0,
+0.0,
+-0.0,
+-8.0
+],
+[
+0.0,
+-0.0,
+-1.0,
+-1.5
+],
+[
+-0.0,
+-1.0,
+-0.0,
+-0.0
+],
+[
+0.0,
+0.0,
+-0.0,
+1.0
+]
+],
+"lightmap": 0,
+"lmso": [
+0.008227,
+0.008227,
+0.06166,
+0.665072
+],
+"cast": 0,
+"recv": true,
+"layer": 0
+},
+{
+"path": "subway/subway_hall_ceiling",
+"mesh": "m194",
+"subs": [
+0
+],
+"mats": [
+"Subway_Wall_4"
+],
+"matrix": [
+[
+1.0,
+0.0,
+-0.0,
+8.0
+],
+[
+0.0,
+-0.0,
+-1.0,
+-1.5
+],
+[
+-0.0,
+1.0,
+-0.0,
+-0.0
+],
+[
+0.0,
+0.0,
+-0.0,
+1.0
+]
+],
+"lightmap": 0,
+"lmso": [
+0.051517,
+0.051517,
+-0.103029,
+0.348262
+],
+"cast": 0,
+"recv": true,
+"layer": 0
+},
+{
+"path": "subway/subway_hall_wall",
+"mesh": "m191",
+"subs": [
+0
+],
+"mats": [
+"Subway_Wall_4"
+],
+"matrix": [
+[
+1.0,
+0.0,
+-0.0,
+8.0
+],
+[
+0.0,
+-0.0,
+-1.0,
+-1.5
+],
+[
+-0.0,
+1.0,
+-0.0,
+-0.0
+],
+[
+0.0,
+0.0,
+-0.0,
+1.0
+]
+],
+"lightmap": 0,
+"lmso": [
+0.034914,
+0.034914,
+0.141602,
+0.400752
+],
+"cast": 0,
+"recv": true,
+"layer": 0
+}
+],
+"colliders": [
+{
+"path": "subway/Track (Front)/subway_track (2)/subway_track_boxCollider (2)",
+"p": [
+4.5,
+-1.55,
+-6.0
+],
+"q": [
+0.70711,
+0.0,
+0.0,
+0.70711
+],
+"h": [
+0.2,
+1.6,
+0.1
+]
+},
+{
+"path": "subway/Track (Back)/subway_track (4)/subway_track_boxCollider (2)",
+"p": [
+-11.5,
+-1.55,
+6.0
+],
+"q": [
+0.70711,
+0.0,
+0.0,
+0.70711
+],
+"h": [
+0.2,
+1.6,
+0.1
+]
+},
+{
+"path": "subway/Track (Back)/subway_track (6)/subway_track_boxCollider (6)",
+"p": [
+-23.5,
+-1.55,
+6.0
+],
+"q": [
+0.70711,
+0.0,
+0.0,
+0.70711
+],
+"h": [
+0.2,
+1.6,
+0.1
+]
+},
+{
+"path": "subway/Track (Front)/subway_track (1)/subway_track_boxCollider (8)",
+"p": [
+18.5,
+-1.55,
+-6.0
+],
+"q": [
+0.70711,
+0.0,
+0.0,
+0.70711
+],
+"h": [
+0.2,
+1.6,
+0.1
+]
+},
+{
+"path": "subway/subway_staircase_base/subway_starcase_step (4)",
+"p": [
+-5.625,
+0.5625,
+1.12
+],
+"q": [
+0.70711,
+0.0,
+0.0,
+0.70711
+],
+"h": [
+0.125,
+1.5,
+0.0625
+]
+},
+{
+"path": "subway/subway_staircase_base/subway_starcase_step (10)",
+"p": [
+-7.125,
+1.3125,
+1.12
+],
+"q": [
+0.70711,
+0.0,
+0.0,
+0.70711
+],
+"h": [
+0.125,
+1.5,
+0.0625
+]
+},
+{
+"path": "subway/Track (Front)/subway_track (0)/subway_track_boxCollider (5)",
+"p": [
+23.5,
+-1.55,
+-6.0
+],
+"q": [
+0.70711,
+0.0,
+0.0,
+0.70711
+],
+"h": [
+0.2,
+1.6,
+0.1
+]
+},
+{
+"path": "subway/Track (Front)/subway_track (2)/subway_track_boxCollider (8)",
+"p": [
+10.5,
+-1.55,
+-6.0
+],
+"q": [
+0.70711,
+0.0,
+0.0,
+0.70711
+],
+"h": [
+0.2,
+1.6,
+0.1
+]
+},
+{
+"path": "subway/Track (Back)/subway_track (5)/subway_track_boxCollider (0)",
+"p": [
+-16.0,
+-1.375,
+4.75
+],
+"q": [
+0.70711,
+0.0,
+0.0,
+0.70711
+],
+"h": [
+4.0,
+0.0885,
+0.075
+]
+},
+{
+"path": "subway/Track (Front)/subway_track (1)/subway_track_boxCollider (9)",
+"p": [
+19.5,
+-1.55,
+-6.0
+],
+"q": [
+0.70711,
+0.0,
+0.0,
+0.70711
+],
+"h": [
+0.2,
+1.6,
+0.1
+]
+},
+{
+"path": "subway/Track (Back)/subway_track (6)/subway_track_boxCollider (3)",
+"p": [
+-26.5,
+-1.55,
+6.0
+],
+"q": [
+0.70711,
+0.0,
+0.0,
+0.70711
+],
+"h": [
+0.2,
+1.6,
+0.1
+]
+},
+{
+"path": "subway/Track (Front)/subway_track (5)/subway_track_boxCollider (8)",
+"p": [
+-13.5,
+-1.55,
+-6.0
+],
+"q": [
+0.70711,
+0.0,
+0.0,
+0.70711
+],
+"h": [
+0.2,
+1.6,
+0.1
+]
+},
+{
+"path": "subway/Track (Back)/subway_track (4)/subway_track_boxCollider (8)",
+"p": [
+-5.5,
+-1.55,
+6.0
+],
+"q": [
+0.70711,
+0.0,
+0.0,
+0.70711
+],
+"h": [
+0.2,
+1.6,
+0.1
+]
+},
+{
+"path": "subway/Track (Front)/subway_track (5)/subway_track_boxCollider (7)",
+"p": [
+-14.5,
+-1.55,
+-6.0
+],
+"q": [
+0.70711,
+0.0,
+0.0,
+0.70711
+],
+"h": [
+0.2,
+1.6,
+0.1
+]
+},
+{
+"path": "subway/Track (Front)/subway_track (4)/subway_track_boxCollider (0)",
+"p": [
+-8.0,
+-1.375,
+-7.25
+],
+"q": [
+0.70711,
+0.0,
+0.0,
+0.70711
+],
+"h": [
+4.0,
+0.0885,
+0.075
+]
+},
+{
+"path": "subway/Track (Back)/subway_track (5)/subway_track_boxCollider (4)",
+"p": [
+-17.5,
+-1.55,
+6.0
+],
+"q": [
+0.70711,
+0.0,
+0.0,
+0.70711
+],
+"h": [
+0.2,
+1.6,
+0.1
+]
+},
+{
+"path": "subway/Track (Front)/subway_track (5)/subway_track_boxCollider (2)",
+"p": [
+-19.5,
+-1.55,
+-6.0
+],
+"q": [
+0.70711,
+0.0,
+0.0,
+0.70711
+],
+"h": [
+0.2,
+1.6,
+0.1
+]
+},
+{
+"path": "subway/subway_staircase_base/subway_starcase_step (19)",
+"p": [
+-9.375,
+2.4375,
+1.12
+],
+"q": [
+0.70711,
+0.0,
+0.0,
+0.70711
+],
+"h": [
+0.125,
+1.5,
+0.0625
+]
+},
+{
+"path": "subway/Track (Front)/subway_track (0)/subway_track_boxCollider (4)",
+"p": [
+22.5,
+-1.55,
+-6.0
+],
+"q": [
+0.70711,
+0.0,
+0.0,
+0.70711
+],
+"h": [
+0.2,
+1.6,
+0.1
+]
+},
+{
+"path": "subway/subway_beam (0)/subway_support (1)/subway_support_boxCollider (0)",
+"p": [
+-7.5,
+0.05,
+3.375
+],
+"q": [
+0.0,
+0.70711,
+-0.70711,
+0.0
+],
+"h": [
+0.3702,
+0.3702,
+0.05
+]
+},
+{
+"path": "subway/Track (Back)/subway_track (6)/subway_track_boxCollider (0)",
+"p": [
+-24.0,
+-1.375,
+4.75
+],
+"q": [
+0.70711,
+0.0,
+0.0,
+0.70711
+],
+"h": [
+4.0,
+0.0885,
+0.075
+]
+},
+{
+"path": "subway/subway_staircase_base/subway_starcase_step (14)",
+"p": [
+-8.125,
+1.8125,
+1.12
+],
+"q": [
+0.70711,
+0.0,
+0.0,
+0.70711
+],
+"h": [
+0.125,
+1.5,
+0.0625
+]
+},
+{
+"path": "subway/Track (Back)/subway_track (5)/subway_track_boxCollider (2)",
+"p": [
+-19.5,
+-1.55,
+6.0
+],
+"q": [
+0.70711,
+0.0,
+0.0,
+0.70711
+],
+"h": [
+0.2,
+1.6,
+0.1
+]
+},
+{
+"path": "subway/Track (Back)/subway_track (1)/subway_track_boxCollider (4)",
+"p": [
+14.5,
+-1.55,
+6.0
+],
+"q": [
+0.70711,
+0.0,
+0.0,
+0.70711
+],
+"h": [
+0.2,
+1.6,
+0.1
+]
+},
+{
+"path": "subway/Track (Back)/subway_track (1)/subway_track_boxCollider (2)",
+"p": [
+12.5,
+-1.55,
+6.0
+],
+"q": [
+0.70711,
+0.0,
+0.0,
+0.70711
+],
+"h": [
+0.2,
+1.6,
+0.1
+]
+},
+{
+"path": "subway/subway_beam (2)/subway_support (0)/subway_support_boxCollider (4)",
+"p": [
+7.5,
+5.98,
+-3.375
+],
+"q": [
+0.70711,
+0.0,
+0.0,
+0.70711
+],
+"h": [
+0.25,
+0.25,
+0.28
+]
+},
+{
+"path": "subway/Track (Back)/subway_track (3)/subway_track_boxCollider (8)",
+"p": [
+2.5,
+-1.55,
+6.0
+],
+"q": [
+0.70711,
+0.0,
+0.0,
+0.70711
+],
+"h": [
+0.2,
+1.6,
+0.1
+]
+},
+{
+"path": "subway/Track (Front)/subway_track (3)/subway_track_boxCollider (1)",
+"p": [
+0.0,
+-1.375,
+-4.75
+],
+"q": [
+0.70711,
+0.0,
+0.0,
+0.70711
+],
+"h": [
+4.0,
+0.0885,
+0.075
+]
+},
+{
+"path": "subway/subway_staircase_base/subway_starcase_step (17)",
+"p": [
+-8.875,
+2.1875,
+1.12
+],
+"q": [
+0.70711,
+0.0,
+0.0,
+0.70711
+],
+"h": [
+0.125,
+1.5,
+0.0625
+]
+},
+{
+"path": "subway/subway_beam (2)/subway_support (1)/subway_support_boxCollider (2)",
+"p": [
+7.675,
+3.18,
+3.375
+],
+"q": [
+0.0,
+0.70711,
+-0.70711,
+0.0
+],
+"h": [
+0.075,
+0.25,
+2.88
+]
+},
+{
+"path": "subway/Track (Front)/subway_track (1)/subway_track_boxCollider (7)",
+"p": [
+17.5,
+-1.55,
+-6.0
+],
+"q": [
+0.70711,
+0.0,
+0.0,
+0.70711
+],
+"h": [
+0.2,
+1.6,
+0.1
+]
+},
+{
+"path": "subway/Track (Front)/subway_track (0)/subway_track_boxCollider (3)",
+"p": [
+21.5,
+-1.55,
+-6.0
+],
+"q": [
+0.70711,
+0.0,
+0.0,
+0.70711
+],
+"h": [
+0.2,
+1.6,
+0.1
+]
+},
+{
+"path": "subway/subway_beam (1)/subway_support (0)/subway_support_boxCollider (1)",
+"p": [
+0.175,
+3.18,
+-3.375
+],
+"q": [
+0.70711,
+0.0,
+0.0,
+0.70711
+],
+"h": [
+0.075,
+0.25,
+2.88
+]
+},
+{
+"path": "subway/Track (Front)/subway_track (2)/subway_track_boxCollider (6)",
+"p": [
+8.5,
+-1.55,
+-6.0
+],
+"q": [
+0.70711,
+0.0,
+0.0,
+0.70711
+],
+"h": [
+0.2,
+1.6,
+0.1
+]
+},
+{
+"path": "subway/Track (Back)/subway_track (5)/subway_track_boxCollider (6)",
+"p": [
+-15.5,
+-1.55,
+6.0
+],
+"q": [
+0.70711,
+0.0,
+0.0,
+0.70711
+],
+"h": [
+0.2,
+1.6,
+0.1
+]
+},
+{
+"path": "subway/Track (Back)/subway_track (6)/subway_track_boxCollider (7)",
+"p": [
+-22.5,
+-1.55,
+6.0
+],
+"q": [
+0.70711,
+0.0,
+0.0,
+0.70711
+],
+"h": [
+0.2,
+1.6,
+0.1
+]
+},
+{
+"path": "subway/Track (Back)/subway_track (2)/subway_track_boxCollider (9)",
+"p": [
+11.5,
+-1.55,
+6.0
+],
+"q": [
+0.70711,
+0.0,
+0.0,
+0.70711
+],
+"h": [
+0.2,
+1.6,
+0.1
+]
+},
+{
+"path": "subway/Track (Back)/subway_track (2)/subway_track_boxCollider (1)",
+"p": [
+8.0,
+-1.375,
+7.25
+],
+"q": [
+0.70711,
+0.0,
+0.0,
+0.70711
+],
+"h": [
+4.0,
+0.0885,
+0.075
+]
+},
+{
+"path": "subway/Track (Back)/subway_track (4)/subway_track_boxCollider (0)",
+"p": [
+-8.0,
+-1.375,
+4.75
+],
+"q": [
+0.70711,
+0.0,
+0.0,
+0.70711
+],
+"h": [
+4.0,
+0.0885,
+0.075
+]
+},
+{
+"path": "subway/subway_staircase_base/subway_starcase_step (6)",
+"p": [
+-6.125,
+0.8125,
+1.12
+],
+"q": [
+0.70711,
+0.0,
+0.0,
+0.70711
+],
+"h": [
+0.125,
+1.5,
+0.0625
+]
+},
+{
+"path": "subway/subway_beam (1)/subway_support (1)/subway_support_boxCollider (2)",
+"p": [
+0.175,
+3.18,
+3.375
+],
+"q": [
+0.0,
+0.70711,
+-0.70711,
+0.0
+],
+"h": [
+0.075,
+0.25,
+2.88
+]
+},
+{
+"path": "subway/Track (Front)/subway_track (3)/subway_track_boxCollider (4)",
+"p": [
+-1.5,
+-1.55,
+-6.0
+],
+"q": [
+0.70711,
+0.0,
+0.0,
+0.70711
+],
+"h": [
+0.2,
+1.6,
+0.1
+]
+},
+{
+"path": "subway/Track (Back)/subway_track (6)/subway_track_boxCollider (9)",
+"p": [
+-20.5,
+-1.55,
+6.0
+],
+"q": [
+0.70711,
+0.0,
+0.0,
+0.70711
+],
+"h": [
+0.2,
+1.6,
+0.1
+]
+},
+{
+"path": "subway/Track (Back)/subway_track (5)/subway_track_boxCollider (8)",
+"p": [
+-13.5,
+-1.55,
+6.0
+],
+"q": [
+0.70711,
+0.0,
+0.0,
+0.70711
+],
+"h": [
+0.2,
+1.6,
+0.1
+]
+},
+{
+"path": "subway/Track (Back)/subway_track (1)/subway_track_boxCollider (9)",
+"p": [
+19.5,
+-1.55,
+6.0
+],
+"q": [
+0.70711,
+0.0,
+0.0,
+0.70711
+],
+"h": [
+0.2,
+1.6,
+0.1
+]
+},
+{
+"path": "subway/Track (Front)/subway_track (6)/subway_track_boxCollider (2)",
+"p": [
+-27.5,
+-1.55,
+-6.0
+],
+"q": [
+0.70711,
+0.0,
+0.0,
+0.70711
+],
+"h": [
+0.2,
+1.6,
+0.1
+]
+},
+{
+"path": "subway/subway_staircase_base/subway_starcase_step (16)",
+"p": [
+-8.625,
+2.0625,
+1.12
+],
+"q": [
+0.70711,
+0.0,
+0.0,
+0.70711
+],
+"h": [
+0.125,
+1.5,
+0.0625
+]
+},
+{
+"path": "subway/Track (Back)/subway_track (3)/subway_track_boxCollider (0)",
+"p": [
+0.0,
+-1.375,
+4.75
+],
+"q": [
+0.70711,
+0.0,
+0.0,
+0.70711
+],
+"h": [
+4.0,
+0.0885,
+0.075
+]
+},
+{
+"path": "subway/Track (Back)/subway_track (3)/subway_track_boxCollider (5)",
+"p": [
+-0.5,
+-1.55,
+6.0
+],
+"q": [
+0.70711,
+0.0,
+0.0,
+0.70711
+],
+"h": [
+0.2,
+1.6,
+0.1
+]
+},
+{
+"path": "subway/subway_beam (0)/subway_support (1)/subway_support_boxCollider (5)",
+"p": [
+-7.5,
+0.2,
+3.375
+],
+"q": [
+0.0,
+0.70711,
+-0.70711,
+0.0
+],
+"h": [
+0.25,
+0.25,
+0.1
+]
+},
+{
+"path": "subway/Track (Front)/subway_track (6)/subway_track_boxCollider (0)",
+"p": [
+-24.0,
+-1.375,
+-7.25
+],
+"q": [
+0.70711,
+0.0,
+0.0,
+0.70711
+],
+"h": [
+4.0,
+0.0885,
+0.075
+]
+},
+{
+"path": "subway/Track (Front)/subway_track (1)/subway_track_boxCollider (2)",
+"p": [
+12.5,
+-1.55,
+-6.0
+],
+"q": [
+0.70711,
+0.0,
+0.0,
+0.70711
+],
+"h": [
+0.2,
+1.6,
+0.1
+]
+},
+{
+"path": "subway/Track (Front)/subway_track (1)/subway_track_boxCollider (3)",
+"p": [
+13.5,
+-1.55,
+-6.0
+],
+"q": [
+0.70711,
+0.0,
+0.0,
+0.70711
+],
+"h": [
+0.2,
+1.6,
+0.1
+]
+},
+{
+"path": "subway/Track (Front)/subway_track (0)/subway_track_boxCollider (7)",
+"p": [
+25.5,
+-1.55,
+-6.0
+],
+"q": [
+0.70711,
+0.0,
+0.0,
+0.70711
+],
+"h": [
+0.2,
+1.6,
+0.1
+]
+},
+{
+"path": "subway/Track (Front)/subway_track (0)/subway_track_boxCollider (1)",
+"p": [
+24.0,
+-1.375,
+-4.75
+],
+"q": [
+0.70711,
+0.0,
+0.0,
+0.70711
+],
+"h": [
+4.0,
+0.0885,
+0.075
+]
+},
+{
+"path": "subway/Track (Back)/subway_track (1)/subway_track_boxCollider (1)",
+"p": [
+16.0,
+-1.375,
+7.25
+],
+"q": [
+0.70711,
+0.0,
+0.0,
+0.70711
+],
+"h": [
+4.0,
+0.0885,
+0.075
+]
+},
+{
+"path": "subway/Track (Back)/subway_track (0)/subway_track_boxCollider (5)",
+"p": [
+23.5,
+-1.55,
+6.0
+],
+"q": [
+0.70711,
+0.0,
+0.0,
+0.70711
+],
+"h": [
+0.2,
+1.6,
+0.1
+]
+},
+{
+"path": "subway/Track (Back)/subway_track (2)/subway_track_boxCollider (0)",
+"p": [
+8.0,
+-1.375,
+4.75
+],
+"q": [
+0.70711,
+0.0,
+0.0,
+0.70711
+],
+"h": [
+4.0,
+0.0885,
+0.075
+]
+},
+{
+"path": "subway/subway_beam (0)/subway_support (0)/subway_support_boxCollider (0)",
+"p": [
+-7.5,
+0.05,
+-3.375
+],
+"q": [
+0.70711,
+0.0,
+0.0,
+0.70711
+],
+"h": [
+0.3702,
+0.3702,
+0.05
+]
+},
+{
+"path": "subway/Track (Back)/subway_track (6)/subway_track_boxCollider (5)",
+"p": [
+-24.5,
+-1.55,
+6.0
+],
+"q": [
+0.70711,
+0.0,
+0.0,
+0.70711
+],
+"h": [
+0.2,
+1.6,
+0.1
+]
+},
+{
+"path": "subway/subway_beam (0)/subway_support (1)/subway_support_boxCollider (3)",
+"p": [
+-7.5,
+3.0,
+3.375
+],
+"q": [
+0.0,
+0.70711,
+-0.70711,
+0.0
+],
+"h": [
+0.1,
+0.15,
+2.5
+]
+},
+{
+"path": "subway/Track (Front)/subway_track (4)/subway_track_boxCollider (7)",
+"p": [
+-6.5,
+-1.55,
+-6.0
+],
+"q": [
+0.70711,
+0.0,
+0.0,
+0.70711
+],
+"h": [
+0.2,
+1.6,
+0.1
+]
+},
+{
+"path": "subway/Track (Front)/subway_track (0)/subway_track_boxCollider (6)",
+"p": [
+24.5,
+-1.55,
+-6.0
+],
+"q": [
+0.70711,
+0.0,
+0.0,
+0.70711
+],
+"h": [
+0.2,
+1.6,
+0.1
+]
+},
+{
+"path": "subway/subway_beam (1)/subway_support (1)/subway_support_boxCollider (4)",
+"p": [
+0.0,
+5.98,
+3.375
+],
+"q": [
+0.0,
+0.70711,
+-0.70711,
+0.0
+],
+"h": [
+0.25,
+0.25,
+0.28
+]
+},
+{
+"path": "subway/subway_beam (0)",
+"p": [
+-7.5,
+5.6,
+0.0
+],
+"q": [
+0.70711,
+0.0,
+0.0,
+0.70711
+],
+"h": [
+0.1,
+3.2,
+0.1
+]
+},
+{
+"path": "subway/Track (Back)/subway_track (2)/subway_track_boxCollider (2)",
+"p": [
+4.5,
+-1.55,
+6.0
+],
+"q": [
+0.70711,
+0.0,
+0.0,
+0.70711
+],
+"h": [
+0.2,
+1.6,
+0.1
+]
+},
+{
+"path": "subway/Track (Front)/subway_track (4)/subway_track_boxCollider (6)",
+"p": [
+-7.5,
+-1.55,
+-6.0
+],
+"q": [
+0.70711,
+0.0,
+0.0,
+0.70711
+],
+"h": [
+0.2,
+1.6,
+0.1
+]
+},
+{
+"path": "subway/Track (Front)/subway_track (4)/subway_track_boxCollider (1)",
+"p": [
+-8.0,
+-1.375,
+-4.75
+],
+"q": [
+0.70711,
+0.0,
+0.0,
+0.70711
+],
+"h": [
+4.0,
+0.0885,
+0.075
+]
+},
+{
+"path": "subway/Track (Front)/subway_track (4)/subway_track_boxCollider (8)",
+"p": [
+-5.5,
+-1.55,
+-6.0
+],
+"q": [
+0.70711,
+0.0,
+0.0,
+0.70711
+],
+"h": [
+0.2,
+1.6,
+0.1
+]
+},
+{
+"path": "subway/Track (Front)/subway_track (3)/subway_track_boxCollider (3)",
+"p": [
+-2.5,
+-1.55,
+-6.0
+],
+"q": [
+0.70711,
+0.0,
+0.0,
+0.70711
+],
+"h": [
+0.2,
+1.6,
+0.1
+]
+},
+{
+"path": "subway/Track (Front)/subway_track (5)/subway_track_boxCollider (0)",
+"p": [
+-16.0,
+-1.375,
+-7.25
+],
+"q": [
+0.70711,
+0.0,
+0.0,
+0.70711
+],
+"h": [
+4.0,
+0.0885,
+0.075
+]
+},
+{
+"path": "subway/Track (Front)/subway_track (3)/subway_track_boxCollider (5)",
+"p": [
+-0.5,
+-1.55,
+-6.0
+],
+"q": [
+0.70711,
+0.0,
+0.0,
+0.70711
+],
+"h": [
+0.2,
+1.6,
+0.1
+]
+},
+{
+"path": "subway/Track (Back)/subway_track (2)/subway_track_boxCollider (7)",
+"p": [
+9.5,
+-1.55,
+6.0
+],
+"q": [
+0.70711,
+0.0,
+0.0,
+0.70711
+],
+"h": [
+0.2,
+1.6,
+0.1
+]
+},
+{
+"path": "subway/Track (Back)/subway_track (6)/subway_track_boxCollider (4)",
+"p": [
+-25.5,
+-1.55,
+6.0
+],
+"q": [
+0.70711,
+0.0,
+0.0,
+0.70711
+],
+"h": [
+0.2,
+1.6,
+0.1
+]
+},
+{
+"path": "subway/Track (Front)/subway_track (3)/subway_track_boxCollider (6)",
+"p": [
+0.5,
+-1.55,
+-6.0
+],
+"q": [
+0.70711,
+0.0,
+0.0,
+0.70711
+],
+"h": [
+0.2,
+1.6,
+0.1
+]
+},
+{
+"path": "subway/Track (Front)/subway_track (4)/subway_track_boxCollider (3)",
+"p": [
+-10.5,
+-1.55,
+-6.0
+],
+"q": [
+0.70711,
+0.0,
+0.0,
+0.70711
+],
+"h": [
+0.2,
+1.6,
+0.1
+]
+},
+{
+"path": "subway/Track (Back)/subway_track (4)/subway_track_boxCollider (3)",
+"p": [
+-10.5,
+-1.55,
+6.0
+],
+"q": [
+0.70711,
+0.0,
+0.0,
+0.70711
+],
+"h": [
+0.2,
+1.6,
+0.1
+]
+},
+{
+"path": "subway/subway_beam (1)/subway_support (0)/subway_support_boxCollider (2)",
+"p": [
+-0.175,
+3.18,
+-3.375
+],
+"q": [
+0.70711,
+0.0,
+0.0,
+0.70711
+],
+"h": [
+0.075,
+0.25,
+2.88
+]
+},
+{
+"path": "subway/subway_colliders/subway_boxCollider 13 (1)",
+"p": [
+0.0,
+-5.75,
+-0.0
+],
+"q": [
+0.70711,
+0.0,
+0.0,
+0.70711
+],
+"h": [
+50.0,
+8.0,
+4.25
+]
+},
+{
+"path": "subway/Track (Front)/subway_track (5)/subway_track_boxCollider (9)",
+"p": [
+-12.5,
+-1.55,
+-6.0
+],
+"q": [
+0.70711,
+0.0,
+0.0,
+0.70711
+],
+"h": [
+0.2,
+1.6,
+0.1
+]
+},
+{
+"path": "subway/Track (Back)/subway_track (5)/subway_track_boxCollider (5)",
+"p": [
+-16.5,
+-1.55,
+6.0
+],
+"q": [
+0.70711,
+0.0,
+0.0,
+0.70711
+],
+"h": [
+0.2,
+1.6,
+0.1
+]
+},
+{
+"path": "subway/Track (Front)/subway_track (3)/subway_track_boxCollider (9)",
+"p": [
+3.5,
+-1.55,
+-6.0
+],
+"q": [
+0.70711,
+0.0,
+0.0,
+0.70711
+],
+"h": [
+0.2,
+1.6,
+0.1
+]
+},
+{
+"path": "subway/subway_beam (0)/subway_support (1)/subway_support_boxCollider (2)",
+"p": [
+-7.325,
+3.18,
+3.375
+],
+"q": [
+0.0,
+0.70711,
+-0.70711,
+0.0
+],
+"h": [
+0.075,
+0.25,
+2.88
+]
+},
+{
+"path": "subway/Track (Front)/subway_track (2)/subway_track_boxCollider (3)",
+"p": [
+5.5,
+-1.55,
+-6.0
+],
+"q": [
+0.70711,
+0.0,
+0.0,
+0.70711
+],
+"h": [
+0.2,
+1.6,
+0.1
+]
+},
+{
+"path": "subway/subway_beam (2)/subway_support (1)/subway_support_boxCollider (4)",
+"p": [
+7.5,
+5.98,
+3.375
+],
+"q": [
+0.0,
+0.70711,
+-0.70711,
+0.0
+],
+"h": [
+0.25,
+0.25,
+0.28
+]
+},
+{
+"path": "subway/subway_staircase_base/subway_starcase_step (11)",
+"p": [
+-7.375,
+1.4375,
+1.12
+],
+"q": [
+0.70711,
+0.0,
+0.0,
+0.70711
+],
+"h": [
+0.125,
+1.5,
+0.0625
+]
+},
+{
+"path": "subway/Track (Back)/subway_track (0)/subway_track_boxCollider (2)",
+"p": [
+20.5,
+-1.55,
+6.0
+],
+"q": [
+0.70711,
+0.0,
+0.0,
+0.70711
+],
+"h": [
+0.2,
+1.6,
+0.1
+]
+},
+{
+"path": "subway/Track (Back)/subway_track (1)/subway_track_boxCollider (3)",
+"p": [
+13.5,
+-1.55,
+6.0
+],
+"q": [
+0.70711,
+0.0,
+0.0,
+0.70711
+],
+"h": [
+0.2,
+1.6,
+0.1
+]
+},
+{
+"path": "subway/subway_beam (0)/subway_support (1)/subway_support_boxCollider (1)",
+"p": [
+-7.675,
+3.18,
+3.375
+],
+"q": [
+0.0,
+0.70711,
+-0.70711,
+0.0
+],
+"h": [
+0.075,
+0.25,
+2.88
+]
+},
+{
+"path": "subway/Track (Front)/subway_track (2)/subway_track_boxCollider (7)",
+"p": [
+9.5,
+-1.55,
+-6.0
+],
+"q": [
+0.70711,
+0.0,
+0.0,
+0.70711
+],
+"h": [
+0.2,
+1.6,
+0.1
+]
+},
+{
+"path": "subway/subway_staircase_base/subway_starcase_step (5)",
+"p": [
+-5.875,
+0.6875,
+1.12
+],
+"q": [
+0.70711,
+0.0,
+0.0,
+0.70711
+],
+"h": [
+0.125,
+1.5,
+0.0625
+]
+},
+{
+"path": "subway/Track (Front)/subway_track (6)/subway_track_boxCollider (3)",
+"p": [
+-26.5,
+-1.55,
+-6.0
+],
+"q": [
+0.70711,
+0.0,
+0.0,
+0.70711
+],
+"h": [
+0.2,
+1.6,
+0.1
+]
+},
+{
+"path": "subway/Track (Front)/subway_track (2)/subway_track_boxCollider (1)",
+"p": [
+8.0,
+-1.375,
+-4.75
+],
+"q": [
+0.70711,
+0.0,
+0.0,
+0.70711
+],
+"h": [
+4.0,
+0.0885,
+0.075
+]
+},
+{
+"path": "subway/subway_beam (0)/subway_support (0)/subway_support_boxCollider (3)",
+"p": [
+-7.5,
+3.0,
+-3.375
+],
+"q": [
+0.70711,
+0.0,
+0.0,
+0.70711
+],
+"h": [
+0.1,
+0.15,
+2.5
+]
+},
+{
+"path": "subway/Track (Front)/subway_track (4)/subway_track_boxCollider (2)",
+"p": [
+-11.5,
+-1.55,
+-6.0
+],
+"q": [
+0.70711,
+0.0,
+0.0,
+0.70711
+],
+"h": [
+0.2,
+1.6,
+0.1
+]
+},
+{
+"path": "subway/Track (Front)/subway_track (4)/subway_track_boxCollider (5)",
+"p": [
+-8.5,
+-1.55,
+-6.0
+],
+"q": [
+0.70711,
+0.0,
+0.0,
+0.70711
+],
+"h": [
+0.2,
+1.6,
+0.1
+]
+},
+{
+"path": "subway/Track (Back)/subway_track (0)/subway_track_boxCollider (0)",
+"p": [
+24.0,
+-1.375,
+4.75
+],
+"q": [
+0.70711,
+0.0,
+0.0,
+0.70711
+],
+"h": [
+4.0,
+0.0885,
+0.075
+]
+},
+{
+"path": "subway/subway_beam (2)/subway_support (1)/subway_support_boxCollider (3)",
+"p": [
+7.5,
+3.0,
+3.375
+],
+"q": [
+0.0,
+0.70711,
+-0.70711,
+0.0
+],
+"h": [
+0.1,
+0.15,
+2.5
+]
+},
+{
+"path": "subway/Track (Back)/subway_track (0)/subway_track_boxCollider (3)",
+"p": [
+21.5,
+-1.55,
+6.0
+],
+"q": [
+0.70711,
+0.0,
+0.0,
+0.70711
+],
+"h": [
+0.2,
+1.6,
+0.1
+]
+},
+{
+"path": "subway/subway_beam (2)/subway_support (0)/subway_support_boxCollider (3)",
+"p": [
+7.5,
+3.0,
+-3.375
+],
+"q": [
+0.70711,
+0.0,
+0.0,
+0.70711
+],
+"h": [
+0.1,
+0.15,
+2.5
+]
+},
+{
+"path": "subway/Track (Back)/subway_track (0)/subway_track_boxCollider (4)",
+"p": [
+22.5,
+-1.55,
+6.0
+],
+"q": [
+0.70711,
+0.0,
+0.0,
+0.70711
+],
+"h": [
+0.2,
+1.6,
+0.1
+]
+},
+{
+"path": "subway/Track (Back)/subway_track (3)/subway_track_boxCollider (6)",
+"p": [
+0.5,
+-1.55,
+6.0
+],
+"q": [
+0.70711,
+0.0,
+0.0,
+0.70711
+],
+"h": [
+0.2,
+1.6,
+0.1
+]
+},
+{
+"path": "subway/subway_staircase_base/subway_starcase_step (9)",
+"p": [
+-6.875,
+1.1875,
+1.12
+],
+"q": [
+0.70711,
+0.0,
+0.0,
+0.70711
+],
+"h": [
+0.125,
+1.5,
+0.0625
+]
+},
+{
+"path": "subway/Track (Front)/subway_track (3)/subway_track_boxCollider (7)",
+"p": [
+1.5,
+-1.55,
+-6.0
+],
+"q": [
+0.70711,
+0.0,
+0.0,
+0.70711
+],
+"h": [
+0.2,
+1.6,
+0.1
+]
+},
+{
+"path": "subway/Track (Front)/subway_track (1)/subway_track_boxCollider (1)",
+"p": [
+16.0,
+-1.375,
+-4.75
+],
+"q": [
+0.70711,
+0.0,
+0.0,
+0.70711
+],
+"h": [
+4.0,
+0.0885,
+0.075
+]
+},
+{
+"path": "subway/subway_beam (0)/subway_support (0)/subway_support_boxCollider (5)",
+"p": [
+-7.5,
+0.2,
+-3.375
+],
+"q": [
+0.70711,
+0.0,
+0.0,
+0.70711
+],
+"h": [
+0.25,
+0.25,
+0.1
+]
+},
+{
+"path": "subway/Track (Front)/subway_track (6)/subway_track_boxCollider (1)",
+"p": [
+-24.0,
+-1.375,
+-4.75
+],
+"q": [
+0.70711,
+0.0,
+0.0,
+0.70711
+],
+"h": [
+4.0,
+0.0885,
+0.075
+]
+},
+{
+"path": "subway/Track (Front)/subway_track (6)/subway_track_boxCollider (5)",
+"p": [
+-24.5,
+-1.55,
+-6.0
+],
+"q": [
+0.70711,
+0.0,
+0.0,
+0.70711
+],
+"h": [
+0.2,
+1.6,
+0.1
+]
+},
+{
+"path": "subway/Track (Front)/subway_track (0)/subway_track_boxCollider (2)",
+"p": [
+20.5,
+-1.55,
+-6.0
+],
+"q": [
+0.70711,
+0.0,
+0.0,
+0.70711
+],
+"h": [
+0.2,
+1.6,
+0.1
+]
+},
+{
+"path": "subway/Track (Back)/subway_track (2)/subway_track_boxCollider (3)",
+"p": [
+5.5,
+-1.55,
+6.0
+],
+"q": [
+0.70711,
+0.0,
+0.0,
+0.70711
+],
+"h": [
+0.2,
+1.6,
+0.1
+]
+},
+{
+"path": "subway/subway_beam (2)",
+"p": [
+7.5,
+5.6,
+0.0
+],
+"q": [
+0.70711,
+0.0,
+0.0,
+0.70711
+],
+"h": [
+0.1,
+3.2,
+0.1
+]
+},
+{
+"path": "subway/Track (Back)/subway_track (6)/subway_track_boxCollider (2)",
+"p": [
+-27.5,
+-1.55,
+6.0
+],
+"q": [
+0.70711,
+0.0,
+0.0,
+0.70711
+],
+"h": [
+0.2,
+1.6,
+0.1
+]
+},
+{
+"path": "subway/subway_beam (1)",
+"p": [
+0.0,
+5.6,
+0.0
+],
+"q": [
+0.70711,
+0.0,
+0.0,
+0.70711
+],
+"h": [
+0.1,
+3.2,
+0.1
+]
+},
+{
+"path": "subway/Track (Back)/subway_track (1)/subway_track_boxCollider (8)",
+"p": [
+18.5,
+-1.55,
+6.0
+],
+"q": [
+0.70711,
+0.0,
+0.0,
+0.70711
+],
+"h": [
+0.2,
+1.6,
+0.1
+]
+},
+{
+"path": "subway/Track (Front)/subway_track (6)/subway_track_boxCollider (6)",
+"p": [
+-23.5,
+-1.55,
+-6.0
+],
+"q": [
+0.70711,
+0.0,
+0.0,
+0.70711
+],
+"h": [
+0.2,
+1.6,
+0.1
+]
+},
+{
+"path": "subway/subway_colliders/subway_boxCollider 13",
+"p": [
+0.0,
+-0.75,
+-0.0
+],
+"q": [
+0.70711,
+0.0,
+0.0,
+0.70711
+],
+"h": [
+50.0,
+4.0,
+0.75
+]
+},
+{
+"path": "subway/subway_colliders/subway_boxCollider 12",
+"p": [
+-31.0,
+1.25,
+-0.0
+],
+"q": [
+0.70711,
+0.0,
+0.0,
+0.70711
+],
+"h": [
+19.0,
+4.0,
+1.25
+]
+},
+{
+"path": "subway/subway_colliders/subway_boxCollider 11",
+"p": [
+-31.0,
+3.75,
+-3.0
+],
+"q": [
+0.70711,
+0.0,
+0.0,
+0.70711
+],
+"h": [
+19.0,
+1.0,
+1.25
+]
+},
+{
+"path": "subway/subway_colliders/subway_boxCollider 10",
+"p": [
+-33.0,
+3.5,
+0.0
+],
+"q": [
+0.70711,
+0.0,
+0.0,
+0.70711
+],
+"h": [
+17.0,
+2.0,
+1.0
+]
+},
+{
+"path": "subway/subway_colliders/subway_boxCollider 9",
+"p": [
+-31.0,
+3.75,
+3.0
+],
+"q": [
+0.70711,
+0.0,
+0.0,
+0.70711
+],
+"h": [
+19.0,
+1.0,
+1.25
+]
+},
+{
+"path": "subway/subway_colliders/subway_boxCollider 8",
+"p": [
+12.25,
+1.25,
+-3.25
+],
+"q": [
+0.70711,
+0.0,
+0.0,
+0.70711
+],
+"h": [
+0.25,
+0.25,
+1.25
+]
+},
+{
+"path": "subway/subway_colliders/subway_boxCollider 7",
+"p": [
+12.25,
+2.25,
+-2.0
+],
+"q": [
+0.70711,
+0.0,
+0.0,
+0.70711
+],
+"h": [
+0.25,
+1.0,
+0.25
+]
+},
+{
+"path": "subway/subway_colliders/subway_boxCollider 6",
+"p": [
+0.0,
+-3.5,
+9.0
+],
+"q": [
+0.70711,
+0.0,
+0.0,
+0.70711
+],
+"h": [
+50.0,
+1.0,
+6.5
+]
+},
+{
+"path": "subway/subway_colliders/subway_boxCollider 5",
+"p": [
+12.25,
+1.25,
+1.25
+],
+"q": [
+0.70711,
+0.0,
+0.0,
+0.70711
+],
+"h": [
+0.25,
+2.25,
+1.25
+]
+},
+{
+"path": "subway/subway_colliders/subway_boxCollider 4",
+"p": [
+31.0,
+3.5,
+-0.0
+],
+"q": [
+0.70711,
+0.0,
+0.0,
+0.70711
+],
+"h": [
+19.0,
+4.0,
+1.0
+]
+},
+{
+"path": "subway/subway_colliders/subway_boxCollider 3",
+"p": [
+31.0,
+1.25,
+3.75
+],
+"q": [
+0.70711,
+0.0,
+0.0,
+0.70711
+],
+"h": [
+19.0,
+0.25,
+1.25
+]
+},
+{
+"path": "subway/subway_colliders/subway_boxCollider 2",
+"p": [
+33.25,
+1.25,
+-0.0
+],
+"q": [
+0.70711,
+0.0,
+0.0,
+0.70711
+],
+"h": [
+16.75,
+3.5,
+1.25
+]
+},
+{
+"path": "subway/subway_colliders/subway_boxCollider 1",
+"p": [
+31.0,
+1.25,
+-3.75
+],
+"q": [
+0.70711,
+0.0,
+0.0,
+0.70711
+],
+"h": [
+19.0,
+0.25,
+1.25
+]
+},
+{
+"path": "subway/subway_colliders/subway_boxCollider",
+"p": [
+0.0,
+-3.5,
+-9.0
+],
+"q": [
+0.70711,
+0.0,
+0.0,
+0.70711
+],
+"h": [
+50.0,
+1.0,
+6.5
+]
+},
+{
+"path": "subway/subway_beam (1)/subway_support (0)/subway_support_boxCollider (3)",
+"p": [
+0.0,
+3.0,
+-3.375
+],
+"q": [
+0.70711,
+0.0,
+0.0,
+0.70711
+],
+"h": [
+0.1,
+0.15,
+2.5
+]
+},
+{
+"path": "subway/Track (Back)/subway_track (5)/subway_track_boxCollider (1)",
+"p": [
+-16.0,
+-1.375,
+7.25
+],
+"q": [
+0.70711,
+0.0,
+0.0,
+0.70711
+],
+"h": [
+4.0,
+0.0885,
+0.075
+]
+},
+{
+"path": "subway/subway_pipes (0)",
+"p": [
+27.0,
+-0.95,
+-4.1584
+],
+"q": [
+0.70711,
+0.0,
+0.0,
+0.70711
+],
+"h": [
+1.0,
+0.0941,
+0.3509
+]
+},
+{
+"path": "subway/Track (Back)/subway_track (2)/subway_track_boxCollider (8)",
+"p": [
+10.5,
+-1.55,
+6.0
+],
+"q": [
+0.70711,
+0.0,
+0.0,
+0.70711
+],
+"h": [
+0.2,
+1.6,
+0.1
+]
+},
+{
+"path": "subway/Track (Front)/subway_track (6)/subway_track_boxCollider (4)",
+"p": [
+-25.5,
+-1.55,
+-6.0
+],
+"q": [
+0.70711,
+0.0,
+0.0,
+0.70711
+],
+"h": [
+0.2,
+1.6,
+0.1
+]
+},
+{
+"path": "subway/subway_beam (1)/subway_support (1)/subway_support_boxCollider (3)",
+"p": [
+0.0,
+3.0,
+3.375
+],
+"q": [
+0.0,
+0.70711,
+-0.70711,
+0.0
+],
+"h": [
+0.1,
+0.15,
+2.5
+]
+},
+{
+"path": "subway/Track (Front)/subway_track (1)/subway_track_boxCollider (4)",
+"p": [
+14.5,
+-1.55,
+-6.0
+],
+"q": [
+0.70711,
+0.0,
+0.0,
+0.70711
+],
+"h": [
+0.2,
+1.6,
+0.1
+]
+},
+{
+"path": "subway/subway_staircase_base/subway_starcase_step (12)",
+"p": [
+-7.625,
+1.5625,
+1.12
+],
+"q": [
+0.70711,
+0.0,
+0.0,
+0.70711
+],
+"h": [
+0.125,
+1.5,
+0.0625
+]
+},
+{
+"path": "subway/Track (Front)/subway_track (2)/subway_track_boxCollider (4)",
+"p": [
+6.5,
+-1.55,
+-6.0
+],
+"q": [
+0.70711,
+0.0,
+0.0,
+0.70711
+],
+"h": [
+0.2,
+1.6,
+0.1
+]
+},
+{
+"path": "subway/subway_beam (0)/subway_support (1)/subway_sideBeam",
+"p": [
+-8.625,
+2.3,
+3.325
+],
+"q": [
+0.5,
+0.5,
+-0.5,
+0.5
+],
+"h": [
+0.075,
+0.875,
+0.1
+]
+},
+{
+"path": "subway/Track (Back)/subway_track (4)/subway_track_boxCollider (7)",
+"p": [
+-6.5,
+-1.55,
+6.0
+],
+"q": [
+0.70711,
+0.0,
+0.0,
+0.70711
+],
+"h": [
+0.2,
+1.6,
+0.1
+]
+},
+{
+"path": "subway/subway_beam (0)/subway_support (0)/subway_support_boxCollider (1)",
+"p": [
+-7.325,
+3.18,
+-3.375
+],
+"q": [
+0.70711,
+0.0,
+0.0,
+0.70711
+],
+"h": [
+0.075,
+0.25,
+2.88
+]
+},
+{
+"path": "subway/Track (Back)/subway_track (2)/subway_track_boxCollider (5)",
+"p": [
+7.5,
+-1.55,
+6.0
+],
+"q": [
+0.70711,
+0.0,
+0.0,
+0.70711
+],
+"h": [
+0.2,
+1.6,
+0.1
+]
+},
+{
+"path": "subway/Track (Back)/subway_track (3)/subway_track_boxCollider (1)",
+"p": [
+0.0,
+-1.375,
+7.25
+],
+"q": [
+0.70711,
+0.0,
+0.0,
+0.70711
+],
+"h": [
+4.0,
+0.0885,
+0.075
+]
+},
+{
+"path": "subway/Track (Front)/subway_track (1)/subway_track_boxCollider (6)",
+"p": [
+16.5,
+-1.55,
+-6.0
+],
+"q": [
+0.70711,
+0.0,
+0.0,
+0.70711
+],
+"h": [
+0.2,
+1.6,
+0.1
+]
+},
+{
+"path": "subway/Track (Front)/subway_track (5)/subway_track_boxCollider (4)",
+"p": [
+-17.5,
+-1.55,
+-6.0
+],
+"q": [
+0.70711,
+0.0,
+0.0,
+0.70711
+],
+"h": [
+0.2,
+1.6,
+0.1
+]
+},
+{
+"path": "subway/Track (Front)/subway_track (5)/subway_track_boxCollider (5)",
+"p": [
+-16.5,
+-1.55,
+-6.0
+],
+"q": [
+0.70711,
+0.0,
+0.0,
+0.70711
+],
+"h": [
+0.2,
+1.6,
+0.1
+]
+},
+{
+"path": "subway/Track (Front)/subway_track (0)/subway_track_boxCollider (0)",
+"p": [
+24.0,
+-1.375,
+-7.25
+],
+"q": [
+0.70711,
+0.0,
+0.0,
+0.70711
+],
+"h": [
+4.0,
+0.0885,
+0.075
+]
+},
+{
+"path": "subway/Track (Front)/subway_track (0)/subway_track_boxCollider (9)",
+"p": [
+27.5,
+-1.55,
+-6.0
+],
+"q": [
+0.70711,
+0.0,
+0.0,
+0.70711
+],
+"h": [
+0.2,
+1.6,
+0.1
+]
+},
+{
+"path": "subway/Track (Front)/subway_track (5)/subway_track_boxCollider (6)",
+"p": [
+-15.5,
+-1.55,
+-6.0
+],
+"q": [
+0.70711,
+0.0,
+0.0,
+0.70711
+],
+"h": [
+0.2,
+1.6,
+0.1
+]
+},
+{
+"path": "subway/Track (Front)/subway_track (2)/subway_track_boxCollider (0)",
+"p": [
+8.0,
+-1.375,
+-7.25
+],
+"q": [
+0.70711,
+0.0,
+0.0,
+0.70711
+],
+"h": [
+4.0,
+0.0885,
+0.075
+]
+},
+{
+"path": "subway/Track (Back)/subway_track (1)/subway_track_boxCollider (6)",
+"p": [
+16.5,
+-1.55,
+6.0
+],
+"q": [
+0.70711,
+0.0,
+0.0,
+0.70711
+],
+"h": [
+0.2,
+1.6,
+0.1
+]
+},
+{
+"path": "subway/subway_beam (0)/subway_support (0)/subway_sideBeam",
+"p": [
+-8.625,
+2.3,
+-3.325
+],
+"q": [
+0.5,
+0.5,
+-0.5,
+0.5
+],
+"h": [
+0.075,
+0.875,
+0.1
+]
+},
+{
+"path": "subway/Track (Back)/subway_track (1)/subway_track_boxCollider (7)",
+"p": [
+17.5,
+-1.55,
+6.0
+],
+"q": [
+0.70711,
+0.0,
+0.0,
+0.70711
+],
+"h": [
+0.2,
+1.6,
+0.1
+]
+},
+{
+"path": "subway/Track (Back)/subway_track (4)/subway_track_boxCollider (4)",
+"p": [
+-9.5,
+-1.55,
+6.0
+],
+"q": [
+0.70711,
+0.0,
+0.0,
+0.70711
+],
+"h": [
+0.2,
+1.6,
+0.1
+]
+},
+{
+"path": "subway/Track (Back)/subway_track (0)/subway_track_boxCollider (9)",
+"p": [
+27.5,
+-1.55,
+6.0
+],
+"q": [
+0.70711,
+0.0,
+0.0,
+0.70711
+],
+"h": [
+0.2,
+1.6,
+0.1
+]
+},
+{
+"path": "subway/Track (Back)/subway_track (4)/subway_track_boxCollider (6)",
+"p": [
+-7.5,
+-1.55,
+6.0
+],
+"q": [
+0.70711,
+0.0,
+0.0,
+0.70711
+],
+"h": [
+0.2,
+1.6,
+0.1
+]
+},
+{
+"path": "subway/Track (Front)/subway_track (6)/subway_track_boxCollider (9)",
+"p": [
+-20.5,
+-1.55,
+-6.0
+],
+"q": [
+0.70711,
+0.0,
+0.0,
+0.70711
+],
+"h": [
+0.2,
+1.6,
+0.1
+]
+},
+{
+"path": "subway/Track (Back)/subway_track (0)/subway_track_boxCollider (6)",
+"p": [
+24.5,
+-1.55,
+6.0
+],
+"q": [
+0.70711,
+0.0,
+0.0,
+0.70711
+],
+"h": [
+0.2,
+1.6,
+0.1
+]
+},
+{
+"path": "subway/Track (Back)/subway_track (3)/subway_track_boxCollider (7)",
+"p": [
+1.5,
+-1.55,
+6.0
+],
+"q": [
+0.70711,
+0.0,
+0.0,
+0.70711
+],
+"h": [
+0.2,
+1.6,
+0.1
+]
+},
+{
+"path": "subway/subway_beam (1)/subway_support (0)/subway_support_boxCollider (5)",
+"p": [
+0.0,
+0.2,
+-3.375
+],
+"q": [
+0.70711,
+0.0,
+0.0,
+0.70711
+],
+"h": [
+0.25,
+0.25,
+0.1
+]
+},
+{
+"path": "subway/Track (Front)/subway_track (2)/subway_track_boxCollider (9)",
+"p": [
+11.5,
+-1.55,
+-6.0
+],
+"q": [
+0.70711,
+0.0,
+0.0,
+0.70711
+],
+"h": [
+0.2,
+1.6,
+0.1
+]
+},
+{
+"path": "subway/subway_staircase_base/subway_starcase_step (18)",
+"p": [
+-9.125,
+2.3125,
+1.12
+],
+"q": [
+0.70711,
+0.0,
+0.0,
+0.70711
+],
+"h": [
+0.125,
+1.5,
+0.0625
+]
+},
+{
+"path": "subway/Track (Front)/subway_track (4)/subway_track_boxCollider (9)",
+"p": [
+-4.5,
+-1.55,
+-6.0
+],
+"q": [
+0.70711,
+0.0,
+0.0,
+0.70711
+],
+"h": [
+0.2,
+1.6,
+0.1
+]
+},
+{
+"path": "subway/Track (Front)/subway_track (3)/subway_track_boxCollider (8)",
+"p": [
+2.5,
+-1.55,
+-6.0
+],
+"q": [
+0.70711,
+0.0,
+0.0,
+0.70711
+],
+"h": [
+0.2,
+1.6,
+0.1
+]
+},
+{
+"path": "subway/Track (Back)/subway_track (2)/subway_track_boxCollider (6)",
+"p": [
+8.5,
+-1.55,
+6.0
+],
+"q": [
+0.70711,
+0.0,
+0.0,
+0.70711
+],
+"h": [
+0.2,
+1.6,
+0.1
+]
+},
+{
+"path": "subway/subway_beam (2)/subway_support (1)/subway_support_boxCollider (0)",
+"p": [
+7.5,
+0.05,
+3.375
+],
+"q": [
+0.0,
+0.70711,
+-0.70711,
+0.0
+],
+"h": [
+0.3702,
+0.3702,
+0.05
+]
+},
+{
+"path": "subway/Track (Front)/subway_track (2)/subway_track_boxCollider (5)",
+"p": [
+7.5,
+-1.55,
+-6.0
+],
+"q": [
+0.70711,
+0.0,
+0.0,
+0.70711
+],
+"h": [
+0.2,
+1.6,
+0.1
+]
+},
+{
+"path": "subway/Track (Back)/subway_track (6)/subway_track_boxCollider (8)",
+"p": [
+-21.5,
+-1.55,
+6.0
+],
+"q": [
+0.70711,
+0.0,
+0.0,
+0.70711
+],
+"h": [
+0.2,
+1.6,
+0.1
+]
+},
+{
+"path": "subway/subway_staircase_base/subway_starcase_step (13)",
+"p": [
+-7.875,
+1.6875,
+1.12
+],
+"q": [
+0.70711,
+0.0,
+0.0,
+0.70711
+],
+"h": [
+0.125,
+1.5,
+0.0625
+]
+},
+{
+"path": "subway/Track (Front)/subway_track (0)/subway_track_boxCollider (8)",
+"p": [
+26.5,
+-1.55,
+-6.0
+],
+"q": [
+0.70711,
+0.0,
+0.0,
+0.70711
+],
+"h": [
+0.2,
+1.6,
+0.1
+]
+},
+{
+"path": "subway/subway_beam (2)/subway_support (0)/subway_support_boxCollider (0)",
+"p": [
+7.5,
+0.05,
+-3.375
+],
+"q": [
+0.70711,
+0.0,
+0.0,
+0.70711
+],
+"h": [
+0.3702,
+0.3702,
+0.05
+]
+},
+{
+"path": "subway/subway_beam (1)/subway_support (1)/subway_support_boxCollider (1)",
+"p": [
+-0.175,
+3.18,
+3.375
+],
+"q": [
+0.0,
+0.70711,
+-0.70711,
+0.0
+],
+"h": [
+0.075,
+0.25,
+2.88
+]
+},
+{
+"path": "subway/Track (Front)/subway_track (3)/subway_track_boxCollider (2)",
+"p": [
+-3.5,
+-1.55,
+-6.0
+],
+"q": [
+0.70711,
+0.0,
+0.0,
+0.70711
+],
+"h": [
+0.2,
+1.6,
+0.1
+]
+},
+{
+"path": "subway/subway_beam (0)/subway_support (0)/subway_support_boxCollider (2)",
+"p": [
+-7.675,
+3.18,
+-3.375
+],
+"q": [
+0.70711,
+0.0,
+0.0,
+0.70711
+],
+"h": [
+0.075,
+0.25,
+2.88
+]
+},
+{
+"path": "subway/Track (Back)/subway_track (0)/subway_track_boxCollider (1)",
+"p": [
+24.0,
+-1.375,
+7.25
+],
+"q": [
+0.70711,
+0.0,
+0.0,
+0.70711
+],
+"h": [
+4.0,
+0.0885,
+0.075
+]
+},
+{
+"path": "subway/subway_staircase_base/subway_starcase_step (7)",
+"p": [
+-6.375,
+0.9375,
+1.12
+],
+"q": [
+0.70711,
+0.0,
+0.0,
+0.70711
+],
+"h": [
+0.125,
+1.5,
+0.0625
+]
+},
+{
+"path": "subway/Track (Back)/subway_track (5)/subway_track_boxCollider (9)",
+"p": [
+-12.5,
+-1.55,
+6.0
+],
+"q": [
+0.70711,
+0.0,
+0.0,
+0.70711
+],
+"h": [
+0.2,
+1.6,
+0.1
+]
+},
+{
+"path": "subway/Track (Front)/subway_track (1)/subway_track_boxCollider (0)",
+"p": [
+16.0,
+-1.375,
+-7.25
+],
+"q": [
+0.70711,
+0.0,
+0.0,
+0.70711
+],
+"h": [
+4.0,
+0.0885,
+0.075
+]
+},
+{
+"path": "subway/subway_staircase_base/subway_starcase_step (15)",
+"p": [
+-8.375,
+1.9375,
+1.12
+],
+"q": [
+0.70711,
+0.0,
+0.0,
+0.70711
+],
+"h": [
+0.125,
+1.5,
+0.0625
+]
+},
+{
+"path": "subway/Track (Back)/subway_track (1)/subway_track_boxCollider (0)",
+"p": [
+16.0,
+-1.375,
+4.75
+],
+"q": [
+0.70711,
+0.0,
+0.0,
+0.70711
+],
+"h": [
+4.0,
+0.0885,
+0.075
+]
+},
+{
+"path": "subway/Track (Back)/subway_track (4)/subway_track_boxCollider (1)",
+"p": [
+-8.0,
+-1.375,
+7.25
+],
+"q": [
+0.70711,
+0.0,
+0.0,
+0.70711
+],
+"h": [
+4.0,
+0.0885,
+0.075
+]
+},
+{
+"path": "subway/subway_beam (0)/subway_support (1)/subway_support_boxCollider (4)",
+"p": [
+-7.5,
+5.98,
+3.375
+],
+"q": [
+0.0,
+0.70711,
+-0.70711,
+0.0
+],
+"h": [
+0.25,
+0.25,
+0.28
+]
+},
+{
+"path": "subway/Track (Back)/subway_track (5)/subway_track_boxCollider (7)",
+"p": [
+-14.5,
+-1.55,
+6.0
+],
+"q": [
+0.70711,
+0.0,
+0.0,
+0.70711
+],
+"h": [
+0.2,
+1.6,
+0.1
+]
+},
+{
+"path": "subway/subway_edge_collider",
+"p": [
+0.0,
+-0.95,
+4.175
+],
+"q": [
+-0.0,
+-0.70711,
+0.70711,
+0.0
+],
+"h": [
+25.0,
+0.175,
+0.45
+]
+},
+{
+"path": "subway/Track (Back)/subway_track (3)/subway_track_boxCollider (3)",
+"p": [
+-2.5,
+-1.55,
+6.0
+],
+"q": [
+0.70711,
+0.0,
+0.0,
+0.70711
+],
+"h": [
+0.2,
+1.6,
+0.1
+]
+},
+{
+"path": "subway/Track (Front)/subway_track (5)/subway_track_boxCollider (1)",
+"p": [
+-16.0,
+-1.375,
+-4.75
+],
+"q": [
+0.70711,
+0.0,
+0.0,
+0.70711
+],
+"h": [
+4.0,
+0.0885,
+0.075
+]
+},
+{
+"path": "subway/subway_beam (2)/subway_support (0)/subway_support_boxCollider (1)",
+"p": [
+7.675,
+3.18,
+-3.375
+],
+"q": [
+0.70711,
+0.0,
+0.0,
+0.70711
+],
+"h": [
+0.075,
+0.25,
+2.88
+]
+},
+{
+"path": "subway/subway_beam (2)/subway_support (0)/subway_support_boxCollider (5)",
+"p": [
+7.5,
+0.2,
+-3.375
+],
+"q": [
+0.70711,
+0.0,
+0.0,
+0.70711
+],
+"h": [
+0.25,
+0.25,
+0.1
+]
+},
+{
+"path": "subway/Track (Back)/subway_track (2)/subway_track_boxCollider (4)",
+"p": [
+6.5,
+-1.55,
+6.0
+],
+"q": [
+0.70711,
+0.0,
+0.0,
+0.70711
+],
+"h": [
+0.2,
+1.6,
+0.1
+]
+},
+{
+"path": "subway/Track (Back)/subway_track (6)/subway_track_boxCollider (1)",
+"p": [
+-24.0,
+-1.375,
+7.25
+],
+"q": [
+0.70711,
+0.0,
+0.0,
+0.70711
+],
+"h": [
+4.0,
+0.0885,
+0.075
+]
+},
+{
+"path": "subway/Track (Front)/subway_track (5)/subway_track_boxCollider (3)",
+"p": [
+-18.5,
+-1.55,
+-6.0
+],
+"q": [
+0.70711,
+0.0,
+0.0,
+0.70711
+],
+"h": [
+0.2,
+1.6,
+0.1
+]
+},
+{
+"path": "subway/Track (Back)/subway_track (3)/subway_track_boxCollider (9)",
+"p": [
+3.5,
+-1.55,
+6.0
+],
+"q": [
+0.70711,
+0.0,
+0.0,
+0.70711
+],
+"h": [
+0.2,
+1.6,
+0.1
+]
+},
+{
+"path": "subway/subway_beam (2)/subway_support (1)/subway_support_boxCollider (1)",
+"p": [
+7.325,
+3.18,
+3.375
+],
+"q": [
+0.0,
+0.70711,
+-0.70711,
+0.0
+],
+"h": [
+0.075,
+0.25,
+2.88
+]
+},
+{
+"path": "subway/Track (Back)/subway_track (5)/subway_track_boxCollider (3)",
+"p": [
+-18.5,
+-1.55,
+6.0
+],
+"q": [
+0.70711,
+0.0,
+0.0,
+0.70711
+],
+"h": [
+0.2,
+1.6,
+0.1
+]
+},
+{
+"path": "subway/Track (Back)/subway_track (3)/subway_track_boxCollider (4)",
+"p": [
+-1.5,
+-1.55,
+6.0
+],
+"q": [
+0.70711,
+0.0,
+0.0,
+0.70711
+],
+"h": [
+0.2,
+1.6,
+0.1
+]
+},
+{
+"path": "subway/Track (Back)/subway_track (4)/subway_track_boxCollider (5)",
+"p": [
+-8.5,
+-1.55,
+6.0
+],
+"q": [
+0.70711,
+0.0,
+0.0,
+0.70711
+],
+"h": [
+0.2,
+1.6,
+0.1
+]
+},
+{
+"path": "subway/subway_staircase_base/subway_starcase_step (1)",
+"p": [
+-4.875,
+0.1875,
+1.12
+],
+"q": [
+0.70711,
+0.0,
+0.0,
+0.70711
+],
+"h": [
+0.125,
+1.5,
+0.0625
+]
+},
+{
+"path": "subway/subway_beam (1)/subway_support (1)/subway_support_boxCollider (5)",
+"p": [
+0.0,
+0.2,
+3.375
+],
+"q": [
+0.0,
+0.70711,
+-0.70711,
+0.0
+],
+"h": [
+0.25,
+0.25,
+0.1
+]
+},
+{
+"path": "subway/Track (Back)/subway_track (4)/subway_track_boxCollider (9)",
+"p": [
+-4.5,
+-1.55,
+6.0
+],
+"q": [
+0.70711,
+0.0,
+0.0,
+0.70711
+],
+"h": [
+0.2,
+1.6,
+0.1
+]
+},
+{
+"path": "subway/Track (Front)/subway_track (3)/subway_track_boxCollider (0)",
+"p": [
+0.0,
+-1.375,
+-7.25
+],
+"q": [
+0.70711,
+0.0,
+0.0,
+0.70711
+],
+"h": [
+4.0,
+0.0885,
+0.075
+]
+},
+{
+"path": "subway/subway_staircase_base/subway_starcase_step (0)",
+"p": [
+-4.625,
+0.0625,
+1.12
+],
+"q": [
+0.70711,
+0.0,
+0.0,
+0.70711
+],
+"h": [
+0.125,
+1.5,
+0.0625
+]
+},
+{
+"path": "subway/subway_staircase_base/subway_starcase_step (8)",
+"p": [
+-6.625,
+1.0625,
+1.12
+],
+"q": [
+0.70711,
+0.0,
+0.0,
+0.70711
+],
+"h": [
+0.125,
+1.5,
+0.0625
+]
+},
+{
+"path": "subway/subway_beam (0)/subway_support (0)/subway_support_boxCollider (4)",
+"p": [
+-7.5,
+5.98,
+-3.375
+],
+"q": [
+0.70711,
+0.0,
+0.0,
+0.70711
+],
+"h": [
+0.25,
+0.25,
+0.28
+]
+},
+{
+"path": "subway/Track (Back)/subway_track (0)/subway_track_boxCollider (7)",
+"p": [
+25.5,
+-1.55,
+6.0
+],
+"q": [
+0.70711,
+0.0,
+0.0,
+0.70711
+],
+"h": [
+0.2,
+1.6,
+0.1
+]
+},
+{
+"path": "subway/Track (Front)/subway_track (4)/subway_track_boxCollider (4)",
+"p": [
+-9.5,
+-1.55,
+-6.0
+],
+"q": [
+0.70711,
+0.0,
+0.0,
+0.70711
+],
+"h": [
+0.2,
+1.6,
+0.1
+]
+},
+{
+"path": "subway/Track (Front)/subway_track (6)/subway_track_boxCollider (7)",
+"p": [
+-22.5,
+-1.55,
+-6.0
+],
+"q": [
+0.70711,
+0.0,
+0.0,
+0.70711
+],
+"h": [
+0.2,
+1.6,
+0.1
+]
+},
+{
+"path": "subway/subway_staircase_base/subway_starcase_step (3)",
+"p": [
+-5.375,
+0.4375,
+1.12
+],
+"q": [
+0.70711,
+0.0,
+0.0,
+0.70711
+],
+"h": [
+0.125,
+1.5,
+0.0625
+]
+},
+{
+"path": "subway/subway_staircase_base/subway_starcase_step (2)",
+"p": [
+-5.125,
+0.3125,
+1.12
+],
+"q": [
+0.70711,
+0.0,
+0.0,
+0.70711
+],
+"h": [
+0.125,
+1.5,
+0.0625
+]
+},
+{
+"path": "subway/subway_beam (1)/subway_support (0)/subway_support_boxCollider (4)",
+"p": [
+0.0,
+5.98,
+-3.375
+],
+"q": [
+0.70711,
+0.0,
+0.0,
+0.70711
+],
+"h": [
+0.25,
+0.25,
+0.28
+]
+},
+{
+"path": "subway/subway_beam (1)/subway_support (0)/subway_support_boxCollider (0)",
+"p": [
+0.0,
+0.05,
+-3.375
+],
+"q": [
+0.70711,
+0.0,
+0.0,
+0.70711
+],
+"h": [
+0.3702,
+0.3702,
+0.05
+]
+},
+{
+"path": "subway/Track (Front)/subway_track (6)/subway_track_boxCollider (8)",
+"p": [
+-21.5,
+-1.55,
+-6.0
+],
+"q": [
+0.70711,
+0.0,
+0.0,
+0.70711
+],
+"h": [
+0.2,
+1.6,
+0.1
+]
+},
+{
+"path": "subway/Track (Back)/subway_track (1)/subway_track_boxCollider (5)",
+"p": [
+15.5,
+-1.55,
+6.0
+],
+"q": [
+0.70711,
+0.0,
+0.0,
+0.70711
+],
+"h": [
+0.2,
+1.6,
+0.1
+]
+},
+{
+"path": "subway/subway_beam (1)/subway_support (1)/subway_support_boxCollider (0)",
+"p": [
+0.0,
+0.05,
+3.375
+],
+"q": [
+0.0,
+0.70711,
+-0.70711,
+0.0
+],
+"h": [
+0.3702,
+0.3702,
+0.05
+]
+},
+{
+"path": "subway/Track (Front)/subway_track (1)/subway_track_boxCollider (5)",
+"p": [
+15.5,
+-1.55,
+-6.0
+],
+"q": [
+0.70711,
+0.0,
+0.0,
+0.70711
+],
+"h": [
+0.2,
+1.6,
+0.1
+]
+},
+{
+"path": "subway/Track (Back)/subway_track (3)/subway_track_boxCollider (2)",
+"p": [
+-3.5,
+-1.55,
+6.0
+],
+"q": [
+0.70711,
+0.0,
+0.0,
+0.70711
+],
+"h": [
+0.2,
+1.6,
+0.1
+]
+},
+{
+"path": "subway/subway_beam (2)/subway_support (0)/subway_support_boxCollider (2)",
+"p": [
+7.325,
+3.18,
+-3.375
+],
+"q": [
+0.70711,
+0.0,
+0.0,
+0.70711
+],
+"h": [
+0.075,
+0.25,
+2.88
+]
+},
+{
+"path": "subway/subway_beam (2)/subway_support (1)/subway_support_boxCollider (5)",
+"p": [
+7.5,
+0.2,
+3.375
+],
+"q": [
+0.0,
+0.70711,
+-0.70711,
+0.0
+],
+"h": [
+0.25,
+0.25,
+0.1
+]
+},
+{
+"path": "subway/Track (Back)/subway_track (0)/subway_track_boxCollider (8)",
+"p": [
+26.5,
+-1.55,
+6.0
+],
+"q": [
+0.70711,
+0.0,
+0.0,
+0.70711
+],
+"h": [
+0.2,
+1.6,
+0.1
+]
+}
+],
+"capsules": [
+{
+"path": "subway/subway_beam (2)/subway_lightRope_segment (10)",
+"p": [
+7.5,
+4.375,
+0.5
+],
+"q": [
+-0.0,
+0.0,
+0.0,
+1.0
+],
+"r": 0.05,
+"hh": 0.1
+},
+{
+"path": "subway/subway_beam (2)/subway_lightRope_segment (8)",
+"p": [
+7.5,
+4.125,
+-0.5
+],
+"q": [
+-0.0,
+0.0,
+0.0,
+1.0
+],
+"r": 0.05,
+"hh": 0.1
+},
+{
+"path": "subway/subway_beam (0)/subway_lightRope_segment (4)",
+"p": [
+-7.5,
+5.125,
+0.5
+],
+"q": [
+-0.0,
+0.0,
+0.0,
+1.0
+],
+"r": 0.05,
+"hh": 0.1
+},
+{
+"path": "subway/subway_beam (0)/subway_lightRope_segment (5)",
+"p": [
+-7.5,
+4.875,
+0.5
+],
+"q": [
+-0.0,
+0.0,
+0.0,
+1.0
+],
+"r": 0.05,
+"hh": 0.1
+},
+{
+"path": "subway/subway_beam (1)/subway_lightRope_segment (11)",
+"p": [
+0.0,
+4.125,
+0.5
+],
+"q": [
+-0.0,
+0.0,
+0.0,
+1.0
+],
+"r": 0.05,
+"hh": 0.1
+},
+{
+"path": "subway/subway_beam (0)/subway_lightRope_segment (0)",
+"p": [
+-7.5,
+5.375,
+-0.5
+],
+"q": [
+-0.0,
+0.0,
+0.0,
+1.0
+],
+"r": 0.05,
+"hh": 0.1
+},
+{
+"path": "subway/subway_beam (1)/subway_lightRope_segment (5)",
+"p": [
+0.0,
+4.875,
+0.5
+],
+"q": [
+-0.0,
+0.0,
+0.0,
+1.0
+],
+"r": 0.05,
+"hh": 0.1
+},
+{
+"path": "subway/subway_beam (2)/subway_lightRope_segment (3)",
+"p": [
+7.5,
+5.375,
+0.5
+],
+"q": [
+-0.0,
+0.0,
+0.0,
+1.0
+],
+"r": 0.05,
+"hh": 0.1
+},
+{
+"path": "subway/subway_beam (1)/subway_lightRope_segment (8)",
+"p": [
+0.0,
+4.125,
+-0.5
+],
+"q": [
+-0.0,
+0.0,
+0.0,
+1.0
+],
+"r": 0.05,
+"hh": 0.1
+},
+{
+"path": "subway/subway_beam (1)/subway_lightRope_segment (10)",
+"p": [
+0.0,
+4.375,
+0.5
+],
+"q": [
+-0.0,
+0.0,
+0.0,
+1.0
+],
+"r": 0.05,
+"hh": 0.1
+},
+{
+"path": "subway/subway_beam (2)/subway_lightRope_segment (1)",
+"p": [
+7.5,
+5.125,
+-0.5
+],
+"q": [
+-0.0,
+0.0,
+0.0,
+1.0
+],
+"r": 0.05,
+"hh": 0.1
+},
+{
+"path": "subway/subway_beam (1)/subway_lightRope_segment (3)",
+"p": [
+0.0,
+5.375,
+0.5
+],
+"q": [
+-0.0,
+0.0,
+0.0,
+1.0
+],
+"r": 0.05,
+"hh": 0.1
+},
+{
+"path": "subway/subway_beam (2)/subway_lightRope_segment (0)",
+"p": [
+7.5,
+5.375,
+-0.5
+],
+"q": [
+-0.0,
+0.0,
+0.0,
+1.0
+],
+"r": 0.05,
+"hh": 0.1
+},
+{
+"path": "subway/subway_beam (1)/subway_lightRope_segment (6)",
+"p": [
+0.0,
+4.375,
+-0.5
+],
+"q": [
+-0.0,
+0.0,
+0.0,
+1.0
+],
+"r": 0.05,
+"hh": 0.1
+},
+{
+"path": "subway/subway_beam (2)/subway_lightRope_segment (2)",
+"p": [
+7.5,
+4.875,
+-0.5
+],
+"q": [
+-0.0,
+0.0,
+0.0,
+1.0
+],
+"r": 0.05,
+"hh": 0.1
+},
+{
+"path": "subway/subway_beam (0)/subway_lightRope_segment (3)",
+"p": [
+-7.5,
+5.375,
+0.5
+],
+"q": [
+-0.0,
+0.0,
+0.0,
+1.0
+],
+"r": 0.05,
+"hh": 0.1
+},
+{
+"path": "subway/subway_beam (2)/subway_lightRope_segment (5)",
+"p": [
+7.5,
+4.875,
+0.5
+],
+"q": [
+-0.0,
+0.0,
+0.0,
+1.0
+],
+"r": 0.05,
+"hh": 0.1
+},
+{
+"path": "subway/subway_beam (1)/subway_lightRope_segment (1)",
+"p": [
+0.0,
+5.125,
+-0.5
+],
+"q": [
+-0.0,
+0.0,
+0.0,
+1.0
+],
+"r": 0.05,
+"hh": 0.1
+},
+{
+"path": "subway/subway_beam (2)/subway_lightRope_segment (6)",
+"p": [
+7.5,
+4.375,
+-0.5
+],
+"q": [
+-0.0,
+0.0,
+0.0,
+1.0
+],
+"r": 0.05,
+"hh": 0.1
+},
+{
+"path": "subway/subway_beam (1)/subway_lightRope_segment (2)",
+"p": [
+0.0,
+4.875,
+-0.5
+],
+"q": [
+-0.0,
+0.0,
+0.0,
+1.0
+],
+"r": 0.05,
+"hh": 0.1
+},
+{
+"path": "subway/subway_beam (2)/subway_lightRope_segment (9)",
+"p": [
+7.5,
+4.625,
+0.5
+],
+"q": [
+-0.0,
+0.0,
+0.0,
+1.0
+],
+"r": 0.05,
+"hh": 0.1
+},
+{
+"path": "subway/subway_beam (2)/subway_lightRope_segment (4)",
+"p": [
+7.5,
+5.125,
+0.5
+],
+"q": [
+-0.0,
+0.0,
+0.0,
+1.0
+],
+"r": 0.05,
+"hh": 0.1
+},
+{
+"path": "subway/subway_beam (1)/subway_lightRope_segment (7)",
+"p": [
+0.0,
+4.625,
+-0.5
+],
+"q": [
+-0.0,
+0.0,
+0.0,
+1.0
+],
+"r": 0.05,
+"hh": 0.1
+},
+{
+"path": "subway/subway_beam (0)/subway_lightRope_segment (1)",
+"p": [
+-7.5,
+5.125,
+-0.5
+],
+"q": [
+-0.0,
+0.0,
+0.0,
+1.0
+],
+"r": 0.05,
+"hh": 0.1
+},
+{
+"path": "subway/subway_beam (1)/subway_lightRope_segment (0)",
+"p": [
+0.0,
+5.375,
+-0.5
+],
+"q": [
+-0.0,
+0.0,
+0.0,
+1.0
+],
+"r": 0.05,
+"hh": 0.1
+},
+{
+"path": "subway/subway_beam (1)/subway_lightRope_segment (9)",
+"p": [
+0.0,
+4.625,
+0.5
+],
+"q": [
+-0.0,
+0.0,
+0.0,
+1.0
+],
+"r": 0.05,
+"hh": 0.1
+},
+{
+"path": "subway/subway_beam (2)/subway_lightRope_segment (7)",
+"p": [
+7.5,
+4.625,
+-0.5
+],
+"q": [
+-0.0,
+0.0,
+0.0,
+1.0
+],
+"r": 0.05,
+"hh": 0.1
+},
+{
+"path": "subway/subway_beam (0)/subway_lightRope_segment (2)",
+"p": [
+-7.5,
+4.875,
+-0.5
+],
+"q": [
+-0.0,
+0.0,
+0.0,
+1.0
+],
+"r": 0.05,
+"hh": 0.1
+},
+{
+"path": "subway/subway_beam (2)/subway_lightRope_segment (11)",
+"p": [
+7.5,
+4.125,
+0.5
+],
+"q": [
+-0.0,
+0.0,
+0.0,
+1.0
+],
+"r": 0.05,
+"hh": 0.1
+},
+{
+"path": "subway/subway_beam (1)/subway_lightRope_segment (4)",
+"p": [
+0.0,
+5.125,
+0.5
+],
+"q": [
+-0.0,
+0.0,
+0.0,
+1.0
+],
+"r": 0.05,
+"hh": 0.1
+}
+],
+"trimeshes": [
+{
+"path": "subway/subway_beam (1)/subway_support (1)/subway_support_meshCollider (0)",
+"mesh": "m197",
+"matrix": [
+[
+-1.0,
+0.0,
+-0.0,
+0.0
+],
+[
+0.0,
+0.0,
+-1.0,
+-1e-05
+],
+[
+-0.0,
+-1.0,
+-0.0,
+3.375
+],
+[
+0.0,
+0.0,
+-0.0,
+1.0
+]
+]
+},
+{
+"path": "subway/subway_beam (1)/subway_support (0)/subway_support_meshCollider (0)",
+"mesh": "m197",
+"matrix": [
+[
+1.0,
+0.0,
+-0.0,
+0.0
+],
+[
+0.0,
+-0.0,
+-1.0,
+-0.0
+],
+[
+-0.0,
+1.0,
+-0.0,
+-3.375
+],
+[
+0.0,
+0.0,
+-0.0,
+1.0
+]
+]
+},
+{
+"path": "subway/subway_beam (0)/subway_support (1)/subway_support_meshCollider (1)",
+"mesh": "m198",
+"matrix": [
+[
+-1.0,
+0.0,
+-0.0,
+-7.5
+],
+[
+0.0,
+0.0,
+-1.0,
+-0.0
+],
+[
+-0.0,
+-1.0,
+-0.0,
+3.375
+],
+[
+0.0,
+0.0,
+-0.0,
+1.0
+]
+]
+},
+{
+"path": "subway/subway_beam (2)/subway_support (1)/subway_support_meshCollider (1)",
+"mesh": "m198",
+"matrix": [
+[
+-1.0,
+0.0,
+-0.0,
+7.5
+],
+[
+0.0,
+0.0,
+-1.0,
+-1e-05
+],
+[
+-0.0,
+-1.0,
+-0.0,
+3.375
+],
+[
+0.0,
+0.0,
+-0.0,
+1.0
+]
+]
+},
+{
+"path": "subway/subway_beam (1)/subway_support (1)/subway_support_meshCollider (1)",
+"mesh": "m198",
+"matrix": [
+[
+-1.0,
+0.0,
+-0.0,
+0.0
+],
+[
+0.0,
+0.0,
+-1.0,
+-1e-05
+],
+[
+-0.0,
+-1.0,
+-0.0,
+3.375
+],
+[
+0.0,
+0.0,
+-0.0,
+1.0
+]
+]
+},
+{
+"path": "subway/subway_beam (1)/subway_support (0)/subway_support_meshCollider (1)",
+"mesh": "m198",
+"matrix": [
+[
+1.0,
+0.0,
+-0.0,
+0.0
+],
+[
+0.0,
+-0.0,
+-1.0,
+-0.0
+],
+[
+-0.0,
+1.0,
+-0.0,
+-3.375
+],
+[
+0.0,
+0.0,
+-0.0,
+1.0
+]
+]
+},
+{
+"path": "subway/subway_colliders/subway_meshCollider 31",
+"mesh": "mf25838450e39",
+"matrix": [
+[
+1.0,
+0.0,
+-0.0,
+0.0
+],
+[
+0.0,
+-0.0,
+-1.0,
+0.0
+],
+[
+-0.0,
+1.0,
+-0.0,
+-0.0
+],
+[
+0.0,
+0.0,
+-0.0,
+1.0
+]
+]
+},
+{
+"path": "subway/subway_colliders/subway_meshCollider 30",
+"mesh": "m20436a3a0e39",
+"matrix": [
+[
+1.0,
+0.0,
+-0.0,
+0.0
+],
+[
+0.0,
+-0.0,
+-1.0,
+0.0
+],
+[
+-0.0,
+1.0,
+-0.0,
+-0.0
+],
+[
+0.0,
+0.0,
+-0.0,
+1.0
+]
+]
+},
+{
+"path": "subway/subway_colliders/subway_meshCollider 29",
+"mesh": "m9f457f410e39",
+"matrix": [
+[
+1.0,
+0.0,
+-0.0,
+0.0
+],
+[
+0.0,
+-0.0,
+-1.0,
+0.0
+],
+[
+-0.0,
+1.0,
+-0.0,
+-0.0
+],
+[
+0.0,
+0.0,
+-0.0,
+1.0
+]
+]
+},
+{
+"path": "subway/subway_colliders/subway_meshCollider 28",
+"mesh": "m891778200e39",
+"matrix": [
+[
+1.0,
+0.0,
+-0.0,
+0.0
+],
+[
+0.0,
+-0.0,
+-1.0,
+0.0
+],
+[
+-0.0,
+1.0,
+-0.0,
+-0.0
+],
+[
+0.0,
+0.0,
+-0.0,
+1.0
+]
+]
+},
+{
+"path": "subway/subway_colliders/subway_meshCollider 27",
+"mesh": "mad6eadc50e39",
+"matrix": [
+[
+1.0,
+0.0,
+-0.0,
+0.0
+],
+[
+0.0,
+-0.0,
+-1.0,
+0.0
+],
+[
+-0.0,
+1.0,
+-0.0,
+-0.0
+],
+[
+0.0,
+0.0,
+-0.0,
+1.0
+]
+]
+},
+{
+"path": "subway/subway_colliders/subway_meshCollider 26",
+"mesh": "mb914dd450e39",
+"matrix": [
+[
+1.0,
+0.0,
+-0.0,
+0.0
+],
+[
+0.0,
+-0.0,
+-1.0,
+0.0
+],
+[
+-0.0,
+1.0,
+-0.0,
+-0.0
+],
+[
+0.0,
+0.0,
+-0.0,
+1.0
+]
+]
+},
+{
+"path": "subway/subway_colliders/subway_meshCollider 25",
+"mesh": "mf3c0994f0e39",
+"matrix": [
+[
+1.0,
+0.0,
+-0.0,
+0.0
+],
+[
+0.0,
+-0.0,
+-1.0,
+0.5
+],
+[
+-0.0,
+1.0,
+-0.0,
+0.0
+],
+[
+0.0,
+0.0,
+-0.0,
+1.0
+]
+]
+},
+{
+"path": "subway/subway_colliders/subway_meshCollider 24",
+"mesh": "m6a21c4ea0e39",
+"matrix": [
+[
+1.0,
+0.0,
+-0.0,
+0.0
+],
+[
+0.0,
+-0.0,
+-1.0,
+0.0
+],
+[
+-0.0,
+1.0,
+-0.0,
+-0.0
+],
+[
+0.0,
+0.0,
+-0.0,
+1.0
+]
+]
+},
+{
+"path": "subway/subway_colliders/subway_meshCollider 23",
+"mesh": "m6e4269d00e39",
+"matrix": [
+[
+1.0,
+0.0,
+-0.0,
+0.0
+],
+[
+0.0,
+-0.0,
+-1.0,
+0.0
+],
+[
+-0.0,
+1.0,
+-0.0,
+-0.0
+],
+[
+0.0,
+0.0,
+-0.0,
+1.0
+]
+]
+},
+{
+"path": "subway/subway_colliders/subway_meshCollider 22",
+"mesh": "m180e03fb0e39",
+"matrix": [
+[
+1.0,
+0.0,
+-0.0,
+0.0
+],
+[
+0.0,
+-0.0,
+-1.0,
+0.0
+],
+[
+-0.0,
+1.0,
+-0.0,
+-0.0
+],
+[
+0.0,
+0.0,
+-0.0,
+1.0
+]
+]
+},
+{
+"path": "subway/subway_colliders/subway_meshCollider 21",
+"mesh": "m7f01d6300e39",
+"matrix": [
+[
+1.0,
+0.0,
+-0.0,
+0.0
+],
+[
+0.0,
+-0.0,
+-1.0,
+0.0
+],
+[
+-0.0,
+1.0,
+-0.0,
+-0.0
+],
+[
+0.0,
+0.0,
+-0.0,
+1.0
+]
+]
+},
+{
+"path": "subway/subway_colliders/subway_meshCollider 20",
+"mesh": "mb556766f0e39",
+"matrix": [
+[
+1.0,
+0.0,
+-0.0,
+0.0
+],
+[
+0.0,
+-0.0,
+-1.0,
+0.0
+],
+[
+-0.0,
+1.0,
+-0.0,
+-0.0
+],
+[
+0.0,
+0.0,
+-0.0,
+1.0
+]
+]
+},
+{
+"path": "subway/subway_colliders/subway_meshCollider 19",
+"mesh": "mdb22b5a00e39",
+"matrix": [
+[
+1.0,
+0.0,
+-0.0,
+0.0
+],
+[
+0.0,
+-0.0,
+-1.0,
+0.0
+],
+[
+-0.0,
+1.0,
+-0.0,
+-0.0
+],
+[
+0.0,
+0.0,
+-0.0,
+1.0
+]
+]
+},
+{
+"path": "subway/subway_colliders/subway_meshCollider 18",
+"mesh": "ma0fd63320e39",
+"matrix": [
+[
+1.0,
+0.0,
+-0.0,
+0.0
+],
+[
+0.0,
+-0.0,
+-1.0,
+0.0
+],
+[
+-0.0,
+1.0,
+-0.0,
+-0.0
+],
+[
+0.0,
+0.0,
+-0.0,
+1.0
+]
+]
+},
+{
+"path": "subway/subway_colliders/subway_meshCollider 17",
+"mesh": "m102af9e70e39",
+"matrix": [
+[
+1.0,
+0.0,
+-0.0,
+0.0
+],
+[
+0.0,
+-0.0,
+-1.0,
+0.0
+],
+[
+-0.0,
+1.0,
+-0.0,
+-0.0
+],
+[
+0.0,
+0.0,
+-0.0,
+1.0
+]
+]
+},
+{
+"path": "subway/subway_colliders/subway_meshCollider 16",
+"mesh": "m5a6aa24c0e39",
+"matrix": [
+[
+1.0,
+0.0,
+-0.0,
+0.0
+],
+[
+0.0,
+-0.0,
+-1.0,
+0.0
+],
+[
+-0.0,
+1.0,
+-0.0,
+-0.0
+],
+[
+0.0,
+0.0,
+-0.0,
+1.0
+]
+]
+},
+{
+"path": "subway/subway_colliders/subway_meshCollider 15",
+"mesh": "ma920473c0e39",
+"matrix": [
+[
+1.0,
+0.0,
+-0.0,
+0.0
+],
+[
+0.0,
+-0.0,
+-1.0,
+0.0
+],
+[
+-0.0,
+1.0,
+-0.0,
+-0.0
+],
+[
+0.0,
+0.0,
+-0.0,
+1.0
+]
+]
+},
+{
+"path": "subway/subway_colliders/subway_meshCollider 14",
+"mesh": "m437b17880e39",
+"matrix": [
+[
+1.0,
+0.0,
+-0.0,
+0.0
+],
+[
+0.0,
+-0.0,
+-1.0,
+0.0
+],
+[
+-0.0,
+1.0,
+-0.0,
+-0.0
+],
+[
+0.0,
+0.0,
+-0.0,
+1.0
+]
+]
+},
+{
+"path": "subway/subway_colliders/subway_meshCollider 13",
+"mesh": "mbedd27d20e39",
+"matrix": [
+[
+1.0,
+0.0,
+-0.0,
+0.0
+],
+[
+0.0,
+-0.0,
+-1.0,
+0.0
+],
+[
+-0.0,
+1.0,
+-0.0,
+-0.0
+],
+[
+0.0,
+0.0,
+-0.0,
+1.0
+]
+]
+},
+{
+"path": "subway/subway_colliders/subway_meshCollider 12",
+"mesh": "m2577e6c10e39",
+"matrix": [
+[
+1.0,
+0.0,
+-0.0,
+0.0
+],
+[
+0.0,
+-0.0,
+-1.0,
+0.0
+],
+[
+-0.0,
+1.0,
+-0.0,
+-0.0
+],
+[
+0.0,
+0.0,
+-0.0,
+1.0
+]
+]
+},
+{
+"path": "subway/subway_colliders/subway_meshCollider 11",
+"mesh": "mf96b882d0e39",
+"matrix": [
+[
+1.0,
+0.0,
+-0.0,
+0.0
+],
+[
+0.0,
+-0.0,
+-1.0,
+0.0
+],
+[
+-0.0,
+1.0,
+-0.0,
+-0.0
+],
+[
+0.0,
+0.0,
+-0.0,
+1.0
+]
+]
+},
+{
+"path": "subway/subway_colliders/subway_meshCollider 10",
+"mesh": "m8e3066240e39",
+"matrix": [
+[
+1.0,
+0.0,
+-0.0,
+0.0
+],
+[
+0.0,
+-0.0,
+-1.0,
+0.0
+],
+[
+-0.0,
+1.0,
+-0.0,
+-0.0
+],
+[
+0.0,
+0.0,
+-0.0,
+1.0
+]
+]
+},
+{
+"path": "subway/subway_colliders/subway_meshCollider 9",
+"mesh": "mb199f30a0e39",
+"matrix": [
+[
+1.0,
+0.0,
+-0.0,
+0.0
+],
+[
+0.0,
+-0.0,
+-1.0,
+0.0
+],
+[
+-0.0,
+1.0,
+-0.0,
+-0.0
+],
+[
+0.0,
+0.0,
+-0.0,
+1.0
+]
+]
+},
+{
+"path": "subway/subway_colliders/subway_meshCollider 8",
+"mesh": "m4406af550e39",
+"matrix": [
+[
+1.0,
+0.0,
+-0.0,
+0.0
+],
+[
+0.0,
+-0.0,
+-1.0,
+0.0
+],
+[
+-0.0,
+1.0,
+-0.0,
+-0.0
+],
+[
+0.0,
+0.0,
+-0.0,
+1.0
+]
+]
+},
+{
+"path": "subway/subway_colliders/subway_meshCollider 7",
+"mesh": "m78eb8a10e39",
+"matrix": [
+[
+1.0,
+0.0,
+-0.0,
+0.0
+],
+[
+0.0,
+-0.0,
+-1.0,
+0.0
+],
+[
+-0.0,
+1.0,
+-0.0,
+-0.0
+],
+[
+0.0,
+0.0,
+-0.0,
+1.0
+]
+]
+},
+{
+"path": "subway/subway_colliders/subway_meshCollider 6",
+"mesh": "m474c66180e39",
+"matrix": [
+[
+1.0,
+0.0,
+-0.0,
+0.0
+],
+[
+0.0,
+-0.0,
+-1.0,
+0.0
+],
+[
+-0.0,
+1.0,
+-0.0,
+-0.0
+],
+[
+0.0,
+0.0,
+-0.0,
+1.0
+]
+]
+},
+{
+"path": "subway/subway_colliders/subway_meshCollider 5",
+"mesh": "mc267aa980e39",
+"matrix": [
+[
+1.0,
+0.0,
+-0.0,
+0.0
+],
+[
+0.0,
+-0.0,
+-1.0,
+0.0
+],
+[
+-0.0,
+1.0,
+-0.0,
+-0.0
+],
+[
+0.0,
+0.0,
+-0.0,
+1.0
+]
+]
+},
+{
+"path": "subway/subway_colliders/subway_meshCollider 4",
+"mesh": "m957a60d00e39",
+"matrix": [
+[
+1.0,
+0.0,
+-0.0,
+0.0
+],
+[
+0.0,
+-0.0,
+-1.0,
+0.0
+],
+[
+-0.0,
+1.0,
+-0.0,
+-0.0
+],
+[
+0.0,
+0.0,
+-0.0,
+1.0
+]
+]
+},
+{
+"path": "subway/subway_colliders/subway_meshCollider 3",
+"mesh": "m8a0cd86e0e39",
+"matrix": [
+[
+1.0,
+0.0,
+-0.0,
+0.0
+],
+[
+0.0,
+-0.0,
+-1.0,
+0.0
+],
+[
+-0.0,
+1.0,
+-0.0,
+-0.0
+],
+[
+0.0,
+0.0,
+-0.0,
+1.0
+]
+]
+},
+{
+"path": "subway/subway_colliders/subway_meshCollider 2",
+"mesh": "m88a77750e39",
+"matrix": [
+[
+1.0,
+0.0,
+-0.0,
+0.0
+],
+[
+0.0,
+-0.0,
+-1.0,
+0.0
+],
+[
+-0.0,
+1.0,
+-0.0,
+-0.0
+],
+[
+0.0,
+0.0,
+-0.0,
+1.0
+]
+]
+},
+{
+"path": "subway/subway_colliders/subway_meshCollider 1",
+"mesh": "m4448d4f0e39",
+"matrix": [
+[
+1.0,
+0.0,
+-0.0,
+0.0
+],
+[
+0.0,
+-0.0,
+-1.0,
+0.0
+],
+[
+-0.0,
+1.0,
+-0.0,
+-0.0
+],
+[
+0.0,
+0.0,
+-0.0,
+1.0
+]
+]
+},
+{
+"path": "subway/subway_colliders/subway_meshCollider",
+"mesh": "m9034dd2d0e39",
+"matrix": [
+[
+1.0,
+0.0,
+-0.0,
+0.0
+],
+[
+0.0,
+-0.0,
+-1.0,
+0.0
+],
+[
+-0.0,
+1.0,
+-0.0,
+-0.0
+],
+[
+0.0,
+0.0,
+-0.0,
+1.0
+]
+]
+},
+{
+"path": "subway/subway_beam (2)/subway_support (0)/subway_support_meshCollider (1)",
+"mesh": "m198",
+"matrix": [
+[
+1.0,
+0.0,
+-0.0,
+7.5
+],
+[
+0.0,
+-0.0,
+-1.0,
+-0.0
+],
+[
+-0.0,
+1.0,
+-0.0,
+-3.375
+],
+[
+0.0,
+0.0,
+-0.0,
+1.0
+]
+]
+},
+{
+"path": "subway/subway_beam (0)/subway_support (0)/subway_support_meshCollider (1)",
+"mesh": "m198",
+"matrix": [
+[
+1.0,
+0.0,
+-0.0,
+-7.5
+],
+[
+0.0,
+-0.0,
+-1.0,
+-0.0
+],
+[
+-0.0,
+1.0,
+-0.0,
+-3.375
+],
+[
+0.0,
+0.0,
+-0.0,
+1.0
+]
+]
+},
+{
+"path": "subway/subway_beam (2)/subway_support (0)/subway_support_meshCollider (0)",
+"mesh": "m197",
+"matrix": [
+[
+1.0,
+0.0,
+-0.0,
+7.5
+],
+[
+0.0,
+-0.0,
+-1.0,
+-0.0
+],
+[
+-0.0,
+1.0,
+-0.0,
+-3.375
+],
+[
+0.0,
+0.0,
+-0.0,
+1.0
+]
+]
+},
+{
+"path": "subway/subway_beam (2)/subway_support (1)/subway_support_meshCollider (0)",
+"mesh": "m197",
+"matrix": [
+[
+-1.0,
+0.0,
+-0.0,
+7.5
+],
+[
+0.0,
+0.0,
+-1.0,
+-1e-05
+],
+[
+-0.0,
+-1.0,
+-0.0,
+3.375
+],
+[
+0.0,
+0.0,
+-0.0,
+1.0
+]
+]
+},
+{
+"path": "subway/subway_beam (0)/subway_support (0)/subway_support_meshCollider (0)",
+"mesh": "m197",
+"matrix": [
+[
+1.0,
+0.0,
+-0.0,
+-7.5
+],
+[
+0.0,
+-0.0,
+-1.0,
+-0.0
+],
+[
+-0.0,
+1.0,
+-0.0,
+-3.375
+],
+[
+0.0,
+0.0,
+-0.0,
+1.0
+]
+]
+},
+{
+"path": "subway/subway_beam (0)/subway_support (1)/subway_support_meshCollider (0)",
+"mesh": "m197",
+"matrix": [
+[
+-1.0,
+0.0,
+-0.0,
+-7.5
+],
+[
+0.0,
+0.0,
+-1.0,
+-0.0
+],
+[
+-0.0,
+-1.0,
+-0.0,
+3.375
+],
+[
+0.0,
+0.0,
+-0.0,
+1.0
+]
+]
+}
+],
+"spawns": [
+[
+9.5,
+0.0,
+1.5
+],
+[
+2.3,
+0.0,
+-2.5
+],
+[
+5.2,
+0.0,
+2.5
+],
+[
+-2.5,
+0.0,
+1.5
+],
+[
+-2.5,
+0.0,
+-1.5
+],
+[
+9.5,
+0.0,
+-1.5
+],
+[
+2.3,
+0.0,
+2.5
+],
+[
+5.3,
+0.0,
+-2.5
+]
+],
+"kill": [
+{
+"path": "Managers/KillVolumes/Kill Volume (2)",
+"p": [
+0.0,
+13.0,
+-0.0
+],
+"q": [
+0.0,
+0.0,
+0.0,
+1.0
+],
+"h": [
+17.0,
+5.0,
+15.0
+]
+},
+{
+"path": "Managers/KillVolumes/Kill Volume",
+"p": [
+-22.0,
+2.0,
+-0.0
+],
+"q": [
+0.0,
+0.0,
+0.0,
+1.0
+],
+"h": [
+5.0,
+8.0,
+15.0
+]
+},
+{
+"path": "Managers/KillVolumes/Kill Volume",
+"p": [
+22.0,
+2.0,
+-0.0
+],
+"q": [
+0.0,
+0.0,
+0.0,
+1.0
+],
+"h": [
+5.0,
+8.0,
+15.0
+]
+},
+{
+"path": "Managers/KillVolumes/Kill Volume (1)",
+"p": [
+0.0,
+-10.0,
+-0.0
+],
+"q": [
+0.0,
+0.0,
+0.0,
+1.0
+],
+"h": [
+17.0,
+5.0,
+15.0
+]
+}
+],
+"train": {
+"renderers": [
+{
+"path": "Managers/Trains/TrainSpawn (Back)/Train A(Clone)/Subway_Train/train/subway_trainDoor_01 (1)/train_door_01",
+"mesh": "m195",
+"subs": [
+0
+],
+"mats": [
+"TX_subwayTrain_9"
+],
+"matrix": [
+[
+1.0,
+0.0,
+-0.0,
+7.21754
+],
+[
+0.0,
+-0.0,
+-1.0,
+2.45791
+],
+[
+-0.0,
+1.0,
+0.0,
+-1.55925
+],
+[
+0.0,
+0.0,
+-0.0,
+1.0
+]
+],
+"lightmap": -1,
+"lmso": [
+1,
+1,
+0,
+0
+],
+"cast": 1,
+"recv": true,
+"layer": 10
+},
+{
+"path": "Managers/Trains/TrainSpawn (Back)/Train A(Clone)/Subway_Train/train/subway_trainDoor_01 (8)/train_doorWindow_01",
+"mesh": "m196",
+"subs": [
+0
+],
+"mats": [
+"TX_subwayTrain_9"
+],
+"matrix": [
+[
+1.0,
+0.0,
+-0.0,
+-0.52
+],
+[
+0.0,
+-0.0,
+-1.0,
+2.71692
+],
+[
+-0.0,
+1.0,
+0.0,
+1.543
+],
+[
+0.0,
+0.0,
+-0.0,
+1.0
+]
+],
+"lightmap": -1,
+"lmso": [
+1,
+1,
+0,
+0
+],
+"cast": 1,
+"recv": true,
+"layer": 10
+},
+{
+"path": "Managers/Trains/TrainSpawn (Back)/Train A(Clone)/Subway_Train/train/subway_trainDoor_01 (10)/train_doorWindow_01",
+"mesh": "m196",
+"subs": [
+0
+],
+"mats": [
+"Subway_Glass_14"
+],
+"matrix": [
+[
+1.0,
+0.0,
+-0.0,
+7.22
+],
+[
+0.0,
+-0.0,
+-1.0,
+2.71692
+],
+[
+-0.0,
+1.0,
+0.0,
+1.543
+],
+[
+0.0,
+0.0,
+-0.0,
+1.0
+]
+],
+"lightmap": -1,
+"lmso": [
+1,
+1,
+0,
+0
+],
+"cast": 1,
+"recv": true,
+"layer": 10
+},
+{
+"path": "Managers/Trains/TrainSpawn (Back)/Train A(Clone)/Subway_Train/train/subway_trainDoor_01 (1)/train_doorWindow_01",
+"mesh": "m196",
+"subs": [
+0
+],
+"mats": [
+"Subway_Glass_14"
+],
+"matrix": [
+[
+1.0,
+0.0,
+-0.0,
+7.21754
+],
+[
+0.0,
+-0.0,
+-1.0,
+2.71483
+],
+[
+-0.0,
+1.0,
+0.0,
+-1.55925
+],
+[
+0.0,
+0.0,
+-0.0,
+1.0
+]
+],
+"lightmap": -1,
+"lmso": [
+1,
+1,
+0,
+0
+],
+"cast": 1,
+"recv": true,
+"layer": 10
+},
+{
+"path": "Managers/Trains/TrainSpawn (Back)/Train A(Clone)/Subway_Train/train/subway_trainDoor_01 (3)/train_doorWindow_01",
+"mesh": "m196",
+"subs": [
+0
+],
+"mats": [
+"Subway_Glass_14"
+],
+"matrix": [
+[
+1.0,
+0.0,
+-0.0,
+-0.521
+],
+[
+0.0,
+-0.0,
+-1.0,
+2.71692
+],
+[
+-0.0,
+1.0,
+0.0,
+-1.56
+],
+[
+0.0,
+0.0,
+-0.0,
+1.0
+]
+],
+"lightmap": -1,
+"lmso": [
+1,
+1,
+0,
+0
+],
+"cast": 1,
+"recv": true,
+"layer": 10
+},
+{
+"path": "Managers/Trains/TrainSpawn (Back)/Train A(Clone)/Subway_Train/train/subway_trainDoor_01 (6)/train_door_01",
+"mesh": "m195",
+"subs": [
+0
+],
+"mats": [
+"TX_subwayTrain_9"
+],
+"matrix": [
+[
+1.0,
+0.0,
+-0.0,
+-6.23
+],
+[
+0.0,
+-0.0,
+-1.0,
+2.46
+],
+[
+-0.0,
+1.0,
+0.0,
+1.543
+],
+[
+0.0,
+0.0,
+-0.0,
+1.0
+]
+],
+"lightmap": -1,
+"lmso": [
+1,
+1,
+0,
+0
+],
+"cast": 1,
+"recv": true,
+"layer": 10
+},
+{
+"path": "Managers/Trains/TrainSpawn (Back)/Train A(Clone)/Subway_Train/train/subway_trainDoor_01 (3)/train_door_01",
+"mesh": "m195",
+"subs": [
+0
+],
+"mats": [
+"TX_subwayTrain_9"
+],
+"matrix": [
+[
+1.0,
+0.0,
+-0.0,
+-0.521
+],
+[
+0.0,
+-0.0,
+-1.0,
+2.46
+],
+[
+-0.0,
+1.0,
+0.0,
+-1.56
+],
+[
+0.0,
+0.0,
+-0.0,
+1.0
+]
+],
+"lightmap": -1,
+"lmso": [
+1,
+1,
+0,
+0
+],
+"cast": 1,
+"recv": true,
+"layer": 10
+},
+{
+"path": "Managers/Trains/TrainSpawn (Back)/Train A(Clone)/Subway_Train/train/subway_trainDoor_02/train_doorWindow_02",
+"mesh": "m193",
+"subs": [
+0
+],
+"mats": [
+"Subway_Glass_14"
+],
+"matrix": [
+[
+1.0,
+0.0,
+-0.0,
+20.72893
+],
+[
+0.0,
+-0.0,
+-1.0,
+2.11944
+],
+[
+-0.0,
+1.0,
+0.0,
+0.00074
+],
+[
+0.0,
+0.0,
+-0.0,
+1.0
+]
+],
+"lightmap": -1,
+"lmso": [
+1,
+1,
+0,
+0
+],
+"cast": 1,
+"recv": true,
+"layer": 10
+},
+{
+"path": "Managers/Trains/TrainSpawn (Back)/Train A(Clone)/Subway_Train/train/subway_trainDoor_01 (4)/train_doorWindow_01",
+"mesh": "m196",
+"subs": [
+0
+],
+"mats": [
+"Subway_Glass_14"
+],
+"matrix": [
+[
+1.0,
+0.0,
+-0.0,
+-7.243
+],
+[
+0.0,
+-0.0,
+-1.0,
+2.71692
+],
+[
+-0.0,
+1.0,
+0.0,
+-1.56
+],
+[
+0.0,
+0.0,
+-0.0,
+1.0
+]
+],
+"lightmap": -1,
+"lmso": [
+1,
+1,
+0,
+0
+],
+"cast": 1,
+"recv": true,
+"layer": 10
+},
+{
+"path": "Managers/Trains/TrainSpawn (Back)/Train A(Clone)/Subway_Train/train/subway_trainDoor_01 (2)/train_door_01",
+"mesh": "m195",
+"subs": [
+0
+],
+"mats": [
+"TX_subwayTrain_9"
+],
+"matrix": [
+[
+1.0,
+0.0,
+-0.0,
+0.489
+],
+[
+0.0,
+-0.0,
+-1.0,
+2.46
+],
+[
+-0.0,
+1.0,
+0.0,
+-1.56
+],
+[
+0.0,
+0.0,
+-0.0,
+1.0
+]
+],
+"lightmap": -1,
+"lmso": [
+1,
+1,
+0,
+0
+],
+"cast": 1,
+"recv": true,
+"layer": 10
+},
+{
+"path": "Managers/Trains/TrainSpawn (Back)/Train A(Clone)/Subway_Train/train/subway_trainDoor_01 (8)/train_doorWindow_01",
+"mesh": "m196",
+"subs": [
+0
+],
+"mats": [
+"Subway_Glass_14"
+],
+"matrix": [
+[
+1.0,
+0.0,
+-0.0,
+-0.52
+],
+[
+0.0,
+-0.0,
+-1.0,
+2.71692
+],
+[
+-0.0,
+1.0,
+0.0,
+1.543
+],
+[
+0.0,
+0.0,
+-0.0,
+1.0
+]
+],
+"lightmap": -1,
+"lmso": [
+1,
+1,
+0,
+0
+],
+"cast": 1,
+"recv": true,
+"layer": 10
+},
+{
+"path": "Managers/Trains/TrainSpawn (Back)/Train A(Clone)/Subway_Train/train/subway_trainDoor_01 (1)/train_door_01",
+"mesh": "m195",
+"subs": [
+0
+],
+"mats": [
+"TX_subwayTrain_9"
+],
+"matrix": [
+[
+1.0,
+0.0,
+-0.0,
+7.21754
+],
+[
+0.0,
+-0.0,
+-1.0,
+2.45791
+],
+[
+-0.0,
+1.0,
+0.0,
+-1.55925
+],
+[
+0.0,
+0.0,
+-0.0,
+1.0
+]
+],
+"lightmap": -1,
+"lmso": [
+1,
+1,
+0,
+0
+],
+"cast": 1,
+"recv": true,
+"layer": 10
+},
+{
+"path": "Managers/Trains/TrainSpawn (Back)/Train A(Clone)/Subway_Train/train/subway_trainDoor_01 (10)/train_doorWindow_01",
+"mesh": "m196",
+"subs": [
+0
+],
+"mats": [
+"Subway_Glass_14"
+],
+"matrix": [
+[
+1.0,
+0.0,
+-0.0,
+7.22
+],
+[
+0.0,
+-0.0,
+-1.0,
+2.71692
+],
+[
+-0.0,
+1.0,
+0.0,
+1.543
+],
+[
+0.0,
+0.0,
+-0.0,
+1.0
+]
+],
+"lightmap": -1,
+"lmso": [
+1,
+1,
+0,
+0
+],
+"cast": 1,
+"recv": true,
+"layer": 10
+},
+{
+"path": "Managers/Trains/TrainSpawn (Back)/Train A(Clone)/Subway_Train/train/subway_trainDoor_01 (5)/train_door_01",
+"mesh": "m195",
+"subs": [
+0
+],
+"mats": [
+"TX_subwayTrain_9"
+],
+"matrix": [
+[
+1.0,
+0.0,
+-0.0,
+-6.233
+],
+[
+0.0,
+-0.0,
+-1.0,
+2.46
+],
+[
+-0.0,
+1.0,
+0.0,
+-1.56
+],
+[
+0.0,
+0.0,
+-0.0,
+1.0
+]
+],
+"lightmap": -1,
+"lmso": [
+1,
+1,
+0,
+0
+],
+"cast": 1,
+"recv": true,
+"layer": 10
+},
+{
+"path": "Managers/Trains/TrainSpawn (Back)/Train A(Clone)/Subway_Train/train/subway_train/train_Lights",
+"mesh": "m190",
+"subs": [
+0
+],
+"mats": [
+"Subway_Lights_7"
+],
+"matrix": [
+[
+1.0,
+0.0,
+-0.0,
+-10.36391
+],
+[
+0.0,
+-0.0,
+-1.0,
+1.38052
+],
+[
+-0.0,
+1.0,
+-0.0,
+0.00052
+],
+[
+0.0,
+0.0,
+-0.0,
+1.0
+]
+],
+"lightmap": -1,
+"lmso": [
+1,
+1,
+0,
+0
+],
+"cast": 1,
+"recv": true,
+"layer": 10
+},
+{
+"path": "Managers/Trains/TrainSpawn (Back)/Train A(Clone)/Subway_Train/train/subway_trainDoor_01 (7)/train_door_01",
+"mesh": "m195",
+"subs": [
+0
+],
+"mats": [
+"TX_subwayTrain_9"
+],
+"matrix": [
+[
+1.0,
+0.0,
+-0.0,
+-7.24
+],
+[
+0.0,
+-0.0,
+-1.0,
+2.46
+],
+[
+-0.0,
+1.0,
+0.0,
+1.543
+],
+[
+0.0,
+0.0,
+-0.0,
+1.0
+]
+],
+"lightmap": -1,
+"lmso": [
+1,
+1,
+0,
+0
+],
+"cast": 1,
+"recv": true,
+"layer": 10
+},
+{
+"path": "Managers/Trains/TrainSpawn (Back)/Train A(Clone)/Subway_Train/train/subway_trainDoor_01 (6)/train_doorWindow_01",
+"mesh": "m196",
+"subs": [
+0
+],
+"mats": [
+"Subway_Glass_14"
+],
+"matrix": [
+[
+1.0,
+0.0,
+-0.0,
+-6.23001
+],
+[
+0.0,
+-0.0,
+-1.0,
+2.71692
+],
+[
+-0.0,
+1.0,
+0.0,
+1.543
+],
+[
+0.0,
+0.0,
+-0.0,
+1.0
+]
+],
+"lightmap": -1,
+"lmso": [
+1,
+1,
+0,
+0
+],
+"cast": 1,
+"recv": true,
+"layer": 10
+},
+{
+"path": "Managers/Trains/TrainSpawn (Back)/Train A(Clone)/Subway_Train/train/subway_trainDoor_01 (5)/train_doorWindow_01",
+"mesh": "m196",
+"subs": [
+0
+],
+"mats": [
+"Subway_Glass_14"
+],
+"matrix": [
+[
+1.0,
+0.0,
+-0.0,
+-6.233
+],
+[
+0.0,
+-0.0,
+-1.0,
+2.71692
+],
+[
+-0.0,
+1.0,
+0.0,
+-1.56
+],
+[
+0.0,
+0.0,
+-0.0,
+1.0
+]
+],
+"lightmap": -1,
+"lmso": [
+1,
+1,
+0,
+0
+],
+"cast": 1,
+"recv": true,
+"layer": 10
+},
+{
+"path": "Managers/Trains/TrainSpawn (Back)/Train A(Clone)/Subway_Train/train/subway_trainDoor_01 (9)/train_door_01",
+"mesh": "m195",
+"subs": [
+0
+],
+"mats": [
+"TX_subwayTrain_9"
+],
+"matrix": [
+[
+1.0,
+0.0,
+-0.0,
+0.49
+],
+[
+0.0,
+-0.0,
+-1.0,
+2.46
+],
+[
+-0.0,
+1.0,
+0.0,
+1.543
+],
+[
+0.0,
+0.0,
+-0.0,
+1.0
+]
+],
+"lightmap": -1,
+"lmso": [
+1,
+1,
+0,
+0
+],
+"cast": 1,
+"recv": true,
+"layer": 10
+},
+{
+"path": "Managers/Trains/TrainSpawn (Back)/Train A(Clone)/Subway_Train/train/subway_trainDoor_02 (1)/train_doorWindow_02",
+"mesh": "m193",
+"subs": [
+0
+],
+"mats": [
+"Subway_Glass_14"
+],
+"matrix": [
+[
+1.0,
+0.0,
+-0.0,
+-0.01762
+],
+[
+0.0,
+-0.0,
+-1.0,
+2.12153
+],
+[
+-0.0,
+1.0,
+0.0,
+-0.0
+],
+[
+0.0,
+0.0,
+-0.0,
+1.0
+]
+],
+"lightmap": -1,
+"lmso": [
+1,
+1,
+0,
+0
+],
+"cast": 1,
+"recv": true,
+"layer": 10
+},
+{
+"path": "Managers/Trains/TrainSpawn (Back)/Train A(Clone)/Subway_Train/train/subway_trainDoor_01 (7)/train_doorWindow_01",
+"mesh": "m196",
+"subs": [
+0
+],
+"mats": [
+"Subway_Glass_14"
+],
+"matrix": [
+[
+1.0,
+0.0,
+-0.0,
+-7.24
+],
+[
+0.0,
+-0.0,
+-1.0,
+2.71692
+],
+[
+-0.0,
+1.0,
+0.0,
+1.543
+],
+[
+0.0,
+0.0,
+-0.0,
+1.0
+]
+],
+"lightmap": -1,
+"lmso": [
+1,
+1,
+0,
+0
+],
+"cast": 1,
+"recv": true,
+"layer": 10
+},
+{
+"path": "Managers/Trains/TrainSpawn (Back)/Train A(Clone)/Subway_Train/train/subway_train/train",
+"mesh": "m18e",
+"subs": [
+0
+],
+"mats": [
+"TX_subwayTrain_9"
+],
+"matrix": [
+[
+1.0,
+0.0,
+-0.0,
+-0.00156
+],
+[
+0.0,
+-0.0,
+-1.0,
+2.11504
+],
+[
+-0.0,
+1.0,
+-0.0,
+0.00052
+],
+[
+0.0,
+0.0,
+-0.0,
+1.0
+]
+],
+"lightmap": -1,
+"lmso": [
+1,
+1,
+0,
+0
+],
+"cast": 1,
+"recv": true,
+"layer": 10
+},
+{
+"path": "Managers/Trains/TrainSpawn (Back)/Train A(Clone)/Subway_Train/train/subway_trainDoor_01/train_doorWindow_01",
+"mesh": "m196",
+"subs": [
+0
+],
+"mats": [
+"Subway_Glass_14"
+],
+"matrix": [
+[
+1.0,
+0.0,
+-0.0,
+6.20454
+],
+[
+0.0,
+-0.0,
+-1.0,
+2.71483
+],
+[
+-0.0,
+1.0,
+0.0,
+-1.55925
+],
+[
+0.0,
+0.0,
+-0.0,
+1.0
+]
+],
+"lightmap": -1,
+"lmso": [
+1,
+1,
+0,
+0
+],
+"cast": 1,
+"recv": true,
+"layer": 10
+},
+{
+"path": "Managers/Trains/TrainSpawn (Back)/Train A(Clone)/Subway_Train/train/subway_trainDoor_01/train_door_01",
+"mesh": "m195",
+"subs": [
+0
+],
+"mats": [
+"TX_subwayTrain_9"
+],
+"matrix": [
+[
+1.0,
+0.0,
+-0.0,
+6.20454
+],
+[
+0.0,
+-0.0,
+-1.0,
+2.45791
+],
+[
+-0.0,
+1.0,
+0.0,
+-1.55925
+],
+[
+0.0,
+0.0,
+-0.0,
+1.0
+]
+],
+"lightmap": -1,
+"lmso": [
+1,
+1,
+0,
+0
+],
+"cast": 1,
+"recv": true,
+"layer": 10
+},
+{
+"path": "Managers/Trains/TrainSpawn (Back)/Train A(Clone)/Subway_Train/train/subway_trainDoor_01 (11)/train_doorWindow_01",
+"mesh": "m196",
+"subs": [
+0
+],
+"mats": [
+"Subway_Glass_14"
+],
+"matrix": [
+[
+1.0,
+0.0,
+-0.0,
+6.2
+],
+[
+0.0,
+-0.0,
+-1.0,
+2.71692
+],
+[
+-0.0,
+1.0,
+0.0,
+1.543
+],
+[
+0.0,
+0.0,
+-0.0,
+1.0
+]
+],
+"lightmap": -1,
+"lmso": [
+1,
+1,
+0,
+0
+],
+"cast": 1,
+"recv": true,
+"layer": 10
+},
+{
+"path": "Managers/Trains/TrainSpawn (Back)/Train A(Clone)/Subway_Train/train/subway_trainDoor_01 (8)/train_door_01",
+"mesh": "m195",
+"subs": [
+0
+],
+"mats": [
+"TX_subwayTrain_9"
+],
+"matrix": [
+[
+1.0,
+0.0,
+-0.0,
+-0.52
+],
+[
+0.0,
+-0.0,
+-1.0,
+2.46
+],
+[
+-0.0,
+1.0,
+0.0,
+1.543
+],
+[
+0.0,
+0.0,
+-0.0,
+1.0
+]
+],
+"lightmap": -1,
+"lmso": [
+1,
+1,
+0,
+0
+],
+"cast": 1,
+"recv": true,
+"layer": 10
+},
+{
+"path": "Managers/Trains/TrainSpawn (Back)/Train A(Clone)/Subway_Train/train/subway_trainDoor_01 (4)/train_door_01",
+"mesh": "m195",
+"subs": [
+0
+],
+"mats": [
+"TX_subwayTrain_9"
+],
+"matrix": [
+[
+1.0,
+0.0,
+-0.0,
+-7.243
+],
+[
+0.0,
+-0.0,
+-1.0,
+2.46
+],
+[
+-0.0,
+1.0,
+0.0,
+-1.56
+],
+[
+0.0,
+0.0,
+-0.0,
+1.0
+]
+],
+"lightmap": -1,
+"lmso": [
+1,
+1,
+0,
+0
+],
+"cast": 1,
+"recv": true,
+"layer": 10
+},
+{
+"path": "Managers/Trains/TrainSpawn (Back)/Train A(Clone)/Subway_Train/train/subway_trainDoor_01 (11)/train_door_01",
+"mesh": "m195",
+"subs": [
+0
+],
+"mats": [
+"TX_subwayTrain_9"
+],
+"matrix": [
+[
+1.0,
+0.0,
+-0.0,
+6.2
+],
+[
+0.0,
+-0.0,
+-1.0,
+2.46
+],
+[
+-0.0,
+1.0,
+0.0,
+1.543
+],
+[
+0.0,
+0.0,
+-0.0,
+1.0
+]
+],
+"lightmap": -1,
+"lmso": [
+1,
+1,
+0,
+0
+],
+"cast": 1,
+"recv": true,
+"layer": 10
+},
+{
+"path": "Managers/Trains/TrainSpawn (Back)/Train A(Clone)/Subway_Train/train/subway_trainDoor_01 (10)/train_door_01",
+"mesh": "m195",
+"subs": [
+0
+],
+"mats": [
+"TX_subwayTrain_9"
+],
+"matrix": [
+[
+1.0,
+0.0,
+-0.0,
+7.22
+],
+[
+0.0,
+-0.0,
+-1.0,
+2.46
+],
+[
+-0.0,
+1.0,
+0.0,
+1.543
+],
+[
+0.0,
+0.0,
+-0.0,
+1.0
+]
+],
+"lightmap": -1,
+"lmso": [
+1,
+1,
+0,
+0
+],
+"cast": 1,
+"recv": true,
+"layer": 10
+},
+{
+"path": "Managers/Trains/TrainSpawn (Back)/Train A(Clone)/Subway_Train/train/subway_train/train_windows",
+"mesh": "m18f",
+"subs": [
+0
+],
+"mats": [
+"Subway_Glass_14"
+],
+"matrix": [
+[
+1.0,
+0.0,
+-0.0,
+-0.015
+],
+[
+0.0,
+-0.0,
+-1.0,
+2.72045
+],
+[
+-0.0,
+1.0,
+-0.0,
+0.00053
+],
+[
+0.0,
+0.0,
+-0.0,
+1.0
+]
+],
+"lightmap": -1,
+"lmso": [
+1,
+1,
+0,
+0
+],
+"cast": 1,
+"recv": true,
+"layer": 10
+},
+{
+"path": "Managers/Trains/TrainSpawn (Back)/Train A(Clone)/Subway_Train/train/subway_trainDoor_02/train_door_02",
+"mesh": "m192",
+"subs": [
+0
+],
+"mats": [
+"TX_subwayTrain_9"
+],
+"matrix": [
+[
+1.0,
+0.0,
+-0.0,
+20.72893
+],
+[
+0.0,
+-0.0,
+-1.0,
+2.11944
+],
+[
+-0.0,
+1.0,
+0.0,
+0.00074
+],
+[
+0.0,
+0.0,
+-0.0,
+1.0
+]
+],
+"lightmap": -1,
+"lmso": [
+1,
+1,
+0,
+0
+],
+"cast": 1,
+"recv": true,
+"layer": 10
+},
+{
+"path": "Managers/Trains/TrainSpawn (Back)/Train A(Clone)/Subway_Train/train/subway_trainDoor_01 (9)/train_doorWindow_01",
+"mesh": "m196",
+"subs": [
+0
+],
+"mats": [
+"Subway_Glass_14"
+],
+"matrix": [
+[
+1.0,
+0.0,
+-0.0,
+0.49
+],
+[
+0.0,
+-0.0,
+-1.0,
+2.71692
+],
+[
+-0.0,
+1.0,
+0.0,
+1.543
+],
+[
+0.0,
+0.0,
+-0.0,
+1.0
+]
+],
+"lightmap": -1,
+"lmso": [
+1,
+1,
+0,
+0
+],
+"cast": 1,
+"recv": true,
+"layer": 10
+},
+{
+"path": "Managers/Trains/TrainSpawn (Back)/Train A(Clone)/Subway_Train/train/subway_trainDoor_02 (1)/train_door_02",
+"mesh": "m192",
+"subs": [
+0
+],
+"mats": [
+"TX_subwayTrain_9"
+],
+"matrix": [
+[
+1.0,
+0.0,
+-0.0,
+-0.01762
+],
+[
+0.0,
+-0.0,
+-1.0,
+2.12153
+],
+[
+-0.0,
+1.0,
+0.0,
+-0.0
+],
+[
+0.0,
+0.0,
+-0.0,
+1.0
+]
+],
+"lightmap": -1,
+"lmso": [
+1,
+1,
+0,
+0
+],
+"cast": 1,
+"recv": true,
+"layer": 10
+},
+{
+"path": "Managers/Trains/TrainSpawn (Back)/Train A(Clone)/Subway_Train/train/subway_trainDoor_01 (2)/train_doorWindow_01",
+"mesh": "m196",
+"subs": [
+0
+],
+"mats": [
+"Subway_Glass_14"
+],
+"matrix": [
+[
+1.0,
+0.0,
+-0.0,
+0.489
+],
+[
+0.0,
+-0.0,
+-1.0,
+2.71692
+],
+[
+-0.0,
+1.0,
+0.0,
+-1.56
+],
+[
+0.0,
+0.0,
+-0.0,
+1.0
+]
+],
+"lightmap": -1,
+"lmso": [
+1,
+1,
+0,
+0
+],
+"cast": 1,
+"recv": true,
+"layer": 10
+}
+],
+"box": {
+"c": [
+0.0,
+2.1,
+-0.0
+],
+"h": [
+10.0,
+2.15,
+1.5
+]
+}
+},
+"lightmaps": [
+"lightmap_0.png"
+],
+"env": {
+"ambientSky": [
+1.434,
+1.2868,
+1.0755
+],
+"ambientEquator": [
+0.4151,
+0.4014,
+0.4014
+],
+"ambientGround": [
+1.0989,
+0.6894,
+0.6894
+],
+"fog": false,
+"fogColor": [
+1.0,
+1.0,
+1.0
+],
+"fogDensity": 0.009999999776482582,
+"sh": [
+0.26762,
+-0.0161,
+0.01915,
+0.0,
+0.0,
+0.01531,
+0.01314,
+-0.0,
+0.02921,
+0.28919,
+0.07352,
+0.02841,
+0.0,
+0.0,
+0.02328,
+0.01623,
+-1e-05,
+0.03498,
+0.33728,
+0.1975,
+0.04392,
+0.0,
+0.0,
+0.03805,
+0.0151,
+-1e-05,
+0.0281
+],
+"sky": [
+"sky_0.png",
+"sky_1.png",
+"sky_2.png",
+"sky_3.png",
+"sky_4.png",
+"sky_5.png"
+],
+"skyMean": [
+0.2656,
+0.2864,
+0.3353
+]
+},
+"lights": [
+{
+"type": "spot",
+"color": [
+0.902,
+0.8261,
+0.5483
+],
+"intensity": 8.0,
+"p": [
+0.0,
+-1.5,
+-6.0
+],
+"dir": [
+0.0,
+1.0,
+0.0
+],
+"range": 10.0,
+"angle": 80.0,
+"inner": 62.19,
+"shadows": true,
+"mask": 4286578687,
+"name": "subway_track_boxCollider (4)",
+"jitter": null
+},
+{
+"type": "sun",
+"color": [
+1.0,
+0.9985,
+0.8443
+],
+"intensity": 0.2,
+"p": [
+0.0,
+2.85,
+-0.0
+],
+"dir": [
+0.0,
+-0.866,
+0.5
+],
+"range": 8.0,
+"angle": 120.0,
+"inner": 0.0,
+"shadows": false,
+"mask": 4294967295,
+"name": "Light (1)",
+"jitter": null
+}
+]
+}

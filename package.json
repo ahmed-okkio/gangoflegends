@@ -8,7 +8,8 @@
     "dev": "electron . --dev",
     "test": "node test.js",
     "dist": "electron-builder --win",
-    "release": "electron-builder --win --publish never && node release.cjs"
+    "release": "electron-builder --win --publish never && node release.cjs",
+    "dist:mac": "electron-builder --mac --publish never"
   },
   "type": "module",
   "dependencies": {
@@ -67,6 +68,19 @@
       "oneClick": false,
       "allowToChangeInstallationDirectory": true,
       "artifactName": "GangOfLegends-Setup-${version}.${ext}"
+    },
+    "mac": {
+      "target": [
+        {
+          "target": "dmg",
+          "arch": [
+            "universal"
+          ]
+        }
+      ],
+      "category": "public.app-category.games",
+      "identity": null,
+      "artifactName": "GangOfLegends-${version}-mac.${ext}"
     },
     "publish": {
       "provider": "github",
