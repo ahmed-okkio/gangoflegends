@@ -260,6 +260,8 @@ async function joinLobby(raw) {
   conn.send({ t: 'pick', champ: me.champ });
 }
 
+// how far behind the host's clock to play everyone else back. 0.034: 2 snapshots at 60Hz; 0.025: a lost one and a bit
+const wantDelay = () => Math.min(0.7, Math.max(0.034, game.jit * 1.2 + 0.025));
 // a snapshot from the host (or the practice connection simulator)
 function onSnap(m) {
   if (!game?.local || m.s.mt <= game.lastMt) return; // the unreliable channel can deliver out of order: an older one is stale
@@ -271,10 +273,15 @@ function onSnap(m) {
   // trip, and those stalls froze everyone else, then made them jump. 30s, not 5: a stall every few seconds dropped out of
   // a short window, the delay shrank and the next stall froze them again (media players remember about as long). One
   // that arrives right after a long frame of mine (loading the match, GC) waited on me, not the network: not counted
+  // the fight starting: forget the samples from loading the match and the countdown (both sides' long frames read as
+  // jitter: others were drawn ~0.6s behind for the first seconds, past what lag compensation rewinds, sim.js VIEW)
+  if (m.s.st === 'fight' && game.lastSt === 'count') { game.offs.splice(0, game.offs.length - 30); game.fresh = true; }
+  game.lastSt = m.s.st;
   const offs = game.offs, t = performance.now();
   if (!offs.length || t - last < 50) { offs.push(m.s.mt - t / 1000); if (offs.length > 1800) offs.shift(); } // 60 a second
   game.off = Math.max(...offs.slice(-300));
   game.jit = offs.map(o => Math.max(0, game.off - o)).sort((a, b) => a - b)[Math.floor(0.99 * (offs.length - 1))];
+  if (game.fresh) { game.delay = wantDelay(); game.fresh = false; } // straight there, not eased down over seconds
   game.local.sync(m.s, m.s.p[game.mySlot]);
   // events ride along on several snapshots (any one can be lost); e[7] numbers them so each plays once (sim.js fx() for
   // the rest). Mine that my copy already played are skipped; one it didn't see coming (a hit it didn't predict) still plays.
@@ -693,7 +700,7 @@ function frame(now) {
     if (!s.length || !game.mine) return;
     // the margin over that lateness grows with it: a steady link plays as little as 2 snapshots behind (a good ping gets
     // others as fresh as it can), a bursty one keeps more spare (a gap past it carries on, see carryOn)
-    game.delay += (Math.min(0.7, Math.max(0.034, game.jit * 1.2 + 0.025)) - game.delay) * 0.02; // 0.034: 2 snapshots at 60Hz; 0.025: a lost one and a bit
+    game.delay += (wantDelay() - game.delay) * 0.02;
     // that clock runs at wall speed, nudged toward where it should be: at most 5% fast or 15% slow (slower shows as slow
     // motion; engines stay within 0.85-1.1x). The offset jumps a few ms whenever its quickest sample leaves the window,
     // and jumping with it made everyone else stutter
@@ -763,11 +770,15 @@ function slideOver(limp, own, a, b, alpha, shift, dt) {
   const at = e?.[1] && o?.[1] ? [6, 7, 8].map((k, j) => o[k] + (e[k] - o[k]) * t + (shift[i]?.[j] ?? 0)) : null;
   if (limp !== game.wasLimp && at && game.drawnHips) {
     const gap = game.drawnHips.map((v, j) => v - at[j]);
-    game.slide = Math.hypot(...gap) < 2 ? gap : null; // further: respawned or flung, just go there
+    game.slide = Math.hypot(...gap) < 4 ? gap : null; // further: respawned or flung, just go there
   }
   game.wasLimp = limp;
   if (!game.slide) return;
-  game.slide = game.slide.map(v => v * Math.pow(0.85, dt * 60));
+  // the gap is however far I moved in a round trip and the delay (a dash's end: ~1.5m). Closed at 15% a frame it outran
+  // the dash itself (~14m/s: a teleport); now it eases out over ~0.2s but never faster than 5m/s, so it reads as carrying on
+  const len = Math.hypot(...game.slide), cut = Math.min(len, len * dt / 0.2, 5 * dt);
+  game.slide = len - cut < 0.005 ? null : game.slide.map(v => v * (1 - cut / len));
+  if (!game.slide) return;
   shift[i] = game.slide.map((v, j) => v + (shift[i]?.[j] ?? 0));
 }
 
