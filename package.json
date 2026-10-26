@@ -1,6 +1,6 @@
 {
   "name": "gang-of-legends",
-  "version": "1.20.0",
+  "version": "1.21.0",
   "description": "Gang Beasts-style ragdoll brawler with League of Legends champions. Free fan game.",
   "main": "main.cjs",
   "scripts": {
