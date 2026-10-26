@@ -45,6 +45,7 @@
       "!assets/props/preview_*.png",
       "!assets/custom_sfx/**",
       "!worker/**",
+      "!.claude/**",
       "!node_modules/three/src/**",
       {
         "from": "node_modules/three/examples/jsm",
