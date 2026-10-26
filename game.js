@@ -260,8 +260,8 @@ async function joinLobby(raw) {
   conn.send({ t: 'pick', champ: me.champ });
 }
 
-// how far behind the host's clock to play everyone else back. 0.034: 2 snapshots at 60Hz; 0.025: a lost one and a bit
-const wantDelay = () => Math.min(0.7, Math.max(0.034, game.jit * 1.2 + 0.025));
+// how far behind the host's clock to play everyone else back. 0.05: 3 snapshots at 60Hz; 0.025: a lost one and a bit
+const wantDelay = () => Math.min(0.7, Math.max(0.05, game.jit * 1.2 + 0.025));
 // a snapshot from the host (or the practice connection simulator)
 function onSnap(m) {
   if (!game?.local || m.s.mt <= game.lastMt) return; // the unreliable channel can deliver out of order: an older one is stale
@@ -294,11 +294,11 @@ function onSnap(m) {
   if (now.length) view.fx(now);
   if (later.length) setTimeout(() => view.fx(later), game.delay * 1000);
 }
-// one of the effects my copy played (game.played: [...event, time]) standing in for the host's e: same kind, same victim.
+// one of the effects my copy played (game.played: [...event, time]) standing in for the host's e: same kind, attacker and victim.
 // Each stands in for one, so two punches that both landed don't cover a third the host saw and I didn't
 function claim(e, t) {
-  game.played = game.played.filter(p => t - p[7] < (game.ping ?? 200) + 400);
-  const i = game.played.findIndex(p => p[0] === e[0] && p[6] === e[6]);
+  game.played = game.played.filter(p => t - p[7] < (game.ping ?? 200) + 150);
+  const i = game.played.findIndex(p => p[0] === e[0] && p[5] === e[5] && p[6] === e[6]); // same kind, attacker and victim: a phantom spark of mine can't eat someone else's real hit
   if (i >= 0) game.played.splice(i, 1);
   return i >= 0;
 }
@@ -641,7 +641,7 @@ let hostAt = 0, hostInp = null;
 function hostSteps() {
   if (!game?.sim || game.local || !hostInp) return;
   const now = performance.now();
-  acc += Math.min(0.1, (now - (hostAt || now)) / 1000); hostAt = now;
+  acc += Math.min(0.25, (now - (hostAt || now)) / 1000); hostAt = now; // a 250ms hitch caught up, not dropped (clients ran on)
   while (acc >= DT) {
     acc -= DT;
     game.sim.setInput(game.mySlot, hostInp);
@@ -747,7 +747,7 @@ function frame(now) {
 // be extrapolated far: floors, walls, each other). When the next one lands, where they were drawn and where it puts them
 // differ: that gap fades out (15% a frame at 60fps) instead of jumping. Returns how far to draw each one's hips off the snapshots
 const VX = 10 + PARTS.length * 4; // hips velocity in a snapshot entry (sim.js snapshot())
-const carry = (e, t) => { const k = 0.15 * (1 - Math.exp(-Math.min(t, 0.15) / 0.15)); return [e[VX] * k, 0, e[VX + 2] * k]; };
+const carry = (e, t) => { if (e[VX + 4] > 0) return [0, 0, 0]; /* stunned (VX + 4: SX + 5): a punched ragdoll is no straight line */ const k = 0.15 * (1 - Math.exp(-Math.min(t, 0.15) / 0.15)); return [e[VX] * k, 0, e[VX + 2] * k]; };
 function carryOn(a, b, alpha, n, at, dt) {
   const was = game.carry, gaps = game.gaps ??= [], fade = Math.pow(0.85, dt * 60);
   game.carry = at > n.mt ? n : null;

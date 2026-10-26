@@ -797,6 +797,53 @@ if ((await prepareMap('trawler')).imported) {
   console.log('held under: out after', u.toFixed(1), 's, grabbed', a.grabs.some(g => g?.vic === b));
   assert.ok(!b.alive && u < 9, 'held under you drown quicker');
 }
+// 12k. punched at a good ping (100ms round trip): a punch (no stun now, just its knockback) is predicted through on my copy, not handed to the host's
+// ragdoll (a snap there and a replay back on every punch taken). And a punch I throw back right after starts on my copy
+// within a tick or two of the host's
+{
+  const d = duo('grind', [{ id: 'a', name: 'A', champ: 'blitz', team: 0 }, { id: 'b', name: 'B', champ: 'hec', team: 1 }], 1, 3, { practice: true });
+  let owned = false, hit = -1, cliP = -1, hostP = -1;
+  for (let i = 0; i < 320; i++) {
+    if (i === 150) for (const [slot, x] of [[0, -4], [1, -3]]) {
+      const p = d.host.players[slot], t0 = p.bodies[0].translation();
+      for (const b of p.bodies) { const t = b.translation(); b.setTranslation({ x: t.x + x - t0.x, y: t.y, z: t.z + 3 - t0.z }, true); b.setLinvel({ x: 0, y: 0, z: 0 }, true); }
+    }
+    d.step({ x: 0, z: 0, b: i >= 215 && i < 218 ? BTN.RIGHT : 0 }, h => h.setInput(0, { x: i >= 190 && i < 196 ? 1 : 0, z: 0, b: i >= 200 && i < 203 ? BTN.LEFT : 0 }));
+    if (i > 150) owned ||= d.cli.players[1].hostOwned;
+    if (hit < 0 && d.host.players[1].sinceHit < 0.02 && i > 200) hit = i;
+    if (cliP < 0 && i > 210 && d.cli.players[1].punch) cliP = i;
+    if (hostP < 0 && i > 210 && d.host.players[1].punch) hostP = i - 3; // the host plays my tick 3 later
+  }
+  console.log('punched at tick', hit, 'host-owned', owned, 'punch back: copy', cliP, 'host', hostP);
+  assert.ok(hit > 0 && !owned, 'a punch taken at good ping is predicted through, no handoff');
+  assert.ok(cliP > 0 && hostP > 0 && Math.abs(cliP - hostP) <= 2, "my punch back starts when the host's does");
+}
+
+// 12l. a cast right at the cooldown's edge that the host refuses (limp there when it lands): my copy's phantom cooldown is taken back
+{
+  const d = duo('grind', [{ id: 'a', name: 'A', champ: 'blitz', team: 0 }, { id: 'b', name: 'B', champ: 'hec', team: 1 }], 0, 12, { practice: true });
+  let edge = -1;
+  for (let i = 0; i < 520; i++) {
+    const press = i === 100 || edge < 0 && i > 100 && d.cli.players[0].cd[1] <= 0;
+    if (press && i > 100) edge = i;
+    d.step({ x: 0, z: 0, b: press ? BTN.A2 : 0 }, h => { if (edge > 0 && i >= edge + 10 && i <= edge + 13) h.players[0].hooked = 0.5; }); // limp on the host as it lands: refused
+  }
+  const c = d.cli.players[0].cd[1], h = Math.max(0, d.host.players[0].cd[1] - 12 / 60);
+  console.log('edge cast at', edge, 'copy cd', c.toFixed(2), 'host cd', d.host.players[0].cd[1].toFixed(2));
+  assert.ok(edge > 0 && Math.abs(c - h) < 0.3, "my copy's cooldown agrees with the host's");
+}
+
+// 12m. an ability pressed during a punch's stun still goes off on the host once it wears off
+{
+  const sim = near('blitz', 'hec');
+  run(sim, 90);
+  const p = sim.players[0];
+  p.stun = 0.17; sim.setInput(0, { x: 0, z: 0, b: BTN.A2 }); sim.step(); sim.setInput(0, { x: 0, z: 0, b: 0 });
+  run(sim, 20);
+  assert.ok(p.cd[1] > 0, 'the press was kept and cast after the stun');
+  console.log('ability buffered through a stun');
+}
+
 console.log('all ok');
 
 // 12j. GB mode: my copy plays my own punch and Vi's windup at once (for show); the host still does the hitting

@@ -206,7 +206,7 @@ export function createSim({ mapId, players, practice = false, roundsToWin = 3, l
       if (part.hinge) j.setLimits(...part.hinge);
     });
     Object.assign(p, {
-      alive: true, yaw, daze: 0, sinceHit: 9, ko: 0, cd: [0, 0], punch: null, punchCd: 0, armCd: [0, 0], queued: [0, 0], grabs: [null, null], held: [0, 0],
+      alive: true, yaw, daze: 0, sinceHit: 9, ko: 0, cd: [0, 0], punch: null, punchCd: 0, armCd: [0, 0], queued: [0, 0], abQ: [0, 0], castTick: [null, null], grabs: [null, null], held: [0, 0],
       stun: 0, spin: 0, spinHit: null, stole: null, charge: 0, empower: 0, jumpT: 0, phase: 0, grounded: false, prevB: p.input.b,
       butt: null, buttCd: 0, lying: false, safe: 0, hooked: 0, spinA: 0, chargeT: 0,
       stamina: 100, wet: false, drowned: false, emp: null, dash: null, vault: 0, vaultBtn: 0, hay: 0, hayBtn: 0, fb: 0, pulv: 0, flay: 0, fling: 0, tether: null, leap: null, dizzy: 0, kick: null, kickA: 0, palm: 0, qTurn: null, abduct: 0,
@@ -274,24 +274,28 @@ export function createSim({ mapId, players, practice = false, roundsToWin = 3, l
   // where q's skull is; a prediction copy's stand-in (one bean, placed at the hips) has it where a standing beast's would be
   const skull = q => q.bodies[HEAD] === q.bodies[HIPS] ? add(q.bodies[HIPS].translation(), V(0, 0.81, 0)) : add(q.bodies[HEAD].translation(), qrot(q.bodies[HEAD].rotation(), V(0, 0.165, 0.057)));
   // Gang Beasts' punch targeting: the nearest beast of another team within reach and in front of me (a 120° cone)
-  function punchTarget(p, f) {
+  // punch: a punch's, which skips anyone knocked out (a body on the floor stole the homing from the one standing over it)
+  // and goes by where p saw them (seen()); a grab's reaches for those too
+  function punchTarget(p, f, punch) {
     const tp = p.bodies[TORSO].translation();
     let best = null, bd = 1.5; // reach: 1.25x the farthest a punch lands (~1.2m chest to chest)
     for (const q of ps) {
-      if (q.team === p.team || !q.bodies || q.safe > 0) continue;
-      const d = sub(q.bodies[TORSO].translation(), tp), h = Math.hypot(d.x, d.z);
+      if (q.team === p.team || !q.bodies || q.safe > 0 || punch && q.ko > 0) continue;
+      const d = sub(punch ? seen(p, q) : q.bodies[TORSO].translation(), tp), h = Math.hypot(d.x, d.z);
       if (h < bd && d.x * f.x + d.z * f.z > h * 0.5) { best = q; bd = h; }
     }
     return best;
   }
 
   // quiet: no hit sound (hitq: the sparks only), when the cast makes its own (Pulverize's slam)
-  function hit(vic, part, dv, daze, quiet) {
+  // punch: a plain punch. No stun (it only knocks back and dazes; casting and moving go on), but the head snaps back
+  // hard so a landed one reads at a glance
+  function hit(vic, part, dv, daze, quiet, punch) {
     if (vic.safe > 0) return; // just up from a knockout: untouchable
     // a prediction copy only learns about hits from the host, but shows my own landing on a stand-in (at its chest) right away
     if (local >= 0) { if (by === local) fx('hit', add(vic.bodies[part].translation(), V(0, 0.45, 0)), daze >= 40 ? 1 : 0, by, vic.slot); return; }
     for (const b of vic.bodies) addVel(b, dv);
-    addVel(vic.bodies[HEAD], mul(dv, 0.3)); // snap the head back a little
+    addVel(vic.bodies[HEAD], punch ? add(mul(norm(V(dv.x, 0, dv.z)), 3), V(0, 1, 0)) : mul(dv, 0.3)); // snap the head back
     vic.sinceHit = 0;
     fx(quiet ? 'hitq' : 'hit', vic.bodies[part].translation(), daze >= 40 ? 1 : 0, by, vic.slot);
     if (dv.y > 2) vic.jumpT = Math.max(vic.jumpT, 0.3); // don't let the hover spring swallow a launch
@@ -299,7 +303,7 @@ export function createSim({ mapId, players, practice = false, roundsToWin = 3, l
     if (vic.ko > 0) return;
     // let the knockback play out before control returns. Sett's Haymaker windup doesn't flinch (only a knockout stops it)
     // and shrugs off half the daze
-    if (!(vic.hay > 0)) vic.stun = Math.max(vic.stun, 0.15 + len(dv) * 0.04);
+    if (!(vic.hay > 0) && !punch) vic.stun = Math.max(vic.stun, 0.15 + len(dv) * 0.04);
     vic.daze += daze * (vic.hay > 0 ? 0.5 : 1); // no head bonus: where it lands doesn't make a hit stronger
     if (vic.daze >= 100) knockOut(vic);
   }
@@ -315,7 +319,7 @@ export function createSim({ mapId, players, practice = false, roundsToWin = 3, l
     setLegGroups(p, bodyGroups(p));
     for (const b of p.bodies) { b.setLinearDamping(0.4); for (let c = 0; c < b.numColliders(); c++) b.collider(c).setFriction(0.35); }
   }
-  // drop whatever the player was doing: knocked out, or caught by a hook
+  // drop whatever the player was doing: knocked out, caught by a hook or stunned by an ability (the cooldown stays spent)
   function cancel(p) {
     p.spin = 0; p.charge = 0; p.punch = null; p.butt = null; p.dash = null; p.vault = 0; p.hay = 0; p.leap = null; p.kickA = 0; p.qTurn = null;
     releaseGrabs(p);
@@ -427,6 +431,7 @@ export function createSim({ mapId, players, practice = false, roundsToWin = 3, l
     if (ab.id === 'hijack') return hijack(p, ab);
     if (ab.id === 'sonic' && !turned && ahead(p) < -0.5) { p.qTurn = { yaw: p.yaw, t: 0.4 }; return; } // aimed over 120° round: turn first, then thrust (control())
     p.cd[i] = ab.cd;
+    if (local >= 0) p.castTick[i] = tick; // my copy's guess: sync() takes it back if the host never cast
     const f = facing(p), t = p.bodies[TORSO].translation(), btn = i ? BTN.A2 : BTN.A1;
     if (ab.id === 'sonic') { // a palm thrust: the wave leaves his right hand, out at arm's length
       p.palm = 0.3;
@@ -519,7 +524,7 @@ export function createSim({ mapId, players, practice = false, roundsToWin = 3, l
       const d = sub(seen(p, o), t), along = d.x * f.x + d.z * f.z;
       if (Math.abs(along) > 3.2 || Math.abs(d.x * f.z - d.z * f.x) > 0.8 || Math.abs(d.y) > 1.2) continue;
       hit(o, TORSO, add(mul(f, 3.86), V(0, 5.85, 0)), 20); // popped up and a short way the way he aimed: away in front, toward him behind
-      if (o.ko <= 0 && o.safe <= 0) o.stun = Math.max(o.stun, 0.5);
+      if (o.ko <= 0 && o.safe <= 0) { o.stun = Math.max(o.stun, 0.5); cancel(o); }
     }
   }
   // Singed Q: a glue puddle where the throw lands (on whatever floor is under that point; none = it falls away)
@@ -545,7 +550,7 @@ export function createSim({ mapId, players, practice = false, roundsToWin = 3, l
     fx('fling', add(o.o.bodies[TORSO].translation(), V(0, local >= 0 ? 0.45 : 0, 0)), 0, p.slot, o.o.slot);
     if (local >= 0) return;
     hit(o.o, TORSO, V(-o.d.x / n * 9, 10, -o.d.z / n * 9), 25);
-    if (o.o.ko <= 0 && o.o.safe <= 0) o.o.stun = Math.max(o.o.stun, 0.7);
+    if (o.o.ko <= 0 && o.o.safe <= 0) { o.o.stun = Math.max(o.o.stun, 0.7); cancel(o.o); }
   }
   // Alistar Q: slam the ground, launching everyone close into the air (stunned while they're up)
   function pulverize(p, t) {
@@ -557,7 +562,7 @@ export function createSim({ mapId, players, practice = false, roundsToWin = 3, l
       const d = sub(seen(p, o), t);
       if (Math.hypot(d.x, d.z) > PULV_R || Math.abs(d.y) > 1.2) continue;
       hit(o, TORSO, add(mul(norm(V(d.x, 0, d.z)), 1.5), V(0, 9, 0)), 20, true);
-      if (o.ko <= 0 && o.safe <= 0) o.stun = Math.max(o.stun, 1);
+      if (o.ko <= 0 && o.safe <= 0) { o.stun = Math.max(o.stun, 1); cancel(o); }
     }
   }
   // Sett Q: a cone punch whose reach and power grow with the windup (k 0..1); the middle of the cone hits hardest
@@ -609,6 +614,9 @@ export function createSim({ mapId, players, practice = false, roundsToWin = 3, l
     if (m > 1) { mx /= m; mz /= m; }
     // Rampage spins the body (spinA) on top of the travel direction, so it works while walking or charging
     if (p.spin > 0) { p.spin -= DT; p.spinA += (2 * Math.PI / SPIN) * DT; } else p.spinA = p.kickA > 0 ? 2 * Math.PI * (1 - p.kickA / KICK) : 0; // one full turn
+    // an ability pressed while staggered is kept 0.3s like a punch (queued) and goes off (or recasts) the tick I can move again:
+    // punch stuns run ~0.17s, and a press in one was lost on the host while my copy, not yet told of the hit, had cast
+    p.abQ = p.abQ.map((q, i) => { const btn = i ? BTN.A2 : BTN.A1; return !move && (pressed & btn || q > 0 && inp.b & btn) ? 0.3 : q - DT; });
     if (move) {
       if (p.charge > 0) { if (m > 0.2) p.yaw = turnToward(p.yaw, Math.atan2(mx, mz), 3 * DT); }
       else if (m > 0.2 && !p.dash && !(p.hay > 0) && !p.qTurn) p.want = Math.atan2(mx, mz); // a Haymaker windup holds its aim
@@ -632,19 +640,20 @@ export function createSim({ mapId, players, practice = false, roundsToWin = 3, l
       p.aimD = typeof inp.d === 'number' ? inp.d : null; // how far away the cursor is (spot-targeted: Singed Q)
       if (glued(p, p.bodies[TORSO].translation())) p.aimBtn = 0; // stuck in enemy glue: no abilities
       else for (const i of [0, 1]) {
-        const btn = i ? BTN.A2 : BTN.A1;
+        const btn = i ? BTN.A2 : BTN.A1, pr = pressed & btn || p.abQ[i] > 0; // pressed now, or buffered through a stun
+        p.abQ[i] = 0;
         if (!abs[i].release) {
-          if (pressed & btn) { if (abs[i].lock && aim != null && p.cd[i] <= 0) p.yaw = aim; useAbility(p, i); }
+          if (pr) { if (abs[i].lock && aim != null && p.cd[i] <= 0) p.yaw = aim; useAbility(p, i); }
           continue;
         }
-        if (pressed & btn && LEAPS.includes(abs[i].id) && p.tether != null) { useAbility(p, i); continue; } // recast: no aiming
+        if (pr && LEAPS.includes(abs[i].id) && p.tether != null) { useAbility(p, i); continue; } // recast: no aiming
         const flying = LEAPS.includes(abs[i].id) && hooks.find(h => h.o === p && !h.vic);
-        if (pressed & btn && flying) { flying.leap = true; continue; } // recast before it caught (a ping's worth early): leap when it does
-        if (pressed & btn && p.cd[i] <= 0) p.aimBtn |= btn;
+        if (pr && flying) { flying.leap = true; continue; } // recast before it caught (a ping's worth early): leap when it does
+        if (pr && p.cd[i] <= 0) p.aimBtn |= btn;
         if (p.aimBtn & btn && !(inp.b & btn)) { p.aimBtn &= ~btn; if (aim != null) p.yaw = aim; useAbility(p, i); }
       }
       if (aim != null && (p.aimBtn || p.vault > 0)) p.yaw = aim;
-    } else p.aimBtn = 0;
+    } else if (!ctrl) p.aimBtn = 0; // only limp (KO, hooked, lying) drops an aim: a stun keeps it, let go meanwhile it fires as I'm free
     const f = facing(p); // travel direction
     const bf = V(Math.sin(p.yaw + p.spinA), 0, Math.cos(p.yaw + p.spinA)), side = V(bf.z, 0, -bf.x); // body facing; side = the beast's left
 
@@ -672,7 +681,7 @@ export function createSim({ mapId, players, practice = false, roundsToWin = 3, l
     // Sett Q: hold to plant and wind up, let go (or hold past 3 s) to throw it
     if (p.hay > 0) {
       if (move && inp.b & p.hayBtn && p.hay < 3) { p.hay += DT; speed = 0; }
-      else { if (move) haymaker(p, f, tp, hayK(p)); p.hay = 0; }
+      else { if (move) haymaker(p, f, tp, hayK(p)); p.hay = 0; } // stunned out of it (a hook, Pulverize): no throw, and the cooldown stays spent
     }
     p.fb -= DT; p.pulv -= DT; p.flay -= DT; p.fling -= DT; p.palm -= DT;
     if (p.qTurn && ((p.qTurn.t -= DT) <= 0 || ahead(p) > 0.5)) { p.yaw = p.qTurn.yaw; p.qTurn = null; useAbility(p, 0, true); }
@@ -757,11 +766,12 @@ export function createSim({ mapId, players, practice = false, roundsToWin = 3, l
         p.held[arm] = 0;
       }
       if ((p.queued[arm] -= DT) > 0 && move && p.punchCd <= 0 && p.armCd[arm] <= 0 && p.spin <= 0 && !p.grabs[arm]) {
-        const to = punchTarget(p, f), d = to && sub(to.bodies[TORSO].translation(), tp);
+        const to = punchTarget(p, f, true), d = to && sub(to.bodies[TORSO].translation(), tp);
         p.punch = { arm, t: 0, hit: new Set(), to };
         p.punchCd = 0.25; p.armCd[arm] = 1; p.queued[arm] = 0; // one a second per hand; alternating, 2 a second
         fx('swing', handPos(p, arm), 0, p.slot);
-        addVel(T, mul(d ? norm(V(d.x, 0, d.z)) : f, 1.5)); // lunge into it
+        // lunge into it. A prediction copy's target is a stand-in a round trip behind: lunging at it put me somewhere the host didn't
+        addVel(T, mul(d && local < 0 ? norm(V(d.x, 0, d.z)) : f, 1.5));
       }
       grabbing[arm] = p.held[arm] >= TAP || (p.held[arm] > 0 && !p.grounded); // in the air, grab at once: ledges go by fast
     }
@@ -844,10 +854,10 @@ export function createSim({ mapId, players, practice = false, roundsToWin = 3, l
     if (p.punch && p.punch.t > 0.01) {
       const arm = p.bodies[FORE + p.punch.arm], hp = handPos(p, p.punch.arm);
       const fv = add(arm.linvel(), cross(arm.angvel(), sub(hp, arm.worldCom()))), pf = aimTo ? norm(V(aimTo.x, 0, aimTo.z)) : f;
-      for (const { vic, part } of playersNearSeen(p, hp, 0.2)) {
+      for (const { vic, part } of playersNearSeen(p, hp, p.punch.to ? 0.3 : 0.2)) { // a tracked punch counts 10cm sooner: the arm stops ~0.25m short of the head it homes on, so from 1.25m on it always missed
         if (p.punch.hit.has(vic)) continue;
         const sp = len(sub(fv, p.view ? seenVel(p, vic) : vic.bodies[part].linvel()));
-        if (sp < 2.5) continue; // a resting fist just pushes
+        if (sp < 1.5) continue; // a resting fist just pushes (at full reach a landing fist is only doing 2-3m/s)
         p.punch.hit.add(vic);
         // daze: 20 for any punch (5 to knock out), the same for every champ and for empowered ones (theirs is the launch).
         // A standing punch's fist does 10-15m/s, running barely adds; only past 16m/s (a big spin, say) does speed add,
@@ -863,7 +873,7 @@ export function createSim({ mapId, players, practice = false, roundsToWin = 3, l
             if (o === vic || (Math.hypot(d.x, d.z) < 2.4 && Math.abs(d.y) < 1.2)) hit(o, o === vic ? part : TORSO, add(mul(norm(V(d.x, 0, d.z)), 5.4), V(0, 1.8, 0)), dz);
           }
         } else if (p.empower > 0) { p.empower = 0; hit(vic, part, add(mul(pf, 2), V(0, 10, 0)), dz); }
-        else { const k = Math.min(sp, 12) / 6; hit(vic, part, add(mul(norm(add(norm(fv), pf)), 0.44 * k), V(0, 0.12, 0)), dz); } // knockback 2.2/0.6 -> 0.44/0.12 (-80%): trading punches toe to toe, not batting each other out of reach
+        else { const k = Math.min(sp, 12) / 6; hit(vic, part, add(mul(norm(add(norm(fv), pf)), 0.44 * k), V(0, 0.12, 0)), dz, false, true); } // knockback 2.2/0.6 -> 0.44/0.12 (-80%): trading punches toe to toe, not batting each other out of reach
       }
     }
     if (p.spin > 0) for (let i = 0; i < 2; i++) {
@@ -946,6 +956,7 @@ export function createSim({ mapId, players, practice = false, roundsToWin = 3, l
       p.next = Math.min(...p.q.keys()); // a gap that's never coming (every message repeats the last 6 ticks): carry on from what did arrive
     }
     p.input = p.q.get(p.next); p.q.delete(p.next); p.ack = p.next++;
+    if (p.lostB) { p.input.b |= p.lostB; p.lostB = 0; } // presses from ticks dropped lining up again (setInput)
     p.view = p.input.v == null ? 0 : Math.max(0, Math.min(VIEW, Math.round((mt - DT - p.input.v) / DT) + 1)); // see seen()
     let ready = 0; while (p.q.has(p.next + ready)) ready++; // the unbroken run waiting (newest - ack overstates it when they come out of order)
     p.slack = Math.min(p.slack, ready);
@@ -994,7 +1005,7 @@ export function createSim({ mapId, players, practice = false, roundsToWin = 3, l
       h.vic.hooked = 0.1; // limp for as long as the pull lasts
       const vp = h.vic.bodies[TORSO].translation(), to = sub(h.o.bodies[TORSO].translation(), vp), d = len(to);
       h.pos = vp;
-      if (d < 1.4 || h.pull > 0.7) { if (h.vic.ko <= 0 && h.vic.safe <= 0) { h.vic.stun = Math.max(h.vic.stun, 0.5); h.vic.dizzy = 0.5; } return false; } // stunned on their feet a moment after landing: time to combo
+      if (d < 1.4 || h.pull > 0.7) { if (h.vic.ko <= 0 && h.vic.safe <= 0) { h.vic.stun = Math.max(h.vic.stun, 0.5); h.vic.dizzy = 0.5; cancel(h.vic); } return false; } // stunned on their feet a moment after landing: time to combo
       const v = add(mul(to, 14 / d), V(0, 1.5, 0));
       for (const b of h.vic.bodies) b.setLinvel(v, true);
       return true;
@@ -1042,7 +1053,7 @@ export function createSim({ mapId, players, practice = false, roundsToWin = 3, l
     glue = (s.g ?? []).map(([x, y, z, t, r, team]) => ({ x, y, z, t, r, team }));
     me.tether = hooks.find(h => h.vic && (h.thresh || h.lee))?.vic.slot ?? null; // my copy's catch, until the host's own shows
     for (const h of s.h ?? []) if (h[0] === local && h[4] >= 0) me.tether = h[4];
-    for (const e of s.p) if (ps[e[0]] && ps[e[0]] !== me) { ps[e[0]].seen = !!e[1]; ps[e[0]].safe = e[3] & 32 ? 1 : 0; } // safe: stand-ins can't be hit either
+    for (const e of s.p) if (ps[e[0]] && ps[e[0]] !== me) { ps[e[0]].seen = !!e[1]; ps[e[0]].safe = e[3] & 32 ? 1 : 0; ps[e[0]].ko = e[3] & 16 ? 1 : 0; } // safe: stand-ins can't be hit either; ko: nor punch-homed on (punchTarget)
     s.ch?.forEach((c, i) => { if (CHAMPS[c]) ps[i].champ = c; });
     s.sl?.forEach((c, i) => { if (ps[i]) ps[i].stole = CHAMPS[c] ? c : null; });
     if (!e[1]) { if (me.alive) removeRagdoll(me); return; }
@@ -1058,13 +1069,20 @@ export function createSim({ mapId, players, practice = false, roundsToWin = 3, l
     // status is the host's call
     me.daze = e[2];
     me.cd = me.cd.map((c, i) => Math.max(c, e[4 + i] / 10 - 0.1 - lag)); // the host's, as of `lag` ago (sent rounded up to 0.1s)
+    // a cast my copy made that the host refused (for whatever reason: cooling there, stunned, hooked, glued): once the host has
+    // played that tick, a cooldown well under what the cast would have left means it never happened, so the host's stands
+    me.castTick.forEach((t, i) => {
+      if (t == null || ack < t) return;
+      if (e[4 + i] / 10 < kit(me.champ, me.stole)[i].cd - (ack - t) * DT - 0.15) me.cd[i] = Math.max(0, e[4 + i] / 10 - lag);
+      me.castTick[i] = null;
+    });
     me.stun = Math.max(me.stun, e[x + 5] - lag); // what's left of it now (taken whole, I stayed stunned a round trip longer than the host's me)
     if (e[x + 6]) me.hooked = 0.1;
     if (e[3] & 16 && me.ko <= 0) { me.daze = 0; cancel(me); down(me); }
     else if (!(e[3] & 16) && me.ko > 0) { me.ko = 0; wake(me); }
     if (e[3] & 16) me.ko = e[x + 7];
     me.safe = e[3] & 32 ? Math.max(me.safe, 0.1) : 0;
-    // Abscond is cast on the host only (HOST_CASTS): my copy takes its empowered punch when the host's flag comes on and
+    // Abscond's empowered punch: my copy casts it too, but the host's flag is the truth: my copy takes it when that comes on and
     // drops it when it goes off (used or run out). Edges only, so a punch my copy already spent isn't re-armed by a late snapshot
     const emp = !!(e[3] & 4);
     if (emp !== me.hostEmp && kit(me.champ, me.stole)[1].id === 'abscond') { me.empower = emp ? 4 : 0; me.emp = 'aoe'; }
@@ -1074,7 +1092,9 @@ export function createSim({ mapId, players, practice = false, roundsToWin = 3, l
     me.hostOwned = gb && !!(e[3] & (8 | 512));
     // stunned (every hit stuns): flung or reeling with no control, so nothing of mine to predict. The host's flight is the truth,
     // drawn as is, instead of guessing it on and correcting every snapshot (teleporting about mid-air)
-    if (e[x + 5] > lag) me.hostOwned = true;
+    // Not a punch's micro-stun (0.15-0.2s, longer than a good ping's lag): snapping to the host's ragdoll and replaying on every
+    // punch taken rubber-banded; those are carried (below) like any hit I didn't see
+    if (e[x + 5] > Math.max(lag, 0.3)) me.hostOwned = true;
     // knocked out, hooked or tied to another champ: I'm drawn from the host's state (game.js) and can't predict it, so
     // the ragdoll is just kept on it, ready to predict from there once I'm free. (Correcting the prediction instead
     // overshot every snapshot and grew: holding each other and jumping flung me metres up and down.)
@@ -1093,12 +1113,13 @@ export function createSim({ mapId, players, practice = false, roundsToWin = 3, l
       shift(sub(hp, hips().translation()), sub(hv, hips().linvel()));
       const keep = me.input, n = events.length;
       me.prevB = sent.get(ack)?.b ?? me.prevB;
-      for (let t = ack + 1; t <= tick; t++) { me.input = sent.get(t) ?? me.input; control(me, st !== 'count'); belts(me); water(me); world.step(); }
+      me.stun = 0; // the host's is over (it handed back): a stale one here blocked the replayed casts
+      for (let t = ack + 1; t <= tick; t++) { me.input = sent.get(t) ?? me.input; control(me, st !== 'count'); belts(me); water(me); world.step(); hist.set(t, { pos: hips().translation(), vel: hips().linvel() }); }
       me.input = keep; events.length = n;
       // the replay carries me on a round trip's worth (a dash's end: ~0.5m at 200ms): drawn from where I was, eased in
       // through smooth like any correction, or I jumped there the next frame
       const d = sub(was, hips().translation());
-      hist.clear(); smooth = len(d) < 4 ? d : V();
+      smooth = len(d) < 4 ? d : V(); // hist kept: the replayed ticks are recorded, so corrections go on at once, not a round trip blind
       return;
     }
     const h = hist.get(ack);
@@ -1241,7 +1262,7 @@ export function createSim({ mapId, players, practice = false, roundsToWin = 3, l
       inp.i.slice(-8).forEach(([x, z, b, a, d, v], k, all) => { const t = n - all.length + 1 + k; if (p.next == null || t >= p.next) p.q.set(t, { x: +x || 0, z: +z || 0, b: b | 0, a: yaw(a), d: dist(d), v: yaw(v) }); });
       p.newest = Math.max(p.newest, n);
       // first input, or way behind after a lag spike (feed() only trims a tick every 2s): line up 2 ticks behind
-      if (p.next == null || p.newest - p.next > 30) { p.next = p.newest - 2; for (const t of p.q.keys()) if (t < p.next) p.q.delete(t); }
+      if (p.next == null || p.newest - p.next > 30) { p.next = p.newest - 2; for (const [t, q] of p.q) if (t < p.next) { p.lostB = (p.lostB | 0) | q.b; p.q.delete(t); } } // their presses kept (feed)
     },
     // switch champ from the next round on (practice: right away, respawning somewhere free)
     setChamp(slot, id) {
