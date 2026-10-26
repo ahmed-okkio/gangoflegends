@@ -3,11 +3,13 @@ import { xhr } from './stages.js';
 
 const ctx = typeof AudioContext !== 'undefined' ? new AudioContext() : null;
 const base = './gbcache/audio/';
-const LAUGHS = [0, 1, 2, 3, 4, 5, 6, 7].map(i => `./assets/sfx/laugh_${i}.wav`); // our own (tools/custom_laughs.py), mixed in with GB's
+const LAUGHS = [0, 1, 2, 3, 4, 5, 6].map(i => `./assets/sfx/laugh_${i}.wav`); // our own (tools/custom_laughs.py), mixed in with GB's
 const VOLUME = 0.3; // GB clips are mastered hot: the slider's 100% is this
 let volume = 1;
 export const setVolume = v => { volume = v; };
 let index = {};
+const GAP = { fall: 5 }; // s from one to the next: two knocked out together get one laugh, the first
+const next = {};
 const buffers = {}; // file -> Promise<AudioBuffer>
 
 export async function loadSfx() {
@@ -20,6 +22,7 @@ export function play(group, vol = 1, rate = 0.92 + Math.random() * 0.16) {
   const list = index[group];
   if (!ctx || !list?.length) return;
   if (ctx.state === 'suspended') ctx.resume();
+  if (GAP[group]) { if (ctx.currentTime < (next[group] ?? 0)) return; next[group] = ctx.currentTime + GAP[group]; }
   const file = list[Math.floor(Math.random() * list.length)];
   buffers[file] ??= xhr(file.startsWith('./') ? file : base + file, 'arraybuffer').then(b => ctx.decodeAudioData(b));
   buffers[file].then(buf => {

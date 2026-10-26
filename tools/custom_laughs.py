@@ -13,7 +13,7 @@ SQUEAKY = "highpass=f=300,treble=g=5"
 # Formants moved further than the pitch (a smaller creature, not the recording sped up) hide whose voice it is
 SOURCES = [
     ("dogger1", 1.4, 1.4, SQUEAKY), ("dogger2", 1.4, 1.4, SQUEAKY), ("dogger3", 1.4, 1.4, SQUEAKY),
-    ("baleed", 1.9, 1.5, "highpass=f=250"), ("dog", 1.9, 1.55, "highpass=f=250"), ("woofwoof", 1.9, 1.6, "highpass=f=250"),
+    ("baleed", 1.9, 1.5, "highpass=f=250"), ("dog", 1.9, 1.55, "highpass=f=250"),
     ("dogwoofwoof", 1.9, 1.65, "highpass=f=250"), ("gafil", 1.9, 1.7, "highpass=f=250"),
 ]
 
