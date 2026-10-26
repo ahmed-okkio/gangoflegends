@@ -2,7 +2,7 @@
 // Runs on the host only (and in Node for tests); clients just render snapshots of it.
 import RAPIER from '@dimforge/rapier3d-compat';
 import { MAPS, trainsAt } from './maps.js';
-import { CHAMPS } from './champs.js';
+import { CHAMPS, kit } from './champs.js';
 import { PARTS, ANCHOR, HAND, HIP_HEIGHT, CHEST, HEAD, ARM, THIGH, FORE, LEG, HIPS, WAIST } from './beast.js';
 
 export const initPhysics = () => RAPIER.init();
@@ -39,7 +39,7 @@ const turnToward = (a, b, max) => a + Math.max(-max, Math.min(max, wrap(b - a)))
 // --- ragdoll: the Gang Beasts beast (beast.js). Part index = body index everywhere; bodies[0] is the chest. ---
 const TORSO = CHEST;
 const CORE = [HIPS, WAIST, CHEST, HEAD, THIGH, THIGH + 1, LEG, LEG + 1]; // moved as one by the locomotion; arms hang off it
-const HOST_CASTS = ['hook', 'sentence', 'charge', 'rampage', 'headbutt', 'adhesive']; // GB mode: a client's copy never plays these (useAbility)
+const HOST_CASTS = ['hook', 'sentence', 'charge', 'rampage', 'headbutt', 'adhesive', 'hijack', 'abscond']; // GB mode: a client's copy never plays these (useAbility)
 const LEAPS = ['sentence', 'sonic']; // abilities whose recast flies you to whoever they caught (Thresh Q, Lee Sin Q)
 const HOIST = [WAIST, CHEST]; // lifted by a hoist, carrying the whole core's weight; hips and legs hang off it
 const HOIST_K = CORE.reduce((m, i) => m + PARTS[i].mass, 0) / HOIST.reduce((m, i) => m + PARTS[i].mass, 0);
@@ -176,7 +176,7 @@ export function createSim({ mapId, players, practice = false, roundsToWin = 3, l
     });
     Object.assign(p, {
       alive: true, yaw, daze: 0, sinceHit: 9, ko: 0, cd: [0, 0], punch: null, punchCd: 0, grabs: [null, null], held: [0, 0],
-      stun: 0, spin: 0, spinHit: null, charge: 0, empower: 0, jumpT: 0, phase: 0, grounded: false, prevB: p.input.b,
+      stun: 0, spin: 0, spinHit: null, stole: null, charge: 0, empower: 0, jumpT: 0, phase: 0, grounded: false, prevB: p.input.b,
       butt: null, buttCd: 0, lying: false, safe: 0, hooked: 0, spinA: 0, chargeT: 0,
       emp: null, dash: null, vault: 0, vaultBtn: 0, hay: 0, hayBtn: 0, fb: 0, pulv: 0, flay: 0, fling: 0, tether: null, leap: null, dizzy: 0, kick: null, kickA: 0, palm: 0, qTurn: null,
     });
@@ -370,11 +370,12 @@ export function createSim({ mapId, players, practice = false, roundsToWin = 3, l
     // GB mode: my copy plays my casts at once for show (pose, windup, glow, effects; hits are the host's, see hit()). Not the
     // ones that throw my body about or put something in the world (dashes, charges, spins, leaps, hooks, glue): the host plays
     // those, drawn from its state (sync hostOwned)
-    const ab = CHAMPS[p.champ].abilities[i];
+    const ab = kit(p.champ, p.stole)[i];
     if (gb && local >= 0 && (HOST_CASTS.includes(ab.id) || LEAPS.includes(ab.id) && p.tether != null)) return;
     if (ab.id === 'charge' && p.charge > 0) { p.charge = 0; return; } // recast ends the charge early
     if (LEAPS.includes(ab.id) && p.tether != null) return leap(p); // recast while they're caught / marked: fly to them
     if (p.cd[i] > 0) return;
+    if (ab.id === 'hijack') return hijack(p, ab);
     if (ab.id === 'sonic' && !turned && ahead(p) < -0.5) { p.qTurn = { yaw: p.yaw, t: 0.4 }; return; } // aimed over 120° round: turn first, then thrust (control())
     p.cd[i] = ab.cd;
     const f = facing(p), t = p.bodies[TORSO].translation(), btn = i ? BTN.A2 : BTN.A1;
@@ -386,6 +387,7 @@ export function createSim({ mapId, players, practice = false, roundsToWin = 3, l
     } else if (ab.id === 'hook' || ab.id === 'sentence') hooks.push({ o: p, pos: add(add(t, mul(f, 0.7)), V(0, 0.2, 0)), dir: f, t: 0, vic: null, pull: 0, thresh: ab.id === 'sentence' });
     else if (ab.id === 'fist') { p.empower = 4; p.emp = 'launch'; }
     else if (ab.id === 'rampage') { p.spin = SPIN; p.spinHit = new Set(); }
+    else if (ab.id === 'abscond') { p.dash = { t: 0.2, power: 0, sylas: true }; p.empower = 4; p.emp = 'aoe'; fx('swing', t, 0, p.slot); }
     else if (ab.id === 'charge') { p.charge = CHARGE; p.chargeT = 0; }
     else if (ab.id === 'vault') { p.vault = DT; p.vaultBtn = btn; } // charges while held, see control()
     else if (ab.id === 'relentless') { p.empower = 4; p.emp = 'through'; }
@@ -412,6 +414,20 @@ export function createSim({ mapId, players, practice = false, roundsToWin = 3, l
     p.kick = { vic: o.o, f, t: 0.8, hit: new Set([p, o.o]) };
   }
 
+  // Sylas Q: point and click. The champ nearest the cursor (within radius of it, and in range) has their Q stolen: his Q is
+  // theirs (a Sylas's stolen one if he has one) till the round ends, ready now. Nobody there: no cast, no cooldown
+  function hijack(p, ab) {
+    const t = p.bodies[TORSO].translation(), f = facing(p), at = add(t, mul(f, Math.min(ab.aim, p.aimD ?? ab.aim)));
+    const [o] = ps.filter(o => o !== p && live(o)).map(o => ({ o, s: seen(p, o) }))
+      .filter(({ s }) => Math.hypot(s.x - t.x, s.z - t.z) < ab.aim + 0.5 && Math.hypot(s.x - at.x, s.z - at.z) < ab.radius + 0.6 && Math.abs(s.y - t.y) < 2)
+      .sort((a, b) => Math.hypot(a.s.x - at.x, a.s.z - at.z) - Math.hypot(b.s.x - at.x, b.s.z - at.z));
+    if (!o) return;
+    p.cd[0] = ab.cd;
+    fx('sonic', o.o.bodies[TORSO].translation(), 0, p.slot, o.o.slot);
+    if (local >= 0) return;
+    p.stole = o.o.stole ?? (o.o.champ === 'sylas' ? null : o.o.champ);
+    if (p.stole) p.cd[0] = 0;
+  }
   // Sett E: yank everyone close on both sides into him and stun them; caught from both sides at once stuns for longer
   function facebreaker(p, f, t) {
     p.fb = 0.35;
@@ -427,11 +443,11 @@ export function createSim({ mapId, players, practice = false, roundsToWin = 3, l
   }
   // Thresh Q / Lee Sin Q recast: fly at whoever the chain is on (Lee: whoever the wave marked)
   function leap(p) {
-    const q = ps[p.tether], t = p.bodies[TORSO].translation();
+    const q = ps[p.tether], t = p.bodies[TORSO].translation(), lee = hooks.some(h => h.o === p && h.lee);
     p.tether = null;
     hooks = hooks.filter(h => h.o !== p);
     if (!q || !live(q)) return;
-    p.leap = { slot: q.slot, t: 0, lee: p.champ === 'lee' }; // reeled in until he reaches them (control())
+    p.leap = { slot: q.slot, t: 0, lee }; // reeled in until he reaches them (control())
     fx('swing', t, 0, p.slot);
   }
   // Thresh E: sweep the chain through a line on both sides of him, knocking everyone in it up and along the way he aimed
@@ -520,7 +536,7 @@ export function createSim({ mapId, players, practice = false, roundsToWin = 3, l
     const ctrl = p.ko > 0 || p.hooked > 0 ? 0 : lying ? 0.08 : 1; // hooked: limp, dragged along helpless
     const move = ctrl && (p.stun -= DT) <= 0 ? 1 : 0; // staggered: can't steer, jump or cast
     if ((p.sinceHit += DT) > 1.2) p.daze = Math.max(0, p.daze - 15 * DT);
-    p.cd = p.cd.map((c, i) => i === 0 && p.champ === 'lee' && hooks.some(h => h.o === p) ? c : Math.max(0, c - DT)); // Sonic Wave cools once the wave missed, the mark wore off or he flew in
+    p.cd = p.cd.map((c, i) => i === 0 && hooks.some(h => h.o === p && h.lee) ? c : Math.max(0, c - DT)); // Sonic Wave cools once the wave missed, the mark wore off or he flew in
     p.punchCd -= DT; p.empower -= DT; p.jumpT -= DT; p.buttCd -= DT;
 
     const tp = T.translation(), tv = T.linvel(), Hb = p.bodies[HIPS];
@@ -540,7 +556,7 @@ export function createSim({ mapId, players, practice = false, roundsToWin = 3, l
       // aiming (input.a: the cursor's yaw, null = where you face): "release" abilities (hook) go off when the
       // key is let go; the held ones (Vi Q) start on press. Either way the champ turns to the cursor while held.
       // "lock" ones (Sett Q) take the cursor's aim on press and keep it.
-      const aim = typeof inp.a === 'number' ? inp.a : null, abs = CHAMPS[p.champ].abilities;
+      const aim = typeof inp.a === 'number' ? inp.a : null, abs = kit(p.champ, p.stole);
       p.aimD = typeof inp.d === 'number' ? inp.d : null; // how far away the cursor is (spot-targeted: Singed Q)
       if (glued(p, p.bodies[TORSO].translation())) p.aimBtn = 0; // stuck in enemy glue: no abilities
       else for (const i of [0, 1]) {
@@ -743,7 +759,15 @@ export function createSim({ mapId, players, practice = false, roundsToWin = 3, l
         if (sp < 2.5) continue; // a resting fist just pushes
         p.punch.hit.add(vic);
         if (p.empower > 0 && p.emp === 'through') { p.empower = 0; relentless(p, vic, part, pf); }
-        else if (p.empower > 0) { p.empower = 0; hit(vic, part, add(mul(pf, 2), V(0, 10, 0)), 45); }
+        else if (p.empower > 0 && p.emp === 'aoe') { // Sylas E: the punch bursts out round him, everyone close knocked away
+          p.empower = 0;
+          fx('pulv', tp, 0, p.slot);
+          for (const o of ps) {
+            if (o === p || !o.alive) continue;
+            const d = sub(o === vic ? vic.bodies[TORSO].translation() : seen(p, o), tp);
+            if (o === vic || (Math.hypot(d.x, d.z) < 2.4 && Math.abs(d.y) < 1.2)) hit(o, o === vic ? part : TORSO, add(mul(norm(V(d.x, 0, d.z)), 9), V(0, 3, 0)), 30);
+          }
+        } else if (p.empower > 0) { p.empower = 0; hit(vic, part, add(mul(pf, 2), V(0, 10, 0)), 45); }
         else { const k = Math.min(sp, 12) / 6; hit(vic, part, add(mul(norm(add(norm(fv), pf)), 2.2 * k), V(0, 0.6, 0)), 20 * k); }
       }
     }
@@ -760,7 +784,8 @@ export function createSim({ mapId, players, practice = false, roundsToWin = 3, l
       const [first] = [0, ...(p.dash.ali ? [0.9, 1.8] : [])].flatMap(h => playersNearSeen(p, add(tp, add(mul(f, 0.45), V(0, h, 0))), 0.6));
       if (first) {
         const k = p.dash.power, air = !first.vic.grounded; // Alistar's Headbutt sends someone already airborne much further
-        if (p.dash.ali) hit(first.vic, first.part, add(mul(f, air ? 11.2 : 7.8), V(0, air ? 4 : 3, 0)), air ? 40 : 30);
+        if (p.dash.sylas) hit(first.vic, first.part, add(mul(f, 3), V(0, 1, 0)), 10); // Abscond: just a bump
+        else if (p.dash.ali) hit(first.vic, first.part, add(mul(f, air ? 11.2 : 7.8), V(0, air ? 4 : 3, 0)), air ? 40 : 30);
         else hit(first.vic, first.part, mul(add(mul(f, 6 + k * 6), V(0, 2 + k * 2, 0)), 0.85), (25 + k * 20) * 0.85); // Vi Q
         p.dash = null;
         addVel(T, mul(f, -2));
@@ -913,6 +938,7 @@ export function createSim({ mapId, players, practice = false, roundsToWin = 3, l
     for (const h of s.h ?? []) if (h[0] === local && h[4] >= 0) me.tether = h[4];
     for (const e of s.p) if (ps[e[0]] && ps[e[0]] !== me) { ps[e[0]].seen = !!e[1]; ps[e[0]].safe = e[3] & 32 ? 1 : 0; } // safe: stand-ins can't be hit either
     s.ch?.forEach((c, i) => { if (CHAMPS[c]) ps[i].champ = c; });
+    s.sl?.forEach((c, i) => { if (ps[i]) ps[i].stole = CHAMPS[c] ? c : null; });
     if (!e[1]) { if (me.alive) removeRagdoll(me); return; }
     const x = SX, hp = V(e[6], e[7], e[8]), hv = V(e[x + 1], e[x + 2], e[x + 3]), ack = e[x + 4];
     const lag = (tick - ack) * DT; // this state is the host's me that long ago (a round trip, roughly)
@@ -1074,6 +1100,7 @@ export function createSim({ mapId, players, practice = false, roundsToWin = 3, l
       h: hooks.map(h => [h.o.slot, r2(h.pos.x), r2(h.pos.y), r2(h.pos.z), (h.thresh || h.lee) && h.vic ? h.vic.slot : -1, h.vic ? 1 : 0]), // ..., caught
       g: glue.map(g => [r2(g.x), r2(g.y), r2(g.z), r2(g.t), g.r, g.team]),
       ch: ps.map(p => p.champ),
+      sl: ps.map(p => p.stole ?? 0), // Sylas: whose Q he stole
     };
   }
 
@@ -1109,5 +1136,7 @@ export function createSim({ mapId, players, practice = false, roundsToWin = 3, l
     // in an enemy's glue: no abilities (game.js greys out the ability bar)
     stuck(slot) { const p = ps[slot]; return !!p?.alive && !!p.bodies && glued(p, p.bodies[TORSO].translation()); },
     drop(slot) { const p = ps[slot]; if (p) { p.left = true; removeRagdoll(p); } },
+    // floor (the stage, not champs) within 3m under x, y, z: bots check before stepping off a ledge (game.js botInput)
+    floor(x, y, z) { return !!world.castRay(new RAPIER.Ray(V(x, y, z), DOWN), 3, true, undefined, (1 << 16) | 1); },
   };
 }

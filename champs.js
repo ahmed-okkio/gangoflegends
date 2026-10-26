@@ -56,7 +56,17 @@ export const CHAMPS = {
       { id: 'rage', name: "Dragon's Rage", cd: 6, desc: 'Kick the champ in front of you back. Anyone they crash into gets knocked back too.' },
     ],
   },
+  sylas: {
+    name: 'Sylas', title: 'The Unshackled', body: '#c48f6c', limb: '#a0704f', eyes: '#c9a8ff', glow: '#5fa8ff',
+    abilities: [
+      { id: 'hijack', name: 'Hijack', cd: 8, aim: 7, point: true, release: true, radius: 0.9, desc: "Hold to aim at a champ in range, let go to steal their Q: it's yours in place of Hijack for the rest of the round." },
+      { id: 'abscond', name: 'Abscond', cd: 7, desc: 'Dash forward. For 4s your next punch is empowered: it smacks everyone around you, not just who it hits.' },
+    ],
+  },
 };
+
+// a player's two abilities: Sylas's Hijack swaps his Q for the stolen one (stole: whose champ's Q) for the round
+export const kit = (champ, stole) => stole ? [CHAMPS[stole].abilities[0], CHAMPS[champ].abilities[1]] : CHAMPS[champ].abilities;
 
 export const TEAM_COLORS = ['#ff4d5e', '#3d8bff', '#2ecc71', '#ffc93c'];
 export const TEAM_NAMES = ['Red', 'Blue', 'Green', 'Gold'];

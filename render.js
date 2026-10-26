@@ -26,8 +26,9 @@ const PROPS = {
   thresh: [['crown', HEAD], ['mantle', CHEST], ['lantern', HIPS], ['hook', -1]], // hook: drawn on his Q, not worn
   singed: [['tank', CHEST], ['goggles', HEAD]],
   lee: [['blindfold', HEAD], ['wrap', FORE], ['wrap', FORE + 1]],
+  sylas: [['hair', HEAD], ['collar', CHEST], ['shackleL', FORE, 'zap'], ['shackleR', FORE + 1, 'zap'], ['chain', -1]], // zap: crackle with lightning on Abscond. chain: hung off each cuff, see apply()
 };
-const PROP_FILE = { blitz: 'blitzcrank', hec: 'hecarim', vi: 'vi', sett: 'sett', ali: 'alistar', thresh: 'thresh', singed: 'singed', lee: 'leesin' };
+const PROP_FILE = { blitz: 'blitzcrank', hec: 'hecarim', vi: 'vi', sett: 'sett', ali: 'alistar', thresh: 'thresh', singed: 'singed', lee: 'leesin', sylas: 'sylas' };
 const propScenes = {}; // 'blitz/core' -> parsed glTF scene
 export async function loadProps() {
   if (Object.keys(propScenes).length) return;
@@ -744,13 +745,23 @@ export function createRenderer(canvas) {
     if (skinned) group.add(skinned);
     if (belt) parts[HIPS].add(mesh(new THREE.TorusGeometry(0.2, 0.035, 10, 32).rotateX(Math.PI / 2), gummy(color), 0, 0.04, 0)); // team belt
     const fists = [];
-    for (const [n, part, tag] of PROPS[champId]) {
+    let zap = false;
+    for (const [n, part, tag] of PROPS[champId] ?? []) {
       const o = part >= 0 && propScenes[`${champId}/${n}`]?.clone();
       if (!o) continue;
       o.traverse(m => { if (m.isMesh) { m.castShadow = m.receiveShadow = true; m.material = m.material.clone(); } }); // own copy: to light up, and to fade
       parts[part].add(o);
-      if (tag === 'fist') fists.push(o);
+      if (tag === 'fist' || tag === 'zap') fists.push(o);
+      if (tag === 'zap') zap = true;
     }
+    // Sylas's chains: not worn on the forearm (they'd point out with his punches like a sword) but hung off each cuff,
+    // swinging under gravity in apply(). Looks only, like every prop: the sim never sees them, so no hitbox
+    const chains = champId !== 'sylas' || !propScenes['sylas/chain'] ? [] : [0, 1].map(arm => {
+      const obj = propScenes['sylas/chain'].clone();
+      obj.traverse(m => { if (m.isMesh) { m.castShadow = true; m.material = m.material.clone(); } });
+      group.add(obj); fists.push(obj);
+      return { obj, arm, at: new THREE.Vector3(arm ? -0.02 : 0.02, -0.34, -0.11), tip: null, prev: null, t: 0 }; // at: under the cuff, forearm frame
+    });
     const skin = new Set(); // everything that fades see-through after a KO
     group.traverse(m => { if (m.isMesh) [].concat(m.material).forEach(x => skin.add(x)); });
 
@@ -788,10 +799,11 @@ export function createRenderer(canvas) {
       hay.visible = false;
       group.add(hay);
     }
-    return { group, parts, tag, stars, fists, swirl, hay, skin: [...skin], ghost: false, champId, glow: c.glow ?? '#ff8a00', torsoMat: body, glowBase: body.emissive.clone(), eyes: c.eyes, q: PARTS.map(() => [0, 0, 0, 1]), pos: PARTS.map(() => [0, 0, 0]) };
+    return { group, parts, tag, stars, fists, zap, chains, swirl, hay, skin: [...skin], ghost: false, champId, glow: c.glow ?? '#ff8a00', torsoMat: body, glowBase: body.emissive.clone(), eyes: c.eyes, q: PARTS.map(() => [0, 0, 0, 1]), pos: PARTS.map(() => [0, 0, 0]) };
   }
 
   const qa = new THREE.Quaternion(), qb = new THREE.Quaternion(), tmp = new THREE.Vector3(), tmp2 = new THREE.Vector3();
+  const CHAIN = 0.42, DOWN3 = new THREE.Vector3(0, -1, 0); // Sylas's chain length (6 links, tools/model_props.py)
   // draw an interpolated state between snapshots a and b; `own` ({ slot, a, b, alpha }) draws one player from its own
   // pair of states instead (a predicting client's own champ)
   // shift: per slot, how far to draw the hips off the snapshots (game.js carryOn)
@@ -819,6 +831,15 @@ export function createRenderer(canvas) {
         av.parts[i].position.fromArray(av.pos[i]);
         av.parts[i].quaternion.fromArray(av.q[i]);
       }
+      for (const c of av.chains) { // a pendulum: one tip point, pulled down by gravity and held at the chain's length from the cuff
+        const fore = av.parts[FORE + c.arm], at = tmp.copy(c.at).applyQuaternion(fore.quaternion).add(fore.position);
+        const dt = Math.min(0.05, time - c.t); c.t = time;
+        if (!c.tip || c.tip.distanceTo(at) > 1) { c.tip = at.clone(); c.tip.y -= CHAIN; c.prev = c.tip.clone(); } // (re)spawned
+        const v = tmp2.subVectors(c.tip, c.prev).multiplyScalar(0.94); // a little drag so it settles
+        c.prev.copy(c.tip); c.tip.add(v); c.tip.y -= 20 * dt * dt;
+        c.tip.sub(at).setLength(CHAIN).add(at);
+        c.obj.position.copy(at); c.obj.quaternion.setFromUnitVectors(DOWN3, tmp2.subVectors(c.tip, at).normalize());
+      }
       const flags = pb[3], head = av.parts[HEAD].position, torso = av.parts[CHEST].position;
       av.tag.position.copy(head).y += 0.65;
       if (av.hay) {
@@ -841,9 +862,10 @@ export function createRenderer(canvas) {
         const mt = m.material;
         if (!mt?.emissive) return;
         mt.userData.e0 ??= [mt.emissive.clone(), mt.emissiveIntensity];
-        if (lit) { mt.emissive.set(av.glow); mt.emissiveIntensity = 2.2 + Math.sin(time * 18); } else { mt.emissive.copy(mt.userData.e0[0]); mt.emissiveIntensity = mt.userData.e0[1]; }
+        if (lit) { mt.emissive.set(av.glow); mt.emissiveIntensity = av.zap ? (Math.random() < 0.15 ? 3.5 : 0.8 + Math.random() * 1.4) : 2.2 + Math.sin(time * 18); } // zap: lightning flicker else { mt.emissive.copy(mt.userData.e0[0]); mt.emissiveIntensity = mt.userData.e0[1]; }
       });
       if (lit && av.fists.length && Math.random() < 0.5) emit(av.fists[Math.floor(Math.random() * 2)].getWorldPosition(tmp2), { color: av.glow, n: 1, speed: 0.6, size: 0.18, life: 0.35, grav: 3, up: 1 });
+      if (lit && av.zap) for (const f of av.fists) if (Math.random() < 0.6) emit(f.localToWorld(tmp2.set((Math.random() - 0.5) * 0.25, -0.15 - Math.random() * 0.4, (Math.random() - 0.5) * 0.25)), { color: Math.random() < 0.7 ? av.glow : '#e8f4ff', n: 2, speed: 2.2, size: 0.12, life: 0.18, grav: 0 }); // sparks crackling off shackles and chains
       av.torsoMat.emissive.copy(av.glowBase);
       if (flags & 2) {
         av.torsoMat.emissive.set('#2fffd0').multiplyScalar(0.35 + 0.25 * Math.sin(time * 20));
@@ -870,7 +892,7 @@ export function createRenderer(canvas) {
     const m4 = new THREE.Matrix4(), q = new THREE.Quaternion();
     hookPool.forEach((h, i) => {
       const d = b.h[i], o = d && a.h?.find(e => e[0] === d[0]); // the same hook in the older snapshot (one per champ)
-      const champ = d && setup.players[d[0]]?.champ;
+      const champ = d && (b.sl?.[d[0]] || setup.players[d[0]]?.champ); // a stolen Q looks like its owner's
       h.head.visible = !!d && !!b.p[d[0]]?.[1]; h.links.visible = h.head.visible && champ !== 'lee'; h.shell.visible = false;
       h.scythe.visible = h.head.visible && champ === 'thresh' && h.scythe.children.length > 0;
       if (!h.head.visible) return;

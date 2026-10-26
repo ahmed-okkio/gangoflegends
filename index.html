@@ -150,6 +150,7 @@
   #lobbyChatIn { margin-bottom: 14px; font-weight: 700; font-size: 14px; }
   .lobbyacts { margin-top: auto; display: flex; gap: 10px; }
   .lobbyacts .btn { flex: 1; padding: 13px; font-size: 18px; }
+  #botPicks { display: flex; flex-wrap: wrap; gap: 6px; }
   .settings { display: grid; grid-template-columns: 140px 1fr; gap: 10px 14px; align-items: center; max-width: 440px; }
   #mapBlurb { color: var(--dust); font-size: 14px; margin: 12px 0 0; }
 
@@ -200,6 +201,7 @@
     background: linear-gradient(90deg, rgba(6,16,20,.96) 0, rgba(6,16,20,.9) 420px, rgba(6,16,20,.35)); }
   #escMenu h2 { font-size: 54px; margin-bottom: 18px; }
   #escMenu .volrow { width: 360px; margin: 10px 0 10px 22px; }
+  #escMenu .relay { margin: 2px 0 6px 22px; font-size: 15px; }
   #escChamps { display: grid; grid-template-columns: repeat(2, 170px); gap: 6px; margin: 10px 0 0 22px; }
   #escChamps button { display: flex; align-items: center; gap: 10px; padding: 8px 10px; border: 1px solid var(--line); background: rgba(19,45,53,.55); color: var(--gold-hi); font: 700 15px var(--display); text-align: left; }
   #escChamps button:hover { border-color: var(--gold-lo); }
@@ -288,7 +290,7 @@
 
   <section class="panel hidden" data-panel="practice">
     <h2>Practice</h2>
-    <p class="lede">Try a stage against a dummy of every other champion. Press Esc to come back.</p>
+    <p class="lede">Try a stage against dummies of the champions you pick. Press Esc to come back.</p>
     <div id="practiceMaps" class="maps"></div>
     <div id="netSim" class="hidden">
       <p class="hint">Simulated connection (dev): set any of these and you play as a client of a host running here, through a link this slow. 0 = off.</p>
@@ -299,6 +301,11 @@
         <span>Over TCP</span><label class="relay"><input id="simTcp" type="checkbox"> Like the relay: lost packets stall what's behind them</label>
       </div>
     </div>
+    <div class="settings" style="margin: 4px 0 12px; max-width: none">
+      <span>Dummies</span><input id="botCount" type="number" min="0" max="7" step="1" style="width: 70px">
+      <span>Champions</span><div id="botPicks"></div>
+    </div>
+    <label class="relay" style="margin-bottom: 14px"><input class="botsFight" type="checkbox"> Dummies fight back (can also be switched from the Esc menu)</label>
     <button id="practiceBtn" class="btn primary" data-sfx="start">Start practice</button>
   </section>
 
@@ -321,7 +328,8 @@
     <h2>Settings</h2>
     <p class="lede">Saved on this computer.</p>
     <label class="volrow">Volume <input class="vol" type="range" min="0" max="100"><output class="volOut"></output></label>
-    <label class="relay" style="margin-top: 18px"><input id="devIn" type="checkbox"> Dev mode (adds a connection simulator to Practice)</label>
+    <label class="relay" style="margin-top: 18px"><input class="noPredict" type="checkbox"> Server only: no prediction. Online, your champ moves when the host says so, like everyone else's: a round trip late, but never corrected</label>
+    <label class="relay" style="margin-top: 10px"><input id="devIn" type="checkbox"> Dev mode (adds a connection simulator to Practice)</label>
   </section>
 
   <section class="panel hidden" data-panel="notes">
@@ -367,6 +375,8 @@
     <div id="escChamps"></div>
     <small id="escChampNote"></small>
     <label class="volrow">Volume <input class="vol" type="range" min="0" max="100"><output class="volOut"></output></label>
+    <label class="relay"><input class="noPredict" type="checkbox"> Server only (no prediction)</label>
+    <label id="escBots" class="relay hidden"><input class="botsFight" type="checkbox"> Dummies fight back</label>
     <button id="quitBtn" class="tab" data-sfx="back">Leave match</button>
   </div>
 </div>

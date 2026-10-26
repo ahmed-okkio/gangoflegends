@@ -277,7 +277,35 @@ def lee_wrap():  # forearm frame (hand at y -.337): bandages wound round the wri
     cyl(WRAPS(), 0.056, 0.14, (0, -0.25, 0))
     for k, y in enumerate((-0.2, -0.25, -0.3)): ring(WRAPS(), 0.058, 0.009, (0, y, 0), ((-1) ** k * 0.25, 1, 0))
 
+# ---------------- Sylas: the Unshackled, huge petricite shackles trailing gold chain, long dark hair tied back, a leather collar ----------------
+STONE = lambda: mat("petricite", (0.66, 0.62, 0.86), 0.4)
+MAGIC = lambda: mat("magic", (0.6, 0.35, 1.0), 0.3, 0, glow=3)
+HAIR = lambda: mat("hair_dark", (0.07, 0.05, 0.045), 0.6)
+
+def sylas_shackle(s):  # forearm frame (hand at y -.337); s = 1 left, -1 right: a fat stone cuff, gold rims, a rune on the outside
+    cyl(STONE(), 0.1, 0.22, (0, -0.2, 0.005), r2=0.115)  # flares toward the hand
+    for y, r in ((-0.09, 0.103), (-0.31, 0.118)): ring(GOLD(), r, 0.02, (0, y, 0.005))
+    box(STONE(), (0.1, 0.06, 0.1), (s * 0.1, -0.2, 0.005), 0.03)  # a block jutting off the outside
+    box(MAGIC(), (0.02, 0.12, 0.03), (s * 0.152, -0.2, 0.005), 0.008)  # glowing rune in it
+
+def sylas_chain():  # its own frame: hangs from the origin down -y. render.js swings it off the cuff (a pendulum, under gravity) and lights it on Abscond
+    for k in range(6): ring(GOLD(), 0.045, 0.016, (0, -0.035 - k * 0.07, 0), (k % 2, 0, (k + 1) % 2))
+
+def sylas_hair():  # head frame (skull centre y .165, z .057, r .21): dark cap, a band and a thick tail down the back, loose strands by the face
+    ball(HAIR(), 0.228, (0, 0.25, 0.03), (1.0, 0.66, 1.0))
+    ring(LEATHER(), 0.04, 0.015, (0, 0.33, -0.19), (0, 0.6, -1))  # the tie
+    tube(HAIR(), [(0, 0.34, -0.17), (0, 0.3, -0.27), (0, 0.15, -0.3), (0, -0.02, -0.26)], [0.055, 0.06, 0.045, 0.01])
+    for x in (0.17, -0.17): tube(HAIR(), [(x * 0.9, 0.32, 0.19), (x * 1.1, 0.22, 0.2), (x * 1.2, 0.08, 0.17)], [0.03, 0.025, 0.006])
+
+def sylas_collar():  # chest frame (capsule along x: r .193, half length .082, centre y .254 z -.013): a leather collar with an iron clasp hanging at the throat
+    tube(LEATHER(), [(math.sin(a) * 0.16, 0.45 - 0.02 * math.cos(a), -math.cos(a) * 0.11 - 0.01) for a in [k * math.pi / 6 for k in range(-6, 7)]], [0.028] * 13)
+    kx, ky, kz = on_vest(0, 0.35, 1.08)
+    bpy.ops.mesh.primitive_cone_add(vertices=3, radius1=0.06, radius2=0, depth=0.03, location=B((kx, ky, kz))); ob = bpy.context.object
+    aim(ob, (0, 0, 1)); bake(ob); done(ob, IRON())  # a flat triangle
+    for sx in (1, -1): tube(LEATHER(), [on_vest(sx * 0.12, 0.42, 1.06), on_vest(sx * 0.05, 0.36, 1.07), (kx, ky, kz)], [0.014] * 3)
+
 PROPS = {
+    "sylas_shackleL": lambda: sylas_shackle(1), "sylas_shackleR": lambda: sylas_shackle(-1), "sylas_chain": sylas_chain, "sylas_hair": sylas_hair, "sylas_collar": sylas_collar,
     "leesin_blindfold": lee_blindfold, "leesin_wrap": lee_wrap,
     "thresh_crown": thresh_crown, "thresh_mantle": thresh_mantle, "thresh_lantern": thresh_lantern, "thresh_hook": thresh_hook, "singed_tank": singed_tank, "singed_goggles": singed_goggles,
     "alistar_horns": ali_horns, "alistar_cuff": ali_cuff,
@@ -295,7 +323,8 @@ PIVOT = {"core": (0, 0.6347, -0.0101), "blade": (0, 1.0693, 0.0247), "tail": (0,
          "hair": (0, 1.0693, 0.0247), "jacket": (0, 0.6347, -0.0101), "sleeve": (0.2015, 0.9447, -0.0425), "fist": (0.2015, 0.6711, -0.0433),
          "horns": (0, 1.0693, 0.0247), "cuff": (0.2015, 0.6711, -0.0433), "crown": (0, 1.0693, 0.0247), "mantle": (0, 0.6347, -0.0101), "lantern": (0, 0.4223, 0.0002), "hook": (1.1, 1.0, 0.3),
          "tank": (0, 0.6347, -0.0101), "goggles": (0, 1.0693, 0.0247),
-         "blindfold": (0, 1.0693, 0.0247), "wrap": (0.2015, 0.6711, -0.0433)}
+         "blindfold": (0, 1.0693, 0.0247), "wrap": (0.2015, 0.6711, -0.0433),
+         "shackleL": (0.2015, 0.6711, -0.0433), "shackleR": (-0.2015, 0.6711, -0.0433), "chain": (0.2215, 0.3311, -0.1533), "collar": (0, 0.6347, -0.0101)}
 
 def mannequin(dx):
     grey = mat("beast", (0.62, 0.6, 0.58), 0.6)
@@ -320,14 +349,14 @@ if preview:
     sc.world = bpy.data.worlds.new("w"); sc.world.color = (0.32, 0.34, 0.38)
     sc.render.engine = "BLENDER_WORKBENCH"; sc.display.shading.light = "STUDIO"; sc.display.shading.color_type = "MATERIAL"
     sc.display.shading.show_cavity = True; sc.display.shading.show_shadows = True
-    sc.render.resolution_x, sc.render.resolution_y = 1800, 900
-    for champ, dx in (("blitzcrank", -2.2), ("hecarim", -1.1), ("vi", 0), ("sett", 1.1), ("alistar", 2.2), ("thresh", 3.3), ("singed", 4.4), ("leesin", 5.5)):
+    sc.render.resolution_x, sc.render.resolution_y = 2000, 900
+    for champ, dx in (("blitzcrank", -2.2), ("hecarim", -1.1), ("vi", 0), ("sett", 1.1), ("alistar", 2.2), ("thresh", 3.3), ("singed", 4.4), ("leesin", 5.5), ("sylas", 6.6)):
         mannequin(dx)
         for name, ob in built.items():
             if name.startswith(champ): ob.location = B(Vector(PIVOT[name.split("_")[1]]) + Vector((dx, 0, 0)))
     cam = bpy.data.objects.new("cam", bpy.data.cameras.new("cam")); sc.collection.objects.link(cam); sc.camera = cam
-    cam.data.type = "ORTHO"; cam.data.ortho_scale = 9
+    cam.data.type = "ORTHO"; cam.data.ortho_scale = 10
     for view, d in (("front", (0.0, 0.25, 1)), ("three_quarter", (0.8, 0.35, 0.9)), ("back", (-0.5, 0.3, -1))):
-        target = B((1.65, 0.75, 0)); cam.location = target + B(Vector(d).normalized() * 6)
+        target = B((2.2, 0.75, 0)); cam.location = target + B(Vector(d).normalized() * 6)
         cam.rotation_euler = (target - cam.location).to_track_quat("-Z", "Y").to_euler()
         sc.render.filepath = os.path.join(out, f"preview_{view}.png"); bpy.ops.render.render(write_still=True)

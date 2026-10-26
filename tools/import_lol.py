@@ -10,6 +10,7 @@ CHAMPS = {  # champion folder: (mesh, diffuse texture)
     "blitzcrank": ("blitzcrank.skn", "steamgolem.png"),
     "hecarim": ("hecarim.skn", "hecarim_base_tx_cm.png"),
     "thresh": ("thresh.skn", "thresh_base_tx_cm.png"),
+    "sylas": ("sylas_base.skn", "sylas_base_tx_cm.png"),
 }
 root = os.path.join(os.path.dirname(__file__), "..", "lolcache")
 

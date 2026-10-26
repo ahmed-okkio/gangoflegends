@@ -1,7 +1,7 @@
 // App flow: menu -> lobby -> match. The host (or practice) runs the sim; clients send input and draw snapshots.
 import { initPhysics, createSim, DT, BTN } from './sim.js';
 import { createRenderer, playerColor, loadProps } from './render.js';
-import { CHAMPS, TEAM_NAMES, TEAM_COLORS, FFA_COLORS } from './champs.js';
+import { kit, CHAMPS, TEAM_NAMES, TEAM_COLORS, FFA_COLORS } from './champs.js';
 import { MAPS } from './maps.js';
 import * as net from './net.js';
 import { prepareMap, loadBeast, xhr } from './stages.js';
@@ -167,10 +167,28 @@ $('netLogBtn').onclick = async () => {
   catch { const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([text])); a.download = 'gangoflegends-network-log.txt'; a.click(); menuError('Saved the log as a file.', true); }
 };
 
+// practice dummies: how many (0-7: 8 champs at most) and who, saved here. Default: one of each other champ
+let botPicks = null;
+try { botPicks = JSON.parse(store.get('practiceBots', 'null')); } catch {}
+if (!Array.isArray(botPicks) || botPicks.length > 7 || !botPicks.every(c => CHAMPS[c] || c === 'random')) botPicks = Object.keys(CHAMPS).filter(c => c !== me.champ).slice(0, 7);
+const saveBots = () => { store.set('practiceBots', JSON.stringify(botPicks)); renderBots(); };
+function renderBots() {
+  $('botCount').value = botPicks.length;
+  $('botPicks').innerHTML = botPicks.map((c, i) => `<select data-i="${i}" aria-label="Dummy ${i + 1}">${['random', ...Object.keys(CHAMPS)].map(id =>
+    `<option value="${id}"${id === c ? ' selected' : ''}>${id === 'random' ? 'Random' : CHAMPS[id].name}</option>`).join('')}</select>`).join('') || '<span class="hint">None: just you</span>';
+}
+$('botCount').onchange = e => {
+  const n = Math.min(7, Math.max(0, Math.round(+e.target.value) || 0));
+  while (botPicks.length < n) botPicks.push('random');
+  botPicks.length = n; saveBots();
+};
+$('botPicks').onchange = e => { botPicks[+e.target.dataset.i] = e.target.value; saveBots(); };
+renderBots();
+
 $('practiceBtn').onclick = () => startPractice(practiceMap);
 function startPractice(map) {
-  const roster = Object.keys(CHAMPS).filter(c => c !== me.champ); // one dummy of each other champ
-  const dummies = roster.slice(0, 7).map((champ, i) => ({ id: `dummy${i}`, name: 'Dummy', champ, team: i + 1 }));
+  const any = Object.keys(CHAMPS);
+  const dummies = botPicks.map((c, i) => ({ id: `dummy${i}`, name: 'Dummy', champ: CHAMPS[c] ? c : any[Math.floor(Math.random() * any.length)], team: i + 1 }));
   const lag = netSim();
   startGame({ map, teams: 0, rounds: 3, practice: true, lag: lag.ping || lag.jitter || lag.loss ? lag : null, players: [{ id: 'me', name: me.name, champ: me.champ, team: 0 }, ...dummies] });
 }
@@ -365,6 +383,8 @@ async function startGame(setup) {
   // my champ, predicted (sim.js). Practice behind a simulated connection has both: game.sim is the host
   if (!game.sim || setup.lag) game.local = createSim({ mapId: setup.map, players: setup.players, local: game.mySlot, gb: GB_MODE });
   game.fake = setup.lag && { acc: 0, t: 0, n: 0, ev: [] };
+  game.bots = setup.practice ? setup.players.map(() => ({ t: 0, x: 0, z: 0, hold: 0, hand: 0, ab: 0 })) : null;
+  $('escBots').classList.toggle('hidden', !setup.practice);
   attract = null;
   view.setMatch(setup);
   abilityHud();
@@ -372,8 +392,8 @@ async function startGame(setup) {
   show('hud');
 }
 function abilityHud() {
-  const mine = CHAMPS[game.setup.players[game.mySlot]?.champ ?? 'blitz'];
-  $('abil').innerHTML = mine.abilities.map((a, i) => `<div class="slot" style="--g:${mine.glow ?? mine.eyes}"><kbd data-act="a${i + 1}"></kbd><b>${a.name}</b><i></i><span class="cd"></span></div>`).join('');
+  const id = game.setup.players[game.mySlot]?.champ ?? 'blitz', mine = CHAMPS[id];
+  $('abil').innerHTML = kit(id, game.stole).map((a, i) => `<div class="slot" style="--g:${mine.glow ?? mine.eyes}"><kbd data-act="a${i + 1}"></kbd><b>${a.name}</b><i></i><span class="cd"></span></div>`).join('');
   showKeys();
 }
 // Esc menu: switch champ for the next round (practice: right away)
@@ -405,6 +425,7 @@ function updateHud(s, now) {
     view.setChamp(i, c);
     if (i === game.mySlot) { abilityHud(); escChamps(); }
   });
+  if ((s.sl?.[game.mySlot] || null) !== (game.stole ?? null)) { game.stole = s.sl?.[game.mySlot] || null; abilityHud(); } // Sylas stole a Q / round reset
   if (setup.practice) $('scores').innerHTML = `<span class="chip">Practice on ${MAPS[setup.map].name}${setup.lag ? ` · ${setup.lag.ping}ms${setup.lag.tcp ? ' TCP' : ''}` : ''}</span>`;
   else if (setup.teams) $('scores').innerHTML = s.sc.slice(0, setup.teams).map((n, t) => `<span class="chip" style="--pc:${TEAM_COLORS[t]}">${TEAM_NAMES[t]} <b>${n}</b></span>`).join('');
   else $('scores').innerHTML = setup.players.map((p, i) => `<span class="chip ${s.p[i]?.[1] ? '' : 'out'}" style="--pc:${playerColor(setup, i)}">${esc(p.name)} <b>${s.sc[i] ?? 0}</b></span>`).join('');
@@ -429,7 +450,7 @@ function updateHud(s, now) {
     el.classList.toggle('cooling', cd > 0);
     el.classList.toggle('recast', re);
     el.querySelector('.cd').textContent = cd > 0 ? Math.ceil(cd) : '';
-    el.querySelector('i').style.height = `${Math.min(100, cd / CHAMPS[setup.players[game.mySlot].champ].abilities[i].cd * 100)}%`;
+    el.querySelector('i').style.height = `${Math.min(100, cd / kit(setup.players[game.mySlot].champ, game.stole)[i].cd * 100)}%`;
   });
 }
 
@@ -531,6 +552,15 @@ function slider(cls, key, def, apply, sample) {
   set(+store.get(key, def));
 }
 slider('vol', 'volume', 70, setVolume, () => play('hit', 0.8));
+// on/off settings (Settings / Practice tabs + Esc menu) share one saved setting each too; opt() reads one, live
+function toggle(cls, key) {
+  const els = document.querySelectorAll('.' + cls), set = v => { store.set(key, v ? '1' : '0'); els.forEach(el => { el.checked = v; }); };
+  els.forEach(el => { el.onchange = () => set(el.checked); });
+  set(opt(key));
+}
+const opt = key => store.get(key, '0') === '1';
+toggle('noPredict', 'noPredict'); // server only: a client draws its own champ from the host's snapshots too (frame())
+toggle('botsFight', 'botsFight'); // practice: the dummies come after you (driveBots())
 
 // UI sounds: a tick on hover, and each button's data-sfx (default "click") on click
 let hovered = null;
@@ -575,7 +605,7 @@ function readInput() {
 // A windup ability's (aimMin) strip grows to its full reach over the windup
 const aiming = [false, false], held = [0, 0];
 function showAim(inp, dt) {
-  const abs = CHAMPS[game.setup.players[game.mySlot].champ].abilities, mine = game.cur?.p[game.mySlot];
+  const abs = kit(game.setup.players[game.mySlot].champ, game.stole), mine = game.cur?.p[game.mySlot];
   let range = 0, back = false, point = null;
   const sim = game.sim ?? game.local, stuck = sim.stuck(game.mySlot);
   [BTN.A1, BTN.A2].forEach((btn, i) => {
@@ -609,6 +639,7 @@ function frame(now) {
     while (acc >= DT) {
       acc -= DT;
       game.sim.setInput(game.mySlot, inp);
+      driveBots();
       game.sim.step();
       const ev = game.sim.takeEvents();
       if (ev.length) { view.fx(ev); if (conn) for (const e of ev) game.sentEv.push([...e, ++game.evN, now]); }
@@ -626,14 +657,14 @@ function frame(now) {
     // my champ moves right away on my own copy (sim.js sync). Inputs go out every other tick, each message carrying
     // the last 6 ticks' inputs over the unreliable channel, so a lost or late message costs nothing; the host plays them back tick by tick.
     if (game.fake) fakeHost(dt, now);
-    const { local } = game;
+    const { local } = game, pure = opt('noPredict'); // server only: my copy still runs (it numbers my inputs) but isn't shown
     acc += dt;
     while (acc >= DT) {
       acc -= DT;
       local.setInput(game.mySlot, GB_MODE ? { ...inp, b: inp.b & ~BTN.LIFT } : inp); // GB mode: my copy plays all but lifting (sim.js: what it leaves the host)
       local.step();
       const ev = local.takeEvents();
-      if (ev.length) { view.fx(ev); for (const e of ev) if (e[5] === game.mySlot) game.played.push([...e, now]); }
+      if (ev.length && !pure) { view.fx(ev); for (const e of ev) if (e[5] === game.mySlot) game.played.push([...e, now]); } // server only: the host's effects play instead
       const mine = local.snapshot();
       game.mine = [game.mine?.[1], mine.p[game.mySlot]]; game.myHooks = mine.h;
       // and what my screen shows the others at (the playback clock): the host tests my abilities against that (sim.js seen())
@@ -661,13 +692,13 @@ function frame(now) {
     const a = s[0], b = s[1] ?? a, alpha = b === a ? 1 : Math.min(1, Math.max(0, (at - a.mt) / (b.mt - a.mt)));
     // me: between my last two local steps, unless knocked out, hooked or grabbing / grabbed by someone (then the host's
     // ragdoll is the truth, and drawn on the same clock as whoever I'm tied to)
-    const me = local.players[game.mySlot], limp = !me.alive || me.ko > 0 || me.hooked > 0 || me.tied || me.hostOwned;
+    const me = local.players[game.mySlot], limp = pure || !me.alive || me.ko > 0 || me.hooked > 0 || me.tied || me.hostOwned;
     const shift = carryOn(a, b, alpha, s[s.length - 1], at, dt), own = limp ? null : { slot: game.mySlot, a: game.mine[0] ?? game.mine[1], b: game.mine[1], alpha: acc / DT };
     if (!limp) shift[game.mySlot] = null;
     slideOver(limp, own, a, b, alpha, shift, dt);
     const fa = s.at(-2) ?? s.at(-1), fb = s.at(-1); // the newest two snapshots (my hooks from the host, below)
     // my own hook and glue: drawn from my copy (cast at once) until the host's catch / puddle shows up on screen
-    const og = local.ownGlue.filter(g => !b.g?.some(h => h[5] === g.team && Math.hypot(h[0] - g.x, h[2] - g.z) < 1));
+    const og = pure ? [] : local.ownGlue.filter(g => !b.g?.some(h => h[5] === g.team && Math.hypot(h[0] - g.x, h[2] - g.z) < 1));
     // GB mode: my hook as the host has it, from the newest snapshots like my arms
     const hostHook = h => h[0] !== game.mySlot || (!GB_MODE && h[5]), caught = b.h.some(h => h[0] === game.mySlot && h[5]);
     const myHost = x => GB_MODE ? x.h.filter(h => h[0] === game.mySlot) : [];
@@ -742,6 +773,7 @@ function fakeHost(dt, now) {
   h.acc += dt;
   while (h.acc >= DT) {
     h.acc -= DT;
+    driveBots();
     game.sim.step();
     for (const e of game.sim.takeEvents()) h.ev.push([...e, ++h.n, now]);
     if (++h.t % 2) continue;
@@ -762,14 +794,20 @@ async function startAttract() {
   view.setMatch({ map, teams: 0, rounds: 3, practice: true, menu: true, players });
   attract = { sim, prev: null, cur: null, bots: players.map(() => ({ t: 0, x: 0, z: 0, hold: 0, hand: 0, ab: 0 })) };
 }
-// each bot walks at the nearest other one and throws punches when close, now and then an ability
-function botInput(sim, i, bot) {
+// practice dummies: stand still, or (botsFight, toggled live) come after me like the backdrop's bots
+function driveBots() {
+  if (!game.bots) return;
+  const on = opt('botsFight');
+  game.bots.forEach((bot, i) => { if (i !== game.mySlot) game.sim.setInput(i, on ? botInput(game.sim, i, bot, game.mySlot) : { x: 0, z: 0, b: 0 }); });
+}
+// each bot walks at the nearest other one (only: just that one) and throws punches when close, now and then an ability
+function botInput(sim, i, bot, only = null) {
   const ps = sim.players, me = ps[i];
   if (!me.alive) return { x: 0, z: 0, b: 0 };
   const p = me.bodies[0].translation();
   if ((bot.t -= DT) <= 0) {
     bot.t = 0.4 + Math.random() * 0.8;
-    const foes = ps.filter((q, j) => j !== i && q.alive).map(q => q.bodies[0].translation()).sort((a, b) => Math.hypot(a.x - p.x, a.z - p.z) - Math.hypot(b.x - p.x, b.z - p.z));
+    const foes = ps.filter((q, j) => (only == null ? j !== i : j === only) && q.alive).map(q => q.bodies[0].translation()).sort((a, b) => Math.hypot(a.x - p.x, a.z - p.z) - Math.hypot(b.x - p.x, b.z - p.z));
     const f = foes[0], d = f ? Math.hypot(f.x - p.x, f.z - p.z) : 0;
     [bot.x, bot.z] = !f || d < 0.01 || Math.random() < 0.2 ? [0, 0] : [(f.x - p.x) / d, (f.z - p.z) / d];
     if (f && d < 1.4) { bot.hold = Math.random() < 0.25 ? 30 : 3; bot.hand = Math.random() < 0.5 ? BTN.LEFT : BTN.RIGHT; } // a grab or a punch
@@ -777,6 +815,8 @@ function botInput(sim, i, bot) {
   }
   const b = (bot.hold-- > 0 ? bot.hand : 0) | bot.ab;
   bot.ab = 0;
+  // no floor a step ahead: stand there instead. ponytail: no pathing, a foe across a gap is just waited for
+  if (!sim.floor(p.x + bot.x * 0.8, p.y, p.z + bot.z * 0.8)) return { x: 0, z: 0, b };
   return { x: bot.x, z: bot.z, b };
 }
 function runAttract(dt) {

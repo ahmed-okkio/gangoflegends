@@ -143,6 +143,19 @@ function duo(mapId, players, slot, ow, extra = {}) {
   console.log('hec ok', (torso(s3, 0).x - x0).toFixed(2));
 }
 
+// 4b. Sylas Hijack steals the hit champ's Q; Abscond dashes, recast spins
+{
+  const sim = near('sylas', 'blitz');
+  run(sim, 90);
+  lineUp(sim, 5);
+  run(sim, 40, i => sim.setInput(0, { x: 0, z: 0, b: i < 3 ? BTN.A1 : 0, a: Math.PI / 2, d: 5 }));
+  assert.equal(sim.players[0].stole, 'blitz', 'hijack steals');
+  assert.equal(sim.snapshot().sl[0], 'blitz', 'steal in snapshot');
+  run(sim, 10, i => sim.setInput(0, { x: 0, z: 0, b: i < 2 ? BTN.A2 : 0 }));
+  assert.ok(sim.players[0].empower > 0 && sim.players[0].emp === 'aoe' && sim.players[0].cd[1] > 6, 'abscond: dash, empowered, cooling at once');
+  console.log('sylas ok');
+}
+
 // 5. Power Fist launches
 {
   const sim = near('blitz', 'hec');
