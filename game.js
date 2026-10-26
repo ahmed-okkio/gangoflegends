@@ -567,7 +567,7 @@ function toggle(cls, key) {
 }
 const opt = key => store.get(key, '0') === '1';
 toggle('noPredict', 'noPredict'); // server only: a client draws its own champ from the host's snapshots too (frame())
-toggle('botsFight', 'botsFight'); // practice: the dummies come after you (driveBots())
+toggle('botsFight', 'botsFight'); // practice: the dummies fight everyone (driveBots())
 
 // UI sounds: a tick on hover, and each button's data-sfx (default "click") on click
 let hovered = null;
@@ -823,21 +823,27 @@ async function startAttract() {
   view.setMatch({ map, teams: 0, rounds: 3, practice: true, menu: true, players });
   attract = { sim, prev: null, cur: null, bots: players.map(() => ({ t: 0, x: 0, z: 0, hold: 0, hand: 0, ab: 0 })) };
 }
-// practice dummies: stand still, or (botsFight, toggled live) come after me like the backdrop's bots
+// practice dummies: stand still, or (botsFight, toggled live) a free-for-all like the backdrop's bots, me included
 function driveBots() {
   if (!game.bots) return;
   const on = opt('botsFight');
-  game.bots.forEach((bot, i) => { if (i !== game.mySlot) game.sim.setInput(i, on ? botInput(game.sim, i, bot, game.mySlot) : { x: 0, z: 0, b: 0 }); });
+  game.bots.forEach((bot, i) => { if (i !== game.mySlot) game.sim.setInput(i, on ? botInput(game.sim, i, bot) : { x: 0, z: 0, b: 0 }); });
 }
-// each bot walks at the nearest other one (only: just that one) and throws punches when close, now and then an ability
-function botInput(sim, i, bot, only = null) {
+// each bot picks a foe (any other champ, nearer ones likelier), keeps it 3-6s or until it's out,
+// walks at it and throws punches when close, now and then an ability
+function botInput(sim, i, bot) {
   const ps = sim.players, me = ps[i];
   if (!me.alive) return { x: 0, z: 0, b: 0 };
-  const p = me.bodies[0].translation();
+  const p = me.bodies[0].translation(), far = q => { const t = q.bodies[0].translation(); return Math.hypot(t.x - p.x, t.z - p.z); };
+  if (!(bot.keep > 0) || !ps[bot.foe]?.alive) {
+    const w = ps.map((q, j) => j !== i && q.alive ? 1 / (1 + far(q)) : 0);
+    let r = Math.random() * w.reduce((a, b) => a + b, 0);
+    bot.foe = w.findIndex(x => (r -= x) < 0 && x > 0); bot.keep = 3 + Math.random() * 3;
+  }
+  bot.keep -= DT;
   if ((bot.t -= DT) <= 0) {
     bot.t = 0.4 + Math.random() * 0.8;
-    const foes = ps.filter((q, j) => (only == null ? j !== i : j === only) && q.alive).map(q => q.bodies[0].translation()).sort((a, b) => Math.hypot(a.x - p.x, a.z - p.z) - Math.hypot(b.x - p.x, b.z - p.z));
-    const f = foes[0], d = f ? Math.hypot(f.x - p.x, f.z - p.z) : 0;
+    const f = ps[bot.foe]?.alive ? ps[bot.foe].bodies[0].translation() : null, d = f ? Math.hypot(f.x - p.x, f.z - p.z) : 0;
     [bot.x, bot.z] = !f || d < 0.01 || Math.random() < 0.2 ? [0, 0] : [(f.x - p.x) / d, (f.z - p.z) / d];
     if (f && d < 1.4) { bot.hold = Math.random() < 0.25 ? 30 : 3; bot.hand = Math.random() < 0.5 ? BTN.LEFT : BTN.RIGHT; } // a grab or a punch
     if (Math.random() < 0.08) bot.ab = Math.random() < 0.5 ? BTN.A1 : BTN.A2;
