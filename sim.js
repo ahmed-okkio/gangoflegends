@@ -722,10 +722,13 @@ export function createSim({ mapId, players, practice = false, roundsToWin = 3, l
       if (p.fling > 0) { ua = fa = add(V(0, 1, 0), mul(bf, p.fling > 0.15 ? 0.4 : -0.6)); str = 0.9; } // up and over
       if (p.pulv > 0) { ua = fa = add(mul(bf, 0.6), DOWN); str = 0.9; } // both fists slammed into the floor
       if (p.fb > 0) { ua = fa = p.fb > 0.18 ? add(mul(side, s), mul(bf, -0.3)) : add(mul(side, s * 0.15), bf); str = 0.9; }
-      // punch: the fist sweeps round from the side to the front (a short hook) out of the cocked pose below
+      // punch: a hook. The elbow starts out to the side with the forearm bent across in front; the upper arm swings round
+      // to the front while the forearm straightens, so the fist travels an arc in at the target (the head) and lands
+      // with the arm near straight
       if (p.punch?.arm === i) {
-        const u = Math.min(1, p.punch.t / 0.1), d = aimTo ? norm(aimTo) : bf, sd = norm(V(d.z, 0, -d.x));
-        ua = add(add(mul(sd, s * 0.9 * (1 - u)), mul(d, 0.3 + 0.7 * u)), V(0, 0.15, 0)); fa = add(d, V(0, 0.1, 0)); str = 0.9; fs = 0.8;
+        const u = Math.min(1, p.punch.t / 0.14), d = aimTo ? norm(aimTo) : bf, sd = mul(norm(V(d.z, 0, -d.x)), s);
+        const a = 0.25 + 1.25 * u, b = 1.4 * (1 - u) + 0.1; // upper arm: from out to the side round to the front; elbow bend
+        ua = add(add(mul(sd, Math.cos(a)), mul(d, Math.sin(a))), V(0, 0.15, 0)); fa = add(add(mul(d, Math.cos(b)), mul(sd, -Math.sin(b))), V(0, 0.1, 0)); str = 0.9; fs = 0.8;
       }
       if (p.spin > 0) { ua = fa = add(mul(side, s), mul(bf, 0.1)); str = 0.5; fs = 0.4; }
       if (p.kickA > 0 || fk) { ua = fa = add(mul(side, s), V(0, fk ? 0.3 : -0.2, 0)); str = 0.5; fs = 0.4; } // out wide for balance
