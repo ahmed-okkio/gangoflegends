@@ -765,7 +765,7 @@ export function createSim({ mapId, players, practice = false, roundsToWin = 3, l
           for (const o of ps) {
             if (o === p || !o.alive) continue;
             const d = sub(o === vic ? vic.bodies[TORSO].translation() : seen(p, o), tp);
-            if (o === vic || (Math.hypot(d.x, d.z) < 2.4 && Math.abs(d.y) < 1.2)) hit(o, o === vic ? part : TORSO, add(mul(norm(V(d.x, 0, d.z)), 9), V(0, 3, 0)), 30);
+            if (o === vic || (Math.hypot(d.x, d.z) < 2.4 && Math.abs(d.y) < 1.2)) hit(o, o === vic ? part : TORSO, add(mul(norm(V(d.x, 0, d.z)), 5.4), V(0, 1.8, 0)), 30);
           }
         } else if (p.empower > 0) { p.empower = 0; hit(vic, part, add(mul(pf, 2), V(0, 10, 0)), 45); }
         else { const k = Math.min(sp, 12) / 6; hit(vic, part, add(mul(norm(add(norm(fv), pf)), 2.2 * k), V(0, 0.6, 0)), 20 * k); }

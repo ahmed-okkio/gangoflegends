@@ -67,23 +67,6 @@ export function ui(kind) {
   }
 }
 
-// a chain rattling: a run of quick metallic clinks (GB has no chain sound), each a few inharmonic partials like struck
-// metal, and a heavier clank where it lands (first one of the run, `at` seconds from now)
-function chain(at, len) {
-  if (!ctx) return;
-  if (ctx.state === 'suspended') ctx.resume();
-  const t0 = ctx.currentTime + at, n = Math.round(len / 0.018);
-  for (let i = 0; i <= n; i++) {
-    const t = t0 + i * 0.018 + Math.random() * 0.008, f = 1900 + Math.random() * 1400, last = i === n, v = (last ? 0.07 : 0.03) * volume;
-    for (const [r, g] of [[1, 1], [2.76, 0.6], [5.4, 0.35]]) {
-      const o = ctx.createOscillator(), gn = ctx.createGain(), d = last ? 0.18 : 0.05;
-      o.frequency.value = f * r * (last ? 0.55 : 1);
-      gn.gain.setValueAtTime(0, t); gn.gain.linearRampToValueAtTime(v * g, t + 0.002); gn.gain.exponentialRampToValueAtTime(0.0001, t + d);
-      o.connect(gn).connect(ctx.destination); o.start(t); o.stop(t + d + 0.02);
-    }
-  }
-}
-
 // sim fx events -> sounds
 export function playEvents(events) {
   for (const [kind, , , , big] of events) {
@@ -101,6 +84,10 @@ export function playEvents(events) {
     else if (kind === 'wave') play('swing', 0.6);
     else if (kind === 'sonic') play('hit', 0.5);
     else if (kind === 'rage') play('swing', 0.9);
-    else if (kind === 'hijack') { play('swing', 0.6); chain(0, 0.15); chain(0.3, 0.12); } // out, then reeled back in
+    else if (kind === 'hijack') { // Sylas's chain: cracked out like a whip, catching with an electric pop, ratcheted back in (render.js lashes: out 0.12s, back from 0.24s)
+      play('chainOut', 0.9);
+      setTimeout(() => { play('chainHit', 0.7); play('zap', 0.6); }, 120);
+      for (let i = 0; i < 4; i++) setTimeout(() => play('reel', 0.5, 1.1 + i * 0.12), 240 + i * 45);
+    }
   }
 }

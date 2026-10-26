@@ -24,6 +24,10 @@ GROUPS = {
     "star": r"^GB SFX WIN STAR",
     "count": r"^GB SFX CountDown",
     "train": r"^GB SFX TRAIN ENGINE LOOP",  # Subway's trains (core-audio-stages)
+    "chainOut": r"^GB SFX METAL CABLE SNAP",  # Sylas Hijack: the chain lashing out
+    "chainHit": r"^GB METAL CABLE HIT",  # ...catching
+    "zap": r"^GB SFX BULB BLOWN",  # ...with an electric pop
+    "reel": r"^pulley_tick",  # ...and ratcheting back in
 }
 
 os.makedirs(OUT, exist_ok=True)

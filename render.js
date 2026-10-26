@@ -894,7 +894,7 @@ export function createRenderer(canvas) {
         const mt = m.material;
         if (!mt?.emissive) return;
         mt.userData.e0 ??= [mt.emissive.clone(), mt.emissiveIntensity];
-        if (lit) { mt.emissive.set(av.glow); mt.emissiveIntensity = av.zap ? (Math.random() < 0.15 ? 3.5 : 0.8 + Math.random() * 1.4) : 2.2 + Math.sin(time * 18); } // zap: lightning flicker
+        if (lit) { mt.emissive.set(av.glow); mt.emissiveIntensity = av.zap ? (Math.random() < 0.15 ? 7 : 3 + Math.random() * 2.5) : 2.2 + Math.sin(time * 18); } // zap: lightning flicker (bright: the stone is pale, and has to clear bloom)
         else { mt.emissive.copy(mt.userData.e0[0]); mt.emissiveIntensity = mt.userData.e0[1]; }
       });
       if (lit && av.fists.length && Math.random() < 0.5) emit(av.fists[Math.floor(Math.random() * 2)].getWorldPosition(tmp2), { color: av.glow, n: 1, speed: 0.6, size: 0.18, life: 0.35, grav: 3, up: 1 });
