@@ -773,6 +773,30 @@ if ((await prepareMap('subway')).imported) {
   assert.ok(out, 'a train carries you into the tunnel');
   console.log('subway train ok');
 }
+// 16. Trawler (when imported): overboard you float and can swim a while, then tire and sink out; held under, sooner
+if ((await prepareMap('trawler')).imported) {
+  const sea = (await import('./maps.js')).MAPS.trawler.view.sea;
+  const sim = createSim({ mapId: 'trawler', practice: true, players: [0, 1].map(i => ({ id: i, name: 'P', champ: 'blitz', team: i })) });
+  const dropAt = (slot, x, z) => { const p = sim.players[slot], t0 = torso(sim, slot); for (const b of p.bodies) { const q = b.translation(); b.setTranslation({ x: q.x - t0.x + x, y: q.y - t0.y + sea + 0.5, z: q.z - t0.z + z }, true); b.setLinvel({ x: 0, y: 0, z: 0 }, true); } };
+  dropAt(0, 0, 9); dropAt(1, 3, 12);
+  sim.setInput(0, { x: 1, z: 0, b: 0 });
+  run(sim, 180);
+  const a = sim.players[0];
+  assert.ok(a.alive && Math.abs(torso(sim, 0).y - sea) < 0.6, `floats at the surface: ${torso(sim, 0).y.toFixed(2)}`);
+  assert.ok(torso(sim, 0).x > 2, `swims: ${torso(sim, 0).x.toFixed(2)}`);
+  let t = 3; while (a.alive && t < 30) { sim.step(); t += 1 / 60; }
+  console.log('swam, tired and sank out after', t.toFixed(1), 's');
+  assert.ok(!a.alive && t > 6 && t < 20, 'tires and sinks out');
+  // B (fresh, treading water) held under by A from above
+  run(sim, 100); // A back in practice
+  dropAt(0, 3, 12.8); dropAt(1, 3, 12);
+  const b = sim.players[1]; b.stamina = 100; a.stamina = 100;
+  for (const bd of a.bodies) { const q = bd.translation(); bd.setTranslation({ x: q.x, y: q.y + 0.4, z: q.z }, true); }
+  a.yaw = Math.PI; sim.setInput(0, { x: 0, z: 0, b: BTN.LEFT | BTN.RIGHT }); // facing B, both hands out
+  let u = 0; while (b.alive && u < 20) { sim.step(); u += 1 / 60; }
+  console.log('held under: out after', u.toFixed(1), 's, grabbed', a.grabs.some(g => g?.vic === b));
+  assert.ok(!b.alive && u < 9, 'held under you drown quicker');
+}
 console.log('all ok');
 
 // 12j. GB mode: my copy plays my own punch and Vi's windup at once (for show); the host still does the hitting

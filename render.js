@@ -198,6 +198,7 @@ export function createRenderer(canvas) {
   const camAt = new THREE.Vector3(0, 0, 0);
   let camDist = 14, shake = 0, time = 0;
   const sunOffset = new THREE.Vector3(8, 20, 6);
+  let seaY = null; // Trawler's sea height (maps.js view.sea), for splashes and bubbles
   let cam = { side: 1, pitch: 0.63, min: 10, max: 24 }; // side -1 = camera on the -z side, looking +z
   // calibration knobs for imported Unity lighting (URP intensities don't map 1:1 onto three.js)
   // Unity lights and lightmaps multiply albedo straight; three.js divides diffuse by PI. Lightmaps are RGBM: x 5^2.2 (tools/import_gb.py).
@@ -550,7 +551,7 @@ export function createRenderer(canvas) {
     // its material's horizon colour and opacity ("Water - Trawler"), glossy so it mirrors the sky like theirs
     if (view.sea != null) {
       const sea = new THREE.Mesh(new THREE.PlaneGeometry(3000, 3000).rotateX(-Math.PI / 2), new THREE.MeshStandardMaterial({ color: '#0e3e48', roughness: 0.15, transparent: true, opacity: 0.94 }));
-      sea.position.y = view.sea; sea.receiveShadow = true; g.add(sea);
+      sea.position.y = seaY = view.sea; sea.receiveShadow = true; g.add(sea);
     }
     // like the stage's own camera: Girders' looks from -z at 27 degrees
     const c = { side: -1, pitch: 27, min: 17, max: 28, ...view.cam };
@@ -560,6 +561,7 @@ export function createRenderer(canvas) {
 
   function buildMap(g, map, id) {
     sunOffset.set(8, 20, 6);
+    seaY = null;
     scene.environment = roomEnv; scene.background = null; scene.environmentRotation.set(0, 0, 0);
     Object.assign(grade.uniforms, { strength: { value: 0.35 }, contrast: { value: 1 }, saturation: { value: 1 }, shadows: { value: 0 } });
     bloom.radius = 0.55; bloom.highPassUniforms.smoothWidth.value = 0.01; bloom.compositeMaterial.uniforms.bloomFactors.value = [1, 0.8, 0.6, 0.4, 0.2]; rim.intensity = 0.9;
@@ -896,6 +898,13 @@ export function createRenderer(canvas) {
           const { rangeMin, range } = CHAMPS.sett.abilities[0], k = (pb[x] ?? 0) / 100;
           av.hay.reach(rangeMin + (range - rangeMin) * k);
         }
+      }
+      if (seaY != null) {
+        const wet = torso.y < seaY + 0.2;
+        if (wet && !av.wet) emit(tmp.copy(torso).setY(seaY), { color: '#e8f6ff', n: 16, speed: 4, size: 0.3, life: 0.6, grav: -9, up: 2, additive: false, opacity: 0.8 }); // splash
+        av.wet = wet;
+        if (head.y < seaY - 0.1 && Math.random() < (flags & 2048 ? 0.6 : 0.15)) emit(head, { color: '#d8f2ff', n: 1, speed: 0.4, size: 0.12, life: 0.8, grav: 3, up: 1, additive: false, opacity: 0.7 }); // breath bubbling out
+        else if (flags & 2048 && Math.random() < 0.3) emit(tmp.copy(head).setY(Math.max(head.y, seaY) + 0.1), { color: '#ffffff', n: 1, speed: 1.5, size: 0.14, life: 0.4, grav: -6, up: 2, additive: false, opacity: 0.8 }); // tiring: thrashing spray
       }
       av.stars.visible = !!(flags & 16); // stars only while knocked out
       av.stars.position.copy(head).y += 0.45;

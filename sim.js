@@ -56,6 +56,11 @@ const GLUE_T = 3; // Singed Q puddle lifetime, s
 const DRAW_T = 0.5; // the last ones out within this many seconds of each other draw the round
 const SPIN = 0.3; // Hecarim Q: seconds for its one turn
 const KICK = 0.35; // Lee Sin E: seconds for the roundhouse's turn; it lands as the leg comes round to the front
+// water (Trawler's sea, map.view.sea): every part floats, like Gang Beasts' per-part buoyancy colliders, as long as you've
+// stamina (theirs: 100). Treading water and swimming wear it down, a head held under wears it down fast; tired, you sink to
+// the sea's kill volume (4m down). On deck it comes back
+const FLOAT = 1.25, SINK = 0.6; // buoyancy in g: fresh (floats about chest deep), spent
+const TREAD = 4, STROKE = 5, BREATH = 25, RECOVER = 15, LUNGE = 15; // stamina/s: in water, swimming on top, head under, back on deck; a jump in the water costs LUNGE
 const TWIST = 0.7; // how firmly arms hold their roll (aimPart)
 const TAP = 0.2; // a hand let go within this many seconds punches; held longer, it grabs
 const LATCH = 0.4, GRAB_LEAN = 0.9; // grab assist: how far a hand latches onto who it's going for; most it bends down for them
@@ -100,6 +105,28 @@ export function createSim({ mapId, players, practice = false, roundsToWin = 3, l
     const slab = fixed(RAPIER.ColliderDesc.cuboid((b.max[0] - b.min[0]) / 2, 0.1, (b.max[2] - b.min[2]) / 2), [(b.min[0] + b.max[0]) / 2, b.top - 0.1, (b.min[2] + b.max[2]) / 2]);
     slab.setFriction(0); slab.setFrictionCombineRule(RAPIER.CoefficientCombineRule.Min);
     beltOf.set(slab.handle, b);
+  }
+  // Gang Beasts' sea is only there with the stage imported; the stand-in trawler is a plain floor
+  const sea = map.imported ? map.view?.sea : null;
+  function water(p) {
+    if (sea == null) return;
+    const tp = p.bodies[TORSO].translation();
+    p.wet = tp.y < sea + 0.2;
+    if (!p.wet) { p.stamina = Math.min(100, p.stamina + RECOVER * DT); return; }
+    const moving = Math.hypot(p.input.x, p.input.z) > 0.2 && p.ko <= 0;
+    // held by someone above (or level with) you: pushed under. A prediction copy's stand-ins hold nobody; that's the host's
+    const dunk = ps.some(q => q !== p && q.alive && q.grabs?.some(g => g?.vic === p) && q.bodies[TORSO].translation().y > tp.y - 0.3);
+    const drowning = skull(p).y < sea - 0.1;
+    p.stamina = Math.max(0, p.stamina - (TREAD + (moving ? STROKE : 0) + (drowning ? BREATH : 0)) * DT);
+    p.drowned = drowning && !p.stamina; // out (step()); held up by someone's hands, you'd never reach the kill volume
+    // holding someone under: kept up on top of them (Gang Beasts' beasts climb onto whoever they hold down)
+    const top = p.grabs.some(g => g?.vic?.wet && g.vic.bodies[TORSO].translation().y < tp.y + 0.3);
+    // held under, you lose your float to whoever holds you: they stay up, you hang off their hands below the surface
+    const g = dunk ? SINK : SINK + (FLOAT - SINK) * Math.min(1, p.stamina / 20) + (top ? FLOAT - SINK : 0); // the last 20 the float gives out
+    for (const b of p.bodies) {
+      const y = b.worldCom().y, s = Math.max(0, Math.min(1, (sea - y) / 0.3 + 0.5)), v = b.linvel();
+      if (s) b.setLinvel(V(v.x * (1 - 2 * DT * s), v.y + (20 * g * DT - v.y * 2 * DT) * s, v.z * (1 - 2 * DT * s)), true); // and water drag
+    }
   }
   function belts(p) {
     for (const b of map.belts ?? []) for (const body of p.bodies) {
@@ -182,7 +209,7 @@ export function createSim({ mapId, players, practice = false, roundsToWin = 3, l
       alive: true, yaw, daze: 0, sinceHit: 9, ko: 0, cd: [0, 0], punch: null, punchCd: 0, armCd: [0, 0], queued: [0, 0], grabs: [null, null], held: [0, 0],
       stun: 0, spin: 0, spinHit: null, stole: null, charge: 0, empower: 0, jumpT: 0, phase: 0, grounded: false, prevB: p.input.b,
       butt: null, buttCd: 0, lying: false, safe: 0, hooked: 0, spinA: 0, chargeT: 0,
-      emp: null, dash: null, vault: 0, vaultBtn: 0, hay: 0, hayBtn: 0, fb: 0, pulv: 0, flay: 0, fling: 0, tether: null, leap: null, dizzy: 0, kick: null, kickA: 0, palm: 0, qTurn: null, abduct: 0,
+      stamina: 100, wet: false, drowned: false, emp: null, dash: null, vault: 0, vaultBtn: 0, hay: 0, hayBtn: 0, fb: 0, pulv: 0, flay: 0, fling: 0, tether: null, leap: null, dizzy: 0, kick: null, kickA: 0, palm: 0, qTurn: null, abduct: 0,
     });
   }
 
@@ -653,10 +680,13 @@ export function createSim({ mapId, players, practice = false, roundsToWin = 3, l
     const stuck = glued(p, tp);
     if (stuck) speed *= 0.3;
     if (lying) speed = 1.2; // crawl
-    const k = (p.grounded ? 0.2 : 0.04) * move;
+    const swim = p.wet && !p.grounded;
+    if (swim) speed = p.stamina > 0 ? 2.4 : 0.6;
+    const k = (p.grounded ? 0.2 : swim ? 0.08 : 0.04) * move;
     const dv = V((mx * speed + gv[0] - tv.x) * k, 0, (mz * speed + gv[2] - tv.z) * k);
     if (p.grounded && p.jumpT <= 0) dv.y = ((STAND - ray.timeOfImpact) * 12 - tv.y) * 0.35 + HOLD * DT;
     if (p.grounded && move && pressed & BTN.JUMP && !stuck) { dv.y = 7.3 - tv.y; p.jumpT = 0.3; } // 7.3: hips rise 0.57m, a quarter over the 6.5 it was
+    if (swim && move && pressed & BTN.JUMP && p.stamina > LUNGE) { dv.y = 5.5 - tv.y; p.stamina -= LUNGE; } // a lunge up out of the water, for a ledge to grab
     // climbing, like Gang Beasts: hanging off a ledge by the hands, hold jump to hoist yourself up, a lever on the hands that
     // lifts the chest to their height (arms out in front, legs hanging) and stops there. The stick swings the legs (below);
     // let go of one hand and it reaches back up, to climb hand over hand
@@ -696,8 +726,8 @@ export function createSim({ mapId, players, practice = false, roundsToWin = 3, l
     // shoulders, the lifted chest would otherwise swing about them; barely while swinging the legs, which turns the body over)
     const fk = !!p.leap?.lee && !p.leap.sy; // Sonic Wave's recast: a flying kick, foot first
     // grab assist: a hand held out to grab goes for whoever a punch would track, bending down to someone on the floor
-    const gt = p.grounded && p.held.some((h, i) => h >= TAP && !p.grabs[i]) && punchTarget(p, f), gTo = gt && sub(gt.bodies[TORSO].translation(), tp);
-    const lean = fk ? -0.6 : p.kickA > 0 ? -0.25 : p.charge > 0 || p.dash ? 0.35 : p.butt ? 0.9 * Math.sin(Math.min(1, p.butt.t / 0.25) * Math.PI) : gTo ? Math.min(GRAB_LEAN, Math.max(0, -gTo.y - 0.05) * 4) : 0, yq = qyaw(p.yaw + p.spinA), up = (sw ? 0.05 : p.pushUp ? 1 : fk ? 0.5 : p.grounded ? 0.3 : 0.15) * ctrl;
+    const gt = (p.grounded || swim) && p.held.some((h, i) => h >= TAP && !p.grabs[i]) && punchTarget(p, f), gTo = gt && sub(gt.bodies[TORSO].translation(), tp);
+    const lean = fk ? -0.6 : p.kickA > 0 ? -0.25 : p.charge > 0 || p.dash ? 0.35 : p.butt ? 0.9 * Math.sin(Math.min(1, p.butt.t / 0.25) * Math.PI) : gTo ? Math.min(GRAB_LEAN, Math.max(0, -gTo.y - 0.05) * 4) : 0, yq = qyaw(p.yaw + p.spinA), up = (sw ? 0.05 : p.pushUp ? 1 : fk ? 0.5 : p.grounded || swim ? 0.3 : 0.15) * ctrl;
     leak = V();
     orient(Hb, fk ? qmul(yq, qaxis(X, -0.4)) : yq, 10, up); // the flying kick tips the hips back too: the leg leads
     // punching turns the shoulders into it: wound back, then the punching side drives forward (that's the reach)
@@ -714,7 +744,7 @@ export function createSim({ mapId, players, practice = false, roundsToWin = 3, l
     orient(H, qmul(yq, qaxis(X, lean * 0.6)), 20, up);
 
     const hspeed = Math.hypot(tv.x, tv.z), gait = Math.min(1, hspeed / 2);
-    p.phase += hspeed * DT * 4.5;
+    p.phase += (swim ? Math.max(hspeed, 1.5) : hspeed) * DT * 4.5;
     // hands, Gang Beasts style: pressing one cocks that arm back; let go quickly (a tap) and it throws the punch,
     // keep holding and it reaches out and grabs instead. A tap while that hand is still busy (punching, or its cooldown)
     // is kept for a moment and thrown the moment it's free, like Gang Beasts' timed punches: spam-clicking gives a steady
@@ -777,10 +807,13 @@ export function createSim({ mapId, players, practice = false, roundsToWin = 3, l
       if (p.kickA > 0 || fk) { ua = fa = add(mul(side, s), V(0, fk ? 0.3 : -0.2, 0)); str = 0.5; fs = 0.4; } // out wide for balance
       if (p.palm > 0 && i === 1) { ua = fa = add(bf, V(0, 0.05, 0)); str = 0.9; fs = 0.9; } // Sonic Wave: the palm thrust out at the aim
       if (p.held[i] > 0 && !grabbing[i] && p.punch?.arm !== i && p.armCd[i] <= 0) { ua = add(add(mul(bf, -0.5), mul(side, s * 0.7)), V(0, -0.3, 0)); fa = add(bf, V(0, 0.3, 0)); str = 0.6; fs = 0.7; } // cocked: elbow back and out
+      // swimming: a front crawl, arms turning over in turn (Gang Beasts' swim cycle)
+      if (swim && m > 0.2 && !grabbing[i] && p.punch?.arm !== i) { const c = p.phase * 0.8 + i * Math.PI; ua = fa = add(mul(bf, Math.cos(c)), V(0, Math.sin(c), 0)); str = 0.5; }
       // reach up for ledges; hanging on, a free hand reaches back up
       if (!p.grounded && (grabbing[i] || ledge > -Infinity)) { ua = fa = add(mul(bf, 0.5), V(0, 1, 0)); str = 0.8; }
       if (p.pushUp && grabbing[i] && !p.grabs[i]) { ua = fa = sub(p.reach, p.bodies[ARM + i].translation()); str = 0.8; } // hoisting: for the next hold
       if (p.pushUp && p.grabs[i]) { ua = fa = add(bf, mul(DOWN, 0.3)); str = 0.1; } // loosely out in front to the hands: driven harder, they flip the chest over
+      if (swim && p.grabs[i]?.vic?.wet) { ua = fa = add(DOWN, mul(bf, 0.4)); str = 0.9; } // in the water: shove them under
       if (lift && p.grabs[i]?.vic) { ua = fa = add(V(0, 1, 0), mul(bf, 0.3)); str = 0.9; } // overhead
       const free = !p.grabs[i]?.target.isFixed() || !p.grounded; // hanging or climbing, arm momentum is what lifts the beast
       aimPart(p, ARM + i, ua, 14, str * ctrl, [p.bodies[FORE + i]], free, TWIST);
@@ -1060,7 +1093,7 @@ export function createSim({ mapId, players, practice = false, roundsToWin = 3, l
       shift(sub(hp, hips().translation()), sub(hv, hips().linvel()));
       const keep = me.input, n = events.length;
       me.prevB = sent.get(ack)?.b ?? me.prevB;
-      for (let t = ack + 1; t <= tick; t++) { me.input = sent.get(t) ?? me.input; control(me, st !== 'count'); belts(me); world.step(); }
+      for (let t = ack + 1; t <= tick; t++) { me.input = sent.get(t) ?? me.input; control(me, st !== 'count'); belts(me); water(me); world.step(); }
       me.input = keep; events.length = n;
       // the replay carries me on a round trip's worth (a dash's end: ~0.5m at 200ms): drawn from where I was, eased in
       // through smooth like any correction, or I jumped there the next frame
@@ -1110,7 +1143,7 @@ export function createSim({ mapId, players, practice = false, roundsToWin = 3, l
     glue = glue.filter(g => (g.t -= DT) > 0);
     ownGlue = st === 'count' ? [] : ownGlue.filter(g => (g.t -= DT) > 0);
     if (st === 'count' && (timer -= DT) <= 0) st = 'fight';
-    if (me.alive) { control(me, st !== 'count'); belts(me); }
+    if (me.alive) { control(me, st !== 'count'); belts(me); water(me); }
     stepHooks();
     world.step();
     if (me.alive) hist.set(tick, { pos: hips().translation(), vel: hips().linvel() });
@@ -1130,7 +1163,7 @@ export function createSim({ mapId, players, practice = false, roundsToWin = 3, l
     glue = glue.filter(g => (g.t -= DT) > 0);
     if (st === 'count' && (timer -= DT) <= 0) st = 'fight';
     const active = st !== 'count';
-    for (const p of ps) { if (p.next != null) feed(p); if (p.alive && !p.dry) { control(p, active); belts(p); } }
+    for (const p of ps) { if (p.next != null) feed(p); if (p.alive && !p.dry) { control(p, active); belts(p); water(p); } }
     stepHooks();
     // a client whose inputs ran dry (a stall: the relay, TURN over TCP) is paused for the step, unless something is
     // happening to them. Kept walking on the last input, they ran ahead of their own predicted copy by the whole stall,
@@ -1143,7 +1176,7 @@ export function createSim({ mapId, players, practice = false, roundsToWin = 3, l
     if (trail.length > VIEW + 1) trail.shift();
 
     for (const p of ps) {
-      if (p.alive && inKill(p.bodies[TORSO].translation())) { fx('out', p.bodies[TORSO].translation(), 0, -1, p.slot); removeRagdoll(p); p.respawn = 1.5; }
+      if (p.alive && (inKill(p.bodies[TORSO].translation()) || p.drowned)) { fx('out', p.bodies[TORSO].translation(), 0, -1, p.slot); removeRagdoll(p); p.respawn = 1.5; }
       if (practice && !p.alive && !p.left && (p.respawn -= DT) <= 0) spawn(p, freeSpawn());
     }
     if (practice) return;
@@ -1170,7 +1203,8 @@ export function createSim({ mapId, players, practice = false, roundsToWin = 3, l
           | (p.grabs.some(g => g?.vic) || ps.some(q => q.grabs?.some(g => g?.vic === p))) << 7 // holding or held by a champ
           | (p.dizzy > 0) << 8 // stunned on their feet (stars)
           | (!!p.leap || !!p.lifted) << 9 // GB mode: a move only the host plays (it ties me to someone)
-          | (p.abduct > 0) << 10; // Abscond's recast window: E shows Abduct ready
+          | (p.abduct > 0) << 10 // Abscond's recast window: E shows Abduct ready
+          | (p.wet && p.stamina < 30) << 11; // tiring in the water
         // hips position + every part's rotation; clients rebuild the other positions from the joint anchors (beast.js fk)
         const t = p === me ? add(p.bodies[HIPS].translation(), smooth) : p.bodies[HIPS].translation();
         const out = [p.slot, 1, Math.round(p.daze), flags, Math.ceil(p.cd[0] * 10), Math.ceil(p.cd[1] * 10), r2(t.x), r2(t.y), r2(t.z)];
