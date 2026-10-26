@@ -616,7 +616,7 @@ function showAim(inp, dt) {
     held[i] += dt;
     range = ab.aimMin ? ab.aimMin + (ab.aim - ab.aimMin) * Math.min(1, held[i] / ab.windup) : ab.aim;
     back = !!ab.back;
-    if (ab.point) point = { max: ab.aim, r: ab.target ? 0 : ab.radius }; // target: click a champ, no spot (just the range ring)
+    if (ab.point) point = { max: ab.aim, r: ab.target ? 0 : ab.radius, pick: ab.target ? ab.radius : 0 }; // target: click a champ, no spot (just the range ring, and a border on who you'd get)
   });
   game.lastB = inp.b;
   $('abil').classList.toggle('stuck', stuck);

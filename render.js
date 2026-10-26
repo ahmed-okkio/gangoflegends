@@ -6,6 +6,7 @@ import { GTAOPass } from 'three/addons/postprocessing/GTAOPass.js';
 import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
 import { ShaderPass } from 'three/addons/postprocessing/ShaderPass.js';
 import { OutputPass } from 'three/addons/postprocessing/OutputPass.js';
+import { OutlinePass } from 'three/addons/postprocessing/OutlinePass.js';
 import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
 import { MAPS, trainsAt } from './maps.js';
 import { CHAMPS, TEAM_COLORS, FFA_COLORS } from './champs.js';
@@ -167,6 +168,11 @@ export function createRenderer(canvas) {
   ao.blendIntensity = 0.85;
   const aoSize = ao.setSize.bind(ao); ao.setSize = (w, h) => aoSize(w / 2, h / 2); // half res: soft anyway, a quarter of the cost
   composer.addPass(ao);
+  // Hijack: a glowing border round the champ it would take (only on while aiming at one)
+  const outline = new OutlinePass(new THREE.Vector2(1, 1), scene, camera);
+  Object.assign(outline, { edgeStrength: 5, edgeGlow: 0.6, edgeThickness: 2, enabled: false });
+  outline.visibleEdgeColor.set('#7fd8ff'); outline.hiddenEdgeColor.set('#2a5a80');
+  composer.addPass(outline);
   const bloom = new UnrealBloomPass(new THREE.Vector2(1, 1), 0.6, 0.55, 0.9);
   composer.addPass(bloom);
   composer.addPass(new OutputPass());
@@ -782,8 +788,8 @@ export function createRenderer(canvas) {
     // Haymaker range on the floor while it charges, like League's indicator: the cone at full reach, its brighter centre
     // strip (hits harder) and a fill out to the reach wound up so far
     let hay = null;
-    if (champId === 'sett') {
-      const { range, cone, base, core } = c.abilities[0], back = base / Math.tan(cone); // the shape sim.js haymaker hits
+    if (champId === 'sett' || champId === 'sylas') { // Sylas: Haymaker can be his, stolen
+      const { range, cone, base, core } = CHAMPS.sett.abilities[0], back = base / Math.tan(cone); // the shape sim.js haymaker hits
       const mat = (o, col = '#ffb000') => new THREE.MeshBasicMaterial({ color: col, transparent: true, opacity: o, depthWrite: false, side: THREE.DoubleSide, blending: THREE.AdditiveBlending });
       const flat = g => g.rotateX(Math.PI / 2); // drawn in xy pointing +y; laid on the floor pointing +z
       // the cone between from and to metres past Sett, its point back behind him
@@ -1007,8 +1013,15 @@ export function createRenderer(canvas) {
     if (spot) {
       const hp = spot.parts[HIPS].position, y = hp.y - HIP_HEIGHT + 0.05, d = Math.min(aim.dist, aim.point.max);
       aimRange.position.set(hp.x, y, hp.z); aimRange.scale.setScalar(aim.point.max);
-      aimSpot.position.set(hp.x + Math.sin(aim.yaw) * d, y, hp.z + Math.cos(aim.yaw) * d); aimSpot.scale.setScalar(aim.point.r);
+      const cx = hp.x + Math.sin(aim.yaw) * d, cz = hp.z + Math.cos(aim.yaw) * d;
+      aimSpot.position.set(cx, y, cz); aimSpot.scale.setScalar(aim.point.r);
+      // pick (Hijack): who letting go would take, as sim.js hijack() picks: nearest the cursor, in reach
+      const near = (av, x, z, r) => Math.hypot(av.parts[HIPS].position.x - x, av.parts[HIPS].position.z - z) < r;
+      const [tgt] = aim.point.pick ? avatars.filter((av, i) => i !== aim.slot && av.group.visible && near(av, hp.x, hp.z, aim.point.max + 0.5) && near(av, cx, cz, aim.point.pick + 0.6) && Math.abs(av.parts[HIPS].position.y - hp.y) < 2)
+        .sort((a, b) => Math.hypot(a.parts[HIPS].position.x - cx, a.parts[HIPS].position.z - cz) - Math.hypot(b.parts[HIPS].position.x - cx, b.parts[HIPS].position.z - cz)) : [];
+      outline.selectedObjects = tgt ? [tgt.group] : [];
     }
+    outline.enabled = !!spot && outline.selectedObjects.length > 0;
     const me = !spot && aim?.range && avatars[aim.slot];
     aimBar.visible = !!me;
     aimBack.visible = aimArrows.visible = !!me && !!aim.back;
