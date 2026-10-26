@@ -167,6 +167,7 @@ export function createSim({ mapId, players, practice = false, roundsToWin = 3, l
   // a car's box sweeps 0.4m a step, so a limb could end up inside it and squeeze out the far side. Anything in or just
   // ahead of a car is carried along at its speed instead, on into the tunnel's kill box
   function trainHit(p) {
+    const was = p.onTrain;
     p.onTrain = false;
     for (const o of trains.length ? trainsAt(map, mt) : []) {
       const { c, h } = map.train.box, cx = o.x + c[0], top = map.trains.y + c[1] + h[1];
@@ -174,6 +175,7 @@ export function createSim({ mapId, players, practice = false, roundsToWin = 3, l
         const t = b.translation(), dx = (t.x - cx) * o.dir;
         if (Math.abs(t.z - o.z - c[2]) > h[2] + 0.3 || t.y > top + 0.1 || dx < -h[0] || dx > h[0] + 0.6) continue;
         p.onTrain = true;
+        if (!was && local < 0) fx('hit', t, 1, -1, p.slot); // struck: the hard punch thump (the host's call, like any hit)
         for (const q of p.bodies) { const v = q.linvel(); q.setLinvel(V(o.dir * map.trains.speed, Math.max(v.y, 0), v.z), true); }
         return;
       }
@@ -313,7 +315,10 @@ export function createSim({ mapId, players, practice = false, roundsToWin = 3, l
     // a prediction copy only learns about hits from the host, but shows my own landing on a stand-in (at its chest) right away
     if (local >= 0) { if (by === local) fx('hit', add(vic.bodies[part].translation(), V(0, 0.45, 0)), daze >= 40 ? 1 : 0, by, vic.slot); return; }
     for (const b of vic.bodies) addVel(b, dv);
-    addVel(vic.bodies[HEAD], punch ? add(mul(norm(V(dv.x, 0, dv.z)), 3), V(0, 1, 0)) : mul(dv, 0.3)); // snap the head back
+    // snap the head back, the chest rocking after it (by eye: 3 m/s on the head alone was missed)
+    const back = norm(V(dv.x, 0, dv.z));
+    addVel(vic.bodies[HEAD], punch ? add(mul(back, 7), V(0, 1.5, 0)) : mul(dv, 0.3));
+    if (punch) addVel(vic.bodies[CHEST], mul(back, 1.5));
     vic.sinceHit = 0;
     fx(quiet ? 'hitq' : 'hit', vic.bodies[part].translation(), daze >= 40 ? 1 : 0, by, vic.slot);
     if (dv.y > 2) vic.jumpT = Math.max(vic.jumpT, 0.3); // don't let the hover spring swallow a launch

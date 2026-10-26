@@ -23,7 +23,7 @@ GROUPS = {
     "win": r"^GB VO [A-Z]{3} WIN LAUGH",
     "star": r"^GB SFX WIN STAR",
     "count": r"^GB SFX CountDown",
-    "train": r"^GB SFX TRAIN ENGINE LOOP",  # Subway's trains (core-audio-stages)
+    "train": r"^Subway Loop$",  # Subway's trains: the clip GB's Train A prefab loops (in the subway scene bundle)
     "chainOut": r"^GB SFX METAL CABLE SNAP",  # Sylas Hijack: the chain lashing out
     "chainHit": r"^GB METAL CABLE HIT",  # ...catching
     "zap": r"^GB SFX BULB BLOWN",  # ...with an electric pop
@@ -34,7 +34,7 @@ os.makedirs(OUT, exist_ok=True)
 index = {g: [] for g in GROUPS}
 seen = set()
 BUNDLES = os.path.join(GB, r"Gang Beasts_Data\StreamingAssets\aa\StandaloneWindows64-LocalBundles")
-for f in glob.glob(os.path.join(BUNDLES, "core-audio*.bundle")):
+for f in glob.glob(os.path.join(BUNDLES, "core-audio*.bundle")) + glob.glob(os.path.join(BUNDLES, "stages-subway_scenes*.bundle")):
     for o in UnityPy.load(f).objects:
         if o.type.name != "AudioClip": continue
         name = o.peek_name()
