@@ -59,7 +59,7 @@ export const CHAMPS = {
   sylas: {
     name: 'Sylas', title: 'The Unshackled', body: '#c48f6c', limb: '#a0704f', eyes: '#c9a8ff', glow: '#5fa8ff',
     abilities: [
-      { id: 'hijack', name: 'Hijack', cd: 8, aim: 7, point: true, release: true, radius: 0.9, desc: "Hold to aim at a champ in range, let go to steal their Q: it's yours in place of Hijack for the rest of the round." },
+      { id: 'hijack', name: 'Hijack', cd: 8, aim: 7, point: true, release: true, radius: 0.9, target: true, desc: "Hold to aim at a champ in range, let go to steal their Q: it's yours in place of Hijack for the rest of the round." },
       { id: 'abscond', name: 'Abscond', cd: 7, desc: 'Dash forward. For 4s your next punch is empowered: it smacks everyone around you, not just who it hits.' },
     ],
   },

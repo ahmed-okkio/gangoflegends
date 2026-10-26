@@ -857,7 +857,7 @@ export function createRenderer(canvas) {
       av.stars.position.copy(head).y += 0.45;
       av.stars.rotation.y = time * 6;
       // empowered punch (4) or winding up an ability (64): fists glow in the champ's colour; otherwise their own glow comes back
-      const lit = flags & 68;
+      const lit = flags & (av.zap ? 4 : 68); // zap (Sylas's shackles): Abscond's empowered punch only, not aiming Hijack
       for (const f of av.fists) f.traverse(m => {
         const mt = m.material;
         if (!mt?.emissive) return;
@@ -1003,7 +1003,7 @@ export function createRenderer(canvas) {
     if (compiling) return;
     time += dt;
     const spot = aim?.point && avatars[aim.slot];
-    aimRange.visible = aimSpot.visible = !!spot;
+    aimRange.visible = !!spot; aimSpot.visible = !!spot && aim.point.r > 0;
     if (spot) {
       const hp = spot.parts[HIPS].position, y = hp.y - HIP_HEIGHT + 0.05, d = Math.min(aim.dist, aim.point.max);
       aimRange.position.set(hp.x, y, hp.z); aimRange.scale.setScalar(aim.point.max);

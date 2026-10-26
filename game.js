@@ -616,7 +616,7 @@ function showAim(inp, dt) {
     held[i] += dt;
     range = ab.aimMin ? ab.aimMin + (ab.aim - ab.aimMin) * Math.min(1, held[i] / ab.windup) : ab.aim;
     back = !!ab.back;
-    if (ab.point) point = { max: ab.aim, r: ab.radius };
+    if (ab.point) point = { max: ab.aim, r: ab.target ? 0 : ab.radius }; // target: click a champ, no spot (just the range ring)
   });
   game.lastB = inp.b;
   $('abil').classList.toggle('stuck', stuck);
@@ -625,6 +625,30 @@ function showAim(inp, dt) {
 
 // ---------- loop ----------
 let last = performance.now(), acc = 0, tick = 0;
+// host: the sim steps on its own timer, not the screen's frames, so snapshots go out every 33ms however the frames fall
+// (a slow or uneven frame rate on the host made everyone's snapshots bursty, and so their playback delay longer). frame()
+// steps it too, so what it draws is up to date. ponytail: same thread as rendering, so a long frame still holds it up; a Worker if that shows
+let hostAt = 0, hostInp = null;
+function hostSteps() {
+  if (!game?.sim || game.local || !hostInp) return;
+  const now = performance.now();
+  acc += Math.min(0.1, (now - (hostAt || now)) / 1000); hostAt = now;
+  while (acc >= DT) {
+    acc -= DT;
+    game.sim.setInput(game.mySlot, hostInp);
+    driveBots();
+    game.sim.step();
+    const ev = game.sim.takeEvents();
+    if (ev.length) { view.fx(ev); if (conn) for (const e of ev) game.sentEv.push([...e, ++game.evN, now]); }
+    game.prev = game.cur; game.cur = game.sim.snapshot();
+    // ponytail: full JSON snapshots at 30Hz over PeerJS's reliable channel (~2KB each); move to an unreliable binary channel if 8-player games stutter
+    if (conn && ++tick % 2 === 0) {
+      game.sentEv = game.sentEv.filter(e => now - e[8] < 250); // each event goes out on ~7 snapshots
+      conn.broadcastFast({ t: 'snap', s: packSnap(game.cur), ev: game.sentEv.map(e => e.slice(0, 8)) });
+    }
+  }
+}
+setInterval(hostSteps, 4);
 function frame(now) {
   requestAnimationFrame(frame);
   const dt = Math.min(0.1, (now - last) / 1000);
@@ -635,21 +659,8 @@ function frame(now) {
   const inp = $('escMenu').classList.contains('hidden') ? readInput() : { x: 0, z: 0, b: 0, a: null, d: null };
   showAim(inp, dt);
   if (game.sim && !game.local) {
-    acc += dt;
-    while (acc >= DT) {
-      acc -= DT;
-      game.sim.setInput(game.mySlot, inp);
-      driveBots();
-      game.sim.step();
-      const ev = game.sim.takeEvents();
-      if (ev.length) { view.fx(ev); if (conn) for (const e of ev) game.sentEv.push([...e, ++game.evN, now]); }
-      game.prev = game.cur; game.cur = game.sim.snapshot();
-      // ponytail: full JSON snapshots at 30Hz over PeerJS's reliable channel (~2KB each); move to an unreliable binary channel if 8-player games stutter
-      if (conn && ++tick % 2 === 0) {
-        game.sentEv = game.sentEv.filter(e => now - e[8] < 250); // each event goes out on ~7 snapshots
-        conn.broadcastFast({ t: 'snap', s: packSnap(game.cur), ev: game.sentEv.map(e => e.slice(0, 8)) });
-      }
-    }
+    hostInp = inp;
+    hostSteps();
     if (!game.cur) return;
     view.apply(game.prev ?? game.cur, game.cur, acc / DT); // between the last two steps: smooth on screens faster than 60Hz
     if (game.sim.state === 'over') { game = null; pushLobby(); return; }
@@ -692,10 +703,17 @@ function frame(now) {
     const a = s[0], b = s[1] ?? a, alpha = b === a ? 1 : Math.min(1, Math.max(0, (at - a.mt) / (b.mt - a.mt)));
     // me: between my last two local steps, unless knocked out, hooked or grabbing / grabbed by someone (then the host's
     // ragdoll is the truth, and drawn on the same clock as whoever I'm tied to)
-    const me = local.players[game.mySlot], limp = pure || !me.alive || me.ko > 0 || me.hooked > 0 || me.tied || me.hostOwned;
-    const shift = carryOn(a, b, alpha, s[s.length - 1], at, dt), own = limp ? null : { slot: game.mySlot, a: game.mine[0] ?? game.mine[1], b: game.mine[1], alpha: acc / DT };
-    if (!limp) shift[game.mySlot] = null;
-    slideOver(limp, own, a, b, alpha, shift, dt);
+    const me = local.players[game.mySlot], tied = me.hooked > 0 || me.tied, limp = pure || !me.alive || me.ko > 0 || tied || me.hostOwned;
+    let own = limp ? null : { slot: game.mySlot, a: game.mine[0] ?? game.mine[1], b: game.mine[1], alpha: acc / DT };
+    // knocked out, host-owned or server only, but not tied to anyone: the host's ragdoll on a clock up to 50ms fresher than
+    // everyone else's (only my own snapshots' jitter to ride out, not the spare a stall needs; past the newest it holds)
+    if (limp && !tied && me.alive) {
+      const t = at + Math.max(0, Math.min(0.05, game.delay - 0.034)), k = Math.max(0, s.findLastIndex(x => x.mt <= t)), p = s[k], q = s[k + 1] ?? p;
+      own = { slot: game.mySlot, a: p.p[game.mySlot], b: q.p[game.mySlot], alpha: q === p ? 1 : Math.min(1, Math.max(0, (t - p.mt) / (q.mt - p.mt))) };
+    }
+    const shift = carryOn(a, b, alpha, s[s.length - 1], at, dt);
+    if (own) shift[game.mySlot] = null;
+    slideOver(!own ? 1 : limp ? 2 : 0, own, a, b, alpha, shift, dt); // 1: shared clock, 2: fresh, 0: predicted
     const fa = s.at(-2) ?? s.at(-1), fb = s.at(-1); // the newest two snapshots (my hooks from the host, below)
     // my own hook and glue: drawn from my copy (cast at once) until the host's catch / puddle shows up on screen
     const og = pure ? [] : local.ownGlue.filter(g => !b.g?.some(h => h[5] === g.team && Math.hypot(h[0] - g.x, h[2] - g.z) < 1));
@@ -706,7 +724,7 @@ function frame(now) {
     view.apply({ ...a, h: [...a.h.filter(hostHook), ...myHost(fa)] }, drawn, alpha, own, shift);
     game.drawnHips = b.p[game.mySlot]?.[1] ? [...view.avatars()[game.mySlot].pos[HIPS]] : null;
     b.p.forEach((e, i) => { const o = a.p[i], d = shift[i]; local.place(i, ...(e[1] && o?.[1] ? [6, 7, 8].map((k, j) => o[k] + (e[k] - o[k]) * alpha + (d?.[j] ?? 0)) : [0, -100, 0])); });
-    game.cur = { ...b, p: b.p.map((e, i) => i === game.mySlot && !limp ? game.mine[1] : e) };
+    game.cur = { ...b, p: b.p.map((e, i) => i === game.mySlot && own ? own.b : e) };
   }
   updateHud(game.cur, now);
   view.render(dt);
@@ -736,8 +754,8 @@ function carryOn(a, b, alpha, n, at, dt) {
   });
 }
 
-// knocked out, hooked or tied to someone, I'm drawn from the host's ragdoll on the playback clock instead of my predicted
-// one, a round trip and the delay behind: switching either way jumped me (and the camera) by however far I'd moved in that
+// knocked out, hooked or tied to someone, I'm drawn from the host's ragdoll (on the playback clock, or a fresher one) instead
+// of my predicted one, a round trip and the delay behind: switching between any two jumped me (and the camera) by however far I'd moved in that
 // time. Instead that gap fades out (like carryOn's)
 function slideOver(limp, own, a, b, alpha, shift, dt) {
   const i = game.mySlot, e = own ? own.b : b.p[i], o = own ? own.a : a.p[i], t = own ? own.alpha : alpha;
