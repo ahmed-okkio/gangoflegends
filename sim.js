@@ -175,6 +175,7 @@ export function createSim({ mapId, players, practice = false, roundsToWin = 3, l
         const t = b.translation(), dx = (t.x - cx) * o.dir;
         if (Math.abs(t.z - o.z - c[2]) > h[2] + 0.3 || t.y > top + 0.1 || dx < -h[0] || dx > h[0] + 0.6) continue;
         p.onTrain = true;
+        releaseGrabs(p); // a hand on a wall held you in place and the car went through you. Every step it has you, so no regrab
         if (!was && local < 0) fx('hit', t, 1, -1, p.slot); // struck: the hard punch thump (the host's call, like any hit)
         for (const q of p.bodies) { const v = q.linvel(); q.setLinvel(V(o.dir * map.trains.speed, Math.max(v.y, 0), v.z), true); }
         return;
