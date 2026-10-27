@@ -28,6 +28,9 @@ GROUPS = {
     "chainHit": r"^GB METAL CABLE HIT",  # ...catching
     "zap": r"^GB SFX BULB BLOWN",  # ...with an electric pop
     "reel": r"^pulley_tick",  # ...and ratcheting back in
+    "jawOpen": r"^GB SFX SHARK JAW OPEN",  # Trawler's sharks (SharkActor openMouthAudioData / closeMouthAudioData)
+    "jawClose": r"^GB SFX SHARK JAW CLOSE",
+    "splash": r"^GB SFX WATER SPLASHESnew",  # ...breaching
 }
 
 os.makedirs(OUT, exist_ok=True)

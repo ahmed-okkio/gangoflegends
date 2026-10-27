@@ -3,7 +3,7 @@ import { xhr } from './stages.js';
 
 const ctx = typeof AudioContext !== 'undefined' ? new AudioContext() : null;
 const base = './gbcache/audio/';
-const LAUGHS = [0, 1, 2, 3, 4, 5, 6].map(i => `./assets/sfx/laugh_${i}.wav`); // our own (tools/custom_laughs.py), mixed in with GB's
+const LAUGHS = [0, 1, 2, 3, 4, 5].map(i => `./assets/sfx/laugh_${i}.wav`); // our own (tools/custom_laughs.py), mixed in with GB's
 const VOLUME = 0.3; // GB clips are mastered hot: the slider's 100% is this
 let volume = 1;
 export const setVolume = v => { volume = v; };
@@ -72,11 +72,15 @@ export function ui(kind) {
 
 // sim fx events -> sounds
 export function playEvents(events) {
-  for (const [kind, , , , big] of events) {
-    if (kind === 'hit') { play(big ? 'hitHard' : 'hit', 0.8); play('body', 0.5); }
+  for (const [kind, , , , big, , , , mine] of events) {
+    if (kind === 'hit') { play(big ? 'hitHard' : 'hit', 0.8); if (!mine) play('body', 0.5); } // mine: my copy already thudded ('phit')
+    else if (kind === 'phit') play('body', 0.5);
     else if (kind === 'ko') play('ko', 0.9, 1);
     else if (kind === 'out') { play('fall', 0.9, 1); play('wind', 0.6); }
     else if (kind === 'swing') play('swing', 0.35);
+    else if (kind === 'jaw') play(big ? 'jawOpen' : 'jawClose', 0.6); // Trawler's sharks
+    else if (kind === 'bite') play('jawClose', 1);
+    else if (kind === 'breach') play('splash', 0.9);
     else if (kind === 'grab') play('grab', 0.5);
     else if (kind === 'fb') { play('swing', 0.7); play('grab', 0.6); }
     else if (kind === 'vi') play('swing', 0.8);

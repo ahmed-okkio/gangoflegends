@@ -194,7 +194,7 @@ export function createRenderer(canvas) {
   const rim = new THREE.DirectionalLight('#9ad8ff', 0.9); // cool back light so silhouettes pop
   scene.add(hemi, sun, sun.target, rim);
 
-  let world = null, avatars = [], rollers = [], cars = [], hookPool = [], gluePool = [], setup = null, animated = [];
+  let world = null, sharks = [], avatars = [], rollers = [], cars = [], hookPool = [], gluePool = [], setup = null, animated = [];
   const camAt = new THREE.Vector3(0, 0, 0);
   let camDist = 14, shake = 0, time = 0;
   const sunOffset = new THREE.Vector3(8, 20, 6);
@@ -295,13 +295,25 @@ export function createRenderer(canvas) {
   function fx(events) {
     playEvents(events);
     const v = new THREE.Vector3();
-    for (const [kind, x, y, z, big, slot, vic] of events) {
+    for (const [kind, x, y, z, big, slot, vic, , mine] of events) {
       v.set(x, y, z);
       if (kind === 'hijack') lashes.push({ from: slot, to: vic, t: 0 }); // Sylas's Hijack: his chain out to them (stepLashes)
+      if (kind === 'phit' || kind === 'hit' && !mine) { // mine: my copy snapped it already ('phit')
+        // whip the victim's bobble head away from the hitter right here, not after the host's head arrives (the
+        // prediction copy plays my own hits now). By eye against GB: a hard fling (kept under the 80° cap, or it pins there and looks frozen) that wobbles back
+        const bob = avatars[vic]?.bob, from = avatars[slot]?.parts[CHEST]?.position;
+        if (bob?.tip && from && slot !== vic) {
+          const d = tmp2.subVectors(bob.tip, from).setY(0).normalize().setY(0.25).multiplyScalar(big ? 0.14 : 0.1);
+          bob.prev.sub(d); // a verlet point: moving its last spot back is a velocity kick
+        }
+      }
       if (kind === 'hit' || kind === 'hitq') {
         emit(v, { color: big ? '#ffb347' : '#fff3b0', n: big ? 18 : 9, speed: big ? 7 : 4.5, size: big ? 0.35 : 0.22, life: 0.35, grav: 0 });
         ring(v, big ? '#ffb347' : '#ffffff', big ? 1.4 : 0.8);
         shake = Math.max(shake, big ? 0.25 : 0.08);
+      } else if (kind === 'breach' || kind === 'bite') { // a shark out of the sea / its jaws shutting on someone
+        emit(v.setY(Math.max(v.y, seaY ?? v.y)), { color: '#e8f6ff', n: kind === 'breach' ? 30 : 16, speed: 6, size: 0.4, life: 0.8, grav: -9, up: 3, additive: false, opacity: 0.85 });
+        if (kind === 'bite') shake = Math.max(shake, 0.2);
       } else if (kind === 'ko') {
         emit(v, { color: '#ffd84a', n: 14, speed: 3, size: 0.25, life: 0.8, grav: -2, up: 1 });
         ring(v, '#ffd84a', 1.2);
@@ -358,6 +370,7 @@ export function createRenderer(canvas) {
     animated = [];
     cars = []; loop('train', 0); // a new map: no engine left running from the last one
     rollers = buildMap(world, MAPS[s.map], s.map);
+    sharks = []; if (MAPS[s.map].shark) buildSharks(world, MAPS[s.map]);
     for (const l of [hemi, sun, rim]) l.visible = l.intensity > 0; // an unlit light still costs every shader, and the sun a 4096² shadow pass
     avatars = s.players.map((p, slot) => { const a = makeAvatar(p.champ, playerColor(s, slot), p.name, !!s.teams); world.add(a.group); return a; });
     hookPool = []; gluePool = [];
@@ -722,6 +735,55 @@ export function createRenderer(canvas) {
     return p;
   }
 
+  // Trawler's sharks (tools/import_shark.py): six skinned GB sharks, one frame per ragdoll part, the mesh's bones riding on them.
+  // Unity skins with the scaled shark root in each bone (0.6): that scale goes into the bone inverses
+  function buildSharks(g, map) {
+    const { shark: sk, imported: { base } } = map, mine = g;
+    xhr(base + 'shark.bin', 'arraybuffer').then(buf => {
+      if (world !== mine) return; // the match moved on
+      let o = 0;
+      const take = (T, n) => { const a = new T(buf, o, n); o += n * T.BYTES_PER_ELEMENT; return a; }, n = sk.mesh.verts;
+      const geo = new THREE.BufferGeometry();
+      geo.setAttribute('position', new THREE.BufferAttribute(take(Float32Array, n * 3), 3));
+      geo.setAttribute('normal', new THREE.BufferAttribute(take(Float32Array, n * 3), 3));
+      geo.setAttribute('uv', new THREE.BufferAttribute(take(Float32Array, n * 2), 2));
+      geo.setAttribute('skinWeight', new THREE.BufferAttribute(take(Float32Array, n * 4), 4));
+      geo.setAttribute('skinIndex', new THREE.BufferAttribute(take(Uint16Array, n * 4), 4));
+      geo.setIndex(new THREE.BufferAttribute(take(Uint32Array, sk.mesh.indices), 1));
+      const map = sk.mesh.tex ? new THREE.TextureLoader().load(base + sk.mesh.tex) : null;
+      if (map) map.colorSpace = THREE.SRGBColorSpace;
+      const mat = new THREE.MeshStandardMaterial({ map, roughness: 0.6 }), S = new THREE.Matrix4().makeScale(sk.scale, sk.scale, sk.scale);
+      sharks = [0, 1, 2, 3, 4, 5].map(() => {
+        const parts = sk.parts.map(() => { const o3 = new THREE.Object3D(); g.add(o3); return o3; });
+        const bones = sk.mesh.bones.map(i => { const b = new THREE.Bone(); parts[i].add(b); return b; });
+        const m = new THREE.SkinnedMesh(geo, mat);
+        m.bind(new THREE.Skeleton(bones, sk.mesh.binds.map(b => S.clone().multiply(new THREE.Matrix4().fromArray(b)))), new THREE.Matrix4());
+        m.bindMode = 'detached'; m.frustumCulled = false; m.castShadow = m.receiveShadow = true; m.visible = false;
+        g.add(m);
+        return { m, parts, pos: sk.parts.map(() => [0, 0, 0]), q: sk.parts.map(() => [0, 0, 0, 1]) };
+      });
+    }).catch(() => {});
+  }
+  // a shark from snapshots a, b (sim.js snapshot sk: which, jaws, torso xyz, then each part's rotation): the torso where it
+  // was sent, every other part hung off its parent's joint anchor
+  function poseSharks(a, b, t) {
+    if (!sharks.length) return;
+    const sk = MAPS[setup.map].shark;
+    sharks.forEach((v, k) => {
+      const eb = b.sk?.find(e => e[0] === k), ea = a.sk?.find(e => e[0] === k) ?? eb;
+      v.m.visible = !!eb;
+      if (!eb) return;
+      for (let i = 0; i < sk.parts.length; i++) {
+        qa.fromArray(ea, 5 + i * 4); qb.fromArray(eb, 5 + i * 4);
+        qa.slerp(qb, t).toArray(v.q[i]);
+        const j = sk.parts[i].joint;
+        if (!j) v.pos[i] = [0, 1, 2].map(c => ea[2 + c] + (eb[2 + c] - ea[2 + c]) * t);
+        else { const r = qrot(v.q[j.to], j.anchor); v.pos[i] = v.pos[j.to].map((x, c) => x + r[c]); }
+        v.parts[i].position.fromArray(v.pos[i]); v.parts[i].quaternion.fromArray(v.q[i]);
+      }
+    });
+  }
+
   // the Gang Beasts beast mesh, skinned to our part frames (bones ride along as children of the parts)
   function beastMeshes(parts, bodyMat, eyeMat) {
     const { json, body, head } = beastAsset;
@@ -844,6 +906,7 @@ export function createRenderer(canvas) {
   function apply(a, b, alpha, own, shift) {
     if (!setup) return;
     const centre = new THREE.Vector3(), alive = [];
+    poseSharks(a, b, alpha);
     b.p.forEach((pb, slot) => {
       let pa = a.p[slot], t = alpha;
       if (own?.slot === slot) { pa = own.a; pb = own.b; t = own.alpha; }
@@ -875,7 +938,7 @@ export function createRenderer(canvas) {
         bob.v.subVectors(bob.tip, bob.prev).multiplyScalar(Math.pow(0.88, bdt * 60)); bob.prev.copy(bob.tip);
         bob.tip.add(bob.v).addScaledVector(want.sub(bob.tip), Math.min(1, 160 * bdt * bdt)); // ~2Hz wobble
       }
-      const dir = want.subVectors(bob.tip, hd.position).normalize(), lean = Math.min(0.7, up.normalize().angleTo(dir));
+      const dir = want.subVectors(bob.tip, hd.position).normalize(), lean = Math.min(1.4, up.normalize().angleTo(dir));
       if (lean > 1e-3) hd.quaternion.premultiply(qa.setFromAxisAngle(up.cross(dir).normalize(), lean));
       for (const c of av.chains) { // a pendulum: one tip point, pulled down by gravity and held at the chain's length from the cuff
         const fore = av.parts[FORE + c.arm], at = tmp.copy(c.at).applyQuaternion(fore.quaternion).add(fore.position);

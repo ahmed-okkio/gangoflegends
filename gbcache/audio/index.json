@@ -235,5 +235,22 @@
  ],
  "reel": [
   "reel_0.wav"
+ ],
+ "jawOpen": [
+  "jawOpen_0.wav",
+  "jawOpen_1.wav"
+ ],
+ "jawClose": [
+  "jawClose_0.wav",
+  "jawClose_1.wav"
+ ],
+ "splash": [
+  "splash_0.wav",
+  "splash_1.wav",
+  "splash_2.wav",
+  "splash_3.wav",
+  "splash_4.wav",
+  "splash_5.wav",
+  "splash_6.wav"
  ]
 }

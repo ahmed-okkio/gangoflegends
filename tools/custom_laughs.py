@@ -14,7 +14,7 @@ SQUEAKY = "highpass=f=300,treble=g=5"
 SOURCES = [
     ("dogger1", 1.4, 1.4, SQUEAKY), ("dogger2", 1.4, 1.4, SQUEAKY), ("dogger3", 1.4, 1.4, SQUEAKY),
     ("baleed", 1.9, 1.5, "highpass=f=250"), ("dog", 1.9, 1.55, "highpass=f=250"),
-    ("dogwoofwoof", 1.9, 1.65, "highpass=f=250"), ("gafil", 1.9, 1.7, "highpass=f=250"),
+    ("dogwoofwoof", 1.9, 1.65, "highpass=f=250"),
 ]
 
 def ff(*args):

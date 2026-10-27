@@ -97,7 +97,8 @@ renderBinds();
 $('nameIn').value = me.name;
 $('nameIn').addEventListener('input', e => { me.name = e.target.value.trim().slice(0, 14) || 'Summoner'; store.set('name', me.name); });
 const stages = Object.entries(MAPS).filter(([, m]) => !m.hidden);
-$('setMap').innerHTML = stages.map(([id, m]) => `<option value="${id}">${m.name}</option>`).join('');
+$('setMap').innerHTML = stages.map(([id, m]) => `<option value="${id}">${m.name}</option>`).join('') + '<option value="random">Random</option>';
+const randomStage = not => { const ids = stages.map(([id]) => id).filter(id => id !== not); return ids[Math.floor(Math.random() * ids.length)]; };
 let practiceMap = MAPS[store.get('practiceMap')] && !MAPS[store.get('practiceMap')].hidden ? store.get('practiceMap') : stages[0][0];
 const renderMaps = () => { $('practiceMaps').innerHTML = stages.map(([id, m]) => `<button class="map ${id === practiceMap ? 'on' : ''}" data-id="${id}" data-sfx="pick"><b>${m.name}</b><small>${m.blurb}</small></button>`).join(''); };
 renderMaps();
@@ -287,7 +288,8 @@ function onSnap(m) {
   // events ride along on several snapshots (any one can be lost); e[7] numbers them so each plays once (sim.js fx() for
   // the rest). Mine that my copy already played are skipped; one it didn't see coming (a hit it didn't predict) still plays.
   // What happens to me, and what I did (drawn from the newest snapshots, frame()), plays now; the rest in step with the playback delay
-  const ev = m.ev?.filter(e => e[7] > game.evN && !(e[5] === game.mySlot && claim(e, t))) ?? [];
+  // A hit my copy predicted ('phit': thud and head snap) still plays its confirm sound and sparks, flagged (e[8]) not to repeat those
+  const ev = m.ev?.filter(e => e[7] > game.evN && !(e[5] === game.mySlot && claim(e, t) && (e[0] !== 'hit' || (e[8] = 1, false)))) ?? [];
   for (const e of m.ev ?? []) game.evN = Math.max(game.evN, e[7]);
   const mine = e => e[6] === game.mySlot || e[5] === game.mySlot, now = ev.filter(mine), later = ev.filter(e => !mine(e));
   telEv.push([t, now.map(e => [e[0], e[5], e[6], e[7]]), later.map(e => [e[0], e[5], e[6], e[7]])]);
@@ -298,7 +300,7 @@ function onSnap(m) {
 // Each stands in for one, so two punches that both landed don't cover a third the host saw and I didn't
 function claim(e, t) {
   game.played = game.played.filter(p => t - p[7] < (game.ping ?? 200) + 150);
-  const i = game.played.findIndex(p => p[0] === e[0] && p[5] === e[5] && p[6] === e[6]); // same kind, attacker and victim: a phantom spark of mine can't eat someone else's real hit
+  const i = game.played.findIndex(p => (p[0] === e[0] || p[0] === 'phit' && e[0] === 'hit') && p[5] === e[5] && p[6] === e[6]); // same kind, attacker and victim: a phantom spark of mine can't eat someone else's real hit
   if (i >= 0) game.played.splice(i, 1);
   return i >= 0;
 }
@@ -349,7 +351,7 @@ function renderLobby() {
   for (const id of ['setMap', 'setTeams', 'setRounds']) $(id).disabled = !isHost();
   $('startBtn').classList.toggle('hidden', !isHost());
   $('lobbyNote').textContent = isHost() ? 'Share the code. Start whenever everyone is in.' : 'Waiting for the host to start…';
-  $('mapBlurb').textContent = MAPS[s.map].blurb;
+  $('mapBlurb').textContent = MAPS[s.map]?.blurb ?? 'A different stage every round.';
 }
 champCards($('lobbyChamps'), id => {
   if (isHost()) { lobby.players[0].champ = id; pushLobby(); } else conn?.send({ t: 'pick', champ: id });
@@ -376,7 +378,7 @@ $('lobbyChatIn').addEventListener('keydown', e => {
 $('leaveBtn').onclick = () => leave();
 $('startBtn').onclick = () => {
   const { map, teams, rounds } = lobby.settings;
-  const setup = { map, teams, rounds, players: lobby.players.map((p, i) => ({ id: p.id, name: p.name, champ: p.champ, team: teams ? i % teams : i })) };
+  const setup = { map: map === 'random' ? randomStage() : map, random: map === 'random', teams, rounds, players: lobby.players.map((p, i) => ({ id: p.id, name: p.name, champ: p.champ, team: teams ? i % teams : i })) };
   conn.broadcast({ t: 'start', setup });
   startGame(setup);
 };
@@ -388,9 +390,10 @@ async function startGame(setup) {
   game = { setup, mySlot: setup.players.findIndex(p => p.id === myId), snaps: [], cur: null, fightAt: 0, sentEv: [], evN: 0, played: [], lastMt: -1, inq: [], offs: [], off: null, jit: 0, delay: 0.1, at: null };
   $('chatLog').replaceChildren();
   $('ping').textContent = '';
-  if (setup.practice || isHost()) game.sim = createSim({ mapId: setup.map, players: setup.players, practice: !!setup.practice, roundsToWin: setup.rounds });
+  if (setup.practice || isHost()) game.sim = createSim({ mapId: setup.map, players: setup.players, practice: !!setup.practice, roundsToWin: setup.rounds, newMap: !!setup.random, carry: setup.carry });
   // my champ, predicted (sim.js). Practice behind a simulated connection has both: game.sim is the host
   if (!game.sim || setup.lag) game.local = createSim({ mapId: setup.map, players: setup.players, local: game.mySlot, gb: GB_MODE });
+  setup.players.forEach((p, i) => p.left && game.sim?.drop(i)); // gone mid-match (Random stage carries the match on)
   game.fake = setup.lag && { acc: 0, n: 0, ev: [] };
   game.bots = setup.practice ? setup.players.map(() => ({ t: 0, x: 0, z: 0, hold: 0, hand: 0, ab: 0 })) : null;
   $('escBots').classList.toggle('hidden', !setup.practice);
@@ -446,6 +449,7 @@ function updateHud(s, now) {
   if (s.st !== 'fight') game.fightAt = 0;
   const banner = s.st === 'count' ? `<small>Round ${s.rn}</small>${s.tm}`
     : s.st === 'fight' && now - game.fightAt < 900 && !setup.practice ? 'FIGHT!'
+    : s.st === 'next' ? '<small>Next stage</small>…'
     : s.st === 'round' ? (s.win >= 0 ? `<small>Round ${s.rn}</small>${esc(teamName(s.win))} ${plural(s.win)}!` : 'Draw!')
     : s.st === 'match' || s.st === 'over' ? `<small>Match over</small>${esc(teamName(s.win))} ${plural(s.win)} the match!` : '';
   $('banner').innerHTML = banner;
@@ -648,6 +652,16 @@ let last = performance.now(), acc = 0;
 // (a slow or uneven frame rate on the host made everyone's snapshots bursty, and so their playback delay longer). frame()
 // steps it too, so what it draws is up to date. ponytail: same thread as rendering, so a long frame still holds it up; a Worker if that shows
 let hostAt = 0, hostInp = null;
+// Random stage: the round's over, everyone starts the next one on another stage, scores carried over (champs picked
+// mid-match from the Esc menu taking effect, as they would at a new round)
+function nextStage() {
+  if (game.nexting) return;
+  game.nexting = true;
+  const { setup, cur } = game, players = setup.players.map((p, i) => ({ ...p, champ: game.sim.players[i]?.nextChamp ?? game.sim.players[i]?.champ ?? p.champ, left: game.sim.players[i]?.left }));
+  const next = { ...setup, map: randomStage(setup.map), players, carry: { sc: cur.sc, rn: cur.rn + 1 } };
+  conn.broadcast({ t: 'start', setup: next });
+  startGame(next);
+}
 function hostSteps() {
   if (!game?.sim || game.local || !hostInp) return;
   const now = performance.now();
@@ -660,6 +674,7 @@ function hostSteps() {
     const ev = game.sim.takeEvents();
     if (ev.length) { view.fx(ev); if (conn) for (const e of ev) game.sentEv.push([...e, ++game.evN, now]); }
     game.prev = game.cur; game.cur = game.sim.snapshot();
+    if (game.cur.st === 'next') return nextStage();
     // a snapshot every tick: half the wait for the next one, and the playback delay can be half as long (frame()). 8 players
     // ~1.2KB each (wire.js) over the unreliable 'fast' channel: ~70KB/s up per client
     if (conn) {
@@ -860,7 +875,7 @@ async function startAttract() {
 function driveBots() {
   if (!game.bots) return;
   const on = opt('botsFight');
-  game.bots.forEach((bot, i) => { if (i !== game.mySlot) game.sim.setInput(i, on ? botInput(game.sim, i, bot) : { x: 0, z: 0, b: 0 }); });
+  game.bots.forEach((bot, i) => { if (i !== game.mySlot) { const inp = on ? botInput(game.sim, i, bot) : { x: 0, z: 0, b: 0 }; if (on && game.sim.players[i].wet) inp.b |= BTN.JUMP; game.sim.setInput(i, inp); } }); // in the water, they tread it
 }
 // each bot picks a foe (any other champ, nearer ones likelier), keeps it 3-6s or until it's out,
 // walks at it and throws punches when close, now and then an ability

@@ -12,6 +12,41 @@ const ALIVE = 1 + 1 + 2 + 2 + 6 + NQ * 4 + 1 + 6 + 4 + 6; // bytes for a champ o
 const c16 = v => Math.max(-32768, Math.min(32767, Math.round(v * 100))), u16 = v => Math.max(0, Math.min(65535, Math.round(v * 100)));
 const u8 = v => Math.max(0, Math.min(255, v));
 
+// a rotation in 32 bits: the largest component's index :2, the other three :10 each
+function putQ(v, o, q) {
+  let big = 0;
+  for (let k = 1; k < 4; k++) if (Math.abs(q[k]) > Math.abs(q[big])) big = k;
+  const sign = q[big] < 0 ? -1 : 1, [x, y, z] = q.filter((_, k) => k !== big).map(c => Math.min(M, Math.max(0, Math.round((c * sign / R + 1) / 2 * M))));
+  v.setUint32(o, (big << 30 | x << 20 | y << 10 | z) >>> 0);
+}
+function getQ(v, o) {
+  const w = v.getUint32(o), q = [w >>> 20 & M, w >>> 10 & M, w & M].map(c => (c / M * 2 - 1) * R);
+  q.splice(w >>> 30, 0, Math.sqrt(Math.max(0, 1 - q.reduce((t, c) => t + c * c, 0))));
+  return q;
+}
+// Trawler's sharks (sim.js snapshot sk), 12 parts each: [which | jaws open<<7] [torso xyz :16 each] [12 rotations :32 each]
+const SKP = 12, SKB = 1 + 6 + SKP * 4;
+function packSharks(sk) {
+  const b = new Uint8Array(sk.length * SKB), v = new DataView(b.buffer);
+  sk.forEach((e, n) => {
+    let o = n * SKB;
+    v.setUint8(o++, e[0] | (e[1] ? 128 : 0));
+    for (const k of [2, 3, 4]) { v.setInt16(o, c16(e[k])); o += 2; }
+    for (let i = 0; i < SKP; i++, o += 4) putQ(v, o, e.slice(5 + i * 4, 9 + i * 4));
+  });
+  return b;
+}
+function unpackSharks(s) {
+  const b = typeof s === 'string' ? Uint8Array.from(atob(s), c => c.charCodeAt(0)) : s, v = new DataView(b.buffer, b.byteOffset, b.byteLength), out = [];
+  for (let o = 0; o < v.byteLength; o += SKB) {
+    const h = v.getUint8(o), e = [h & 127, h >> 7];
+    for (let k = 0; k < 3; k++) e.push(v.getInt16(o + 1 + k * 2) / 100);
+    for (let i = 0; i < SKP; i++) e.push(...getQ(v, o + 7 + i * 4));
+    out.push(e);
+  }
+  return out;
+}
+
 // [slot | alive<<7] [daze] [flags | hooked<<15 :16] [cd0] [cd1] [hips xyz :16 each] [12 rotations :32 each: largest's index :2, the other three :10 each] [hay %]
 // [hips velocity xyz :16 each] [ack :32] [stun :16] [KO :16] [yaw :16]
 export function packSnap(s) {
@@ -22,20 +57,14 @@ export function packSnap(s) {
     if (!e[1]) continue;
     v.setUint8(o++, u8(e[2])); v.setUint16(o, e[3] | e[X + 6] << 15); o += 2; v.setUint8(o++, u8(e[4])); v.setUint8(o++, u8(e[5]));
     for (const k of [6, 7, 8]) { v.setInt16(o, c16(e[k])); o += 2; }
-    for (let i = 0; i < NQ; i++, o += 4) {
-      const q = e.slice(Q0 + i * 4, Q0 + i * 4 + 4);
-      let big = 0;
-      for (let k = 1; k < 4; k++) if (Math.abs(q[k]) > Math.abs(q[big])) big = k;
-      const sign = q[big] < 0 ? -1 : 1, [x, y, z] = q.filter((_, k) => k !== big).map(c => Math.min(M, Math.max(0, Math.round((c * sign / R + 1) / 2 * M))));
-      v.setUint32(o, (big << 30 | x << 20 | y << 10 | z) >>> 0);
-    }
+    for (let i = 0; i < NQ; i++, o += 4) putQ(v, o, e.slice(Q0 + i * 4, Q0 + i * 4 + 4));
     v.setUint8(o++, u8(e[X]));
     for (const k of [1, 2, 3]) { v.setInt16(o, c16(e[X + k])); o += 2; }
     v.setUint32(o, e[X + 4]); o += 4;
     v.setUint16(o, u16(e[X + 5])); v.setUint16(o + 2, u16(e[X + 7])); v.setInt16(o + 4, c16(e[X + 8])); o += 6;
   }
-  const { p, ...rest } = s;
-  return { ...rest, pb: b };
+  const { p, sk, ...rest } = s;
+  return { ...rest, pb: b, ...sk?.length ? { skb: packSharks(sk) } : {} };
 }
 
 // JSON.stringify replacer for the JSON paths (the reliable channel, the relay, practice's simulated link): a block as base64
@@ -73,11 +102,7 @@ export function unpackSnap(s) {
     const f = v.getUint16(o + 1), e = [h & 127, 1, v.getUint8(o), f & 0x7fff, v.getUint8(o + 3), v.getUint8(o + 4)];
     o += 5;
     for (let k = 0; k < 3; k++, o += 2) e.push(v.getInt16(o) / 100);
-    for (let i = 0; i < NQ; i++, o += 4) {
-      const w = v.getUint32(o), q = [w >>> 20 & M, w >>> 10 & M, w & M].map(c => (c / M * 2 - 1) * R);
-      q.splice(w >>> 30, 0, Math.sqrt(Math.max(0, 1 - q.reduce((t, c) => t + c * c, 0))));
-      e.push(...q);
-    }
+    for (let i = 0; i < NQ; i++, o += 4) e.push(...getQ(v, o));
     e.push(v.getUint8(o++));
     for (let k = 0; k < 3; k++, o += 2) e.push(v.getInt16(o) / 100);
     e.push(v.getUint32(o), v.getUint16(o + 4) / 100, f >> 15, v.getUint16(o + 6) / 100, v.getInt16(o + 8) / 100);
@@ -86,5 +111,7 @@ export function unpackSnap(s) {
   }
   delete s.pb;
   s.p = p;
+  s.sk = s.skb ? unpackSharks(s.skb) : [];
+  delete s.skb;
   return s;
 }

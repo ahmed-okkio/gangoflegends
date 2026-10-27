@@ -79,7 +79,11 @@ export const MAPS = {
     name: 'Trawler',
     blurb: 'A fishing boat out at sea. Throw them overboard, or down the hold.',
     gb: 'trawler',
-    view: { sea: 0.5 }, // water height, by the propeller (top 0.1) and rudder (0.66): Gang Beasts draws its sea at runtime (render.js)
+    // GB's own eight sit in a ring on the stern; spread over the boat instead: bow (clear of the hold), the walkway past the
+    // cabin and the stern (deck heights raycast off the imported stage)
+    gbSpawns: [[-11, 4.3, -1.5], [-10, 4.3, 1.5], [-5.5, 4.3, -2.5], [-5.5, 4.3, 2.5], [3, 3.3, -3], [9, 3.3, -2], [9, 3.3, 2], [13, 3.3, 0]],
+    sharks: true, // Gang Beasts' (tools/import_shark.py; sim.js stepSharks)
+    view: { sea: 1.6 }, // water height: just under the hull's rim (1.8), over the blue as in Gang Beasts, which draws its sea at runtime (render.js)
     killY: -6,
     boxes: [box(0, -0.2, 0, 9, 0.2, 2.5, 'plate')],
     rollers: [], kill: [],

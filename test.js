@@ -2,6 +2,7 @@
 import assert from 'node:assert/strict';
 import { initPhysics, createSim, BTN, STAND } from './sim.js';
 import { prepareMap } from './stages.js';
+import { MAPS } from './maps.js';
 import { packSnap, unpackSnap, b64, frame, unframe } from './wire.js';
 import { HIPS } from './beast.js';
 
@@ -274,13 +275,9 @@ for (const [gap, draw] of [[0.3, true], [0.7, false]]) {
   run(sim, 40, () => sim.setInput(0, { x: 0, z: 0, b: (BTN.LEFT | BTN.RIGHT) }));
   assert.ok(p.grabs.every(Boolean), 'hangs by both hands');
   // hold jump: hoists the chest up to the hands (its middle sits 0.25 above torso()) and stops there, legs hanging
-  run(sim, 60, () => sim.setInput(0, { x: 0, z: 0, b: BTN.LEFT | BTN.RIGHT | BTN.JUMP }));
-  const hipsY = p.bodies[HIPS].translation().y;
-  assert.ok(p.grabs.every(Boolean) && Math.abs(torso(sim, 0).y + 0.2) < 0.15 && hipsY < torso(sim, 0).y - 0.1, `hoists up to the hands ${torso(sim, 0).y.toFixed(2)} hips ${hipsY.toFixed(2)}`);
-  // push toward the ledge (-z): still holding on, the legs swing up over it; then let go onto it
-  run(sim, 90, () => sim.setInput(0, { x: 0, z: -1, b: BTN.LEFT | BTN.RIGHT | BTN.JUMP }));
-  assert.ok(p.grabs.every(Boolean) && p.bodies[HIPS].translation().y > 0.1, `swings the legs up over the edge ${p.bodies[HIPS].translation().y.toFixed(2)}`);
-  run(sim, 60, () => sim.setInput(0, { x: 0, z: -1, b: 0 }));
+  // keep holding jump: up over the lip, the hands let go and it stands on the ledge (Gang Beasts' climb)
+  run(sim, 300, () => sim.setInput(0, { x: 0, z: 0, b: BTN.LEFT | BTN.RIGHT | BTN.JUMP }));
+  run(sim, 60, () => sim.setInput(0, { x: 0, z: 0, b: 0 }));
   assert.ok(p.alive && torso(sim, 0).y > 0.3 && torso(sim, 0).z < 5, `climbs onto the ledge ${JSON.stringify(torso(sim, 0))}`);
   console.log('headbutt + lie down + climb ok');
 }
@@ -630,7 +627,7 @@ for (const [gap, draw] of [[0.3, true], [0.7, false]]) {
       for (const b of p.bodies) { const t = b.translation(); b.setTranslation({ x: t.x + x - t0.x, y: t.y, z: t.z + 3 - t0.z }, true); b.setLinvel({ x: 0, y: 0, z: 0 }, true); }
     }
     d.step({ x: i >= 190 && i < 196 ? 1 : 0, z: 0, b: i >= 200 && i < 203 ? BTN.LEFT : 0 });
-    mine.push(...d.cli.takeEvents().filter(e => e[0] === 'hit').map(e => [...e, i]));
+    mine.push(...d.cli.takeEvents().filter(e => e[0] === 'phit').map(e => [...e, i]));
   }
   const host = d.events.find(e => e[0] === 'hit');
   console.log('own hit shown at tick', mine[0]?.[7], 'host copy arrives', host?.[7]);
@@ -775,11 +772,15 @@ if ((await prepareMap('subway')).imported) {
 }
 // 16. Trawler (when imported): overboard you float and can swim a while, then tire and sink out; held under, sooner
 if ((await prepareMap('trawler')).imported) {
-  const sea = (await import('./maps.js')).MAPS.trawler.view.sea;
+  const sea = MAPS.trawler.view.sea, shark = MAPS.trawler.shark;
+  // no sharks for the swimming (17 has them), and GB's own spawn ring on the stern: the hold below lines A up from where it respawns
+  const spawns = MAPS.trawler.spawns;
+  delete MAPS.trawler.shark; MAPS.trawler.spawns = MAPS.trawler.imported.scene.spawns;
   const sim = createSim({ mapId: 'trawler', practice: true, players: [0, 1].map(i => ({ id: i, name: 'P', champ: 'blitz', team: i })) });
+  MAPS.trawler.shark = shark;
   const dropAt = (slot, x, z) => { const p = sim.players[slot], t0 = torso(sim, slot); for (const b of p.bodies) { const q = b.translation(); b.setTranslation({ x: q.x - t0.x + x, y: q.y - t0.y + sea + 0.5, z: q.z - t0.z + z }, true); b.setLinvel({ x: 0, y: 0, z: 0 }, true); } };
   dropAt(0, 0, 9); dropAt(1, 3, 12);
-  sim.setInput(0, { x: 1, z: 0, b: 0 });
+  sim.setInput(0, { x: 1, z: 0, b: BTN.JUMP }); // held: kept afloat
   run(sim, 180);
   const a = sim.players[0];
   assert.ok(a.alive && Math.abs(torso(sim, 0).y - sea) < 0.6, `floats at the surface: ${torso(sim, 0).y.toFixed(2)}`);
@@ -792,10 +793,31 @@ if ((await prepareMap('trawler')).imported) {
   dropAt(0, 3, 12.8); dropAt(1, 3, 12);
   const b = sim.players[1]; b.stamina = 100; a.stamina = 100;
   for (const bd of a.bodies) { const q = bd.translation(); bd.setTranslation({ x: q.x, y: q.y + 0.4, z: q.z }, true); }
-  a.yaw = Math.PI; sim.setInput(0, { x: 0, z: 0, b: BTN.LEFT | BTN.RIGHT }); // facing B, both hands out
-  let u = 0; while (b.alive && u < 20) { sim.step(); u += 1 / 60; }
+  a.yaw = Math.PI; sim.setInput(0, { x: 0, z: 0, b: BTN.LEFT | BTN.RIGHT | BTN.JUMP }); // facing B, both hands out, kept up
+  sim.setInput(1, { x: 0, z: 0, b: BTN.JUMP }); // B treading water
+  let u = 0; while (b.alive && u < 20) { sim.step(); u += 1 / 60 }
   console.log('held under: out after', u.toFixed(1), 's, grabbed', a.grabs.some(g => g?.vic === b));
-  assert.ok(!b.alive && u > 7.5 && u < 10, 'held under, you drown in 8s');
+  assert.ok(!b.alive && u > 9.5 && u < 12, 'held under, you drown in 10s');
+  MAPS.trawler.spawns = spawns; // the sim reads them live
+}
+// 17. Trawler's sharks (when imported): 20s in they come out; one goes for a beast in the water, bites and drags them out;
+// it goes limp when punched to 0 health
+if ((await prepareMap('trawler')).imported && MAPS.trawler.shark) {
+  const sea = MAPS.trawler.view.sea;
+  const sim = createSim({ mapId: 'trawler', practice: true, players: [{ id: 0, name: 'P', champ: 'blitz', team: 0 }] });
+  const p = sim.players[0];
+  run(sim, 19 * 60);
+  assert.ok(!(sim.snapshot().sk.length), 'sharks asleep the first 20s');
+  const t0 = torso(sim, 0);
+  for (const b of p.bodies) { const q = b.translation(); b.setTranslation({ x: q.x - t0.x, y: q.y - t0.y + sea, z: q.z - t0.z + 14 }, true); b.setLinvel({ x: 0, y: 0, z: 0 }, true); }
+  sim.setInput(0, { x: 0, z: 0, b: BTN.JUMP }); // treading water off the side
+  let t = 0, seen = 0, bit = false;
+  while (p.alive && t < 45) { sim.step(); t += 1 / 60; seen = Math.max(seen, sim.snapshot().sk.length); bit ||= !!p.bitten; }
+  console.log('sharks out', seen, 'bitten', bit, 'out after', t.toFixed(1), 's');
+  assert.ok(seen === 6, 'all six come out');
+  assert.ok(bit && !p.alive, 'a shark bites the swimmer and drags them out');
+  const s = MAPS.trawler.shark && sim.snapshot(), packed = unpackSnap(JSON.parse(JSON.stringify(packSnap(s), b64)));
+  assert.ok(packed.sk.length === s.sk.length && Math.abs(packed.sk[0]?.[2] - s.sk[0]?.[2]) < 0.02, 'sharks survive the wire');
 }
 // 12k. punched at a good ping (100ms round trip): a punch (no stun now, just its knockback) is predicted through on my copy, not handed to the host's
 // ragdoll (a snap there and a replay back on every punch taken). And a punch I throw back right after starts on my copy
