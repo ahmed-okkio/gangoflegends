@@ -436,12 +436,12 @@ export function createSim({ mapId, players, practice = false, roundsToWin = 3, l
   // Vi E punch: smash the target and everyone standing in a cone behind it
   function relentless(p, vic, part, f, daze) {
     const vt = vic.bodies[TORSO].translation();
-    hit(vic, part, add(mul(f, 8.75), V(0, 2.5, 0)), daze);
+    hit(vic, part, add(mul(f, 9.43), V(0, 2.7, 0)), daze);
     fx('vi', vt, Math.atan2(f.x, f.z), p.slot, vic.slot); // big carries the cone's yaw
     for (const o of ps) {
       if (o === p || o === vic || !o.alive) continue;
       const d = sub(o.bodies[TORSO].translation(), vt), along = d.x * f.x + d.z * f.z;
-      if (along > 0 && along < 1.8 && Math.abs(d.x * f.z - d.z * f.x) < 0.5 + along * 0.4 && Math.abs(d.y) < 1) hit(o, TORSO, add(mul(f, 6.25), V(0, 1.88, 0)), 20);
+      if (along > 0 && along < 2.7 && Math.abs(d.x * f.z - d.z * f.x) < 0.7 + along * 0.5 && Math.abs(d.y) < 1) hit(o, TORSO, add(mul(f, 6.77), V(0, 2.02, 0)), 20);
     }
   }
 
@@ -693,7 +693,7 @@ export function createSim({ mapId, players, practice = false, roundsToWin = 3, l
     // Fully wound up it can be held 3s more, then goes by itself
     if (p.vault > 0) {
       if (move && inp.b & p.vaultBtn && p.vault < 3.94) { p.vault += DT; speed *= 0.35; }
-      else { const w = Math.min(p.vault, 0.94); p.dash = { t: 0.27 + w * 0.54, power: w / 0.94 }; p.vault = 0; }
+      else { const w = Math.min(p.vault, 0.94); p.dash = { t: (0.27 + w * 0.54) / 1.35, power: w / 0.94, dir: facing(p), yaw: p.yaw }; p.vault = 0; } // the way she faces on release, kept the whole dash
     }
     if (p.leap) { // Thresh's Death Sentence recast: reeled along the chain all the way to them. Lee Sin's knocks them back
       const q = ps[p.leap.slot], d = q && live(q) && sub(q.bodies[TORSO].translation(), tp);
@@ -701,7 +701,7 @@ export function createSim({ mapId, players, practice = false, roundsToWin = 3, l
       if (!d || len(d) < 1.2 || (p.leap.t += DT) > 1) p.leap = null;
       else { const v = add(mul(d, 14 / len(d)), V(0, 0.8, 0)); for (const b of p.bodies) b.setLinvel(v, true); p.jumpT = 0.1; }
     }
-    if (p.dash) { speed = 11; mx = f.x; mz = f.z; if ((p.dash.t -= DT) <= 0) p.dash = null; }
+    if (p.dash) { const d = p.dash.dir ?? f; if (p.dash.dir) p.yaw = p.dash.yaw; speed = p.dash.dir ? 14.85 : 11; /* Vi's 35% faster, over the same reach (her aim strip) */ mx = d.x; mz = d.z; if ((p.dash.t -= DT) <= 0) p.dash = null; }
     if (p.kick && (p.kick.t -= DT) > 0 && p.kick.vic.alive) { // Dragon's Rage: the champ he kicked bowls over whoever they hit
       const kt = p.kick.vic.bodies[TORSO].translation();
       for (const o of ps) if (o.alive && !p.kick.hit.has(o) && len(sub(o.bodies[TORSO].translation(), kt)) < 0.9) { p.kick.hit.add(o); hit(o, TORSO, add(mul(p.kick.f, 6), V(0, 2.25, 0)), 10); }
@@ -719,7 +719,10 @@ export function createSim({ mapId, players, practice = false, roundsToWin = 3, l
     if (lying) speed = 1.2; // crawl
     const swim = p.wet && !p.grounded;
     if (swim) speed = p.stamina > 0 ? 2.4 : 0.6;
-    const k = (p.grounded ? 0.2 : swim ? 0.08 : 0.04) * move;
+    // flying faster than I could walk (knocked back): the stick barely steers until it's played out, so walking against a
+    // knockback no longer cancels it. Every champ and hit alike; my own dashes and charges run at their own speed, so aren't
+    const flung = Math.hypot(tv.x - gv[0], tv.z - gv[2]) > speed + 1.5; // 1.5: letting go of run (4.8 to 3.6) isn't a fling
+    const k = (p.grounded ? 0.2 : swim ? 0.08 : 0.04) * move * (flung ? 0.1 : 1);
     const dv = V((mx * speed + gv[0] - tv.x) * k, 0, (mz * speed + gv[2] - tv.z) * k);
     if (p.grounded && p.jumpT <= 0) dv.y = ((STAND - ray.timeOfImpact) * 12 - tv.y) * 0.35 + HOLD * DT;
     const ledge = p.grabs.reduce((y, g, i) => g?.target.isFixed() ? Math.max(y, handPos(p, i).y) : y, -Infinity);
@@ -794,7 +797,7 @@ export function createSim({ mapId, players, practice = false, roundsToWin = 3, l
     const fk = !!p.leap?.lee && !p.leap.sy; // Sonic Wave's recast: a flying kick, foot first
     // grab assist: a hand held out to grab goes for whoever a punch would track, bending down to someone on the floor
     const gt = (p.grounded || swim) && p.held.some((h, i) => h >= TAP && !p.grabs[i]) && punchTarget(p, f), gTo = gt && sub(gt.bodies[TORSO].translation(), tp);
-    const lean = fk ? -0.6 : p.kickA > 0 ? -0.25 : p.charge > 0 || p.dash ? 0.35 : p.butt ? 0.9 * Math.sin(Math.min(1, p.butt.t / 0.25) * Math.PI) : gTo ? Math.min(GRAB_LEAN, Math.max(0, -gTo.y - 0.05) * 4) : 0, yq = qyaw(p.yaw + p.spinA), up = (sw ? 0.05 : p.pushUp ? 1 : fk ? 0.5 : p.grounded || swim ? 0.3 : 0.15) * ctrl;
+    const lean = fk ? -0.6 : p.kickA > 0 ? -0.25 : p.vault > 0 ? 0.45 : p.dash?.dir ? 0.6 : p.charge > 0 || p.dash ? 0.35 : p.butt ? 0.9 * Math.sin(Math.min(1, p.butt.t / 0.25) * Math.PI) : gTo ? Math.min(GRAB_LEAN, Math.max(0, -gTo.y - 0.05) * 4) : 0, yq = qyaw(p.yaw + p.spinA), up = (sw ? 0.05 : p.pushUp ? 1 : fk ? 0.5 : p.grounded || swim ? 0.3 : 0.15) * ctrl;
     leak = V();
     orient(Hb, fk ? qmul(yq, qaxis(X, -0.4)) : yq, 10, up); // the flying kick tips the hips back too: the leg leads
     // punching turns the shoulders into it: wound back, then the punching side drives forward (that's the reach)
@@ -825,7 +828,7 @@ export function createSim({ mapId, players, practice = false, roundsToWin = 3, l
       }
       if ((p.queued[arm] -= DT) > 0 && move && p.punchCd <= 0 && p.armCd[arm] <= 0 && p.spin <= 0 && !p.grabs[arm]) {
         const to = punchTarget(p, f, true), d = to && sub(to.bodies[TORSO].translation(), tp);
-        p.punch = { arm, t: 0, hit: new Set(), to };
+        p.punch = { arm, t: 0, hit: new Set(), to, straight: p.empower > 0 && p.emp === 'through' }; // Relentless Force: a straight jab
         p.punchCd = 0.25; p.armCd[arm] = 1; p.queued[arm] = 0; // one a second per hand; alternating, 2 a second
         fx('swing', handPos(p, arm), 0, p.slot);
         // lunge into it. A prediction copy's target is a stand-in a round trip behind: lunging at it put me somewhere the host didn't
@@ -851,8 +854,10 @@ export function createSim({ mapId, players, practice = false, roundsToWin = 3, l
       let ua = add(add(DOWN, mul(bf, 0.15 + swing * 0.4 * gait)), mul(side, s * 0.25)), fa = add(DOWN, mul(bf, 0.5 + swing * 0.3 * gait)), str = 0.1, fs = 1;
       if (grabbing[i]) { ua = fa = gt ? sub(gt.bodies[TORSO].translation(), p.bodies[ARM + i].translation()) : add(add(bf, V(0, 0.35, 0)), mul(side, s * 0.1)); str = 0.8; }
       if (p.charge > 0) { ua = fa = add(bf, V(0, -0.3, 0)); str = 0.6; }
-      if (p.vault > 0) { ua = fa = add(mul(bf, -0.6), DOWN); str = 0.5; } // fists drawn back
-      if (p.dash) { ua = fa = p.dash.sylas ? add(mul(bf, -0.8), V(0, 0.1, 0)) : add(bf, V(0, 0.1, 0)); str = 0.8; } // both fists leading; Abscond: trailing behind
+      // Vi Q, as in League: wound up with the left gauntlet drawn back low behind her and the right up as a guard,
+      // then dashing behind the left fist thrust straight out, the right swung back (that fist is what hits, see below)
+      if (p.vault > 0) { if (i === 0) { ua = add(mul(bf, -0.9), V(0, -0.35, 0)); fa = add(bf, V(0, 0.15, 0)); } else { ua = add(bf, mul(side, s * 0.2)); fa = add(add(bf, V(0, 0.35, 0)), mul(side, -s * 0.3)); } str = 0.7; } // crouched: punch cocked (elbow back, fist at the hip facing forward), guard up across the front
+      if (p.dash) { ua = fa = p.dash.sylas ? add(mul(bf, -0.8), V(0, 0.1, 0)) : p.dash.dir && i === 1 ? null : add(bf, V(0, 0.05, 0)); str = 0.9; if (!ua) { ua = add(mul(bf, -0.6), V(0, -0.5, 0)); fa = add(bf, V(0, 0.35, 0)); } } // Vi: right elbow back, fist tucked at the chest // fists leading (Vi: the left only); Abscond: trailing behind
       if (p.hay > 0 && i === 1) { ua = add(mul(bf, -0.8), V(0, 0.4, 0)); fa = add(bf, V(0, 0.6, 0)); str = 0.6; } // cocked back
       if (p.hay > 0 && i === 0) { ua = fa = add(bf, V(0, 0.2, 0)); str = 0.5; } // guard hand out front
       // Facebreaker: arms fling wide, then slam together in front
@@ -863,10 +868,12 @@ export function createSim({ mapId, players, practice = false, roundsToWin = 3, l
       // punch: a hook. The elbow starts out to the side with the forearm bent across in front; the upper arm swings round
       // to the front while the forearm straightens, so the fist travels an arc in at the target (the head) and lands
       // with the arm near straight
+      if (p.punch?.straight && p.punch.arm !== i) { ua = add(mul(bf, -0.2), V(0, -0.6, 0)); fa = add(bf, V(0, 0.9, 0)); str = 0.8; } // the other glove up at the chin
       if (p.punch?.arm === i) {
         const u = Math.min(1, p.punch.t / 0.14), d = aimTo ? norm(aimTo) : bf, sd = mul(norm(V(d.z, 0, -d.x)), s);
         const a = 0.25 + 1.25 * u, b = 1.4 * (1 - u) + 0.1; // upper arm: from out to the side round to the front; elbow bend
         ua = add(add(mul(sd, Math.cos(a)), mul(d, Math.sin(a))), V(0, 0.15, 0)); fa = add(add(mul(d, Math.cos(b)), mul(sd, -Math.sin(b))), V(0, 0.1, 0)); str = 0.9; fs = 0.8;
+        if (p.punch.straight) { ua = add(d, V(0, -0.5 * (1 - u), 0)); fa = add(d, V(0, 0.05, 0)); } // a jab: the arm comes up straight out at them and locks, never round past the body
       }
       // after it, the arm (and the shoulders' turn, tw) is lowered back over RECOIL s (armCd counts down from 1), held
       // firmly from where the punch left it: let go at once, it dropped from head height like a pendulum and jerked the whole body as it swung through
@@ -945,7 +952,7 @@ export function createSim({ mapId, players, practice = false, roundsToWin = 3, l
     }
     if (p.dash && !p.dash.sylas) { // Abscond is just a dash: it doesn't stop on champs or bump them
       // Alistar's Headbutt also catches someone above him (launched by Pulverize), up to ~2m over his head
-      const [first] = [0, ...(p.dash.ali ? [0.9, 1.8] : [])].flatMap(h => playersNearSeen(p, add(tp, add(mul(f, 0.45), V(0, h, 0))), 0.6));
+      const [first] = [0, ...(p.dash.ali ? [0.9, 1.8] : [])].flatMap(h => playersNearSeen(p, add(tp, add(mul(f, 0.45), V(p.dash.dir ? side.x * 0.25 : 0, h, p.dash.dir ? side.z * 0.25 : 0))), 0.6)); // Vi: at her leading left fist
       if (first) {
         const k = p.dash.power, air = !first.vic.grounded; // Alistar's Headbutt sends someone already airborne much further
         if (p.dash.ali) hit(first.vic, first.part, add(mul(f, air ? 11.2 : 7.8), V(0, air ? 4 : 3, 0)), air ? 40 : 30);
@@ -1564,6 +1571,8 @@ export function createSim({ mapId, players, practice = false, roundsToWin = 3, l
       if (practice && p.alive) { removeRagdoll(p); spawn(p, freeSpawn()); }
     },
     // in an enemy's glue: no abilities (game.js greys out the ability bar)
+    // able to start a cast right now (game.js shows the aim strip only then): the fight's on, up, free and not glued
+    ready(slot) { const p = ps[slot]; return st !== 'count' && !!p?.alive && !!p.bodies && !(p.ko > 0) && !p.lying && !(p.hooked > 0) && !(p.stun > 0) && !glued(p, p.bodies[TORSO].translation()); },
     stuck(slot) { const p = ps[slot]; return !!p?.alive && !!p.bodies && glued(p, p.bodies[TORSO].translation()); },
     drop(slot) { const p = ps[slot]; if (p) { p.left = true; removeRagdoll(p); } },
     // floor (the stage, not champs) within 3m under x, y, z: bots check before stepping off a ledge (game.js botInput)

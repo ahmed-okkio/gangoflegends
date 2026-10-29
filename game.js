@@ -187,9 +187,9 @@ $('botPicks').onchange = e => { botPicks[+e.target.dataset.i] = e.target.value; 
 renderBots();
 
 $('practiceBtn').onclick = () => startPractice(practiceMap);
-function startPractice(map) {
+function startPractice(map, picks = botPicks) {
   const any = Object.keys(CHAMPS);
-  const dummies = botPicks.map((c, i) => ({ id: `dummy${i}`, name: 'Dummy', champ: CHAMPS[c] ? c : any[Math.floor(Math.random() * any.length)], team: i + 1 }));
+  const dummies = picks.map((c, i) => ({ id: `dummy${i}`, name: 'Dummy', champ: CHAMPS[c] ? c : any[Math.floor(Math.random() * any.length)], team: i + 1 }));
   const lag = netSim();
   startGame({ map, teams: 0, rounds: 3, practice: true, lag: lag.ping || lag.jitter || lag.loss ? lag : null, players: [{ id: 'me', name: me.name, champ: me.champ, team: 0 }, ...dummies] });
 }
@@ -629,13 +629,13 @@ const aiming = [false, false], held = [0, 0];
 function showAim(inp, dt) {
   const abs = kit(game.setup.players[game.mySlot].champ, game.stole), mine = game.cur?.p[game.mySlot];
   let range = 0, back = false, point = null;
-  const sim = game.sim ?? game.local, stuck = sim.stuck(game.mySlot);
+  const sim = game.sim ?? game.local, stuck = sim.stuck(game.mySlot), ready = sim.ready(game.mySlot);
   [BTN.A1, BTN.A2].forEach((btn, i) => {
     const ab = abs[i];
     const re = ab.recastAim && mine?.[3] & 1024; // Abscond's Abduct window: aim the chains
     if (!(inp.b & btn)) aiming[i] = false;
-    else if (!aiming[i] && !(game.lastB & btn)) { aiming[i] = (re || !!ab.aim && !(mine?.[4 + i] > 0)) && !stuck; held[i] = 0; }
-    if (!aiming[i]) return;
+    else if (!aiming[i] && !(game.lastB & btn)) { aiming[i] = (re || !!ab.aim && !(mine?.[4 + i] > 0)) && ready; held[i] = 0; }
+    if (!aiming[i] || !ready) return; // knocked down or stunned mid-hold: hidden and not winding up (sim.js holds the aim through a stun)
     held[i] += dt;
     range = ab.aimMin ? ab.aimMin + (ab.aim - ab.aimMin) * Math.min(1, held[i] / ab.windup) : ab.aim ?? ab.recastAim;
     back = !!ab.back;
@@ -923,7 +923,12 @@ function runAttract(dt) {
 requestAnimationFrame(frame);
 show('menu');
 
-// dev shortcuts: #practice-<map> starts straight into practice (used by the smoke test)
-const dev = location.hash.match(/^#practice-(\w+)/);
-if (dev && MAPS[dev[1]]) startPractice(dev[1]);
+// dev shortcuts: #practice-<map>[&champ=vi][&bots=1 | &bots=blitz,hec] starts straight into practice (npm run dev, the
+// smoke test). Neither changes the saved champ or practice dummies
+const dev = location.hash.match(/^#practice-(\w+)(.*)/);
+if (dev && MAPS[dev[1]]) {
+  const q = new URLSearchParams(dev[2]), champ = q.get('champ'), bots = q.get('bots');
+  if (CHAMPS[champ]) me.champ = champ;
+  startPractice(dev[1], !bots ? botPicks : /^\d+$/.test(bots) ? Array(Math.min(7, +bots)).fill('random') : bots.split(',').slice(0, 7));
+}
 if (dev || devOn()) { Object.defineProperty(window, "game", { get: () => game }); window.view = view; } // smoke-test probes

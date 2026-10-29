@@ -5,7 +5,16 @@ const tls = require('tls');
 
 // SMOKE=<png path> loads SMOKE_HASH (default #practice-girders), screenshots after SMOKE_MS, then quits. Offscreen, no window.
 const smoke = process.env.SMOKE;
-const dev = process.argv.includes('--dev'); // npm run dev: straight into practice (DEV_MAP, default Girders) with DevTools open
+const dev = process.argv.includes('--dev'); // npm run dev: straight into practice with DevTools open
+// npm run dev -- --map=girders --champ=vi --bots=2 (or --bots=blitz,hec): default Rooftop, my saved champ, one random dummy
+const devArg = k => process.argv.find(a => a.startsWith(`--${k}=`))?.slice(k.length + 3);
+const devHash = `practice-${devArg('map') || process.env.DEV_MAP || 'rooftop'}&bots=${devArg('bots') || 1}${devArg('champ') ? `&champ=${devArg('champ')}` : ''}`;
+// one dev instance at a time: a new npm run dev closes the last one
+if (dev) {
+  const pidFile = path.join(require('os').tmpdir(), 'gangoflegends-dev.pid');
+  try { process.kill(+fs.readFileSync(pidFile, 'utf8')); } catch {}
+  fs.writeFileSync(pidFile, String(process.pid));
+}
 if (smoke) app.setPath('userData', path.join(app.getPath('temp'), `gangoflegends-test-${process.pid}`));
 // a throwaway profile per run: gone when it quits (hundreds of runs filled the temp drive). ponytail: best effort, a crash leaves one
 if (smoke) process.on('exit', () => { try { fs.rmSync(app.getPath('userData'), { recursive: true, force: true }); } catch {} });
@@ -48,7 +57,7 @@ app.whenReady().then(() => {
   });
   const updates = app.isPackaged && !smoke && process.platform !== 'darwin'; // unsigned Mac builds can't self-install: Mac players download the new .dmg
   // v feeds the lobby version check; u=1 makes the page start behind the "checking for updates" screen
-  win.loadFile(path.join(__dirname, 'index.html'), { query: { v: app.getVersion(), u: updates ? '1' : '0', rv: via ? JSON.stringify(via) : '' }, hash: smoke ? (process.env.SMOKE_HASH ?? 'practice-girders') : dev ? `practice-${process.env.DEV_MAP || 'girders'}` : '' });
+  win.loadFile(path.join(__dirname, 'index.html'), { query: { v: app.getVersion(), u: updates ? '1' : '0', rv: via ? JSON.stringify(via) : '' }, hash: smoke ? (process.env.SMOKE_HASH ?? 'practice-girders') : dev ? devHash : '' });
   if (dev) win.webContents.openDevTools({ mode: 'detach' });
   if (updates) checkForUpdates(win);
   if (app.isPackaged && !smoke && process.platform === 'darwin') offerMacUpdate(win);

@@ -14,7 +14,7 @@ python tools/import_gb.py girders   # Gang Beasts stage from your install -> gbc
 python tools/import_beast.py        # beast mesh -> gbcache/beast
 python tools/import_audio.py        # sounds -> gbcache/audio
 npm start          # run from source
-npm run dev        # straight into practice with DevTools
+npm run dev        # straight into practice with DevTools: Rooftop, saved champ, 1 dummy; -- --map=girders --champ=vi --bots=2 (or --bots=blitz,hec)
 npm test           # physics, combat and netcode-size checks
 npm run release    # push main first: starts the Mac CI build, builds the Windows installer, publishes the GitHub release (uses gh)
 ```

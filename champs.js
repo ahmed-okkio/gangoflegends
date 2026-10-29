@@ -18,7 +18,7 @@ export const CHAMPS = {
     name: 'Vi', title: 'The Piltover Enforcer', body: '#5b6b8c', limb: '#45526d', eyes: '#7fd3ff', glow: '#ff5fae',
     abilities: [
       { id: 'vault', name: 'Vault Breaker', cd: 5, aim: 8.03, aimMin: 2.97, windup: 0.94, desc: 'Hold to wind up (aimed at your cursor), let go to dash and punch the first champ you hit. Longer windup, bigger hit; fully wound up you can hold it 3s more.' },
-      { id: 'relentless', name: 'Relentless Force', cd: 2.5, desc: 'Your next punch smashes through its target into everyone behind it.' },
+      { id: 'relentless', name: 'Relentless Force', cd: 5, desc: 'Your next punch smashes through its target into everyone behind it.' },
     ],
   },
   sett: {

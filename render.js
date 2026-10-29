@@ -281,7 +281,33 @@ export function createRenderer(canvas) {
     lashes.splice(0, lashes.length, ...lashes.filter(l => l.t <= LASH));
     lashLinks.count = n; lashLinks.instanceMatrix.needsUpdate = true;
   }
+  // Relentless Force's shockwave: the exact cone sim.js relentless() knocks back (half-width 0.7 + 0.5 per metre, 2.7m
+  // deep), which is a sector of a circle centred 1.4m behind the target. A faint fill shows the area, an arc sweeps out through it
+  const CONE = Math.atan(0.5), APEX = 1.4, REACH = 2.7, cones = [];
+  function cone(pos, yaw, color) {
+    let c = cones.find(q => q.life <= 0);
+    if (!c) {
+      const mat = () => new THREE.MeshBasicMaterial({ color, transparent: true, blending: THREE.AdditiveBlending, depthWrite: false, side: THREE.DoubleSide });
+      c = { g: new THREE.Group(), fill: new THREE.Mesh(new THREE.RingGeometry(APEX, APEX + REACH, 24, 1, -CONE, 2 * CONE), mat()), front: new THREE.Mesh(new THREE.RingGeometry(0.9, 1, 24, 1, -CONE, 2 * CONE), mat()) };
+      c.fill.rotation.x = c.front.rotation.x = -Math.PI / 2;
+      c.g.add(c.fill, c.front); scene.add(c.g); cones.push(c);
+    }
+    c.g.position.copy(pos).add(tmp.set(-Math.sin(yaw) * APEX, 0, -Math.cos(yaw) * APEX));
+    c.g.rotation.y = yaw - Math.PI / 2; // the sector points along +x; this turns it to (sin yaw, cos yaw)
+    c.life = 0.35; c.g.visible = true;
+  }
+  function stepCones(dt) {
+    for (const c of cones) {
+      if (c.life <= 0) continue;
+      c.life -= dt; c.g.visible = c.life > 0;
+      const k = 1 - c.life / 0.35;
+      c.front.scale.setScalar(APEX + REACH * Math.sqrt(k)); // fast out, easing to the edge of the reach
+      c.front.material.opacity = 1 - k * k;
+      c.fill.material.opacity = 0.35 * (1 - k);
+    }
+  }
   function stepRings(dt) {
+    stepCones(dt);
     for (const r of rings) {
       if (r.life <= 0) continue;
       r.life -= dt;
@@ -322,10 +348,10 @@ export function createRenderer(canvas) {
         ring(v, '#ffb000', 2.4, true, 0.35);
         ring(v, '#ffffff', 2.4, true, 0.2);
         shake = Math.max(shake, 0.12);
-      } else if (kind === 'vi') { // Relentless Force: a blast of smoke shoved out through the cone behind the target (sim.js relentless)
+      } else if (kind === 'vi') { // Relentless Force: a shockwave out through the cone behind the target, its knockback reach (sim.js relentless)
         const dir = tmp2.set(Math.sin(big), 0, Math.cos(big));
-        emit(v, { color: '#c9a3b6', n: 22, speed: 6, size: 1.1, life: 0.9, grav: 0.6, dir, grow: true, additive: false, opacity: 0.7 });
-        emit(v, { color: '#ff5fae', n: 10, speed: 8, size: 0.18, life: 0.4, grav: 0, dir });
+        cone(tmp3.copy(v).setY(v.y - 0.5), big, '#ff5fae');
+        emit(v, { color: '#ff9fd0', n: 12, speed: 9, size: 0.16, life: 0.3, grav: 0, dir });
         shake = Math.max(shake, 0.15);
       } else if (kind === 'flay') { // Thresh's Flay: a green arc of chain swept through the line
         const dir = tmp2.set(Math.sin(big), 0, Math.cos(big));
@@ -370,7 +396,7 @@ export function createRenderer(canvas) {
     animated = [];
     cars = []; loop('train', 0); // a new map: no engine left running from the last one
     rollers = buildMap(world, MAPS[s.map], s.map);
-    sharks = []; if (MAPS[s.map].shark) buildSharks(world, MAPS[s.map]);
+    sharks = []; const sharksIn = MAPS[s.map].shark ? buildSharks(world, MAPS[s.map]) : null;
     for (const l of [hemi, sun, rim]) l.visible = l.intensity > 0; // an unlit light still costs every shader, and the sun a 4096² shadow pass
     avatars = s.players.map((p, slot) => { const a = makeAvatar(p.champ, playerColor(s, slot), p.name, !!s.teams); world.add(a.group); return a; });
     hookPool = []; gluePool = [];
@@ -379,11 +405,20 @@ export function createRenderer(canvas) {
     // in the first frame froze the game for ~2.5s. After the stage's sky is in: its environment map changes every
     // material's program
     const sky = skyReady; skyReady = null;
-    const mark = compiling = (sky ?? Promise.resolve()).then(() => {
+    // (sharks too, shown for it: compileAsync skips hidden objects, and their first surfacing froze the game). Then the
+    // textures, one a frame, and a first draw: all at once on the first frame shown they froze it ~0.9s
+    const mark = compiling = Promise.all([sky, sharksIn]).then(() => {
+      for (const v of sharks) v.m.visible = true;
       renderer.setRenderTarget(composer.readBuffer); // the RenderPass draws into this (linear, no tone mapping): compile those variants
       const job = renderer.compileAsync(scene, camera);
       renderer.setRenderTarget(null);
+      for (const v of sharks) v.m.visible = false;
       return job;
+    }).then(async () => {
+      const texs = new Set();
+      scene.traverse(o => [o.material].flat().forEach(m => m && Object.values(m).forEach(t => t?.isTexture && texs.add(t))));
+      for (const t of texs) { if (compiling !== mark) return; renderer.initTexture(t); await new Promise(r => requestAnimationFrame(r)); }
+      composer.render(); // once, hidden: the shadow and post-processing variants compileAsync misses compile here, not mid-fight
     }).catch(() => {}).then(() => { if (compiling === mark) compiling = null; });
     return mark;
   }
@@ -739,7 +774,7 @@ export function createRenderer(canvas) {
   // Unity skins with the scaled shark root in each bone (0.6): that scale goes into the bone inverses
   function buildSharks(g, map) {
     const { shark: sk, imported: { base } } = map, mine = g;
-    xhr(base + 'shark.bin', 'arraybuffer').then(buf => {
+    return Promise.all([xhr(base + 'shark.bin', 'arraybuffer'), sk.mesh.tex ? new THREE.TextureLoader().loadAsync(base + sk.mesh.tex) : null]).then(([buf, map]) => {
       if (world !== mine) return; // the match moved on
       let o = 0;
       const take = (T, n) => { const a = new T(buf, o, n); o += n * T.BYTES_PER_ELEMENT; return a; }, n = sk.mesh.verts;
@@ -750,7 +785,7 @@ export function createRenderer(canvas) {
       geo.setAttribute('skinWeight', new THREE.BufferAttribute(take(Float32Array, n * 4), 4));
       geo.setAttribute('skinIndex', new THREE.BufferAttribute(take(Uint16Array, n * 4), 4));
       geo.setIndex(new THREE.BufferAttribute(take(Uint32Array, sk.mesh.indices), 1));
-      const map = sk.mesh.tex ? new THREE.TextureLoader().load(base + sk.mesh.tex) : null;
+      // (texture loaded first: the upload is done with the rest before the match shows)
       if (map) map.colorSpace = THREE.SRGBColorSpace;
       const mat = new THREE.MeshStandardMaterial({ map, roughness: 0.6 }), S = new THREE.Matrix4().makeScale(sk.scale, sk.scale, sk.scale);
       sharks = [0, 1, 2, 3, 4, 5].map(() => {
@@ -898,7 +933,7 @@ export function createRenderer(canvas) {
     return { group, parts, tag, stars, fists, zap, chains, swirl, hay, skin: [...skin], ghost: false, champId, glow: c.glow ?? '#ff8a00', torsoMat: body, glowBase: body.emissive.clone(), eyes: c.eyes, q: PARTS.map(() => [0, 0, 0, 1]), pos: PARTS.map(() => [0, 0, 0]) };
   }
 
-  const qa = new THREE.Quaternion(), qb = new THREE.Quaternion(), tmp = new THREE.Vector3(), tmp2 = new THREE.Vector3();
+  const qa = new THREE.Quaternion(), qb = new THREE.Quaternion(), tmp = new THREE.Vector3(), tmp2 = new THREE.Vector3(), tmp3 = new THREE.Vector3();
   const CHAIN = 0.42, DOWN3 = new THREE.Vector3(0, -1, 0); // Sylas's chain length (6 links, tools/model_props.py)
   // draw an interpolated state between snapshots a and b; `own` ({ slot, a, b, alpha }) draws one player from its own
   // pair of states instead (a predicting client's own champ)
@@ -935,9 +970,14 @@ export function createRenderer(canvas) {
       const up = tmp.set(0, 0.4, 0).applyQuaternion(hd.quaternion), want = tmp2.copy(hd.position).add(up), bdt = Math.min(0.05, time - bob.t); bob.t = time;
       if (!bob.tip || bob.tip.distanceTo(want) > 0.6) { bob.tip = want.clone(); bob.prev.copy(want); } // (re)spawned
       else if (bdt > 0) {
+        // past a run (dashes, charges, launches) the tip is carried along: lagging ~2m/frame behind it reset every few
+        // frames and the head nodded fast. Up to a run it lags as before
+        const mv = tmp3.subVectors(hd.position, bob.at ?? hd.position), fast = mv.length() - 4.8 * bdt;
+        if (fast > 0) { mv.setLength(fast); bob.tip.add(mv); bob.prev.add(mv); }
         bob.v.subVectors(bob.tip, bob.prev).multiplyScalar(Math.pow(0.88, bdt * 60)); bob.prev.copy(bob.tip);
         bob.tip.add(bob.v).addScaledVector(want.sub(bob.tip), Math.min(1, 160 * bdt * bdt)); // ~2Hz wobble
       }
+      (bob.at ??= new THREE.Vector3()).copy(hd.position);
       const dir = want.subVectors(bob.tip, hd.position).normalize(), lean = Math.min(1.4, up.normalize().angleTo(dir));
       if (lean > 1e-3) hd.quaternion.premultiply(qa.setFromAxisAngle(up.cross(dir).normalize(), lean));
       for (const c of av.chains) { // a pendulum: one tip point, pulled down by gravity and held at the chain's length from the cuff
