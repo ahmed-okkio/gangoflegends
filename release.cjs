@@ -16,7 +16,7 @@ execFileSync('npx', ['electron-builder', '--win', '--publish', 'never'], { stdio
 // files.json: every packaged file's git blob hash, for the in-game patcher (main.cjs patchFiles). Files git has are fetched
 // from the release tag; the rest (node_modules) are marked local, and a change in one needs the installer
 const crypto = require('crypto'), fs = require('fs'), path = require('path');
-const tree = new Map(git('ls-tree', '-r', 'HEAD').split('\n').map(l => [l.split('\t')[1], l.split(' ')[2]]));
+const tree = new Map(git('ls-tree', '-r', 'HEAD').split('\n').map(l => [l.split('\t')[1], l.split(/\s/)[2]])); // "<mode> blob <hash>\t<path>"
 const appDir = 'release/win-unpacked/resources/app', manifest = { electron: require('electron/package.json').version, files: {}, local: [] };
 for (const f of fs.readdirSync(appDir, { recursive: true })) {
   const p = f.split(path.sep).join('/'), full = path.join(appDir, f);
