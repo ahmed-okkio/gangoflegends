@@ -230,7 +230,7 @@ export function createSim({ mapId, players, practice = false, roundsToWin = 3, l
       if (part.hinge) j.setLimits(...part.hinge);
     });
     Object.assign(p, {
-      alive: true, yaw, daze: 0, sinceHit: 9, ko: 0, cd: [0, 0], punch: null, punchCd: 0, armCd: [0, 0], queued: [0, 0], abQ: [0, 0], castTick: [null, null], grabs: [null, null], held: [0, 0],
+      alive: true, yaw, daze: 0, sinceHit: 9, ko: 0, kos: 0, cd: [0, 0], punch: null, punchCd: 0, armCd: [0, 0], queued: [0, 0], abQ: [0, 0], castTick: [null, null], grabs: [null, null], held: [0, 0],
       stun: 0, spin: 0, spinHit: null, stole: null, charge: 0, empower: 0, jumpT: 0, mantled: false, heave: null, stuckT: [0, 0], ghost: [false, false], phase: 0, grounded: false, prevB: p.input.b,
       butt: null, buttCd: 0, lying: false, safe: 0, hooked: 0, spinA: 0, chargeT: 0,
       stamina: 100, wet: false, drowned: false, emp: null, dash: null, vault: 0, vaultBtn: 0, hay: 0, hayBtn: 0, fb: 0, pulv: 0, flay: 0, fling: 0, tether: null, leap: null, dizzy: 0, kick: null, kickA: 0, palm: 0, qTurn: null, abduct: 0,
@@ -336,7 +336,8 @@ export function createSim({ mapId, players, practice = false, roundsToWin = 3, l
 
   function knockOut(p) {
     fx('ko', p.bodies[HEAD].translation(), 0, -1, p.slot);
-    p.ko = 2.4; p.daze = 0;
+    p.kos = (p.kos | 0) + 1;
+    p.ko = 2.4 * (1 + 4 * (Math.min(p.kos, 15) - 1) / 14); p.daze = 0; // each KO this life longer: the 15th on 5x as long
     cancel(p);
     down(p);
   }
