@@ -866,6 +866,19 @@ if ((await prepareMap('trawler')).imported && MAPS.trawler.shark) {
   console.log('ability buffered through a stun');
 }
 
+// 12m. a new match's host gets the client's last inputs of the previous match (its ticks 4 minutes on) before the new
+// ones from tick 0: the client still walks and its cooldowns stay 0 (were stun and cooldowns of the old match's length)
+{
+  const d = duo('grind', [{ id: 'a', name: 'A', champ: 'blitz', team: 0 }, { id: 'b', name: 'B', champ: 'hec', team: 1 }], 0, 6, { practice: true });
+  d.host.setInput(0, { n: 14400, i: [[0, 0, 0, null, null]] });
+  for (let i = 0; i < 120; i++) d.step({ x: 1, z: 0, b: 0 });
+  const me = d.cli.players[0], x0 = me.bodies[0].translation().x;
+  assert.ok(me.cd.every(c => c === 0) && me.stun <= 0, `cd ${me.cd} stun ${me.stun}`);
+  for (let i = 0; i < 60; i++) d.step({ x: 1, z: 0, b: 0 });
+  assert.ok(d.host.players[0].bodies[0].translation().x - x0 > 0.5, 'host walks me after the tick restart');
+  console.log('stale inputs from the last match ok');
+}
+
 console.log('all ok');
 
 // 12j. GB mode: my copy plays my own punch and Vi's windup at once (for show); the host still does the hitting

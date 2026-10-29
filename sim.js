@@ -1342,7 +1342,7 @@ export function createSim({ mapId, players, practice = false, roundsToWin = 3, l
     s.sl?.forEach((c, i) => { if (ps[i]) ps[i].stole = CHAMPS[c] ? c : null; });
     if (!e[1]) { if (me.alive) removeRagdoll(me); return; }
     const x = SX, hp = V(e[6], e[7], e[8]), hv = V(e[x + 1], e[x + 2], e[x + 3]), ack = e[x + 4];
-    const lag = (tick - ack) * DT; // this state is the host's me that long ago (a round trip, roughly)
+    const lag = Math.max(0, tick - ack) * DT; // this state is the host's me that long ago (a round trip, roughly)
     mt = s.mt + lag; // the host's clock, run on to now: trains are where they'll be when my inputs land
     // countdown: my inputs land on the host a round trip (tick - ack) after this snapshot's clock, so start moving that much early
     if (st === 'count') { timer = s.t - lag; if (timer <= 0) st = 'fight'; }
@@ -1547,6 +1547,8 @@ export function createSim({ mapId, players, practice = false, roundsToWin = 3, l
       const yaw = a => typeof a === 'number' && Number.isFinite(a) ? a : null, dist = d => yaw(d) == null ? null : Math.max(0, Math.min(30, d));
       if (!Array.isArray(inp.i)) { p.input = { x: +inp.x || 0, z: +inp.z || 0, b: inp.b | 0, a: yaw(inp.a), d: dist(inp.d) }; return; }
       const n = inp.n | 0;
+      // ticks restarted (the client's new match, while this one still had its last match's inputs): start over from these
+      if (p.next != null && n < p.next - 60) { p.q.clear(); p.next = null; p.newest = -1; }
       // v: the host time the client's screen showed everyone else at (lag compensation, seen()); any finite number, capped there
       inp.i.slice(-8).forEach(([x, z, b, a, d, v], k, all) => { const t = n - all.length + 1 + k; if (p.next == null || t >= p.next) p.q.set(t, { x: +x || 0, z: +z || 0, b: b | 0, a: yaw(a), d: dist(d), v: yaw(v) }); });
       p.newest = Math.max(p.newest, n);
