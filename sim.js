@@ -549,7 +549,7 @@ export function createSim({ mapId, players, practice = false, roundsToWin = 3, l
     for (const o of ps) {
       if (o === p || !o.alive) continue;
       const d = sub(seen(p, o), t), along = d.x * f.x + d.z * f.z;
-      if (Math.abs(along) > 3.2 || Math.abs(d.x * f.z - d.z * f.x) > 0.8 || Math.abs(d.y) > 1.2) continue;
+      if (Math.abs(along) > 3.2 || Math.abs(d.x * f.z - d.z * f.x) > 2 || Math.abs(d.y) > 1.2) continue; // 2m either side: catches champs beside him too
       hit(o, TORSO, add(mul(f, 5.21), V(0, 5.85, 0)), 20); // popped up and a short way the way he aimed: away in front, toward him behind
       if (o.ko <= 0 && o.safe <= 0) { o.stun = Math.max(o.stun, 0.5); cancel(o); }
     }
