@@ -1200,7 +1200,7 @@ export function createRenderer(canvas) {
     aimBack.visible = aimArrows.visible = !!me && !!aim.back;
     if (me) {
       const hp = me.parts[HIPS].position;
-      for (const [bar, yaw] of [[aimBar, aim.yaw], [aimBack, aim.yaw + Math.PI]]) { bar.position.set(hp.x, hp.y - HIP_HEIGHT + 0.05, hp.z); bar.rotation.y = yaw; bar.scale.set(aim.back ? 4 : 0.7, 1, aim.range); } // Flay's strip is as wide as it hits (sim.js flay)
+      for (const [bar, yaw] of [[aimBar, aim.yaw], [aimBack, aim.yaw + Math.PI]]) { bar.position.set(hp.x, hp.y - HIP_HEIGHT + 0.05, hp.z); bar.rotation.y = yaw; bar.scale.set(aim.back ? 2.6 : 0.7, 1, aim.range); } // Flay's strip is as wide as it hits (sim.js flay)
       if (aim.back) { aimArrows.position.set(hp.x, hp.y - HIP_HEIGHT + 0.05, hp.z); aimArrows.rotation.y = aim.yaw + Math.PI; aimArrows.scale.setScalar(aim.range / 3); }
     }
     for (const fn of animated) fn({ dt, time });
