@@ -114,13 +114,15 @@ export const playerColor = (setup, slot) => {
 };
 
 const VignetteShader = {
-  uniforms: { tDiffuse: { value: null }, strength: { value: 0.35 }, contrast: { value: 1 }, saturation: { value: 1 }, shadows: { value: 0 } },
+  uniforms: { tDiffuse: { value: null }, strength: { value: 0.35 }, contrast: { value: 1 }, saturation: { value: 1 }, shadows: { value: 0 }, curve: { value: new THREE.Vector2(1, 1) } },
   vertexShader: 'varying vec2 vUv; void main() { vUv = uv; gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0); }',
   // plus a light colour grade (Gang Beasts' URP profile: contrast, saturation, darker shadows), in display space
-  fragmentShader: `uniform sampler2D tDiffuse; uniform float strength, contrast, saturation, shadows; varying vec2 vUv;
+  fragmentShader: `uniform sampler2D tDiffuse; uniform float strength, contrast, saturation, shadows; uniform vec2 curve; varying vec2 vUv;
     void main() {
       vec4 c = texture2D(tDiffuse, vUv); float l = dot(c.rgb, vec3(0.2126, 0.7152, 0.0722));
-      c.rgb = mix(vec3(l), c.rgb, saturation); c.rgb = (c.rgb - 0.5) * contrast + 0.5;
+      // URP's master Color Curve: a Hermite from (0,0) to (1,1) with end slopes curve (1,1: none)
+      vec3 t = clamp(c.rgb, 0.0, 1.0); c.rgb = (t*t*t - 2.0*t*t + t) * curve.x + (3.0 - 2.0*t) * t*t + (t*t*t - t*t) * curve.y;
+      l = dot(c.rgb, vec3(0.2126, 0.7152, 0.0722)); c.rgb = mix(vec3(l), c.rgb, saturation); c.rgb = (c.rgb - 0.5) * contrast + 0.5;
       c.rgb *= 1.0 - shadows * (1.0 - smoothstep(0.0, 0.35, l));
       float d = distance(vUv, vec2(0.5)); c.rgb *= 1.0 - strength * smoothstep(0.35, 0.85, d); gl_FragColor = c; }`,
 };
@@ -521,7 +523,7 @@ export function createRenderer(canvas) {
         color: /^Water/.test(d.name) ? new THREE.Color('#2f7fb5') : new THREE.Color().setRGB(d.color[0], d.color[1], d.color[2], THREE.SRGBColorSpace),
         map: d.map ? tex(d.map) : null, roughness: 1 - d.smoothness * 0.8, metalness: d.metallic,
         ...MAPS[setup.map]?.water?.length && /^Water/.test(d.name) ? { transparent: true, opacity: 0.8, depthWrite: false } // Aquarium's pools: see who's sinking
-          : d.color[3] < 1 && /^Glass/.test(d.name) ? { transparent: true, opacity: d.color[3], depthWrite: false } : {}, // Aquarium's tank windows
+          : d.color[3] < 1 && /^Glass/.test(d.name) ? { transparent: true, opacity: Math.max(d.color[3], 0.45), depthWrite: false } : {}, // Aquarium's tank windows
       });
       if (d.emission && Math.max(...d.emission) > 0) m.emissive.setRGB(...d.emission.map(v => Math.min(v, 1)));
       // lightmapped surfaces get their ambient from the lightmap alone, like in Unity
@@ -601,7 +603,8 @@ export function createRenderer(canvas) {
     // (eyes, champion glows, glossy highlights) bloom faintly, the pit and lava fully
     bloom.highPassUniforms.smoothWidth.value = 2.5;
     bloom.strength = 0.4; bloom.threshold = 2; bloom.radius = 0; bloom.compositeMaterial.uniforms.bloomFactors.value = [1, 0.75, 0.35, 0.1, 0]; renderer.toneMappingExposure = view.exposure ?? 0.8; scene.environmentIntensity = 0.5 * (view.dim ?? 1); // exposure: by eye (three's ACES curve isn't URP's)
-    Object.assign(grade.uniforms, { strength: { value: 0.2 }, contrast: { value: 1.06 }, saturation: { value: 1.04 }, shadows: { value: 0.3 } });
+    Object.assign(grade.uniforms, { strength: { value: 0.2 }, contrast: { value: 1.06 }, saturation: { value: 1.04 }, shadows: { value: 0.3 }, ...view.grade });
+    grade.uniforms.curve.value.set(...view.curve ?? [1, 1]);
     scene.fog = null;
     // the stage's own sky, as Unity bakes it (import_gb.py): the backdrop, and the light on everything without a lightmap,
     // beasts included. Its mean is the stage's ambient probe, so it goes in at full strength. Unity's cube faces are in
@@ -624,6 +627,11 @@ export function createRenderer(canvas) {
       const sea = new THREE.Mesh(new THREE.PlaneGeometry(3000, 3000).rotateX(-Math.PI / 2), new THREE.MeshStandardMaterial({ color: '#0e3e48', roughness: 0.15, transparent: true, opacity: 0.94 }));
       sea.position.y = seaY = view.sea; sea.receiveShadow = true; g.add(sea);
     }
+    if (view.tank) {
+      const [r, y0, y1] = view.tank;
+      const body = new THREE.Mesh(new THREE.CylinderGeometry(r, r, y1 - y0, 48, 1, true), new THREE.MeshBasicMaterial({ color: '#1f5fc0', transparent: true, opacity: 0.85, depthWrite: false }));
+      body.position.y = (y0 + y1) / 2; g.add(body);
+    }
     // like the stage's own camera: Girders' looks from -z at 27 degrees
     const c = { side: -1, pitch: 27, min: 17, max: 28, ...view.cam };
     cam = { ...c, pitch: c.pitch * Math.PI / 180 };
@@ -634,7 +642,7 @@ export function createRenderer(canvas) {
     sunOffset.set(8, 20, 6);
     seaY = null;
     scene.environment = roomEnv; scene.background = null; scene.environmentRotation.set(0, 0, 0);
-    Object.assign(grade.uniforms, { strength: { value: 0.35 }, contrast: { value: 1 }, saturation: { value: 1 }, shadows: { value: 0 } });
+    Object.assign(grade.uniforms, { strength: { value: 0.35 }, contrast: { value: 1 }, saturation: { value: 1 }, shadows: { value: 0 } }); grade.uniforms.curve.value.set(1, 1);
     bloom.radius = 0.55; bloom.highPassUniforms.smoothWidth.value = 0.01; bloom.compositeMaterial.uniforms.bloomFactors.value = [1, 0.8, 0.6, 0.4, 0.2]; rim.intensity = 0.9;
     cam = { side: 1, pitch: 0.63, min: 10, max: 24 };
     // Gang Beasts' stages have their occlusion baked into the lightmaps; AO on top cost about half the frame (Incinerator)

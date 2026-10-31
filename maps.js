@@ -170,6 +170,10 @@ export const MAPS = {
     gb: 'aquarium',
     pools: /aquarium_water(Upper|Lower)$/, // swim in the stage's own water meshes (stages.js): the round pool and the lower tank
     octopus: true, // Gang Beasts' tentacles (tools/import_tentacle.py; sim.js stepTentacles)
+    // its own Volume: +1 EV (others +1.4), contrast +10, no saturation boost, and a master curve lifting the mids (end slopes 2, 0.47)
+    // tank: the round pool's water seen through its glass (radius, glass bottom and top; GB's water shader shades it deep blue)
+    // camera kept under the skylight's ring (~6m up), like Gang Beasts' view from inside the room
+    view: { tank: [4.62, -2.48, -0.52], cam: { pitch: 25, min: 10, max: 14 }, exposure: 0.6, curve: [2, 0.47], grade: { contrast: { value: 1.1 }, saturation: { value: 1 } } },
     killY: -20, // under the round pool GB's Kill Volume starts 4.5m down: what the tentacles drag you into
     boxes: [box(0, -0.2, 0, 8, 0.2, 8, 'plate')],
     rollers: [], kill: [],
