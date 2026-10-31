@@ -18,12 +18,13 @@ export async function loadSfx() {
   for (const g of ['fall', 'win']) index[g] = [...index[g] ?? [], ...LAUGHS];
 }
 
-export function play(group, vol = 1, rate = 0.92 + Math.random() * 0.16) {
+// seed: an int every machine shares (laughs), so all pick the same clip; omitted = random
+export function play(group, vol = 1, rate = 0.92 + Math.random() * 0.16, seed) {
   const list = index[group];
   if (!ctx || !list?.length) return;
   if (ctx.state === 'suspended') ctx.resume();
   if (GAP[group]) { if (ctx.currentTime < (next[group] ?? 0)) return; next[group] = ctx.currentTime + GAP[group]; }
-  const file = list[Math.floor(Math.random() * list.length)];
+  const file = list[seed == null ? Math.floor(Math.random() * list.length) : Math.abs(seed) % list.length];
   buffers[file] ??= xhr(file.startsWith('./') ? file : base + file, 'arraybuffer').then(b => ctx.decodeAudioData(b));
   buffers[file].then(buf => {
     const src = ctx.createBufferSource(), g = ctx.createGain();
@@ -72,11 +73,12 @@ export function ui(kind) {
 
 // sim fx events -> sounds
 export function playEvents(events) {
-  for (const [kind, , , , big, , , , mine] of events) {
+  for (const [kind, x, , z, big, , vic, , mine] of events) {
+    const seed = Math.round(x * 100) * 31 + Math.round(z * 100) * 7 + vic; // host's rounded event data, same on every machine
     if (kind === 'hit') { play(big ? 'hitHard' : 'hit', 0.8); if (!mine) play('body', 0.5); } // mine: my copy already thudded ('phit')
     else if (kind === 'phit') play('body', 0.5);
     else if (kind === 'ko') play('ko', 0.9, 1);
-    else if (kind === 'out') { play('fall', 0.9, 1); play('wind', 0.6); }
+    else if (kind === 'out') { play('fall', 0.9, 1, seed); play('wind', 0.6); }
     else if (kind === 'swing') play('swing', 0.35);
     else if (kind === 'jaw') play(big ? 'jawOpen' : 'jawClose', 0.6); // Trawler's sharks
     else if (kind === 'bite') play('jawClose', 1);
@@ -86,7 +88,7 @@ export function playEvents(events) {
     else if (kind === 'vi') play('swing', 0.8);
     else if (kind === 'riven') play(big ? 'hitHard' : 'swing', 0.8);
     else if (kind === 'ki') { play('hitHard', 0.7); play('grab', 0.5); }
-    else if (kind === 'pulv') { play('hitHard', 0.9); play('fall', 0.6); }
+    else if (kind === 'pulv') { play('hitHard', 0.9); play('fall', 0.6, 1, seed); }
     else if (kind === 'flay') { play('swing', 0.9); play('grab', 0.5); }
     else if (kind === 'undertow') { play('swing', 0.9); play('hit', 0.5); }
     else if (kind === 'glue') play('body', 0.7);

@@ -61,7 +61,8 @@ const KICK = 0.35; // Lee Sin E: seconds for the roundhouse's turn; it lands as 
 // stamina (theirs: 100) and hold jump: let go and you sink. Treading water and swimming wear it down, a head held under wears it down fast; tired, you sink to
 // the sea's kill volume (4m down). On deck it comes back
 const FLOAT = 1.25, SINK = 0.6, DRIFT = 0.9; // buoyancy in g: fresh (floats about chest deep), spent, not kicking (drifts slowly down)
-const TREAD = 0.8, STROKE = 1, BREATH = 10, RECOVER = 15; // stamina/s: in water, swimming on top, head under, back on deck
+const TREAD = 2.4, STROKE = 3, BREATH = 10, RECOVER = 15; // stamina/s: in water, swimming on top, head under, back on deck
+const WEAR = 1.5, WORN = 10; // max stamina/s lost while treading or swimming, down to WORN: it never comes back that life (round)
 const TWIST = 0.7; // how firmly arms hold their roll (aimPart)
 const TAP = 0.2; // a hand let go within this many seconds punches; held longer, it grabs
 const LATCH = 0.4, GRAB_LEAN = 0.9; // grab assist: how far a hand latches onto who it's going for; most it bends down for them
@@ -116,13 +117,14 @@ export function createSim({ mapId, players, practice = false, roundsToWin = 3, t
     if (!anyWater) return;
     const tp = p.bodies[TORSO].translation(), sea = waterLevel(map, tp.x, tp.z) ?? -Infinity;
     p.wet = tp.y < sea + 0.2;
-    if (!p.wet) { p.stamina = Math.min(100, p.stamina + RECOVER * DT); return; }
+    if (!p.wet) { p.stamina = Math.min(p.stamMax, p.stamina + RECOVER * DT); return; }
     const moving = Math.hypot(p.input.x, p.input.z) > 0.2 && p.ko <= 0;
     const kick = !!(p.input.b & BTN.JUMP) && p.ko <= 0; // Gang Beasts: hold jump to stay up; let go and you sink
     // held by someone above (or level with) you: pushed under. A prediction copy's stand-ins hold nobody; that's the host's
     const dunk = ps.some(q => q !== p && q.alive && q.grabs?.some(g => g?.vic === p) && q.bodies[TORSO].translation().y > tp.y - 0.3);
     const drowning = skull(p).y < sea - 0.1;
-    p.stamina = Math.max(0, p.stamina - ((kick ? TREAD : 0) + (moving ? STROKE : 0) + (drowning ? BREATH : 0)) * DT);
+    if (kick || moving) p.stamMax = Math.max(WORN, p.stamMax - WEAR * DT);
+    p.stamina = Math.max(0, Math.min(p.stamMax, p.stamina) - ((kick ? TREAD : 0) + (moving ? STROKE : 0) + (drowning ? BREATH : 0)) * DT);
     // out (step()) once the head's been under 10s straight (the breath spent with it, from full): a bob under doesn't do it. Held up by
     // someone's hands, you'd never reach the kill volume
     p.under = drowning ? (p.under ?? 0) + DT : 0;
@@ -261,7 +263,7 @@ export function createSim({ mapId, players, practice = false, roundsToWin = 3, t
       alive: true, yaw, daze: 0, sinceHit: 9, ko: 0, kos: 0, cd: [0, 0], punch: null, punchCd: 0, armCd: [0, 0], queued: [0, 0], abQ: [0, 0], castTick: [null, null], grabs: [null, null], held: [0, 0],
       stun: 0, spin: 0, spinHit: null, stole: null, charge: 0, empower: 0, jumpT: 0, mantled: false, heave: null, stuckT: [0, 0], ghost: [false, false], phase: 0, grounded: false, prevB: p.input.b,
       butt: null, buttCd: 0, lying: false, safe: 0, hooked: 0, spinA: 0, chargeT: 0,
-      stamina: 100, wet: false, drowned: false, emp: null, dash: null, vault: 0, vaultBtn: 0, hay: 0, hayBtn: 0, fb: 0, pulv: 0, flay: 0, fling: 0, tether: null, leap: null, dizzy: 0, kick: null, kickA: 0, palm: 0, qTurn: null, abduct: 0, wings: null, undertow: null, phased: null, aimT: [0, 0], toss: 0,
+      stamina: 100, stamMax: 100, wet: false, drowned: false, emp: null, dash: null, vault: 0, vaultBtn: 0, hay: 0, hayBtn: 0, fb: 0, pulv: 0, flay: 0, fling: 0, tether: null, leap: null, dizzy: 0, kick: null, kickA: 0, palm: 0, qTurn: null, abduct: 0, wings: null, undertow: null, phased: null, aimT: [0, 0], toss: 0,
     });
   }
 

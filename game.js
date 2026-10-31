@@ -443,7 +443,7 @@ function updateHud(s, now) {
   else $('scores').innerHTML = setup.players.map((p, i) => `<span class="chip ${s.p[i]?.[1] ? '' : 'out'}" style="--pc:${playerColor(setup, i)}">${esc(p.name)} <b>${s.sc[i] ?? 0}</b></span>`).join('');
 
   if (s.st === 'count' && s.tm !== game.lastTm) play('count', 0.7, 1);
-  if (s.st !== game.lastSt && (s.st === 'round' || s.st === 'match') && s.win >= 0) { play('star', 0.8, 1); play('win', 0.9, 1); }
+  if (s.st !== game.lastSt && (s.st === 'round' || s.st === 'match') && s.win >= 0) { play('star', 0.8, 1); play('win', 0.9, 1, s.rn * 8 + s.win); }
   game.lastTm = s.tm; game.lastSt = s.st;
   if (s.st === 'fight' && !game.fightAt) game.fightAt = now;
   if (s.st !== 'fight') game.fightAt = 0;

@@ -864,7 +864,7 @@ if ((await prepareMap('trawler')).imported) {
   assert.ok(torso(sim, 0).x > 2, `swims: ${torso(sim, 0).x.toFixed(2)}`);
   let t = 3; while (a.alive && t < 80) { sim.step(); t += 1 / 60; }
   console.log('swam, tired and sank out after', t.toFixed(1), 's');
-  assert.ok(!a.alive && t > 30 && t < 70, 'tires and sinks out');
+  assert.ok(!a.alive && t > 12 && t < 30, 'tires and sinks out');
   // B (fresh, treading water) held under by A from above
   run(sim, 100); // A back in practice
   dropAt(0, 3, 12.8); dropAt(1, 3, 12);
