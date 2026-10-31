@@ -1391,9 +1391,9 @@ export function createSim({ mapId, players, practice = false, roundsToWin = 3, t
   }
 
   // ---------- Gang Beasts' Aquarium octopus (maps.js tentacleSpine; render.js draws tools/import_tentacle.py's mesh) ----------
-  // GB's Tentacle Mechanics, tuning off its TentacleController: 15-30s into the round all eight rise out of the round pool.
-  // Then turns of idling (tips swaying just out of the water, 20s at first) and attacking (10s at first, faster each turn: up
-  // from 4 m/s by 4 a turn to their 15). Attacking, each goes for the nearest beast in 6m of its root half the time (targeted),
+  // GB's Tentacle Mechanics, tuning off its TentacleController: 30-45s into the round the first rises out of the round pool, then
+  // another every 4-10s, never more than two up. Each idles (tip swaying just out of the water) then attacks, then sinks;
+  // every dive makes the next wilder (4 m/s up to their 15). Attacking, each goes for the nearest beast in 6m of its root half the time (targeted),
   // else flails, slapping at spots round the rim. A tip touching a beast grips it: 35% of the time it's forgiven, lifted 4.5m
   // over the water and thrown; otherwise dragged down to 10m under, into the pool's kill volume, a 20% chance every ~0.4s of
   // slipping free on the way. Kinematic spines: whoever's in the way is shoved, a fast tip dazes. The host's alone: clients draw
@@ -1408,7 +1408,7 @@ export function createSim({ mapId, players, practice = false, roundsToWin = 3, t
     });
     return { k, segs, root: V(rx, poolY, rz), tip: V(rx, poolY - 3, rz), arch: 1, st: 'off', t: 0, goal: null, prey: null, vic: null, bite: null, throw: false, slip: 0 };
   });
-  const octo = { on: false, t: 15 + Math.random() * 15, phase: 'idle', turn: 0 };
+  const octo = { t: 30 + Math.random() * 15, turn: 0 };
   function tnPlace(t, snap) {
     const pts = tentacleSpine(t.k, [t.tip.x, t.tip.y, t.tip.z], t.arch, t.segs.map((_, i) => (i + 0.5) / TSEG), poolY);
     t.segs.forEach((b, i) => {
@@ -1456,32 +1456,35 @@ export function createSim({ mapId, players, practice = false, roundsToWin = 3, t
   const rim = () => { const a = Math.random() * Math.PI * 2, r = 4.8 + Math.random() * 2.5; return V(r * Math.sin(a), 0.4, r * Math.cos(a)); };
   function stepTentacles() {
     if (!tentacles.length || st === 'count') return;
-    if (!octo.on) {
-      if ((octo.t -= DT) > 0) return;
-      octo.on = true; octo.phase = 'idle'; octo.t = 20;
-      for (const t of tentacles) { t.st = 'idle'; tnPlace(t, true); }
-      fx('breach', V(0, poolY, 0), 0, -1, -1);
-    }
-    if ((octo.t -= DT) <= 0) { // the next turn: idle <-> attack, each a bit wilder
-      if (octo.phase === 'idle') { octo.phase = 'attack'; octo.t = Math.min(18, 10 + 2 * octo.turn); }
-      else { octo.phase = 'idle'; octo.turn++; octo.t = Math.max(6, 20 - 4 * octo.turn); }
+    if ((octo.t -= DT) > 0) return; // the first rises 30-45s in, then another every 4-10s while fewer than two are up
+    octo.t = 4 + Math.random() * 6;
+    const down = tentacles.filter(t => t.st === 'off');
+    if (tentacles.length - down.length < 2 && down.length) {
+      const t = down[Math.floor(Math.random() * down.length)];
+      t.st = 'idle'; t.ph = 'idle'; t.pt = Math.max(5, 12 - 2 * octo.turn); tnPlace(t, true);
+      fx('breach', t.root, 0, -1, -1);
     }
     for (const t of tentacles) {
+      if (t.st === 'off') continue;
       if (t.vic && !t.vic.alive) letGo(t);
       if (t.st === 'hold' && !t.vic) t.st = 'idle';
+      if ((t.pt -= DT) <= 0 && t.st !== 'hold') { // its turn: idle -> attack -> back under, each a bit wilder
+        if (t.ph === 'idle') { t.ph = 'attack'; t.pt = Math.min(15, 8 + octo.turn); }
+        else { tnPark(t); octo.turn++; fx('breach', t.root, 0, -1, -1); continue; }
+      }
       const sway = mt * 0.9 + t.k * 1.7, [rx, rz] = TENTACLE_ROOTS[t.k];
-      if (t.st === 'idle' && octo.phase === 'attack') t.st = 'pick';
+      if (t.st === 'idle' && t.ph === 'attack') t.st = 'pick';
       if (t.st === 'pick') { // half the time the nearest beast in reach, else a flail round the rim
         const near = Math.random() < 0.5 ? ps.filter(p => p.alive && !(p.safe > 0) && !p.bitten && p.bodies[TORSO].translation().y > poolY - 5)
           .map(p => { const q = p.bodies[TORSO].translation(); return [p, Math.hypot(q.x - rx, q.z - rz)]; }).filter(e => e[1] < 6).sort((a, b) => a[1] - b[1])[0] : null;
         t.prey = near?.[0] ?? null; t.st = t.prey ? 'attack' : 'flail'; t.t = t.prey ? 5 : 2; t.goal = rim();
       }
-      let goal, speed = Math.min(15, 4 + 4 * octo.turn), arch = 1.2;
+      let goal, speed = Math.min(15, 4 + octo.turn), arch = 1.2;
       if (t.st === 'idle') { goal = V(rx + 1.2 * Math.sin(sway), poolY + 1.8 + 0.8 * Math.sin(sway * 1.3), rz + 1.2 * Math.cos(sway)); speed = 3; }
       else if (t.st === 'attack' || t.st === 'flail') {
         arch = 3;
         goal = t.st === 'attack' && t.prey?.alive ? t.prey.bodies[TORSO].translation() : t.goal;
-        if ((t.t -= DT) <= 0 || (t.st === 'flail' && len(sub(goal, t.tip)) < 0.5)) t.st = octo.phase === 'attack' ? 'pick' : 'idle';
+        if ((t.t -= DT) <= 0 || (t.st === 'flail' && len(sub(goal, t.tip)) < 0.5)) t.st = t.ph === 'attack' ? 'pick' : 'idle';
         tnGrip(t);
       } else { // hold
         arch = 2;
@@ -1501,7 +1504,7 @@ export function createSim({ mapId, players, practice = false, roundsToWin = 3, t
 
   function resetRound() {
     for (const t of tentacles) tnPark(t);
-    Object.assign(octo, { on: false, turn: 0, t: 15 + Math.random() * 15 });
+    Object.assign(octo, { turn: 0, t: 30 + Math.random() * 15 });
     for (const s of sharks) { skPark(s); s.t = SK.ai.startDelay; }
     for (const p of ps) removeRagdoll(p);
     order = shuffle(order);

@@ -520,7 +520,8 @@ export function createRenderer(canvas) {
         // water uses Gang Beasts' own shader; a plain sea blue stands in
         color: /^Water/.test(d.name) ? new THREE.Color('#2f7fb5') : new THREE.Color().setRGB(d.color[0], d.color[1], d.color[2], THREE.SRGBColorSpace),
         map: d.map ? tex(d.map) : null, roughness: 1 - d.smoothness * 0.8, metalness: d.metallic,
-        ...MAPS[setup.map]?.water?.length && /^Water/.test(d.name) ? { transparent: true, opacity: 0.8, depthWrite: false } : {}, // Aquarium's pools: see who's sinking
+        ...MAPS[setup.map]?.water?.length && /^Water/.test(d.name) ? { transparent: true, opacity: 0.8, depthWrite: false } // Aquarium's pools: see who's sinking
+          : d.color[3] < 1 && /^Glass/.test(d.name) ? { transparent: true, opacity: d.color[3], depthWrite: false } : {}, // Aquarium's tank windows
       });
       if (d.emission && Math.max(...d.emission) > 0) m.emissive.setRGB(...d.emission.map(v => Math.min(v, 1)));
       // lightmapped surfaces get their ambient from the lightmap alone, like in Unity
