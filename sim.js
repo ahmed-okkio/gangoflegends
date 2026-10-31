@@ -1,7 +1,7 @@
 // Host-authoritative game simulation: Rapier world, active ragdolls, abilities, rounds.
 // Runs on the host only (and in Node for tests); clients just render snapshots of it.
 import RAPIER from '@dimforge/rapier3d-compat';
-import { MAPS, trainsAt, wheelAngle } from './maps.js';
+import { MAPS, trainsAt, wheelAngle, waterLevel, tentacleSpine, TENTACLE_ROOTS } from './maps.js';
 import { CHAMPS, kit } from './champs.js';
 import { PARTS, ANCHOR, HAND, HIP_HEIGHT, CHEST, HEAD, ARM, THIGH, FORE, LEG, HIPS, WAIST } from './beast.js';
 
@@ -110,9 +110,10 @@ export function createSim({ mapId, players, practice = false, roundsToWin = 3, t
   }
   // Gang Beasts' sea is only there with the stage imported; the stand-in trawler is a plain floor
   const sea = map.imported ? map.view?.sea : null;
+  const anyWater = sea != null || !!map.water?.length; // Aquarium: just its pools (maps.js waterLevel)
   function water(p) {
-    if (sea == null) return;
-    const tp = p.bodies[TORSO].translation();
+    if (!anyWater) return;
+    const tp = p.bodies[TORSO].translation(), sea = waterLevel(map, tp.x, tp.z) ?? -Infinity;
     p.wet = tp.y < sea + 0.2;
     if (!p.wet) { p.stamina = Math.min(100, p.stamina + RECOVER * DT); return; }
     const moving = Math.hypot(p.input.x, p.input.z) > 0.2 && p.ko <= 0;
@@ -1389,7 +1390,118 @@ export function createSim({ mapId, players, practice = false, roundsToWin = 3, t
     }
   }
 
+  // ---------- Gang Beasts' Aquarium octopus (maps.js tentacleSpine; render.js draws tools/import_tentacle.py's mesh) ----------
+  // GB's Tentacle Mechanics, tuning off its TentacleController: 15-30s into the round all eight rise out of the round pool.
+  // Then turns of idling (tips swaying just out of the water, 20s at first) and attacking (10s at first, faster each turn: up
+  // from 4 m/s by 4 a turn to their 15). Attacking, each goes for the nearest beast in 6m of its root half the time (targeted),
+  // else flails, slapping at spots round the rim. A tip touching a beast grips it: 35% of the time it's forgiven, lifted 4.5m
+  // over the water and thrown; otherwise dragged down to 10m under, into the pool's kill volume, a 20% chance every ~0.4s of
+  // slipping free on the way. Kinematic spines: whoever's in the way is shoved, a fast tip dazes. The host's alone: clients draw
+  // them from the snapshot (tn)
+  const TN = local < 0 && map.imported && map.octopus ? TENTACLE_ROOTS : [];
+  const TSEG = 12, TPARK = -60, poolY = TN.length ? waterLevel(map, 0, 0) ?? 0 : 0;
+  const tentacles = TN.map(([rx, rz], k) => {
+    const segs = Array.from({ length: TSEG }, (_, i) => {
+      const body = world.createRigidBody(RAPIER.RigidBodyDesc.kinematicPositionBased().setTranslation(rx, TPARK, rz));
+      world.createCollider(RAPIER.ColliderDesc.capsule(0.75, 0.5 - 0.35 * i / (TSEG - 1)).setFriction(0.9).setCollisionGroups(WORLD_GROUPS), body);
+      return body;
+    });
+    return { k, segs, root: V(rx, poolY, rz), tip: V(rx, poolY - 3, rz), arch: 1, st: 'off', t: 0, goal: null, prey: null, vic: null, bite: null, throw: false, slip: 0 };
+  });
+  const octo = { on: false, t: 15 + Math.random() * 15, phase: 'idle', turn: 0 };
+  function tnPlace(t, snap) {
+    const pts = tentacleSpine(t.k, [t.tip.x, t.tip.y, t.tip.z], t.arch, t.segs.map((_, i) => (i + 0.5) / TSEG), poolY);
+    t.segs.forEach((b, i) => {
+      const [x, y, z, dx, dy, dz] = pts[i], ax = V(dz, 0, -dx), s = len(ax);
+      const q = s > 1e-4 ? qaxis(mul(ax, 1 / s), Math.acos(Math.max(-1, Math.min(1, dy)))) : dy > 0 ? QI : qaxis(X, Math.PI);
+      if (snap) { b.setTranslation(V(x, y, z), true); b.setRotation(q, true); } else { b.setNextKinematicTranslation(V(x, y, z)); b.setNextKinematicRotation(q); }
+    });
+  }
+  function tnRelease(t, fling) {
+    if (t.vic && fling) for (const b of t.vic.bodies) addVel(b, fling);
+    letGo(t);
+  }
+  function tnPark(t) {
+    tnRelease(t);
+    t.st = 'off'; t.tip = V(t.root.x, poolY - 3, t.root.z);
+    t.segs.forEach(b => b.setTranslation(V(t.root.x, TPARK, t.root.z), true));
+  }
+  const tipOf = t => t.segs[TSEG - 1].translation();
+  function tnGrip(t) {
+    const at = tipOf(t);
+    for (const c of overlap(at, 0.7, 0x1fe | (0xffff << 16))) {
+      const vic = owner.get(c.handle)?.p;
+      if (!vic?.alive || vic.safe > 0 || vic.bitten) continue;
+      const b = c.parent(), tb = t.segs[TSEG - 1];
+      t.bite = world.createImpulseJoint(RAPIER.JointData.spherical(qrot(qconj(tb.rotation()), sub(b.translation(), tb.translation())), V()), tb, b, true);
+      t.bite.setContactsEnabled(false);
+      t.vic = vic; vic.bitten = t;
+      releaseGrabs(vic);
+      fx('hit', at, 1, -1, vic.slot);
+      t.st = 'hold'; t.throw = Math.random() < 0.35; t.t = t.throw ? 2 : 5; t.slip = 0.4;
+      return true;
+    }
+    return false;
+  }
+  // a fast tip slapping someone: dazed and knocked along its swing (GB's damageModifier on every segment)
+  function tnSlap(t, v) {
+    if (len(v) < 6) return;
+    for (const c of overlap(tipOf(t), 0.6, 0x1fe | (0xffff << 16))) {
+      const p = owner.get(c.handle)?.p;
+      if (!p?.alive || p === t.vic || p.safe > 0 || (p.slapAt ?? -1) > mt) continue;
+      p.slapAt = mt + 0.6;
+      by = -1; hit(p, TORSO, mul(v, 0.6), 20);
+    }
+  }
+  const rim = () => { const a = Math.random() * Math.PI * 2, r = 4.8 + Math.random() * 2.5; return V(r * Math.sin(a), 0.4, r * Math.cos(a)); };
+  function stepTentacles() {
+    if (!tentacles.length || st === 'count') return;
+    if (!octo.on) {
+      if ((octo.t -= DT) > 0) return;
+      octo.on = true; octo.phase = 'idle'; octo.t = 20;
+      for (const t of tentacles) { t.st = 'idle'; tnPlace(t, true); }
+      fx('breach', V(0, poolY, 0), 0, -1, -1);
+    }
+    if ((octo.t -= DT) <= 0) { // the next turn: idle <-> attack, each a bit wilder
+      if (octo.phase === 'idle') { octo.phase = 'attack'; octo.t = Math.min(18, 10 + 2 * octo.turn); }
+      else { octo.phase = 'idle'; octo.turn++; octo.t = Math.max(6, 20 - 4 * octo.turn); }
+    }
+    for (const t of tentacles) {
+      if (t.vic && !t.vic.alive) letGo(t);
+      if (t.st === 'hold' && !t.vic) t.st = 'idle';
+      const sway = mt * 0.9 + t.k * 1.7, [rx, rz] = TENTACLE_ROOTS[t.k];
+      if (t.st === 'idle' && octo.phase === 'attack') t.st = 'pick';
+      if (t.st === 'pick') { // half the time the nearest beast in reach, else a flail round the rim
+        const near = Math.random() < 0.5 ? ps.filter(p => p.alive && !(p.safe > 0) && !p.bitten && p.bodies[TORSO].translation().y > poolY - 5)
+          .map(p => { const q = p.bodies[TORSO].translation(); return [p, Math.hypot(q.x - rx, q.z - rz)]; }).filter(e => e[1] < 6).sort((a, b) => a[1] - b[1])[0] : null;
+        t.prey = near?.[0] ?? null; t.st = t.prey ? 'attack' : 'flail'; t.t = t.prey ? 5 : 2; t.goal = rim();
+      }
+      let goal, speed = Math.min(15, 4 + 4 * octo.turn), arch = 1.2;
+      if (t.st === 'idle') { goal = V(rx + 1.2 * Math.sin(sway), poolY + 1.8 + 0.8 * Math.sin(sway * 1.3), rz + 1.2 * Math.cos(sway)); speed = 3; }
+      else if (t.st === 'attack' || t.st === 'flail') {
+        arch = 3;
+        goal = t.st === 'attack' && t.prey?.alive ? t.prey.bodies[TORSO].translation() : t.goal;
+        if ((t.t -= DT) <= 0 || (t.st === 'flail' && len(sub(goal, t.tip)) < 0.5)) t.st = octo.phase === 'attack' ? 'pick' : 'idle';
+        tnGrip(t);
+      } else { // hold
+        arch = 2;
+        goal = t.throw ? V(rx * 1.3, poolY + 4.5, rz * 1.3) : V(rx, -10, rz);
+        speed = t.throw ? 6 : 4;
+        const done = (t.t -= DT) <= 0 || len(sub(goal, t.tip)) < 0.4;
+        if (!t.throw && (t.slip -= DT) <= 0) { t.slip = 0.4 * (0.75 + Math.random() * 0.5); if (Math.random() < 0.2) { tnRelease(t); t.st = 'idle'; } }
+        if (t.st === 'hold' && done) { tnRelease(t, t.throw ? add(mul(norm(V(rx, 0, rz)), 9), V(0, 6, 0)) : null); t.st = 'idle'; }
+      }
+      const d = sub(goal, t.tip), dl = len(d), v = dl > 1e-3 ? mul(d, Math.min(dl, speed * DT) / dl / DT) : V();
+      t.tip = add(t.tip, mul(v, DT));
+      t.arch += (arch - t.arch) * Math.min(1, 2 * DT);
+      tnPlace(t);
+      tnSlap(t, v);
+    }
+  }
+
   function resetRound() {
+    for (const t of tentacles) tnPark(t);
+    Object.assign(octo, { on: false, turn: 0, t: 15 + Math.random() * 15 });
     for (const s of sharks) { skPark(s); s.t = SK.ai.startDelay; }
     for (const p of ps) removeRagdoll(p);
     order = shuffle(order);
@@ -1556,7 +1668,7 @@ export function createSim({ mapId, players, practice = false, roundsToWin = 3, t
     const active = st !== 'count';
     for (const p of ps) { if (p.next != null) feed(p); if (p.alive && !p.dry) { control(p, active); belts(p); water(p); trainHit(p); } }
     stepHooks();
-    stepSharks();
+    stepSharks(); stepTentacles();
     // a client whose inputs ran dry (a stall: the relay, TURN over TCP) is paused for the step, unless something is
     // happening to them. Kept walking on the last input, they ran ahead of their own predicted copy by the whole stall,
     // then the late inputs played on top and they got yanked back (measured: no more >0.5m corrections walking over TCP)
@@ -1614,6 +1726,9 @@ export function createSim({ mapId, players, practice = false, roundsToWin = 3, t
       // sharks out of the deep: [which, jaws open, torso xyz, every part's rotation]; clients rebuild the rest down the joints
       sk: sharks.filter(s => s.st !== 'sleep').map(s => [s.k, s.mouth, ...['x', 'y', 'z'].map(c => r2(torsoOf(s).translation()[c])),
         ...s.bodies.flatMap(b => { const q = b.rotation(); return [r3(q.x), r3(q.y), r3(q.z), r3(q.w)]; })]),
+
+      // Aquarium's tentacles out of the pool: [which, tip xyz, arch]; clients bend them the same (maps.js tentacleSpine)
+      tn: tentacles.filter(t => t.st !== 'off').map(t => [t.k, r2(t.tip.x), r2(t.tip.y), r2(t.tip.z), r2(t.arch)]),
     };
   }
 

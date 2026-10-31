@@ -8,7 +8,7 @@ import { ShaderPass } from 'three/addons/postprocessing/ShaderPass.js';
 import { OutputPass } from 'three/addons/postprocessing/OutputPass.js';
 import { OutlinePass } from 'three/addons/postprocessing/OutlinePass.js';
 import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
-import { MAPS, trainsAt, wheelAngle } from './maps.js';
+import { MAPS, trainsAt, wheelAngle, waterLevel, tentacleSpine, TENTACLE_LEN } from './maps.js';
 import { CHAMPS, TEAM_COLORS, FFA_COLORS } from './champs.js';
 import { PARTS, ORDER, ANCHOR, HAND, CHEST, HEAD, ARM, FORE, LEG, HIPS, HIP_HEIGHT, qmul, qinv, qrot } from './beast.js';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
@@ -195,7 +195,7 @@ export function createRenderer(canvas) {
   const rim = new THREE.DirectionalLight('#9ad8ff', 0.9); // cool back light so silhouettes pop
   scene.add(hemi, sun, sun.target, rim);
 
-  let world = null, sharks = [], avatars = [], rollers = [], cars = [], wheel = null, hookPool = [], gluePool = [], setup = null, animated = [];
+  let world = null, sharks = [], tentacles = [], avatars = [], rollers = [], cars = [], wheel = null, hookPool = [], gluePool = [], setup = null, animated = [];
   const camAt = new THREE.Vector3(0, 0, 0);
   let camDist = 14, shake = 0, time = 0;
   const sunOffset = new THREE.Vector3(8, 20, 6);
@@ -406,6 +406,7 @@ export function createRenderer(canvas) {
     cars = []; wheel = null; loop('train', 0); // a new map: no engine left running from the last one
     rollers = buildMap(world, MAPS[s.map], s.map);
     sharks = []; const sharksIn = MAPS[s.map].shark ? buildSharks(world, MAPS[s.map]) : null;
+    tentacles = []; const tentaclesIn = MAPS[s.map].octopus && MAPS[s.map].imported ? buildTentacles(world, MAPS[s.map]) : null;
     for (const l of [hemi, sun, rim]) l.visible = l.intensity > 0; // an unlit light still costs every shader, and the sun a 4096² shadow pass
     avatars = s.players.map((p, slot) => { const a = makeAvatar(p.champ, playerColor(s, slot), p.name, !!s.teams); world.add(a.group); return a; });
     hookPool = []; gluePool = [];
@@ -416,12 +417,12 @@ export function createRenderer(canvas) {
     const sky = skyReady; skyReady = null;
     // (sharks too, shown for it: compileAsync skips hidden objects, and their first surfacing froze the game). Then the
     // textures, one a frame, and a first draw: all at once on the first frame shown they froze it ~0.9s
-    const mark = compiling = Promise.all([sky, sharksIn]).then(() => {
-      for (const v of sharks) v.m.visible = true;
+    const mark = compiling = Promise.all([sky, sharksIn, tentaclesIn]).then(() => {
+      for (const v of [...sharks, ...tentacles]) v.m.visible = true;
       renderer.setRenderTarget(composer.readBuffer); // the RenderPass draws into this (linear, no tone mapping): compile those variants
       const job = renderer.compileAsync(scene, camera);
       renderer.setRenderTarget(null);
-      for (const v of sharks) v.m.visible = false;
+      for (const v of [...sharks, ...tentacles]) v.m.visible = false;
       return job;
     }).then(async () => {
       const texs = new Set();
@@ -519,6 +520,7 @@ export function createRenderer(canvas) {
         // water uses Gang Beasts' own shader; a plain sea blue stands in
         color: /^Water/.test(d.name) ? new THREE.Color('#2f7fb5') : new THREE.Color().setRGB(d.color[0], d.color[1], d.color[2], THREE.SRGBColorSpace),
         map: d.map ? tex(d.map) : null, roughness: 1 - d.smoothness * 0.8, metalness: d.metallic,
+        ...MAPS[setup.map]?.water?.length && /^Water/.test(d.name) ? { transparent: true, opacity: 0.8, depthWrite: false } : {}, // Aquarium's pools: see who's sinking
       });
       if (d.emission && Math.max(...d.emission) > 0) m.emissive.setRGB(...d.emission.map(v => Math.min(v, 1)));
       // lightmapped surfaces get their ambient from the lightmap alone, like in Unity
@@ -839,6 +841,51 @@ export function createRenderer(canvas) {
     });
   }
 
+  // Aquarium's octopus (tools/import_tentacle.py): eight skinned GB tentacles. Their bones sit straight up the mesh's y axis,
+  // so each bone's inverse is just its height; posed along the spine the host bends (maps.js tentacleSpine)
+  function buildTentacles(g, map) {
+    const base = map.imported.base, mine = g;
+    return Promise.all([xhr(base + 'tentacle.json', 'json'), xhr(base + 'tentacle.bin', 'arraybuffer')]).then(async ([tj, buf]) => {
+      const texs = await Promise.all(tj.mats.map(m => m.tex ? new THREE.TextureLoader().loadAsync(base + m.tex) : null));
+      if (world !== mine) return;
+      let o = 0;
+      const take = (T, n) => { const a = new T(buf, o, n); o += n * T.BYTES_PER_ELEMENT; return a; }, n = tj.verts;
+      const geo = new THREE.BufferGeometry();
+      geo.setAttribute('position', new THREE.BufferAttribute(take(Float32Array, n * 3), 3));
+      geo.setAttribute('normal', new THREE.BufferAttribute(take(Float32Array, n * 3), 3));
+      geo.setAttribute('uv', new THREE.BufferAttribute(take(Float32Array, n * 2), 2));
+      geo.setAttribute('skinWeight', new THREE.BufferAttribute(take(Float32Array, n * 4), 4));
+      geo.setAttribute('skinIndex', new THREE.BufferAttribute(take(Uint16Array, n * 4), 4));
+      geo.setIndex(new THREE.BufferAttribute(take(Uint32Array, tj.indices), 1));
+      tj.subs.forEach(([s, c], i) => geo.addGroup(s, c, i));
+      const mats = tj.mats.map((m, i) => { if (texs[i]) texs[i].colorSpace = THREE.SRGBColorSpace; return new THREE.MeshStandardMaterial({ map: texs[i], color: new THREE.Color().setRGB(...m.color, THREE.SRGBColorSpace), roughness: 0.5 }); });
+      const inv = tj.bones.map(y => new THREE.Matrix4().makeTranslation(0, -y, 0));
+      tentacles = [0, 1, 2, 3, 4, 5, 6, 7].map(() => {
+        const bones = tj.bones.map(() => { const b = new THREE.Bone(); g.add(b); return b; });
+        const m = new THREE.SkinnedMesh(geo, mats);
+        m.bind(new THREE.Skeleton(bones, inv), new THREE.Matrix4());
+        m.bindMode = 'detached'; m.frustumCulled = false; m.castShadow = m.receiveShadow = true; m.visible = false;
+        g.add(m);
+        return { m, bones, fs: tj.bones.map(y => y / TENTACLE_LEN) };
+      });
+    }).catch(() => {});
+  }
+  const tq = new THREE.Quaternion(), tUp = new THREE.Vector3(0, 1, 0), tDir = new THREE.Vector3();
+  function poseTentacles(a, b, t) {
+    if (!tentacles.length) return;
+    const map = MAPS[setup.map], y = waterLevel(map, 0, 0) ?? 0;
+    tentacles.forEach((v, k) => {
+      const eb = b.tn?.find(e => e[0] === k), ea = a.tn?.find(e => e[0] === k) ?? eb;
+      v.m.visible = !!eb;
+      if (!eb) return;
+      const at = [1, 2, 3, 4].map(i => ea[i] + (eb[i] - ea[i]) * t);
+      tentacleSpine(k, at.slice(0, 3), at[3], v.fs, y).forEach(([x, py, z, dx, dy, dz], i) => {
+        v.bones[i].position.set(x, py, z);
+        v.bones[i].quaternion.setFromUnitVectors(tUp, tDir.set(dx, dy, dz)).multiply(tq.setFromAxisAngle(tUp, Math.atan2(-x, -z))); // suckers turned in toward the pool's middle
+      });
+    });
+  }
+
   // the Gang Beasts beast mesh, skinned to our part frames (bones ride along as children of the parts)
   function beastMeshes(parts, bodyMat, eyeMat) {
     const { json, body, head } = beastAsset;
@@ -961,7 +1008,7 @@ export function createRenderer(canvas) {
   function apply(a, b, alpha, own, shift) {
     if (!setup) return;
     const centre = new THREE.Vector3(), alive = [];
-    poseSharks(a, b, alpha);
+    poseSharks(a, b, alpha); poseTentacles(a, b, alpha);
     b.p.forEach((pb, slot) => {
       let pa = a.p[slot], t = alpha;
       if (own?.slot === slot) { pa = own.a; pb = own.b; t = own.alpha; }
@@ -1022,12 +1069,13 @@ export function createRenderer(canvas) {
           av.hay.reach(rangeMin + (range - rangeMin) * k);
         }
       }
-      if (seaY != null) {
-        const wet = torso.y < seaY + 0.2;
-        if (wet && !av.wet) emit(tmp.copy(torso).setY(seaY), { color: '#e8f6ff', n: 16, speed: 4, size: 0.3, life: 0.6, grav: -9, up: 2, additive: false, opacity: 0.8 }); // splash
+      const wy = seaY ?? waterLevel(MAPS[setup.map], torso.x, torso.z); // Aquarium: whichever pool they're over
+      if (wy != null) {
+        const wet = torso.y < wy + 0.2;
+        if (wet && !av.wet) emit(tmp.copy(torso).setY(wy), { color: '#e8f6ff', n: 16, speed: 4, size: 0.3, life: 0.6, grav: -9, up: 2, additive: false, opacity: 0.8 }); // splash
         av.wet = wet;
-        if (head.y < seaY - 0.1 && Math.random() < (flags & 2048 ? 0.6 : 0.15)) emit(head, { color: '#d8f2ff', n: 1, speed: 0.4, size: 0.12, life: 0.8, grav: 3, up: 1, additive: false, opacity: 0.7 }); // breath bubbling out
-        else if (flags & 2048 && Math.random() < 0.3) emit(tmp.copy(head).setY(Math.max(head.y, seaY) + 0.1), { color: '#ffffff', n: 1, speed: 1.5, size: 0.14, life: 0.4, grav: -6, up: 2, additive: false, opacity: 0.8 }); // tiring: thrashing spray
+        if (head.y < wy - 0.1 && Math.random() < (flags & 2048 ? 0.6 : 0.15)) emit(head, { color: '#d8f2ff', n: 1, speed: 0.4, size: 0.12, life: 0.8, grav: 3, up: 1, additive: false, opacity: 0.7 }); // breath bubbling out
+        else if (flags & 2048 && Math.random() < 0.3) emit(tmp.copy(head).setY(Math.max(head.y, wy) + 0.1), { color: '#ffffff', n: 1, speed: 1.5, size: 0.14, life: 0.4, grav: -6, up: 2, additive: false, opacity: 0.8 }); // tiring: thrashing spray
       }
       av.stars.visible = !!(flags & 16); // stars only while knocked out
       av.stars.position.copy(head).y += 0.45;

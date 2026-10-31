@@ -37,6 +37,45 @@ export function wheelAngle(map, t) {
   return k * (w0 * t + (w1 - w0) * (ramp * ramp / (2 * (b - a)) + Math.max(t - b, 0)));
 }
 
+// the water's surface over (x, z), or null for none: the sea of Trawler and Wheel (view.sea) everywhere, Aquarium's pools over
+// their own water meshes (stages.js water: triangles flattened to x, z). Only with the stage imported
+export function waterLevel(map, x, z) {
+  if (!map.imported) return null;
+  if (map.view?.sea != null) return map.view.sea;
+  for (const w of map.water ?? []) {
+    if (x < w.min[0] || x > w.max[0] || z < w.min[1] || z > w.max[1]) continue;
+    const t = w.tris;
+    for (let i = 0; i < t.length; i += 6) {
+      const s = (ax, az, bx, bz) => (bx - ax) * (z - az) - (bz - az) * (x - ax);
+      const a = s(t[i], t[i + 1], t[i + 2], t[i + 3]), b = s(t[i + 2], t[i + 3], t[i + 4], t[i + 5]), c = s(t[i + 4], t[i + 5], t[i], t[i + 1]);
+      if ((a >= 0 && b >= 0 && c >= 0) || (a <= 0 && b <= 0 && c <= 0)) return w.y;
+    }
+  }
+  return null;
+}
+
+// Aquarium's octopus: eight tentacles rooted 3m out round the pool's centre (Gang Beasts' layout), 19.5m long
+export const TENTACLE_ROOTS = [0, 1, 2, 3, 4, 5, 6, 7].map(k => [3 * Math.sin(k * Math.PI / 4), 3 * Math.cos(k * Math.PI / 4)]);
+export const TENTACLE_LEN = 19.5;
+// points along tentacle k's spine at fractions fs (0 deep in the pool, 1 the tip), each [x, y, z, tangent x, y, z]: up out of
+// the water at y over its root, arching `arch` high over to `tip`. A cubic Bezier, sampled by arc length so the bones keep
+// their spacing. Shared by the host's colliders (sim.js) and the drawn bones (render.js), so both bend it the same
+export function tentacleSpine(k, tip, arch, fs, y) {
+  const [rx, rz] = TENTACLE_ROOTS[k], top = Math.max(tip[1], y) + arch;
+  const P = [[rx, y - 14, rz], [rx, y + arch * 0.6, rz], [rx + (tip[0] - rx) * 0.6, top, rz + (tip[2] - rz) * 0.6], tip];
+  const at = u => { const v = 1 - u, w = [v * v * v, 3 * v * v * u, 3 * v * u * u, u * u * u]; return [0, 1, 2].map(c => w.reduce((s, wi, i) => s + wi * P[i][c], 0)); };
+  const N = 24, pts = [], acc = [0];
+  for (let i = 0; i <= N; i++) pts.push(at(i / N));
+  for (let i = 1; i <= N; i++) acc.push(acc[i - 1] + Math.hypot(...[0, 1, 2].map(c => pts[i][c] - pts[i - 1][c])));
+  return fs.map(f => {
+    const d = f * acc[N];
+    let i = 1;
+    while (i < N && acc[i] < d) i++;
+    const s = (d - acc[i - 1]) / ((acc[i] - acc[i - 1]) || 1), a = pts[i - 1], b = pts[i], L = Math.hypot(...[0, 1, 2].map(c => b[c] - a[c])) || 1;
+    return [...[0, 1, 2].map(c => a[c] + (b[c] - a[c]) * s), ...[0, 1, 2].map(c => (b[c] - a[c]) / L)];
+  });
+}
+
 export const MAPS = {
   // Gang Beasts stages (gb); without an import each is a stand-in: Girders its own beams, the rest a plain floor
   rooftop: {
@@ -124,6 +163,17 @@ export const MAPS = {
     boxes: [box(0, -0.2, -6, 6, 0.2, 4, 'plate')],
     rollers: [], kill: [],
     spawns: [[-3, 0, -4], [3, 0, -4], [-3, 0, -8], [3, 0, -8], [0, 0, -3], [0, 0, -9], [-5, 0, -6], [5, 0, -6]],
+  },
+  aquarium: {
+    name: 'Aquarium',
+    blurb: 'An aquarium with an octopus in the pool. Its tentacles will drag you under.',
+    gb: 'aquarium',
+    pools: /aquarium_water(Upper|Lower)$/, // swim in the stage's own water meshes (stages.js): the round pool and the lower tank
+    octopus: true, // Gang Beasts' tentacles (tools/import_tentacle.py; sim.js stepTentacles)
+    killY: -20, // under the round pool GB's Kill Volume starts 4.5m down: what the tentacles drag you into
+    boxes: [box(0, -0.2, 0, 8, 0.2, 8, 'plate')],
+    rollers: [], kill: [],
+    spawns: [[-6, 0, 0], [6, 0, 0], [0, 0, -6], [0, 0, 6], [-4.2, 0, -4.2], [4.2, 0, 4.2], [-4.2, 0, 4.2], [4.2, 0, -4.2]],
   },
   grind: {
     name: 'Grind',

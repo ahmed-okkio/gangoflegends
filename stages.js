@@ -39,7 +39,8 @@ export async function prepareMap(id, { meshes = !isNode } = {}) {
   try { scene = await readJson(base + 'scene.json'); } catch { return map; } // not imported: keep the procedural fallback
   const bins = {}, tris = scene.trimeshes ?? [];
   const W = scene.wheel, wtris = W ? [...W.frame.tris, ...W.car.tris] : [];
-  const keys = new Set([...meshes ? Object.keys(scene.meshes) : [], ...tris.map(t => t.mesh), ...wtris.map(t => t.mesh)]);
+  const pools = map.pools ? scene.renderers.filter(r => map.pools.test(r.path)) : [];
+  const keys = new Set([...meshes ? Object.keys(scene.meshes) : [], ...tris.map(t => t.mesh), ...wtris.map(t => t.mesh), ...pools.map(r => r.mesh)]);
   await Promise.all([...keys].map(async k => { bins[k] = await readBin(base + k + '.bin'); }));
   // Incinerator's football-only colliders under and beside its conveyors would hold feet still between the rollers.
   // (The stair ramps for the ball stay: they help ragdolls up the steps.)
@@ -51,6 +52,7 @@ export async function prepareMap(id, { meshes = !isNode } = {}) {
     tris: tris.map(t => meshTris(scene.meshes[t.mesh], bins[t.mesh], t.matrix)),
     rollers: [],
     kill: map.gbKill === false ? map.kill : scene.kill.filter(k => !map.gbKillSkip?.test(k.path)).map(killBox),
+    water: pools.map(r => poolOf(meshTris(scene.meshes[r.mesh], bins[r.mesh], r.matrix ?? [[1, 0, 0, 0], [0, 1, 0, 0], [0, 0, 1, 0]]))), // Aquarium's (maps.js waterLevel)
     train: scene.train ?? null, // Subway's car: its renderers and solid box (maps.js trains)
     // Wheel's ferris wheel: the frame's colliders relative to the hub, one gondola's relative to its hinge (sim.js), and where the hinges sit
     turning: W && map.wheel ? { hub: W.hub, cars: W.cars, ...Object.fromEntries(['frame', 'car'].map(k => [k, { boxes: W[k].boxes, caps: W[k].caps, tris: W[k].tris.map(t => meshTris(scene.meshes[t.mesh], bins[t.mesh], t.matrix)) }])) } : null,
@@ -60,6 +62,13 @@ export async function prepareMap(id, { meshes = !isNode } = {}) {
   };
   if (map.sharks) try { MAPS[id].shark = await readJson(base + 'shark.json'); } catch { /* not imported (tools/import_shark.py): no sharks */ }
   return MAPS[id];
+}
+
+// a flat water mesh as its height and its triangles' x, z (maps.js waterLevel), with their bounds
+function poolOf({ v, i }) {
+  const tris = new Float32Array(i.length * 2), min = [Infinity, Infinity], max = [-Infinity, -Infinity];
+  i.forEach((n, k) => { const x = v[n * 3], z = v[n * 3 + 2]; tris[k * 2] = x; tris[k * 2 + 1] = z; min[0] = Math.min(min[0], x); min[1] = Math.min(min[1], z); max[0] = Math.max(max[0], x); max[1] = Math.max(max[1], z); });
+  return { y: v[1], tris, min, max };
 }
 
 // a stage's kill volume (oriented box) as the world-space { min, max } box sim.js tests the chest against. Gang Beasts

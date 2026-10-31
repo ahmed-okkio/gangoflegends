@@ -82,7 +82,9 @@ def wm(pid):
 # all of Wheel's pier). Matched by name without Unity's " (n)" suffix. Wheel's "dynamic" (the turning wheel) stays off here:
 # it's exported on its own below. Both railing sets, back and front
 WAKE = {"trawler": {"Trawler"}, "wheel": {"World", "Pier_Wheel_Station", "Pier_Connection_Planks", "Pier_Main_Planks", "Pier_Main_SupportsLongA",
-                                          "Pier_Main_SupportsLongB", "Pier_Main_SupportsShortA", "Railing", "RailingForBack", "RailingForFront", "wheel text"}}
+                                          "Pier_Main_SupportsLongB", "Pier_Main_SupportsShortA", "Railing", "RailingForBack", "RailingForFront", "wheel text"},
+        # Aquarium: its railings and benches (its WavesEnabler water is the Waves mode's, lower; melee keeps the stage's own)
+        "aquarium": {"Railings", "Benches"}}
 base_name = lambda n: n.rsplit(" (", 1)[0] if n.endswith(")") else n
 def is_active(pid):
     if pid not in active:
