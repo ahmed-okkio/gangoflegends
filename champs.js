@@ -63,6 +63,13 @@ export const CHAMPS = {
       { id: 'valor', name: 'Valor', cd: 7, lock: true, desc: 'Dash toward your cursor, then burst out, stunning everyone around you.' },
     ],
   },
+  pyke: {
+    name: 'Pyke', title: 'The Bloodharbor Ripper', body: '#56645a', limb: '#47534a', eyes: '#bfeaff', glow: '#3fe0b0',
+    abilities: [
+      { id: 'skewer', name: 'Bone Skewer', cd: 7, aim: 9, aimMin: 3, windup: 1, release: true, desc: 'Hold to charge its range (aimed at your cursor), let go to throw your harpoon. It yanks the first champ it hits half way to you: caught up close, they are flipped right over your head behind you.' },
+      { id: 'undertow', name: 'Phantom Undertow', cd: 8, desc: 'Dash the way you face, through champs, leaving your phantom behind. A moment later it rushes back to you, stunning everyone in its path (everyone sees the path light up).' },
+    ],
+  },
   sylas: {
     name: 'Sylas', title: 'The Unshackled', body: '#c48f6c', limb: '#a0704f', eyes: '#c9a8ff', glow: '#5fa8ff',
     abilities: [

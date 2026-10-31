@@ -39,7 +39,7 @@ const turnToward = (a, b, max) => a + Math.max(-max, Math.min(max, wrap(b - a)))
 // --- ragdoll: the Gang Beasts beast (beast.js). Part index = body index everywhere; bodies[0] is the chest. ---
 const TORSO = CHEST;
 const CORE = [HIPS, WAIST, CHEST, HEAD, THIGH, THIGH + 1, LEG, LEG + 1]; // moved as one by the locomotion; arms hang off it
-const HOST_CASTS = ['hook', 'sentence', 'adhesive', 'hijack']; // GB mode: a client's copy never plays these (useAbility): they tie me to someone or put something in the world
+const HOST_CASTS = ['hook', 'sentence', 'skewer', 'adhesive', 'hijack']; // GB mode: a client's copy never plays these (useAbility): they tie me to someone or put something in the world
 const LEAPS = ['sentence', 'sonic']; // abilities whose recast flies you to whoever they caught (Thresh Q, Lee Sin Q)
 const HOIST = [WAIST, CHEST]; // lifted by a hoist, carrying the whole core's weight; hips and legs hang off it
 const HOIST_K = CORE.reduce((m, i) => m + PARTS[i].mass, 0) / HOIST.reduce((m, i) => m + PARTS[i].mass, 0);
@@ -55,6 +55,7 @@ const PULV_R = 2.8; // Alistar Q reach
 const GLUE_T = 3; // Singed Q puddle lifetime, s
 const DRAW_T = 0.5; // the last ones out within this many seconds of each other draw the round
 const SPIN = 0.3; // Hecarim Q: seconds for its one turn
+const SKEWER_FLIP = 3; // Pyke Q: caught closer than this (m), they're flipped over him rather than pulled half way
 const KICK = 0.35; // Lee Sin E: seconds for the roundhouse's turn; it lands as the leg comes round to the front
 // water (Trawler's sea, map.view.sea): every part floats, like Gang Beasts' per-part buoyancy colliders, as long as you've
 // stamina (theirs: 100) and hold jump: let go and you sink. Treading water and swimming wear it down, a head held under wears it down fast; tired, you sink to
@@ -260,7 +261,7 @@ export function createSim({ mapId, players, practice = false, roundsToWin = 3, t
       alive: true, yaw, daze: 0, sinceHit: 9, ko: 0, kos: 0, cd: [0, 0], punch: null, punchCd: 0, armCd: [0, 0], queued: [0, 0], abQ: [0, 0], castTick: [null, null], grabs: [null, null], held: [0, 0],
       stun: 0, spin: 0, spinHit: null, stole: null, charge: 0, empower: 0, jumpT: 0, mantled: false, heave: null, stuckT: [0, 0], ghost: [false, false], phase: 0, grounded: false, prevB: p.input.b,
       butt: null, buttCd: 0, lying: false, safe: 0, hooked: 0, spinA: 0, chargeT: 0,
-      stamina: 100, wet: false, drowned: false, emp: null, dash: null, vault: 0, vaultBtn: 0, hay: 0, hayBtn: 0, fb: 0, pulv: 0, flay: 0, fling: 0, tether: null, leap: null, dizzy: 0, kick: null, kickA: 0, palm: 0, qTurn: null, abduct: 0, wings: null,
+      stamina: 100, wet: false, drowned: false, emp: null, dash: null, vault: 0, vaultBtn: 0, hay: 0, hayBtn: 0, fb: 0, pulv: 0, flay: 0, fling: 0, tether: null, leap: null, dizzy: 0, kick: null, kickA: 0, palm: 0, qTurn: null, abduct: 0, wings: null, undertow: null, phased: null, aimT: [0, 0], toss: 0,
     });
   }
 
@@ -382,6 +383,13 @@ export function createSim({ mapId, players, practice = false, roundsToWin = 3, t
     setLegGroups(p, legGroups(p));
     for (const b of p.bodies) { b.setLinearDamping(1); for (let c = 0; c < b.numColliders(); c++) b.collider(c).setFriction(0.8); }
   }
+  // Pyke E: through champs for the dash (only the world collides), each collider's groups put back after
+  function phase(p, on) {
+    if (on === !!p.phased) return;
+    const cols = p.bodies.flatMap(b => Array.from({ length: b.numColliders() }, (_, c) => b.collider(c)));
+    if (on) { p.phased = cols.map(c => c.collisionGroups()); for (const c of cols) c.setCollisionGroups((c.collisionGroups() & 0xffff0000) | 1); }
+    else { cols.forEach((c, i) => c.setCollisionGroups(p.phased[i])); p.phased = null; }
+  }
   function setLegGroups(p, g) {
     p.bodies.forEach((b, i) => { if (isLeg(i)) for (let c = 0; c < b.numColliders(); c++) b.collider(c).setCollisionGroups(g); });
   }
@@ -495,6 +503,8 @@ export function createSim({ mapId, players, practice = false, roundsToWin = 3, t
       if (!(gb && local >= 0)) hooks.push({ o: p, pos: at, dir: f, t: 0, vic: null, pull: 0, lee: true });
       fx('wave', at, 0, p.slot);
     } else if (ab.id === 'hook' || ab.id === 'sentence') hooks.push({ o: p, pos: add(add(t, mul(f, 0.7)), V(0, 0.2, 0)), dir: f, t: 0, vic: null, pull: 0, thresh: ab.id === 'sentence' });
+    else if (ab.id === 'skewer') p.toss = 0.25, hooks.push({ o: p, pos: add(add(t, mul(f, 0.7)), V(0, 0.2, 0)), dir: f, t: 0, vic: null, pull: 0, pyke: true, reach: ab.aimMin + (ab.aim - ab.aimMin) * Math.min(1, p.aimT[i] / ab.windup) }); // charged reach, like the strip
+    else if (ab.id === 'undertow') { p.dash = { t: 0.25, power: 0, sylas: true }; p.undertow = { from: t, t: 0.6 }; phase(p, true); fx('phantom', t, 0, p.slot); } // sylas: a dash that bumps nobody, arms trailing
     else if (ab.id === 'fist') { p.empower = 4; p.emp = 'launch'; }
     else if (ab.id === 'rampage') { p.spin = SPIN; p.spinHit = new Set(); }
     else if (ab.id === 'abscond') { p.dash = { t: 0.2, power: 0, sylas: true }; p.empower = 4; p.emp = 'aoe'; p.abduct = ab.recast; fx('swing', t, 0, p.slot); }
@@ -628,6 +638,19 @@ export function createSim({ mapId, players, practice = false, roundsToWin = 3, t
       if (o.ko <= 0 && o.safe <= 0) { o.stun = Math.max(o.stun, 0.5); cancel(o); }
     }
   }
+  // Pyke E: his phantom rushes back from where he dashed from to where he is now, stunning everyone along the way
+  function undertow(p, from, t) {
+    const d = sub(t, from), l = Math.hypot(d.x, d.z) || 1;
+    fx('undertow', add(from, mul(d, 0.5)), Math.atan2(d.x, d.z), p.slot, Math.round(l * 10)); // vic carries the length in dm
+    if (local >= 0) return;
+    for (const o of ps) {
+      if (o === p || !o.alive) continue;
+      const e = sub(seen(p, o), from), along = (e.x * d.x + e.z * d.z) / l;
+      if (along < -0.6 || along > l + 0.6 || Math.abs(e.x * d.z - e.z * d.x) / l > 0.9 || Math.abs(e.y) > 1.2) continue;
+      hit(o, TORSO, V(0, 0, 0), 15); // no knock: they stay on their feet, dazed
+      if (o.ko <= 0 && o.safe <= 0) { o.stun = Math.max(o.stun, 1); o.dizzy = 1; cancel(o); }
+    }
+  }
   // Singed Q: a glue puddle where the throw lands (on whatever floor is under that point; none = it falls away)
   function adhesive(p, f, t, ab) {
     const at = add(t, mul(f, Math.min(ab.aim, p.aimD ?? ab.aim - ab.radius))), ray = world.castRay(new RAPIER.Ray(V(at.x, t.y + 1, at.z), DOWN), 12, true, undefined, (1 << 16) | 1); // floor only
@@ -752,7 +775,8 @@ export function createSim({ mapId, players, practice = false, roundsToWin = 3, t
         if (pr && LEAPS.includes(abs[i].id) && p.tether != null) { useAbility(p, i); continue; } // recast: no aiming
         const flying = LEAPS.includes(abs[i].id) && hooks.find(h => h.o === p && !h.vic);
         if (pr && flying) { flying.leap = true; continue; } // recast before it caught (a ping's worth early): leap when it does
-        if (pr && (p.cd[i] <= 0 || abducting)) p.aimBtn |= btn;
+        if (pr && (p.cd[i] <= 0 || abducting)) { p.aimBtn |= btn; p.aimT[i] = 0; }
+        if (p.aimBtn & btn) p.aimT[i] += DT; // how long it's been held: a windup release ability's reach (Pyke Q)
         if (p.aimBtn & btn && !(inp.b & btn)) { p.aimBtn &= ~btn; if (aim != null) p.yaw = aim; useAbility(p, i); }
       }
       if (aim != null && (p.aimBtn || p.vault > 0)) p.yaw = aim;
@@ -788,7 +812,9 @@ export function createSim({ mapId, players, practice = false, roundsToWin = 3, t
       else { if (move) haymaker(p, f, tp, hayK(p)); p.hay = 0; } // stunned out of it (a hook, Pulverize): no throw, and the cooldown stays spent
     }
     if (p.rivA && (p.rivA.t += DT) > p.rivA.d) p.rivA = null;
-    p.fb -= DT; p.pulv -= DT; p.flay -= DT; p.fling -= DT; p.palm -= DT;
+    if (p.phased && !p.dash) phase(p, false);
+    if (p.undertow && (p.undertow.t -= DT) <= 0) { undertow(p, p.undertow.from, tp); p.undertow = null; }
+    p.fb -= DT; p.pulv -= DT; p.flay -= DT; p.fling -= DT; p.palm -= DT; p.toss -= DT;
     if (p.qTurn && ((p.qTurn.t -= DT) <= 0 || ahead(p) > 0.5)) { p.yaw = p.qTurn.yaw; p.qTurn = null; useAbility(p, 0, true); }
     if (p.kickA > 0 && (p.kickA -= DT) <= 0) rage(p, facing(p), p.bodies[TORSO].translation());
     const stuck = glued(p, tp);
@@ -959,6 +985,10 @@ export function createSim({ mapId, players, practice = false, roundsToWin = 3, t
       if (back && !grabbing[i]) { const e = back * back * (3 - 2 * back); ua = turnTo(add(bf, V(0, 0.15, 0)), ua, 1 - e); fa = turnTo(bf, fa, 1 - e); str = Math.max(str, RECOIL_STR); }
       if (p.spin > 0) { ua = fa = add(mul(side, s), mul(bf, 0.1)); str = 0.5; fs = 0.4; }
       if (p.kickA > 0 || fk) { ua = fa = add(mul(side, s), V(0, fk ? 0.3 : -0.2, 0)); str = 0.5; fs = 0.4; } // out wide for balance
+      if (p.champ === 'pyke' && i === 1 && (p.aimBtn & BTN.A1 || p.toss > 0)) { // Bone Skewer: held, the dagger cocked up by the ear like a spear; let go, thrown out at the aim
+        if (p.toss > 0) { ua = add(bf, V(0, 0.25, 0)); fa = add(bf, V(0, 0.1, 0)); } else { ua = add(add(mul(bf, -0.2), mul(side, s * 0.5)), V(0, 0.8, 0)); fa = add(mul(bf, -1), V(0, 0.15, 0)); } // fist back by the ear: the reverse-grip blade points forward over it
+        str = 0.9; fs = 0.9;
+      }
       if (p.palm > 0 && i === 1) { ua = fa = add(bf, V(0, 0.05, 0)); str = 0.9; fs = 0.9; } // Sonic Wave: the palm thrust out at the aim
       if (p.held[i] > 0 && !grabbing[i] && p.punch?.arm !== i && p.armCd[i] <= 0) { ua = add(add(mul(bf, -0.5), mul(side, s * 0.7)), V(0, -0.3, 0)); fa = add(bf, V(0, 0.3, 0)); str = 0.6; fs = 0.7; } // cocked: elbow back and out
       // swimming: a front crawl, arms turning over in turn (Gang Beasts' swim cycle)
@@ -1143,7 +1173,7 @@ export function createSim({ mapId, players, practice = false, roundsToWin = 3, t
           else { hit(first.vic, first.part, V(), 25); if (local < 0) cancel(h.vic); }
           if (h.leap) { h.o.tether = h.vic.slot; leap(h.o); return false; } // recast while it flew: straight to them
         }
-        return h.vic || h.t < (h.sylas ? 0.3 : 0.42); // Abduct's chains reach ~8m
+        return h.vic || h.t < (h.sylas ? 0.3 : h.pyke ? (h.reach - 0.7) / 28 : 0.42); // Abduct's chains reach ~8m
       }
       if (h.sylas) { h.pos = h.vic.bodies[TORSO].translation(); return !!h.o.leap && h.vic.alive && h.o.alive; } // drawn on them till he lands
       // what my copy's hook caught is the host's call: it just stays on the stand-in until the host's catch is on screen
@@ -1158,6 +1188,25 @@ export function createSim({ mapId, players, practice = false, roundsToWin = 3, t
         if (h.lee) return true;
         h.vic.hooked = 0.1; // limp and helpless for as long as the chain holds, like Blitzcrank's hook
         if ((h.pull < 0.12 || (h.pull > 0.62 && h.pull < 0.74)) && d > 1.4) { const v = add(mul(to, 6 / d), V(0, 1, 0)); for (const b of h.vic.bodies) b.setLinvel(v, true); }
+        return true;
+      }
+      if (h.pyke) { // Bone Skewer: yanked half way to him, fast. Close up, half way is too short to mean much: flipped over his head instead, landing behind him
+        const vp = h.vic.bodies[TORSO].translation();
+        h.pos = vp;
+        if (!h.arc) {
+          const o = h.o.bodies[TORSO].translation(), to = V(o.x - vp.x, 0, o.z - vp.z), d = Math.hypot(to.x, to.z) || 1, u = mul(to, 1 / d), over = d < SKEWER_FLIP;
+          h.arc = { from: vp, to: over ? add(V(o.x, vp.y, o.z), mul(u, 1.5)) : add(vp, mul(u, d / 2)), h: over ? 1.4 : 0.3, T: over ? 0.35 : 0.2 };
+        }
+        const { from, to, h: up, T } = h.arc, s = h.pull / T;
+        if (!h.vic.alive || s >= 1) {
+          for (const b of h.vic.bodies) b.setLinvel(mul(b.linvel(), 0.2), true); // stops dead where it put them
+          if (h.vic.ko <= 0 && h.vic.safe <= 0) { h.vic.stun = Math.max(h.vic.stun, 0.5); cancel(h.vic); }
+          return false;
+        }
+        h.vic.hooked = 0.1;
+        const want = add(add(from, mul(sub(to, from), s)), V(0, 4 * up * s * (1 - s), 0)); // on a parabola, steered there every tick
+        const v = mul(sub(want, vp), 1 / DT);
+        for (const b of h.vic.bodies) b.setLinvel(v, true);
         return true;
       }
       h.vic.hooked = 0.1; // limp for as long as the pull lasts
@@ -1712,7 +1761,8 @@ export function createSim({ mapId, players, practice = false, roundsToWin = 3, t
           | (p.dizzy > 0) << 8 // stunned on their feet (stars)
           | (!!p.leap || !!p.lifted || !!p.bitten) << 9 // GB mode: a move only the host plays (it ties me to someone, or a shark has me)
           | (p.abduct > 0) << 10 // Abscond's recast window: E shows Abduct ready
-          | (p.wet && p.stamina < 30) << 11; // tiring in the water
+          | (p.wet && p.stamina < 30) << 11 // tiring in the water
+          | (p.champ === 'pyke' && !!(p.aimBtn & BTN.A1)) << 12; // holding Bone Skewer: the dagger turned blade-forward
         // hips position + every part's rotation; clients rebuild the other positions from the joint anchors (beast.js fk)
         const t = p === me ? add(p.bodies[HIPS].translation(), smooth) : p.bodies[HIPS].translation();
         const out = [p.slot, 1, Math.round(p.daze), flags, Math.ceil(p.cd[0] * 10), Math.ceil(p.cd[1] * 10), r2(t.x), r2(t.y), r2(t.z)];

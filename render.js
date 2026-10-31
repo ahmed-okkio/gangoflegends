@@ -28,9 +28,10 @@ const PROPS = {
   singed: [['tank', CHEST], ['goggles', HEAD]],
   lee: [['blindfold', HEAD], ['wrap', FORE], ['wrap', FORE + 1]],
   riven: [['hair', HEAD], ['pauldron', CHEST], ['tunic', CHEST], ['bracer', FORE + 1], ['wrap', FORE], ['greave', LEG + 1]],
+  pyke: [['hood', HEAD], ['harness', CHEST], ['dagger', FORE + 1, 'flip'], ['harpoon', -1]], // harpoon: his dagger, flown on Bone Skewer
   sylas: [['hair', HEAD], ['collar', CHEST], ['shackleL', FORE, 'zap'], ['shackleR', FORE + 1, 'zap'], ['chain', -1]], // zap: crackle with lightning on Abscond. chain: hung off each cuff, see apply()
 };
-const PROP_FILE = { blitz: 'blitzcrank', hec: 'hecarim', vi: 'vi', sett: 'sett', ali: 'alistar', thresh: 'thresh', singed: 'singed', lee: 'leesin', sylas: 'sylas', riven: 'riven' };
+const PROP_FILE = { blitz: 'blitzcrank', hec: 'hecarim', vi: 'vi', sett: 'sett', ali: 'alistar', thresh: 'thresh', singed: 'singed', lee: 'leesin', sylas: 'sylas', riven: 'riven', pyke: 'pyke' };
 const propScenes = {}; // 'blitz/core' -> parsed glTF scene
 export async function loadProps() {
   if (Object.keys(propScenes).length) return;
@@ -284,6 +285,33 @@ export function createRenderer(canvas) {
     lashes.splice(0, lashes.length, ...lashes.filter(l => l.t <= LASH));
     lashLinks.count = n; lashLinks.instanceMatrix.needsUpdate = true;
   }
+  // Phantom Undertow: for the 0.6s before the phantom rushes back (sim.js undertow), a glowing ghost where Pyke dashed from
+  // and a strip on the floor from it to him: the path that will stun, for everyone to see and step out of
+  const phantoms = [], PHANTOM = 0.6;
+  const ptMat = () => new THREE.MeshBasicMaterial({ color: '#3fe0b0', transparent: true, depthWrite: false, blending: THREE.AdditiveBlending, side: THREE.DoubleSide });
+  const ptPool = [];
+  function stepPhantoms(dt) {
+    let n = 0;
+    for (const ph of phantoms) {
+      ph.t += dt;
+      const av = avatars[ph.slot];
+      if (!av?.group.visible || ph.t > PHANTOM) continue;
+      if (!ptPool[n]) {
+        const strip = new THREE.Mesh(new THREE.PlaneGeometry(1.8, 1).rotateX(-Math.PI / 2).translate(0, 0, 0.5), ptMat()); // 1.8 wide: sim.js stuns 0.9 either side
+        const ghost = new THREE.Mesh(new THREE.CapsuleGeometry(0.3, 0.7, 6, 12), ptMat());
+        scene.add(strip, ghost); ptPool[n] = { strip, ghost };
+      }
+      const { strip, ghost } = ptPool[n++], to = av.parts[CHEST].position, k = ph.t / PHANTOM;
+      const dx = to.x - ph.from.x, dz = to.z - ph.from.z;
+      strip.position.set(ph.from.x, ph.from.y - 0.85, ph.from.z); strip.rotation.y = Math.atan2(dx, dz); strip.scale.set(1, 1, Math.hypot(dx, dz) + 0.6);
+      strip.material.opacity = 0.15 + 0.35 * k + 0.1 * Math.sin(ph.t * 40); // brightening as it's about to go
+      ghost.position.copy(ph.from); ghost.material.opacity = 0.35 + 0.2 * Math.sin(ph.t * 25);
+      strip.visible = ghost.visible = true;
+      if (Math.random() < 0.5) emit(ph.from, { color: '#3fe0b0', n: 1, speed: 0.6, size: 0.25, life: 0.4, grav: -1 });
+    }
+    for (let i = n; i < ptPool.length; i++) ptPool[i].strip.visible = ptPool[i].ghost.visible = false;
+    phantoms.splice(0, phantoms.length, ...phantoms.filter(ph => ph.t <= PHANTOM));
+  }
   // Relentless Force's shockwave: the exact cone sim.js relentless() knocks back (half-width 0.7 + 0.5 per metre, 2.7m
   // deep), which is a sector of a circle centred 1.4m behind the target. A faint fill shows the area, an arc sweeps out through it
   const CONE = Math.atan(0.5), APEX = 1.4, REACH = 2.7, cones = [];
@@ -326,6 +354,7 @@ export function createRenderer(canvas) {
     const v = new THREE.Vector3();
     for (const [kind, x, y, z, big, slot, vic, , mine] of events) {
       v.set(x, y, z);
+      if (kind === 'phantom') phantoms.push({ from: v.clone(), slot, t: 0 }); // Pyke's E: his phantom left here, its path back to him lit (stepPhantoms)
       if (kind === 'hijack') lashes.push({ from: slot, to: vic, t: 0 }); // Sylas's Hijack: his chain out to them (stepLashes)
       if (kind === 'phit' || kind === 'hit' && !mine) { // mine: my copy snapped it already ('phit')
         // whip the victim's bobble head away from the hitter right here, not after the host's head arrives (the
@@ -369,6 +398,11 @@ export function createRenderer(canvas) {
         ring(v, '#7dffc0', 2.3, false, 0.3, true);
         ring(v, '#ffffff', 1.8, false, 0.2, true);
         shake = Math.max(shake, 0.18);
+      } else if (kind === 'undertow') { // Pyke's phantom rushing back along his dash (vic: its length in dm)
+        const dir = tmp2.set(Math.sin(big), 0, Math.cos(big));
+        for (let k = -0.5; k <= 0.5; k += 0.25) emit(tmp3.copy(v).addScaledVector(dir, k * vic / 10), { color: '#3fe0b0', n: 6, speed: 2, size: 0.3, life: 0.4, grav: 0 });
+        ring(v, '#3fe0b0', 1.2);
+        shake = Math.max(shake, 0.12);
       } else if (kind === 'wave') { // Sonic Wave leaving Lee's palm
         emit(v, { color: '#4fe3ff', n: 10, speed: 3, size: 0.22, life: 0.3, grav: 0 });
         ring(v, '#4fe3ff', 0.7);
@@ -953,7 +987,7 @@ export function createRenderer(canvas) {
     if (skinned) group.add(skinned);
     if (belt) parts[HIPS].add(mesh(new THREE.TorusGeometry(0.2, 0.035, 10, 32).rotateX(Math.PI / 2), gummy(color), 0, 0.04, 0)); // team belt
     const fists = [];
-    let zap = false;
+    let zap = false, flip = null;
     for (const [n, part, tag] of PROPS[champId] ?? []) {
       const o = part >= 0 && propScenes[`${champId}/${n}`]?.clone();
       if (!o) continue;
@@ -961,6 +995,7 @@ export function createRenderer(canvas) {
       parts[part].add(o);
       if (tag === 'fist' || tag === 'zap') fists.push(o);
       if (tag === 'zap') zap = true;
+      if (tag === 'flip') flip = o; // Pyke's dagger: turned blade-forward while Bone Skewer is held
     }
     // Sylas's chains: not worn on the forearm (they'd point out with his punches like a sword) but hung off each cuff,
     // swinging under gravity in apply(). Looks only, like every prop: the sim never sees them, so no hitbox
@@ -1007,7 +1042,7 @@ export function createRenderer(canvas) {
       hay.visible = false;
       group.add(hay);
     }
-    return { group, parts, tag, stars, fists, zap, chains, swirl, hay, skin: [...skin], ghost: false, champId, glow: c.glow ?? '#ff8a00', torsoMat: body, glowBase: body.emissive.clone(), eyes: c.eyes, q: PARTS.map(() => [0, 0, 0, 1]), pos: PARTS.map(() => [0, 0, 0]) };
+    return { group, parts, tag, stars, fists, zap, flip, chains, swirl, hay, skin: [...skin], ghost: false, champId, glow: c.glow ?? '#ff8a00', torsoMat: body, glowBase: body.emissive.clone(), eyes: c.eyes, q: PARTS.map(() => [0, 0, 0, 1]), pos: PARTS.map(() => [0, 0, 0]) };
   }
 
   const qa = new THREE.Quaternion(), qb = new THREE.Quaternion(), tmp = new THREE.Vector3(), tmp2 = new THREE.Vector3(), tmp3 = new THREE.Vector3();
@@ -1087,7 +1122,8 @@ export function createRenderer(canvas) {
         if (head.y < wy - 0.1 && Math.random() < (flags & 2048 ? 0.6 : 0.15)) emit(head, { color: '#d8f2ff', n: 1, speed: 0.4, size: 0.12, life: 0.8, grav: 3, up: 1, additive: false, opacity: 0.7 }); // breath bubbling out
         else if (flags & 2048 && Math.random() < 0.3) emit(tmp.copy(head).setY(Math.max(head.y, wy) + 0.1), { color: '#ffffff', n: 1, speed: 1.5, size: 0.14, life: 0.4, grav: -6, up: 2, additive: false, opacity: 0.8 }); // tiring: thrashing spray
       }
-      av.stars.visible = !!(flags & 16); // stars only while knocked out
+      av.stars.visible = !!(flags & (16 | 256)); // stars while knocked out or stunned on their feet
+      if (av.flip) av.flip.rotation.y = flags & 4096 ? Math.PI : 0;
       av.stars.position.copy(head).y += 0.45;
       av.stars.rotation.y = time * 6;
       // empowered punch (4) or winding up an ability (64): fists glow in the champ's colour; otherwise their own glow comes back
@@ -1122,9 +1158,10 @@ export function createRenderer(canvas) {
       const head = mesh(new THREE.SphereGeometry(0.2, 16, 10), glow('#ffb347', 2.5), 0, 0, 0, false);
       const shell = new THREE.Mesh(new THREE.SphereGeometry(0.2, 16, 10), new THREE.MeshBasicMaterial({ color: '#4fe3ff', transparent: true, opacity: 0.35, blending: THREE.AdditiveBlending, depthWrite: false }));
       const scythe = propScenes['thresh/hook']?.clone() ?? new THREE.Group(); // Thresh's hook: the chain ties on at its origin, the blade points down +z
+      const harpoon = propScenes['pyke/harpoon']?.clone() ?? new THREE.Group(); // Pyke's dagger, the same way
       const dia = new THREE.InstancedMesh(new THREE.TorusGeometry(0.11, 0.016, 3, 4).rotateX(Math.PI / 2), glow('#ffc94a', 2.4), 120);
-      world.add(links, head, shell, scythe, dia);
-      hookPool.push({ links, head, shell, scythe, dia });
+      world.add(links, head, shell, scythe, harpoon, dia);
+      hookPool.push({ links, head, shell, scythe, harpoon, dia });
     }
     const m4 = new THREE.Matrix4(), q = new THREE.Quaternion();
     hookPool.forEach((h, i) => {
@@ -1132,15 +1169,16 @@ export function createRenderer(canvas) {
       const champ = d && (b.sl?.[d[0]] || setup.players[d[0]]?.champ); // a stolen Q looks like its owner's
       h.head.visible = !!d && !!b.p[d[0]]?.[1]; h.links.visible = h.head.visible && champ !== 'lee'; h.shell.visible = false;
       h.scythe.visible = h.head.visible && champ === 'thresh' && h.scythe.children.length > 0;
+      h.harpoon.visible = h.head.visible && champ === 'pyke' && h.harpoon.children.length > 0;
       h.dia.visible = h.head.visible && !!d[6];
       if (!h.head.visible) return;
       // between the two snapshots like the bodies: it covers ~1m per snapshot, so drawn from the newer one it stepped
       if (o) h.head.position.set(o[1], o[2], o[3]).lerp(tmp2.set(d[1], d[2], d[3]), alpha); else h.head.position.set(d[1], d[2], d[3]);
-      const c = champ === 'lee' ? (d[5] ? '#4fe3ff' : '#fff0a0') : champ === 'thresh' ? '#7dff9a' : '#ffb347'; // Thresh's hook glows green
+      const c = champ === 'lee' ? (d[5] ? '#4fe3ff' : '#fff0a0') : champ === 'thresh' ? '#7dff9a' : champ === 'pyke' ? '#3fe0b0' : '#ffb347'; // Thresh's hook glows green
       h.head.material.color.set(c); h.head.material.emissive.set(c);
       h.head.scale.setScalar(champ === 'lee' && d[5] ? 1.3 + 0.3 * Math.sin(time * 12) : 1);
       if (d[6]) { // Abduct
-        h.links.visible = false; h.scythe.visible = false;
+        h.links.visible = false; h.scythe.visible = false; h.harpoon.visible = false;
         h.head.material.color.set('#ffd86b'); h.head.material.emissive.set('#ffd86b'); h.head.scale.setScalar(0.6);
         if (!d[5]) emit(h.head.position, { color: '#ffd86b', n: 1, speed: 0.5, size: 0.25, life: 0.25, grav: 0 });
         let k = 0;
@@ -1171,16 +1209,17 @@ export function createRenderer(canvas) {
       const arm = avatars[d[0]].parts[FORE + 1]; // avatar groups sit at the origin, so part-local -> world is just the part's own transform
       const from = tmp.fromArray(HAND[1]).applyQuaternion(arm.quaternion).add(arm.position), dir = tmp2.subVectors(h.head.position, from);
       q.setFromUnitVectors(new THREE.Vector3(0, 0, 1), dir.clone().normalize());
-      h.links.material.color.set(champ === 'thresh' ? '#4f6b5c' : '#c9ced6');
-      if (h.scythe.visible) { // the scythe in place of the ball, centred on where the hook is; the chain ties to its tail
+      h.links.material.color.set(champ === 'thresh' ? '#4f6b5c' : champ === 'pyke' ? '#3a5a5a' : '#c9ced6');
+      const blade = h.scythe.visible ? h.scythe : h.harpoon.visible ? h.harpoon : null;
+      if (blade) { // the scythe in place of the ball, centred on where the hook is; the chain ties to its tail
         h.head.visible = false;
         dir.addScaledVector(dir.clone().normalize(), -0.25);
-        h.scythe.position.copy(from).add(dir); h.scythe.quaternion.copy(q);
+        blade.position.copy(from).add(dir); blade.quaternion.copy(q);
       }
-      const n = Math.min(40, Math.max(1, Math.floor(dir.length() / 0.1)));
+      const small = champ === 'pyke', n = Math.min(40, Math.max(1, Math.floor(dir.length() / (small ? 0.06 : 0.1)))); // Pyke's chain: smaller, thinner links
       for (let k = 0; k < n; k++) {
         const twist = new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(0, 0, 1), k % 2 ? Math.PI / 2 : 0);
-        m4.compose(from.clone().addScaledVector(dir, (k + 0.5) / n), q.clone().multiply(twist).multiply(new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(1, 0, 0), Math.PI / 2)), new THREE.Vector3(1, 1, 1));
+        m4.compose(from.clone().addScaledVector(dir, (k + 0.5) / n), q.clone().multiply(twist).multiply(new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(1, 0, 0), Math.PI / 2)), small ? new THREE.Vector3(0.55, 0.55, 0.4) : new THREE.Vector3(1, 1, 1));
         h.links.setMatrixAt(k, m4);
       }
       h.links.count = n;
@@ -1248,6 +1287,7 @@ export function createRenderer(canvas) {
   const aimRange = new THREE.Mesh(new THREE.RingGeometry(0.97, 1, 64).rotateX(-Math.PI / 2), ringMat);
   const aimSpot = new THREE.Mesh(new THREE.CircleGeometry(1, 40).rotateX(-Math.PI / 2), new THREE.MeshBasicMaterial({ color: '#a6ff00', transparent: true, opacity: 0.35, depthWrite: false }));
   for (const m of [aimRange, aimSpot]) { m.renderOrder = 5; m.visible = false; scene.add(m); }
+  let closeUp = null; // dev: { slot, yaw, d }
   let aim = null, aimD = 0; // aimD: the cursor's distance from my champ on the floor, from the last aimYaw()
   function aimYaw(cx, cy, slot) {
     const av = avatars[slot];
@@ -1289,13 +1329,18 @@ export function createRenderer(canvas) {
     for (const fn of animated) fn({ dt, time });
     stepParticles(dt);
     stepRings(dt);
-    stepLashes(dt);
+    stepLashes(dt); stepPhantoms(dt);
     shake = Math.max(0, shake - dt * 1.2);
     const j = shake * shake * 1.5;
     // menu backdrop: the camera comes in closer and frames the brawl low and to the right, under the menu panel
     const d = setup?.menu ? camDist * 0.75 : camDist, ox = setup?.menu ? cam.side * d * 0.12 : 0, oy = setup?.menu ? d * 0.2 : 0;
     camera.position.set(camAt.x + ox + rand(-j, j), camAt.y + oy + d * Math.sin(cam.pitch) + rand(-j, j), camAt.z + cam.side * d * Math.cos(cam.pitch));
     camera.lookAt(camAt.x + ox, camAt.y + oy, camAt.z);
+    if (closeUp && avatars[closeUp.slot]) { // dev: a portrait of one champ (smoke screenshots of props), at an angle round their facing
+      const c = avatars[closeUp.slot].parts[CHEST].position, q = avatars[closeUp.slot].parts[HIPS].quaternion, f = tmp2.set(0, 0, 1).applyQuaternion(q).setY(0).normalize();
+      const a = Math.atan2(f.x, f.z) + closeUp.yaw;
+      camera.position.set(c.x + Math.sin(a) * closeUp.d, c.y + 0.25, c.z + Math.cos(a) * closeUp.d); camera.lookAt(c.x, c.y + 0.15, c.z);
+    }
     aoCam.copy(camera); aoCam.layers.set(0);
     const skyMesh = world?.getObjectByName('sky');
     if (skyMesh) skyMesh.position.copy(camera.position);
@@ -1316,5 +1361,5 @@ export function createRenderer(canvas) {
     world.add(avatars[slot].group);
   }
 
-  return { setMatch, setChamp, apply, fx, render, aimYaw, aimDist: () => aimD, setAim: a => { aim = a; }, avatars: () => avatars, get camSide() { return cam.side; } };
+  return { setMatch, setChamp, apply, fx, render, aimYaw, aimDist: () => aimD, setAim: a => { aim = a; }, closeUp: c => { closeUp = c; }, avatars: () => avatars, get camSide() { return cam.side; } };
 }

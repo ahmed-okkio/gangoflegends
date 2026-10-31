@@ -393,8 +393,69 @@ def riven_greave():  # leg frame (foot bottom at y ~-.136): an olive shin guard 
     box(ARMG(), (0.1, 0.18, 0.04), (0, -0.02, 0.075), 0.015)
     for x in (0.06, -0.06): cyl(ARMG(), 0.025, 0.09, (x, 0.07, 0.06), (x * 6, 0.6, 0.6), r2=0.002)
 
+# ---------------- Pyke: the Bloodharbor Ripper, a drowned harpooner: deep-sea hood and face wrap, bone-hooked harness, his hooked dagger ----------------
+DEEP = lambda: mat("deep", (0.05, 0.13, 0.15), 0.7)
+WRAP = lambda: mat("wrap", (0.12, 0.3, 0.3), 0.6)
+SEA = lambda: mat("sea", (0.25, 1.0, 0.8), 0.3, 0, glow=3)
+STEEL = lambda: mat("steel", (0.55, 0.6, 0.62), 0.3, 0.8)
+
+RED = lambda: mat("bandana", (0.55, 0.05, 0.14), 0.75)  # pink-red like his model
+FIN = lambda: mat("fin", (0.85, 0.8, 0.62), 0.55)  # aged bone, a little green
+
+TOOTH = lambda: mat("tooth", (0.93, 0.89, 0.74), 0.45)
+
+def pyke_hood():  # head frame (skull centre y .165, z .057, r .21; eyes span y .095-.216): a red bandana from under the eyes, hanging down over the chest to a point like a beard; white fang stripes down from its top edge
+    R, C = 0.224, (0, 0.165, 0.057)
+    shell(RED(), (R, R, R), C, lambda x, y, z: y > -0.085 or (z < 0.0 and abs(y + 0.1) > 0.018), seg=72)  # over the lower face; a thin tie round the back
+    surf = lambda x, y: (x, y, C[2] + math.sqrt(max(0.0, (R + 0.026) ** 2 - x * x - (y - C[1]) ** 2)))
+    ball(RED(), 0.016, (0, 0.065, -0.17))  # knot, two tails hanging from it
+    for sx in (1, -1): tube(RED(), [(0, 0.065, -0.175), (sx * 0.03, 0.0, -0.19), (sx * 0.04, -0.07, -0.18)], [0.012, 0.012, 0.004], flat=0.3)
+    for k, x in enumerate((-0.09, -0.03, 0.03, 0.09)):  # fangs: thin white stripes hanging from the top edge
+        n = 0.06
+        m = 6; ring = [surf(x - 0.009 * (1 - j / m), 0.06 - n * j / m) for j in range(m + 1)] + [surf(x + 0.009 * (1 - j / m), 0.06 - n * j / m) for j in reversed(range(m))]  # painted on: every point on the cloth, a hair above it
+        bm = bpy.data.meshes.new("fang"); bm.from_pydata([B(v) for v in ring], [], [list(range(len(ring))), list(reversed(range(len(ring))))])
+        ob = bpy.data.objects.new("fang", bm); bpy.context.scene.collection.objects.link(ob); done(ob, TOOTH())
+
+def pyke_harness():  # chest frame (capsule r .193, centre y .254 z -.013; eyes about y .52-.65): a fish jaw worn round the shoulders, a slim bone ring with small teeth, its two front halves rising beside the head to eye level and curling forward; gold discs on the chest
+    ring_at = lambda a, lift=0.0: (math.sin(a) * 0.27, 0.31 - 0.04 * math.cos(a) + lift, math.cos(a) * 0.21 - 0.02)  # sat on the shoulders
+    tube(FIN(), [ring_at(k * math.pi / 8) for k in range(-8, 9)], [0.04] * 17, flat=0.6)
+    for k in range(18):  # big flat fish teeth all the way round like his jaw cloak: standing up, splayed a little, tips curling in
+        a = k * 2 * math.pi / 18; o = Vector(ring_at(a, 0.02)); out = Vector((math.sin(a), 0, math.cos(a))); L = 0.13 if k % 2 else 0.09
+        tube(TOOTH(), [o, o + out * L * 0.25 + Vector((0, L * 0.55, 0)), o + out * L * 0.1 + Vector((0, L, 0))], [0.024, 0.014, 0.001])
+    for sx in (1, -1):  # the jaw's front halves
+        b = ring_at(sx * 0.85)
+        pts = [b, (sx * 0.3, 0.38, b[2] + 0.02), (sx * 0.29, 0.45, b[2] + 0.06), (sx * 0.24, 0.48, b[2] + 0.1)]  # short hooks curling forward over the shoulders
+        tube(FIN(), pts, [0.035, 0.03, 0.018, 0.003], flat=0.6)
+        cyl(GOLD(), 0.045, 0.02, (sx * 0.12, 0.2, 0.2), (0, 0, 1)); ring(GOLD(), 0.045, 0.008, (sx * 0.12, 0.2, 0.21), (0, 0, 1))  # discs on the chest
+    cyl(GOLD(), 0.05, 0.02, on_vest(0, 0.12, 1.14), (0, 0, 1)); ring(GOLD(), 0.05, 0.009, on_vest(0, 0.12, 1.18), (0, 0, 1))  # the big medallion at his belly
+
+def dagger(z0, d, y0=0, k=1):  # Pyke's dagger along d (+1 = blade toward +z from z0), traced off his model (image px -> metres): a wide flat blade, straight spine, barbs hooking back along the edge, a bone fish-head guard, red-wrapped grip, a hook ring at the pommel
+    p = lambda z, y=0, x=0: (x * k, y0 + y * k, z0 + d * z * k)
+    q = lambda px, py, x=0: p((1197 - px) * 0.00075 + 0.06, (540 - py) * 0.00075, x)
+    outline = [(950, 515), (860, 500), (845, 493), (825, 512), (435, 518), (715, 620), (700, 600), (745, 577), (800, 582), (835, 618), (830, 598), (855, 580), (905, 586), (955, 618), (950, 585)]
+    bm = bpy.data.meshes.new("blade"); bm.from_pydata([B(q(*v)) for v in outline], [], [list(range(len(outline)))])
+    ob = bpy.data.objects.new("blade", bm); bpy.context.scene.collection.objects.link(ob)
+    sol = ob.modifiers.new("t", "SOLIDIFY"); sol.thickness = 0.012 * k; sol.offset = 0; done(ob, mat("pblade", (0.55, 0.57, 0.47), 0.4, 0.5))
+    TAN = lambda: mat("bonetan", (0.82, 0.64, 0.42), 0.6)
+    ball(TAN(), 0.055 * k, q(1020, 545), (0.5, 1, 1.3))  # fish-head guard
+    for sx in (1, -1): ball(SEA(), 0.006 * k, q(985, 525, sx * 0.022))  # its glowing eyes
+    tube(TAN(), [q(1050, 505), q(1090, 485), q(1125, 465)], [0.02 * k, 0.012 * k, 0.002 * k], flat=0.4)  # fin swept back
+    tube(TAN(), [q(1010, 585), q(1025, 610), q(1030, 630)], [0.015 * k, 0.01 * k, 0.002 * k], flat=0.4)  # lower jaw
+    cyl(mat("grip", (0.5, 0.13, 0.13), 0.8), 0.018 * k, 0.16 * k, q(1197, 540), (0, 0, 1))
+    for px in (1130, 1197, 1265): ring(mat("grip", (0.5, 0.13, 0.13), 0.8), 0.019 * k, 0.005 * k, q(px, 540), (0, 0, 1))
+    ball(TAN(), 0.022 * k, q(1322, 535))  # pommel
+    tube(TAN(), [q(1340, 520), q(1365, 465), q(1440, 455), q(1490, 530), q(1450, 605), q(1385, 595)], [0.014 * k, 0.014 * k, 0.013 * k, 0.011 * k, 0.007 * k, 0.002 * k], flat=0.5)  # hook ring
+
+def pyke_dagger():  # forearm frame (hand at y -.337, z forward): held in the right fist in a reverse grip, blade back along the forearm
+    dagger(0.1, -1, -0.33, 1.0)  # reverse grip: big, the blade out the back of the fist
+
+def pyke_harpoon():  # hook frame: the chain ties on at the origin, the dagger flies blade first down +z (Bone Skewer)
+    ring(STEEL(), 0.03, 0.009, (0, 0, -0.01), (1, 0, 0))
+    dagger(0, 1)
+
 PROPS = {
     "riven_bracer": riven_bracer, "riven_hair": riven_hair, "riven_pauldron": riven_pauldron, "riven_tunic": riven_tunic, "riven_wrap": riven_wrap, "riven_greave": riven_greave,
+    "pyke_hood": pyke_hood, "pyke_harness": pyke_harness, "pyke_dagger": pyke_dagger, "pyke_harpoon": pyke_harpoon,
     "sylas_shackleL": lambda: sylas_shackle(1), "sylas_shackleR": lambda: sylas_shackle(-1), "sylas_chain": sylas_chain, "sylas_hair": sylas_hair, "sylas_collar": sylas_collar,
     "leesin_blindfold": lee_blindfold, "leesin_wrap": lee_wrap,
     "thresh_crown": thresh_crown, "thresh_mantle": thresh_mantle, "thresh_lantern": thresh_lantern, "thresh_hook": thresh_hook, "singed_tank": singed_tank, "singed_goggles": singed_goggles,
@@ -414,7 +475,8 @@ PIVOT = {"core": (0, 0.6347, -0.0101), "blade": (0, 1.0693, 0.0247), "tail": (0,
          "horns": (0, 1.0693, 0.0247), "cuff": (0.2015, 0.6711, -0.0433), "crown": (0, 1.0693, 0.0247), "mantle": (0, 0.6347, -0.0101), "lantern": (0, 0.4223, 0.0002), "hook": (1.1, 1.0, 0.3),
          "tank": (0, 0.6347, -0.0101), "goggles": (0, 1.0693, 0.0247),
          "blindfold": (0, 1.0693, 0.0247), "wrap": (0.2015, 0.6711, -0.0433),
-         "shackleL": (0.2015, 0.6711, -0.0433), "shackleR": (-0.2015, 0.6711, -0.0433), "chain": (0.2215, 0.3311, -0.1533), "collar": (0, 0.6347, -0.0101), "pauldron": (0, 0.6347, -0.0101), "tunic": (0, 0.6347, -0.0101), "bracer": (-0.2015, 0.6711, -0.0433), "greave": (-0.239, 0.1201, 0.0057)}
+         "shackleL": (0.2015, 0.6711, -0.0433), "shackleR": (-0.2015, 0.6711, -0.0433), "chain": (0.2215, 0.3311, -0.1533), "collar": (0, 0.6347, -0.0101), "pauldron": (0, 0.6347, -0.0101), "tunic": (0, 0.6347, -0.0101), "bracer": (-0.2015, 0.6711, -0.0433), "greave": (-0.239, 0.1201, 0.0057),
+         "hood": (0, 1.0693, 0.0247), "harness": (0, 0.6347, -0.0101), "dagger": (-0.2015, 0.6711, -0.0433), "harpoon": (1.1, 1.0, 0.3)}
 
 def mannequin(dx):
     grey = mat("beast", (0.62, 0.6, 0.58), 0.6)
@@ -430,8 +492,10 @@ def mannequin(dx):
 os.makedirs(out, exist_ok=True)
 bpy.ops.wm.read_factory_settings(use_empty=True)
 built = {}
+only = sys.argv[sys.argv.index("--") + 1:] if "--" in sys.argv else []  # prop names (or champ prefixes) to build; none = all
+only = [a for a in only if not a.startswith("--")]
 for name, fn in PROPS.items():
-    if only and name not in only: continue
+    if only and not any(name.startswith(a) for a in only): continue
     fn(); built[name] = finish(name)
     print(name, len(built[name].data.polygons), "faces")
 
@@ -441,7 +505,7 @@ if preview:
     sc.render.engine = "BLENDER_WORKBENCH"; sc.display.shading.light = "STUDIO"; sc.display.shading.color_type = "MATERIAL"
     sc.display.shading.show_cavity = True; sc.display.shading.show_shadows = True
     sc.render.resolution_x, sc.render.resolution_y = 2000, 900
-    shown = [(c, dx) for c, dx in (("blitzcrank", -2.2), ("hecarim", -1.1), ("vi", 0), ("sett", 1.1), ("alistar", 2.2), ("thresh", 3.3), ("singed", 4.4), ("leesin", 5.5), ("sylas", 6.6), ("riven", 7.7))
+    shown = [(c, dx) for c, dx in (("blitzcrank", -2.2), ("hecarim", -1.1), ("vi", 0), ("sett", 1.1), ("alistar", 2.2), ("thresh", 3.3), ("singed", 4.4), ("leesin", 5.5), ("sylas", 6.6), ("riven", 7.7), ("pyke", 8.8))
              if any(n.startswith(c) for n in built)]
     for champ, dx in shown:
         mannequin(dx)

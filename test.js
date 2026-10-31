@@ -456,6 +456,37 @@ for (const [gap, draw] of [[0.3, true], [0.7, false]]) {
   console.log('thresh ok', gap0.toFixed(2), gap1.toFixed(2), gap2.toFixed(2));
 }
 
+// 10e2. Pyke: Bone Skewer from close range flips them over his head to behind him; from far drags them in. Phantom
+// Undertow's phantom stuns whoever stands where he dashed through
+{
+  const tap = (sim, b, a) => run(sim, 2, i => sim.setInput(0, { x: 0, z: 0, b: i ? 0 : b, a }));
+  const idle = sim => () => sim.setInput(0, { x: 0, z: 0, b: 0 });
+  let sim = near('pyke', 'blitz');
+  run(sim, 90); lineUp(sim, 2.5);
+  tap(sim, BTN.A1, Math.PI / 2);
+  run(sim, 50, idle(sim));
+  const flip = torso(sim, 1).x - torso(sim, 0).x;
+  assert.ok(flip < -0.5, `close Skewer flips them behind him (${flip.toFixed(2)})`);
+  sim = near('pyke', 'blitz');
+  run(sim, 90); lineUp(sim, 6.5);
+  tap(sim, BTN.A1, Math.PI / 2); // a tap: the short reach, misses
+  run(sim, 50, idle(sim));
+  assert.ok(torso(sim, 1).x - torso(sim, 0).x > 5.5, 'uncharged Skewer falls short');
+  sim = near('pyke', 'blitz');
+  run(sim, 90); lineUp(sim, 6.5);
+  run(sim, 66, () => sim.setInput(0, { x: 0, z: 0, b: BTN.A1, a: Math.PI / 2 })); // charged to full reach
+  run(sim, 30, idle(sim));
+  const far = torso(sim, 1).x - torso(sim, 0).x;
+  assert.ok(far > 2 && far < 4.5, `charged Skewer yanks them half way in (${far.toFixed(2)})`);
+  sim = near('pyke', 'blitz');
+  run(sim, 90); lineUp(sim, 1.5);
+  tap(sim, BTN.A2, Math.PI / 2);
+  run(sim, 40, idle(sim));
+  assert.ok(torso(sim, 0).x > torso(sim, 1).x, 'Undertow dashes through them');
+  assert.ok(sim.players[1].stun > 0 || sim.players[1].ko > 0, 'Undertow stuns whoever he dashed past');
+  console.log('pyke ok', flip.toFixed(2), far.toFixed(2));
+}
+
 // 10f. Lee Sin: the wave marks whoever it hits without hurting them; recast flies him to them and knocks them back.
 // Dragon's Rage kicks the champ in front back, and whoever they crash into goes too
 {
