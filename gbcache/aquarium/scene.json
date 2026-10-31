@@ -1179,6 +1179,20 @@
 ]
 ]
 },
+"m280c6ef53e93": {
+"name": "door_default",
+"verts": 316,
+"normals": true,
+"uv0": true,
+"uv1": false,
+"indices": 588,
+"subs": [
+[
+0,
+588
+]
+]
+},
 "m101": {
 "name": "aquarium_glass",
 "verts": 294,
@@ -9504,6 +9518,282 @@
 "layer": 8
 },
 {
+"path": "Doors/Door (Double) (1)/DoorRight/door_default",
+"mesh": "m280c6ef53e93",
+"subs": [
+0
+],
+"mats": [
+"TX_Incinerator_Diffuse_2_586d48dc"
+],
+"matrix": [
+[
+-0.0,
+-0.0,
+1.0,
+-10.25
+],
+[
+0.0,
+1.0,
+0.0,
+-0.0
+],
+[
+-1.0,
+0.0,
+-0.0,
+2.83
+],
+[
+0.0,
+0.0,
+-0.0,
+1.0
+]
+],
+"lightmap": -1,
+"lmso": [
+1.0,
+1.0,
+0.0,
+0.0
+],
+"cast": 1,
+"recv": true,
+"layer": 10
+},
+{
+"path": "Doors/Door (Double) (2)/DoorRight/door_default",
+"mesh": "m280c6ef53e93",
+"subs": [
+0
+],
+"mats": [
+"TX_Incinerator_Diffuse_2_586d48dc"
+],
+"matrix": [
+[
+-1.0,
+0.0,
+-0.0,
+-7.17
+],
+[
+0.0,
+1.0,
+0.0,
+-3.0
+],
+[
+-0.0,
+0.0,
+-1.0,
+0.25
+],
+[
+0.0,
+0.0,
+-0.0,
+1.0
+]
+],
+"lightmap": -1,
+"lmso": [
+1.0,
+1.0,
+0.0,
+0.0
+],
+"cast": 1,
+"recv": true,
+"layer": 10
+},
+{
+"path": "Doors/Door (Double) (2)/DoorLeft/door_default",
+"mesh": "m280c6ef53e93",
+"subs": [
+0
+],
+"mats": [
+"TX_Incinerator_Diffuse_2_586d48dc"
+],
+"matrix": [
+[
+1.0,
+0.0,
+-0.0,
+-8.83
+],
+[
+0.0,
+1.0,
+0.0,
+-3.0
+],
+[
+-0.0,
+-0.0,
+1.0,
+0.25
+],
+[
+0.0,
+0.0,
+-0.0,
+1.0
+]
+],
+"lightmap": -1,
+"lmso": [
+1.0,
+1.0,
+0.0,
+0.0
+],
+"cast": 1,
+"recv": true,
+"layer": 10
+},
+{
+"path": "Doors/Door (Double) (1)/DoorLeft/door_default",
+"mesh": "m280c6ef53e93",
+"subs": [
+0
+],
+"mats": [
+"TX_Incinerator_Diffuse_2_586d48dc"
+],
+"matrix": [
+[
+0.0,
+0.0,
+-1.0,
+-10.25
+],
+[
+-0.0,
+1.0,
+0.0,
+-0.0
+],
+[
+1.0,
+0.0,
+0.0,
+1.17
+],
+[
+0.0,
+0.0,
+-0.0,
+1.0
+]
+],
+"lightmap": -1,
+"lmso": [
+1.0,
+1.0,
+0.0,
+0.0
+],
+"cast": 1,
+"recv": true,
+"layer": 10
+},
+{
+"path": "Doors/Door (Double)/DoorLeft/door_default",
+"mesh": "m280c6ef53e93",
+"subs": [
+0
+],
+"mats": [
+"TX_Incinerator_Diffuse_2_586d48dc"
+],
+"matrix": [
+[
+1.0,
+0.0,
+-0.0,
+-2.83
+],
+[
+0.0,
+1.0,
+0.0,
+-0.0
+],
+[
+-0.0,
+-0.0,
+1.0,
+10.25
+],
+[
+0.0,
+0.0,
+-0.0,
+1.0
+]
+],
+"lightmap": -1,
+"lmso": [
+1.0,
+1.0,
+0.0,
+0.0
+],
+"cast": 1,
+"recv": true,
+"layer": 10
+},
+{
+"path": "Doors/Door (Double)/DoorRight/door_default",
+"mesh": "m280c6ef53e93",
+"subs": [
+0
+],
+"mats": [
+"TX_Incinerator_Diffuse_2_586d48dc"
+],
+"matrix": [
+[
+-1.0,
+0.0,
+-0.0,
+-1.17
+],
+[
+0.0,
+1.0,
+0.0,
+-0.0
+],
+[
+-0.0,
+0.0,
+-1.0,
+10.25
+],
+[
+0.0,
+0.0,
+-0.0,
+1.0
+]
+],
+"lightmap": -1,
+"lmso": [
+1.0,
+1.0,
+0.0,
+0.0
+],
+"cast": 1,
+"recv": true,
+"layer": 10
+},
+{
 "path": "Aquarium/aquarium_enviroment/aquarium_glass",
 "mesh": "m101",
 "subs": [
@@ -12464,6 +12754,234 @@
 0.25,
 4.5,
 0.25
+]
+},
+{
+"path": "Doors/Door (Double)/DoorLeft/door_default/Collision (1)",
+"p": [
+-2.1103,
+0.7,
+10.25
+],
+"q": [
+0.70711,
+0.0,
+0.0,
+0.70711
+],
+"h": [
+0.075,
+0.125,
+0.1275
+]
+},
+{
+"path": "Doors/Door (Double) (1)/DoorLeft/Collision",
+"p": [
+-10.25,
+0.977,
+1.555
+],
+"q": [
+0.5,
+-0.5,
+0.5,
+0.5
+],
+"h": [
+0.435,
+0.05,
+0.903
+]
+},
+{
+"path": "Doors/Door (Double) (2)/DoorLeft/Collision",
+"p": [
+-8.445,
+-2.023,
+0.25
+],
+"q": [
+0.70711,
+0.0,
+0.0,
+0.70711
+],
+"h": [
+0.435,
+0.05,
+0.903
+]
+},
+{
+"path": "Doors/Door (Double)/DoorRight/door_default/Collision (1)",
+"p": [
+-1.8897,
+0.7,
+10.25
+],
+"q": [
+0.0,
+0.70711,
+-0.70711,
+0.0
+],
+"h": [
+0.075,
+0.125,
+0.1275
+]
+},
+{
+"path": "Doors/Door (Double) (2)/DoorRight/Collision",
+"p": [
+-7.555,
+-2.023,
+0.25
+],
+"q": [
+0.0,
+0.70711,
+-0.70711,
+0.0
+],
+"h": [
+0.435,
+0.05,
+0.903
+]
+},
+{
+"path": "Doors/Door (Double) (1)/DoorRight/Collision",
+"p": [
+-10.25,
+0.977,
+2.445
+],
+"q": [
+0.5,
+0.5,
+-0.5,
+0.5
+],
+"h": [
+0.435,
+0.05,
+0.903
+]
+},
+{
+"path": "Doors/Door (Double)/DoorRight/Collision",
+"p": [
+-1.555,
+0.977,
+10.25
+],
+"q": [
+0.0,
+0.70711,
+-0.70711,
+0.0
+],
+"h": [
+0.435,
+0.05,
+0.903
+]
+},
+{
+"path": "Doors/Door (Double) (1)/DoorRight/door_default/Collision (1)",
+"p": [
+-10.25,
+0.7,
+2.1103
+],
+"q": [
+0.5,
+0.5,
+-0.5,
+0.5
+],
+"h": [
+0.075,
+0.125,
+0.1275
+]
+},
+{
+"path": "Doors/Door (Double) (2)/DoorRight/door_default/Collision (1)",
+"p": [
+-7.8897,
+-2.3,
+0.25
+],
+"q": [
+0.0,
+0.70711,
+-0.70711,
+0.0
+],
+"h": [
+0.075,
+0.125,
+0.1275
+]
+},
+{
+"path": "Doors/Door (Double) (2)/DoorLeft/door_default/Collision (1)",
+"p": [
+-8.1103,
+-2.3,
+0.25
+],
+"q": [
+0.70711,
+0.0,
+0.0,
+0.70711
+],
+"h": [
+0.075,
+0.125,
+0.1275
+]
+},
+{
+"path": "Doors/Door (Double) (1)/DoorLeft/door_default/Collision (1)",
+"p": [
+-10.25,
+0.7,
+1.8897
+],
+"q": [
+0.5,
+-0.5,
+0.5,
+0.5
+],
+"h": [
+0.075,
+0.125,
+0.1275
+]
+},
+{
+"path": "Doors/Door (Double)/DoorLeft/Collision",
+"p": [
+-2.445,
+0.977,
+10.25
+],
+"q": [
+0.70711,
+0.0,
+0.0,
+0.70711
+],
+"h": [
+0.435,
+0.05,
+0.903
 ]
 },
 {

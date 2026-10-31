@@ -84,7 +84,7 @@ def wm(pid):
 WAKE = {"trawler": {"Trawler"}, "wheel": {"World", "Pier_Wheel_Station", "Pier_Connection_Planks", "Pier_Main_Planks", "Pier_Main_SupportsLongA",
                                           "Pier_Main_SupportsLongB", "Pier_Main_SupportsShortA", "Railing", "RailingForBack", "RailingForFront", "wheel text"},
         # Aquarium: its railings and benches (its WavesEnabler water is the Waves mode's, lower; melee keeps the stage's own)
-        "aquarium": {"Railings", "Benches"}}
+        "aquarium": {"Railings", "Benches", "DoorLeft", "DoorRight"}}
 base_name = lambda n: n.rsplit(" (", 1)[0] if n.endswith(")") else n
 def is_active(pid):
     if pid not in active:

@@ -522,12 +522,13 @@ export function createRenderer(canvas) {
         // water uses Gang Beasts' own shader; a plain sea blue stands in
         color: /^Water/.test(d.name) ? new THREE.Color('#2f7fb5') : new THREE.Color().setRGB(d.color[0], d.color[1], d.color[2], THREE.SRGBColorSpace),
         map: d.map ? tex(d.map) : null, roughness: 1 - d.smoothness * 0.8, metalness: d.metallic,
-        ...MAPS[setup.map]?.water?.length && /^Water/.test(d.name) ? { transparent: true, opacity: 0.8, depthWrite: false } // Aquarium's pools: see who's sinking
+        ...MAPS[setup.map]?.water?.length && /^Water/.test(d.name) ? { transparent: true, opacity: 0.8, depthWrite: false, roughness: 0.15 } // Aquarium's pools: see who's sinking
+          : view.cutout?.test(d.name) ? { alphaTest: 0.5, side: THREE.DoubleSide } // Unity alpha-clipped (Aquarium's shutter grille)
           : d.color[3] < 1 && /^Glass/.test(d.name) ? { transparent: true, opacity: Math.max(d.color[3], 0.45), depthWrite: false } : {}, // Aquarium's tank windows
       });
       if (d.emission && Math.max(...d.emission) > 0) m.emissive.setRGB(...d.emission.map(v => Math.min(v, 1)));
       // lightmapped surfaces get their ambient from the lightmap alone, like in Unity
-      if (li >= 0) { m.lightMap = lightmapTex[li]; m.lightMapIntensity = LIGHTMAP_GAIN * (view.dim ?? 1); m.envMapIntensity = 0; }
+      if (li >= 0) { m.lightMap = lightmapTex[li]; m.lightMapIntensity = LIGHTMAP_GAIN * (view.dim ?? 1); m.envMapIntensity = d.metallic; } // metals keep Unity's probe reflections
       return (mats[id] = m);
     };
     // static batching: every submesh is baked into world space (lightmap tiling into its uv1) and merged with the
@@ -554,7 +555,7 @@ export function createRenderer(canvas) {
       let mat = cast === 3 ? new THREE.MeshBasicMaterial({ colorWrite: false, depthWrite: false }) : material(key, li);
       if (cast > 0) { mat = mat.clone(); mat.shadowSide = cast === 2 ? THREE.DoubleSide : THREE.FrontSide; }
       const m = new THREE.Mesh(mergeGeometries(geos), mat);
-      m.castShadow = !city && cast > 0; m.receiveShadow = !city && recv;
+      m.castShadow = !city && cast > 0; m.receiveShadow = !city && recv && !mat.transparent;
       if (city) m.layers.set(1);
       g.add(m);
     }
@@ -614,11 +615,11 @@ export function createRenderer(canvas) {
       const cube = new THREE.CubeTextureLoader().setPath(base).load(sc.env.sky, t => {
         done();
         if (scene.background !== t) return; // left the map meanwhile
-        skyEnv?.dispose(); skyEnv = pmrem.fromCubemap(t); scene.environment = skyEnv.texture;
+        skyEnv?.dispose(); skyEnv = pmrem.fromCubemap(t); if (!view.roomEnv) scene.environment = skyEnv.texture; // roomEnv: an indoor stage whose probes see its bright room, not the sky
       }, undefined, () => done());
       cube.colorSpace = THREE.SRGBColorSpace;
       scene.background = cube; scene.backgroundRotation.set(0, Math.PI, 0); scene.environmentRotation.set(0, Math.PI, 0);
-      scene.environmentIntensity = view.dim ?? 1;
+      scene.environmentIntensity = view.roomEnv ?? view.dim ?? 1; // roomEnv: its strength
       if (sc.env.fog) scene.fog = new THREE.FogExp2(new THREE.Color().setRGB(...sc.env.fogColor, THREE.SRGBColorSpace), sc.env.fogDensity); // Unity's exponential squared
     } else g.add(sky(...view.sky ?? ['#6fb2ee', '#d8ecfa', '#b9c9d6']));
     // Trawler's sea is built at runtime by Gang Beasts' water script (nothing to import): a plain sea at its height, in
@@ -629,7 +630,7 @@ export function createRenderer(canvas) {
     }
     if (view.tank) {
       const [r, y0, y1] = view.tank;
-      const body = new THREE.Mesh(new THREE.CylinderGeometry(r, r, y1 - y0, 48, 1, true), new THREE.MeshBasicMaterial({ color: '#1f5fc0', transparent: true, opacity: 0.85, depthWrite: false }));
+      const body = new THREE.Mesh(new THREE.CylinderGeometry(r, r, y1 - y0, 48, 1, true), new THREE.MeshBasicMaterial({ color: '#2a5ea8', transparent: true, opacity: 0.85, depthWrite: false }));
       body.position.y = (y0 + y1) / 2; g.add(body);
     }
     // like the stage's own camera: Girders' looks from -z at 27 degrees
