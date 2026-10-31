@@ -528,7 +528,7 @@ export function createRenderer(canvas) {
       });
       if (d.emission && Math.max(...d.emission) > 0) m.emissive.setRGB(...d.emission.map(v => Math.min(v, 1)));
       // lightmapped surfaces get their ambient from the lightmap alone, like in Unity
-      if (li >= 0) { m.lightMap = lightmapTex[li]; m.lightMapIntensity = LIGHTMAP_GAIN * (view.dim ?? 1); m.envMapIntensity = d.metallic; } // metals keep Unity's probe reflections
+      if (li >= 0) { m.lightMap = lightmapTex[li]; m.lightMapIntensity = LIGHTMAP_GAIN * (view.dim ?? 1); m.envMapIntensity = view.roomEnv ? d.metallic : 0; } // roomEnv: metals keep Unity's probe reflections
       return (mats[id] = m);
     };
     // static batching: every submesh is baked into world space (lightmap tiling into its uv1) and merged with the
