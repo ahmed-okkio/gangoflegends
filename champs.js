@@ -56,6 +56,13 @@ export const CHAMPS = {
       { id: 'rage', name: "Dragon's Rage", cd: 6, desc: 'Kick the champ in front of you back. Anyone they crash into gets knocked back too.' },
     ],
   },
+  riven: {
+    name: 'Riven', title: 'The Exile', body: '#f0cfb6', limb: '#e2b597', eyes: '#9cffd0', glow: '#7dffc0',
+    abilities: [
+      { id: 'wings', name: 'Broken Wings', cd: 6, lock: true, desc: 'Press up to 3 times (each within 4s): dash toward your cursor and slash whoever is in front. The 3rd is a leap that slams down, knocking everyone around you into the air.' },
+      { id: 'valor', name: 'Valor', cd: 7, lock: true, desc: 'Dash toward your cursor, then burst out, stunning everyone around you.' },
+    ],
+  },
   sylas: {
     name: 'Sylas', title: 'The Unshackled', body: '#c48f6c', limb: '#a0704f', eyes: '#c9a8ff', glow: '#5fa8ff',
     abilities: [

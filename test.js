@@ -301,6 +301,30 @@ for (const [gap, draw] of [[0.3, true], [0.7, false]]) {
   console.log('vi ok');
 }
 
+// 9a. Riven: Broken Wings takes 3 presses (cooling only after the 3rd), the 3rd launches; Valor dashes in and stuns
+{
+  const sim = near('riven', 'hec');
+  run(sim, 90);
+  const r = sim.players[0], h = sim.players[1];
+  for (let k = 0; k < 3; k++) {
+    lineUp(sim, 2.5); h.safe = 0; h.daze = 0;
+    run(sim, 40, i => sim.setInput(0, { x: 0, z: 0, b: i === 0 ? BTN.A1 : 0 }));
+    assert.ok(k < 2 ? r.cd[0] === 0 && r.wings?.n === k + 1 : r.cd[0] > 0 && !r.wings, `broken wings press ${k + 1}: cd ${r.cd[0]}`);
+    assert.ok(h.daze > 0, `broken wings press ${k + 1} hits`);
+  }
+  run(sim, 200, () => sim.setInput(0, { x: 0, z: 0, b: 0 }));
+  lineUp(sim, 3); h.safe = 0; h.ko = 0;
+  let stunned = 0;
+  run(sim, 30, i => { sim.setInput(0, { x: 0, z: 0, b: i === 0 ? BTN.A2 : 0 }); stunned = Math.max(stunned, h.stun); });
+  assert.ok(stunned > 0.5, `valor stuns (${stunned})`);
+  // the window runs out after 4s: one press, then it cools
+  run(sim, 400, () => sim.setInput(0, { x: 0, z: 0, b: 0 })); r.cd = [0, 0];
+  run(sim, 2, i => sim.setInput(0, { x: 0, z: 0, b: i === 0 ? BTN.A1 : 0 }));
+  run(sim, 260, () => sim.setInput(0, { x: 0, z: 0, b: 0 }));
+  assert.ok(!r.wings && r.cd[0] > 4, `broken wings window runs out (${r.cd[0]})`);
+  console.log('riven ok');
+}
+
 // 10. Sett: Haymaker cone, Facebreaker from both sides stuns
 {
   const sim = createSim({ mapId: 'grind', practice: true, players: [

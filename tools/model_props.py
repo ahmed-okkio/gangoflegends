@@ -13,6 +13,7 @@ from mathutils import Vector
 
 out = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "assets", "props")
 preview = "--preview" in sys.argv
+only = [a for a in sys.argv[sys.argv.index("--") + 1:] if not a.startswith("--")] if "--" in sys.argv else []  # prop names to build; none = all
 
 B = lambda v: Vector((v[0], -v[2], v[1]))  # our space (y up, z forward) -> Blender (z up, -y forward)
 mats = {}
@@ -31,6 +32,9 @@ def done(ob, m):
     ob.data.materials.append(m); parts.append(ob); return ob
 def aim(ob, d):  # point the primitive's own axis (Blender z) along d (our space)
     ob.rotation_mode = "QUATERNION"; ob.rotation_quaternion = B(d).to_track_quat("Z", "Y")
+def bake_loc(ob):
+    with bpy.context.temp_override(selected_editable_objects=[ob], active_object=ob, object=ob):
+        bpy.ops.object.transform_apply(location=True, rotation=False, scale=False)
 def bake(ob):
     with bpy.context.temp_override(selected_editable_objects=[ob], active_object=ob, object=ob):
         bpy.ops.object.transform_apply(location=False, rotation=True, scale=True)
@@ -50,8 +54,8 @@ def cyl(m, r, length, at, axis=(0, 1, 0), r2=None):
     aim(ob, axis); bake(ob)
     bv = ob.modifiers.new("bevel", "BEVEL"); bv.width = min(r, length) * 0.15; bv.segments = 3; bv.limit_method = "ANGLE"
     return done(ob, m)
-def ring(m, R, r, at, axis=(0, 1, 0)):
-    bpy.ops.mesh.primitive_torus_add(major_radius=R, minor_radius=r, major_segments=40, minor_segments=12, location=B(at)); ob = bpy.context.object
+def ring(m, R, r, at, axis=(0, 1, 0), seg=(40, 12)):
+    bpy.ops.mesh.primitive_torus_add(major_radius=R, minor_radius=r, major_segments=seg[0], minor_segments=seg[1], location=B(at)); ob = bpy.context.object
     aim(ob, axis); bake(ob)
     return done(ob, m)
 def tube(m, pts, radii, flat=1):  # a tapered tube through points: handles, horns, flames; flat < 1 squashes it across x into a blade
@@ -304,7 +308,93 @@ def sylas_collar():  # chest frame (capsule along x: r .193, half length .082, c
     aim(ob, (0, 0, 1)); bake(ob); done(ob, IRON())  # a flat triangle
     for sx in (1, -1): tube(LEATHER(), [on_vest(sx * 0.12, 0.42, 1.06), on_vest(sx * 0.05, 0.36, 1.07), (kx, ky, kz)], [0.014] * 3)
 
+# ---------------- Riven: the Exile, the broken runeblade ----------------
+RIV_HAIR = lambda: mat("riven_hair", (0.93, 0.92, 0.88), 0.55)
+RIV_LEATHER = lambda: mat("riven_leather", (0.36, 0.22, 0.14), 0.6)
+RIV_CLOTH = lambda: mat("riven_wrap", (0.82, 0.76, 0.64), 0.7)
+
+def slab(m, outline, thick, o, U, W):  # a flat plate: 2D outline (u along U, w along W) from o, thick across U x W (all our space)
+    U, W = Vector(U).normalized(), Vector(W).normalized(); N = U.cross(W)
+    me = bpy.data.meshes.new("slab"); bm = bmesh.new()
+    vs = [bm.verts.new(B(Vector(o) + U * u + W * w + N * (k * thick / 2))) for k in (-1, 1) for u, w in outline]
+    n = len(outline); bm.faces.new(vs[:n]); bm.faces.new(vs[n:][::-1])
+    for i in range(n): bm.faces.new((vs[i], vs[(i + 1) % n], vs[n + (i + 1) % n], vs[n + i]))
+    bm.to_mesh(me); bm.free()
+    ob = bpy.data.objects.new("slab", me); bpy.context.scene.collection.objects.link(ob)
+    bv = ob.modifiers.new("bevel", "BEVEL"); bv.width = thick * 0.3; bv.segments = 2; bv.limit_method = "ANGLE"
+    return done(ob, m)
+
+ARMG = lambda: mat("riven_armor", (0.42, 0.5, 0.14), 0.45, 0.3)
+ARMG2 = lambda: mat("riven_armor_dark", (0.24, 0.3, 0.1), 0.5, 0.3)
+PURPLE = lambda: mat("riven_corset", (0.32, 0.12, 0.26), 0.6)
+
+def riven_bracer():  # sword forearm (hand at y -.337): a brown leather glove and cuff, a steel ring round the wrist
+    cyl(RIV_LEATHER(), 0.072, 0.17, (0, -0.2, 0), r2=0.08); ring(STEEL(), 0.08, 0.022, (0, -0.12, 0)); ring(STEEL(), 0.084, 0.02, (0, -0.28, 0))
+
+def strand(m, pts, radii, n=12, flat=0.55):  # a lock of hair: rings along the points, squashed flat against the head, closed at both ends
+    bm = bmesh.new(); rings = []
+    for i, (p, r) in enumerate(zip(pts, radii)):
+        p = Vector(p); t = (Vector(pts[min(i + 1, len(pts) - 1)]) - Vector(pts[max(i - 1, 0)])).normalized()
+        if i == 0: side = t.cross(Vector((p.x, 0, p.z)).normalized() if (p.x or p.z) else Vector((0, 0, 1))).normalized()
+        side = (side - t * side.dot(t)).normalized(); out = side.cross(t)  # carried along the lock so the rings never twist over
+        rings.append([bm.verts.new(B(p + (side * math.cos(a) + out * math.sin(a) * flat) * r)) for a in [2 * math.pi * k / n for k in range(n)]])
+    tip = bm.verts.new(B(Vector(pts[-1]) + (Vector(pts[-1]) - Vector(pts[-2])) * 0.6))
+    for a, b in zip(rings, rings[1:]):
+        for k in range(n): bm.faces.new((a[k], a[(k + 1) % n], b[(k + 1) % n], b[k]))
+    for k in range(n): bm.faces.new((rings[-1][k], rings[-1][(k + 1) % n], tip))
+    bm.faces.new(rings[0])
+    bmesh.ops.recalc_face_normals(bm, faces=bm.faces)
+    me = bpy.data.meshes.new("strand"); bm.to_mesh(me); bm.free()
+    for f in me.polygons: f.use_smooth = True
+    ob = bpy.data.objects.new("strand", me); bpy.context.scene.collection.objects.link(ob)
+    return done(ob, m)
+
+def riven_hair():  # head frame (skull centre y .165, z .057, r .21): like her chibi figure: a smooth cap down to the nape, layered bangs
+    # sweeping across the brow and framing the face, and a fan of curved crescent spikes radiating from the back of the crown
+    C = Vector((0, 0.165, 0.057))
+    shell(RIV_HAIR(), (0.225, 0.218, 0.23), (0, 0.18, 0.045), lambda x, y, z: (z > 0.06 and y < 0.25) or y < 0.04 + 0.14 * max(0.0, z / 0.23))  # cap, face open
+    def clump(az, el0, el1, r0, r1, w, flick=0.012, tw=0.0, flat=0.22):  # a flat lock lying on the head, tapering to a point
+        pts = []
+        for k in range(8):
+            t = k / 7; el = math.radians(el0 + (el1 - el0) * t); a = math.radians(az + tw * t)
+            pts.append(tuple(C + Vector((math.sin(a) * math.cos(el), math.sin(el), math.cos(a) * math.cos(el))) * (r0 + (r1 - r0) * t + flick * t * t)))
+        strand(RIV_HAIR(), pts, [w * (1 - 0.9 * (k / 7) ** 2) for k in range(8)], flat=flat)
+    for az, tw, end in ((-40, 30, 22), (-12, 34, 26), (16, 30, 32), (42, 18, 36)):  # bangs, layered, sweeping across the brow to her right
+        clump(az, 82, end, 0.228, 0.24, 0.075, tw=tw)
+    for az in (68, -68): clump(az, 55, 2, 0.228, 0.236, 0.065, tw=-10 if az > 0 else 10)  # side locks framing the face, to the cheek
+    P = Vector((0, 0.3, -0.13))  # the whorl at the back of the crown the spikes fan out of
+    for k in range(9):  # crescent spikes radiating round it, all curling the same way, the lower ones lying along the head
+        th0 = math.radians(-20 + k * 40); n = 7; pts = []
+        ln = 0.14 if 1 <= k <= 5 else 0.11
+        for j in range(n):
+            t = j / (n - 1); th = th0 + t * 0.9; r = 0.02 + ln * t
+            d = Vector((math.cos(th), math.sin(th), 0)) * r
+            q = P + d; q = C + (q - C).normalized() * ((q - C).length + 0.04 * t + 0.012)  # held out just off the head, lifting at the tips
+            pts.append(tuple(q))
+        strand(RIV_HAIR(), pts, [0.045 * (1 - 0.95 * (j / (n - 1)) ** 1.5) + 0.004 for j in range(n)], flat=0.35)
+
+def riven_pauldron():  # chest frame (capsule r .193 along x, centre y .254): the big boxy olive armour on her left shoulder, spiked
+    box(ARMG(), (0.22, 0.13, 0.3), (0.27, 0.42, -0.01), 0.04, (0, 0, -22))
+    box(ARMG2(), (0.18, 0.1, 0.27), (0.35, 0.3, -0.01), 0.035, (0, 0, -40))
+    for z in (-0.06, 0.06): box(ARMG(), (0.05, 0.1, 0.05), (0.24, 0.52, z), 0.012)  # the raised blocks on top
+    for z in (-0.11, 0.11): cyl(ARMG2(), 0.04, 0.12, (0.4, 0.33, z), (1, -0.2, z * 3), r2=0.002)  # spikes
+    cyl(ARMG2(), 0.04, 0.12, (0.4, 0.42, 0), (1, 0.2, 0), r2=0.002)
+
+def riven_tunic():  # chest frame: the purple corset band, the brown belt slung low with a big buckle
+    cyl(PURPLE(), 0.2, 0.12, (0, 0.1, -0.01), r2=0.215)  # corset, snug over the lower chest
+    ring(RIV_LEATHER(), 0.215, 0.03, (0, 0.02, -0.01), (0.25, 1, 0))  # belt, slung low to one side
+    box(STEEL(), (0.09, 0.07, 0.03), (0.08, 0.0, 0.205), 0.012, (0, 0, -14))
+
+def riven_wrap():  # off-hand forearm (hand at y -.337): white bandages up the forearm
+    for k in range(5): ring(RIV_CLOTH(), 0.068 - k * 0.002, 0.016, (0, -0.1 - k * 0.045, 0), (0.15 * (-1) ** k, 1, 0))
+
+def riven_greave():  # leg frame (foot bottom at y ~-.136): an olive shin guard with a spike standing off the knee
+    cyl(ARMG2(), 0.07, 0.17, (0, -0.03, 0.01), r2=0.075)
+    box(ARMG(), (0.1, 0.18, 0.04), (0, -0.02, 0.075), 0.015)
+    for x in (0.06, -0.06): cyl(ARMG(), 0.025, 0.09, (x, 0.07, 0.06), (x * 6, 0.6, 0.6), r2=0.002)
+
 PROPS = {
+    "riven_bracer": riven_bracer, "riven_hair": riven_hair, "riven_pauldron": riven_pauldron, "riven_tunic": riven_tunic, "riven_wrap": riven_wrap, "riven_greave": riven_greave,
     "sylas_shackleL": lambda: sylas_shackle(1), "sylas_shackleR": lambda: sylas_shackle(-1), "sylas_chain": sylas_chain, "sylas_hair": sylas_hair, "sylas_collar": sylas_collar,
     "leesin_blindfold": lee_blindfold, "leesin_wrap": lee_wrap,
     "thresh_crown": thresh_crown, "thresh_mantle": thresh_mantle, "thresh_lantern": thresh_lantern, "thresh_hook": thresh_hook, "singed_tank": singed_tank, "singed_goggles": singed_goggles,
@@ -324,7 +414,7 @@ PIVOT = {"core": (0, 0.6347, -0.0101), "blade": (0, 1.0693, 0.0247), "tail": (0,
          "horns": (0, 1.0693, 0.0247), "cuff": (0.2015, 0.6711, -0.0433), "crown": (0, 1.0693, 0.0247), "mantle": (0, 0.6347, -0.0101), "lantern": (0, 0.4223, 0.0002), "hook": (1.1, 1.0, 0.3),
          "tank": (0, 0.6347, -0.0101), "goggles": (0, 1.0693, 0.0247),
          "blindfold": (0, 1.0693, 0.0247), "wrap": (0.2015, 0.6711, -0.0433),
-         "shackleL": (0.2015, 0.6711, -0.0433), "shackleR": (-0.2015, 0.6711, -0.0433), "chain": (0.2215, 0.3311, -0.1533), "collar": (0, 0.6347, -0.0101)}
+         "shackleL": (0.2015, 0.6711, -0.0433), "shackleR": (-0.2015, 0.6711, -0.0433), "chain": (0.2215, 0.3311, -0.1533), "collar": (0, 0.6347, -0.0101), "pauldron": (0, 0.6347, -0.0101), "tunic": (0, 0.6347, -0.0101), "bracer": (-0.2015, 0.6711, -0.0433), "greave": (-0.239, 0.1201, 0.0057)}
 
 def mannequin(dx):
     grey = mat("beast", (0.62, 0.6, 0.58), 0.6)
@@ -341,6 +431,7 @@ os.makedirs(out, exist_ok=True)
 bpy.ops.wm.read_factory_settings(use_empty=True)
 built = {}
 for name, fn in PROPS.items():
+    if only and name not in only: continue
     fn(); built[name] = finish(name)
     print(name, len(built[name].data.polygons), "faces")
 
@@ -350,13 +441,15 @@ if preview:
     sc.render.engine = "BLENDER_WORKBENCH"; sc.display.shading.light = "STUDIO"; sc.display.shading.color_type = "MATERIAL"
     sc.display.shading.show_cavity = True; sc.display.shading.show_shadows = True
     sc.render.resolution_x, sc.render.resolution_y = 2000, 900
-    for champ, dx in (("blitzcrank", -2.2), ("hecarim", -1.1), ("vi", 0), ("sett", 1.1), ("alistar", 2.2), ("thresh", 3.3), ("singed", 4.4), ("leesin", 5.5), ("sylas", 6.6)):
+    shown = [(c, dx) for c, dx in (("blitzcrank", -2.2), ("hecarim", -1.1), ("vi", 0), ("sett", 1.1), ("alistar", 2.2), ("thresh", 3.3), ("singed", 4.4), ("leesin", 5.5), ("sylas", 6.6), ("riven", 7.7))
+             if any(n.startswith(c) for n in built)]
+    for champ, dx in shown:
         mannequin(dx)
         for name, ob in built.items():
             if name.startswith(champ): ob.location = B(Vector(PIVOT[name.split("_")[1]]) + Vector((dx, 0, 0)))
     cam = bpy.data.objects.new("cam", bpy.data.cameras.new("cam")); sc.collection.objects.link(cam); sc.camera = cam
-    cam.data.type = "ORTHO"; cam.data.ortho_scale = 10
+    cam.data.type = "ORTHO"; cam.data.ortho_scale = float(os.environ.get("PREVIEW_SCALE", 10 if len(shown) > 3 else 3.6))
     for view, d in (("front", (0.0, 0.25, 1)), ("three_quarter", (0.8, 0.35, 0.9)), ("back", (-0.5, 0.3, -1))):
-        target = B((2.2, 0.75, 0)); cam.location = target + B(Vector(d).normalized() * 6)
+        target = B((sum(dx for _, dx in shown) / len(shown), float(os.environ.get("PREVIEW_Y", 0.65)), 0.2)); cam.location = target + B(Vector(d).normalized() * 6)
         cam.rotation_euler = (target - cam.location).to_track_quat("-Z", "Y").to_euler()
-        sc.render.filepath = os.path.join(out, f"preview_{view}.png"); bpy.ops.render.render(write_still=True)
+        sc.render.filepath = os.path.join(os.environ.get("PREVIEW_DIR", out), f"preview_{view}.png"); bpy.ops.render.render(write_still=True)  # PREVIEW_DIR: keep a partial (--only) preview out of assets

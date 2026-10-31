@@ -259,7 +259,7 @@ export function createSim({ mapId, players, practice = false, roundsToWin = 3, t
       alive: true, yaw, daze: 0, sinceHit: 9, ko: 0, kos: 0, cd: [0, 0], punch: null, punchCd: 0, armCd: [0, 0], queued: [0, 0], abQ: [0, 0], castTick: [null, null], grabs: [null, null], held: [0, 0],
       stun: 0, spin: 0, spinHit: null, stole: null, charge: 0, empower: 0, jumpT: 0, mantled: false, heave: null, stuckT: [0, 0], ghost: [false, false], phase: 0, grounded: false, prevB: p.input.b,
       butt: null, buttCd: 0, lying: false, safe: 0, hooked: 0, spinA: 0, chargeT: 0,
-      stamina: 100, wet: false, drowned: false, emp: null, dash: null, vault: 0, vaultBtn: 0, hay: 0, hayBtn: 0, fb: 0, pulv: 0, flay: 0, fling: 0, tether: null, leap: null, dizzy: 0, kick: null, kickA: 0, palm: 0, qTurn: null, abduct: 0,
+      stamina: 100, wet: false, drowned: false, emp: null, dash: null, vault: 0, vaultBtn: 0, hay: 0, hayBtn: 0, fb: 0, pulv: 0, flay: 0, fling: 0, tether: null, leap: null, dizzy: 0, kick: null, kickA: 0, palm: 0, qTurn: null, abduct: 0, wings: null,
     });
   }
 
@@ -374,7 +374,7 @@ export function createSim({ mapId, players, practice = false, roundsToWin = 3, t
   }
   // drop whatever the player was doing: knocked out, caught by a hook or stunned by an ability (the cooldown stays spent)
   function cancel(p) {
-    p.spin = 0; p.charge = 0; p.punch = null; p.butt = null; p.dash = null; p.vault = 0; p.hay = 0; p.leap = null; p.kickA = 0; p.qTurn = null;
+    p.spin = 0; p.charge = 0; p.punch = null; p.butt = null; p.dash = null; p.vault = 0; p.hay = 0; p.leap = null; p.kickA = 0; p.qTurn = null; p.rivA = null; p.rivNext = null;
     releaseGrabs(p);
   }
   function wake(p) {
@@ -481,7 +481,9 @@ export function createSim({ mapId, players, practice = false, roundsToWin = 3, t
     if (LEAPS.includes(ab.id) && p.tether != null) return leap(p); // recast while they're caught / marked: fly to them
     if (ab.id === 'abscond' && p.abduct > 0) { if (gb && local >= 0) { p.abduct = 0; return; } return abduct(p); } // the chains tie him to someone: the host's
     if (p.cd[i] > 0) return;
+    if (p.dash?.riven && (ab.id === 'wings' || ab.id === 'valor')) { p.rivNext = i; return; } // E into Q / Q into E: cast when this dash ends
     if (ab.id === 'hijack') return hijack(p, ab);
+    if (ab.id === 'wings') return brokenWings(p, i, ab);
     if (ab.id === 'sonic' && !turned && ahead(p) < -0.5) { p.qTurn = { yaw: p.yaw, t: 0.4 }; return; } // aimed over 120° round: turn first, then thrust (control())
     p.cd[i] = ab.cd;
     if (local >= 0) p.castTick[i] = tick; // my copy's guess: sync() takes it back if the host never cast
@@ -505,7 +507,52 @@ export function createSim({ mapId, players, practice = false, roundsToWin = 3, t
     else if (ab.id === 'adhesive') adhesive(p, f, t, ab);
     else if (ab.id === 'fling') fling(p, t);
     else if (ab.id === 'headbutt') { p.dash = { t: 0.25, power: 1, ali: true }; fx('swing', t, 0, p.slot); }
+    else if (ab.id === 'valor') { p.dash = { t: 0.2, riven: 'e', dir: f, yaw: p.yaw, speed: 12.5 }; p.rivA = { n: 'e', t: 0, d: 0.3 }; fx('swing', t, 0, p.slot); } // ~2.5m, then Ki Burst (wings())
     else if (ab.id === 'rage') { p.kickA = KICK; fx('swing', t, 0, p.slot); } // the kick lands at the end of the turn (control())
+  }
+
+  // Riven Q: up to 3 presses, each within 4s of the last. 1st and 2nd: a short dash and a slash in front; 3rd: a leap that
+  // slams down and knocks everyone round her up. The cooldown starts after the 3rd, or once the window runs out (control())
+  function brokenWings(p, i, ab) {
+    const n = (p.wings?.n ?? 0) + 1, f = facing(p);
+    p.wings = n < 3 ? { n, t: 4 } : null;
+    p.rivA = { n, t: 0, d: n < 3 ? 0.3 : 0.6 }; // the swing (rivPose())
+    if (n === 3) { p.cd[i] = ab.cd; if (local >= 0) p.castTick[i] = tick; }
+    if (n < 3) p.dash = { t: 0.18, riven: n, dir: f, yaw: p.yaw, speed: 6.5 }; // a short step in, ~1.2m
+    else { // the leap: thrown up and forward, the dash just times the landing
+      p.dash = { t: 0.55, riven: 3, dir: f, yaw: p.yaw, speed: 3.5 };
+      for (const b of p.bodies) b.setLinvel(add(mul(f, 3.5), V(0, 8, 0)), true); // high enough to front flip in
+      p.jumpT = 0.45;
+    }
+    fx('swing', p.bodies[TORSO].translation(), 0, p.slot);
+  }
+  // Riven's swings, as in League, the sword in her right hand: Q1 a forehand cut from high on her right down across to her
+  // left, Q2 the backhand back across, Q3 raised overhead on the leap and brought down in the slam; Valor drags it low
+  // behind her. k: how far through the swing (a short hold cocked, then fast). The left arm out for balance
+  const rivK = a => { const u = Math.min(1, Math.max(0, (a.t / a.d - 0.15) / 0.55)); return u * u * (3 - 2 * u); };
+  function rivPose(n, k, i, bf, side) {
+    const right = mul(side, -1), dir = (f, r, u) => add(add(mul(bf, f), mul(right, r)), V(0, u, 0));
+    if (!i) return dir(0.3, -0.8, -0.2);
+    if (n === 1) return turnTo(dir(0.2, 0.8, 0.9), dir(0.9, -0.6, -0.5), k);
+    if (n === 2) return turnTo(dir(0.3, -0.9, 0.1), dir(0.6, 0.9, 0.35), k);
+    if (n === 3) return k < 0.5 ? turnTo(dir(0.5, 0.2, 0.3), dir(-0.4, 0, 1), k * 2) : turnTo(dir(-0.4, 0, 1), dir(1, 0, -0.6), (k - 0.5) * 2);
+    return dir(-0.7, 0.4, -0.6);
+  }
+  // where a Riven dash ends: n 1-2 the Q slash (ahead of her), 3 the Q slam, 'e' Ki Burst (round her, stuns)
+  function wings(p, n) {
+    if (n !== 3) for (const b of p.bodies) { const v = b.linvel(); b.setLinvel(V(v.x * 0.15, v.y, v.z * 0.15), true); } // she plants where the dash ends: sliding on, the burst was left behind her
+    const t = p.bodies[TORSO].translation(), f = facing(p), c = n === 1 || n === 2 ? add(t, mul(f, 1)) : t, r = n === 'e' ? 2.3 : n === 3 ? 2.2 : 1.5;
+    fx(n === 'e' ? 'ki' : 'riven', c, n === 3 ? 1 : 0, p.slot);
+    if (local >= 0) return;
+    for (const o of ps) {
+      if (o === p || !o.alive) continue;
+      const d = sub(seen(p, o), c);
+      if (Math.hypot(d.x, d.z) > r || Math.abs(d.y) > 1.2) continue;
+      if (n === 1 || n === 2) { hit(o, TORSO, add(mul(f, 5), V(0, 2, 0)), 15); continue; }
+      if (n === 3) hit(o, TORSO, add(mul(norm(V(d.x, 0, d.z)), 2.5), V(0, 8, 0)), 20, true);
+      else hit(o, TORSO, add(mul(norm(V(d.x, 0, d.z)), 3), V(0, 1.5, 0)), 20);
+      if (o.ko <= 0 && o.safe <= 0) { o.stun = Math.max(o.stun, n === 3 ? 0.8 : 0.75); o.dizzy = o.stun; cancel(o); } // stars over them while it lasts
+    }
   }
 
   // Lee Sin E (his ult, Dragon's Rage, toned down to use often): a roundhouse kick. One full turn with the right leg out
@@ -728,7 +775,8 @@ export function createSim({ mapId, players, practice = false, roundsToWin = 3, t
       if (!d || len(d) < 1.2 || (p.leap.t += DT) > 1) p.leap = null;
       else { const v = add(mul(d, 14 / len(d)), V(0, 0.8, 0)); for (const b of p.bodies) b.setLinvel(v, true); p.jumpT = 0.1; }
     }
-    if (p.dash) { const d = p.dash.dir ?? f; if (p.dash.dir) p.yaw = p.dash.yaw; speed = p.dash.dir ? 14.85 : 11; /* Vi's 35% faster, over the same reach (her aim strip) */ mx = d.x; mz = d.z; if ((p.dash.t -= DT) <= 0) p.dash = null; }
+    if (p.dash) { const d = p.dash.dir ?? f; if (p.dash.dir) p.yaw = p.dash.yaw; speed = p.dash.speed ?? (p.dash.dir ? 14.85 : 11); /* Vi's 35% faster, over the same reach (her aim strip) */ mx = d.x; mz = d.z; if ((p.dash.t -= DT) <= 0) { if (p.dash.riven) { wings(p, p.dash.riven); p.dash = null; if (p.rivNext != null) { const k = p.rivNext; p.rivNext = null; useAbility(p, k); } } else p.dash = null; } }
+    if (p.wings && (p.wings.t -= DT) <= 0) { p.wings = null; p.cd[0] = kit(p.champ, p.stole)[0].cd; } // Broken Wings' window ran out: it cools
     if (p.kick && (p.kick.t -= DT) > 0 && p.kick.vic.alive) { // Dragon's Rage: the champ he kicked bowls over whoever they hit
       const kt = p.kick.vic.bodies[TORSO].translation();
       for (const o of ps) if (o.alive && !p.kick.hit.has(o) && len(sub(o.bodies[TORSO].translation(), kt)) < 0.9) { p.kick.hit.add(o); hit(o, TORSO, add(mul(p.kick.f, 6), V(0, 2.25, 0)), 10); }
@@ -738,6 +786,7 @@ export function createSim({ mapId, players, practice = false, roundsToWin = 3, t
       if (move && inp.b & p.hayBtn && p.hay < 3) { p.hay += DT; speed = 0; }
       else { if (move) haymaker(p, f, tp, hayK(p)); p.hay = 0; } // stunned out of it (a hook, Pulverize): no throw, and the cooldown stays spent
     }
+    if (p.rivA && (p.rivA.t += DT) > p.rivA.d) p.rivA = null;
     p.fb -= DT; p.pulv -= DT; p.flay -= DT; p.fling -= DT; p.palm -= DT;
     if (p.qTurn && ((p.qTurn.t -= DT) <= 0 || ahead(p) > 0.5)) { p.yaw = p.qTurn.yaw; p.qTurn = null; useAbility(p, 0, true); }
     if (p.kickA > 0 && (p.kickA -= DT) <= 0) rage(p, facing(p), p.bodies[TORSO].translation());
@@ -824,21 +873,21 @@ export function createSim({ mapId, players, practice = false, roundsToWin = 3, t
     const fk = !!p.leap?.lee && !p.leap.sy; // Sonic Wave's recast: a flying kick, foot first
     // grab assist: a hand held out to grab goes for whoever a punch would track, bending down to someone on the floor
     const gt = (p.grounded || swim) && p.held.some((h, i) => h >= TAP && !p.grabs[i]) && punchTarget(p, f), gTo = gt && sub(gt.bodies[TORSO].translation(), tp);
-    const lean = fk ? -0.6 : p.kickA > 0 ? -0.25 : p.vault > 0 ? 0.45 : p.dash?.dir ? 0.6 : p.charge > 0 || p.dash ? 0.35 : p.butt ? 0.9 * Math.sin(Math.min(1, p.butt.t / 0.25) * Math.PI) : gTo ? Math.min(GRAB_LEAN, Math.max(0, -gTo.y - 0.05) * 4) : 0, yq = qyaw(p.yaw + p.spinA), up = (sw ? 0.05 : p.pushUp ? 1 : fk ? 0.5 : p.grounded || swim ? 0.3 : 0.15) * ctrl;
+    const rk = p.rivA ? rivK(p.rivA) : 0, lean = p.rivA ? (p.rivA.n === 3 ? (rk < 0.5 ? -0.3 : 0.75) : p.rivA.n === 'e' ? 0.5 : 0.35) : fk ? -0.6 : p.kickA > 0 ? -0.25 : p.vault > 0 ? 0.45 : p.dash?.dir ? 0.6 : p.charge > 0 || p.dash ? 0.35 : p.butt ? 0.9 * Math.sin(Math.min(1, p.butt.t / 0.25) * Math.PI) : gTo ? Math.min(GRAB_LEAN, Math.max(0, -gTo.y - 0.05) * 4) : 0, yq = qyaw(p.yaw + p.spinA), flip = p.rivA?.n === 3 ? Math.PI * 2 * Math.min(1, Math.max(0, (p.rivA.t - 0.04) / 0.4)) ** 0.8 : 0, up = flip ? 0.6 : (sw ? 0.05 : p.pushUp ? 1 : fk ? 0.5 : p.grounded || swim ? 0.3 : 0.15) * ctrl;
     leak = V();
-    orient(Hb, fk ? qmul(yq, qaxis(X, -0.4)) : yq, 10, up); // the flying kick tips the hips back too: the leg leads
+    orient(Hb, fk ? qmul(yq, qaxis(X, -0.4)) : flip ? qmul(yq, qaxis(X, flip)) : yq, flip ? 30 : 10, up); // the flying kick tips the hips back too: the leg leads; Riven's Q3 pitches every posture goal round, a front flip
     // punching turns the shoulders into it: wound back, then the punching side drives forward (that's the reach)
     const cock = p.held.findIndex(h => h > 0 && h < TAP && p.grounded);
     const backOf = i => p.punch?.arm !== i && p.armCd[i] > 0.75 - RECOIL ? Math.min(1, (p.armCd[i] - 0.75 + RECOIL) / RECOIL) : 0; // coming back from a punch: 1 down to 0
-    const tw = p.punch ? (p.punch.arm ? 0.7 : -0.7) : p.palm > 0 ? 0.6 : cock >= 0 ? (cock ? -0.3 : 0.3) : (backOf(1) - backOf(0)) * 0.7;
+    const tw = p.rivA ? ({ 1: -0.7 + 1.5 * rk, 2: 0.8 - 1.6 * rk, 3: 0, e: -0.4 })[p.rivA.n] : p.punch ? (p.punch.arm ? 0.7 : -0.7) : p.palm > 0 ? 0.6 : cock >= 0 ? (cock ? -0.3 : 0.3) : (backOf(1) - backOf(0)) * 0.7;
     // a punch with a target tracks it: the shoulders turn to them and the fist (below) flies from the shoulder at their head, hit or miss
     const aimTo = (p.punch?.to?.bodies && sub(skull(p.punch.to), p.bodies[ARM + p.punch.arm].translation())) || gTo, ay = aimTo ? Math.atan2(aimTo.x, aimTo.z) : p.yaw + p.spinA;
     // the upper body turns relative to where the hips point now, at most ~63° off them: aimed absolutely, a target (or
     // a new heading) behind turned the chest one way round and the hips the other, legs facing opposite ways
     const hf = qrot(Hb.rotation(), V(0, 0, 1)), hy = Math.atan2(hf.x, hf.z), off = a => hy + Math.max(-1.1, Math.min(1.1, wrap(a - hy)));
-    orient(p.bodies[WAIST], qmul(qyaw(off(ay + tw * 0.4)), qaxis(X, lean * 0.5)), 10, up, [T, ...UPPER.map(i => p.bodies[i])]);
-    orient(T, qmul(qyaw(off(ay + tw)), qaxis(X, lean)), 20, up, UPPER.map(i => p.bodies[i]));
-    orient(H, qmul(yq, qaxis(X, lean * 0.6)), 20, up);
+    orient(p.bodies[WAIST], qmul(qyaw(off(ay + tw * 0.4)), qaxis(X, flip || lean * 0.5)), flip ? 30 : 10, up, [T, ...UPPER.map(i => p.bodies[i])]);
+    orient(T, qmul(qyaw(off(ay + tw)), qaxis(X, flip || lean)), flip ? 30 : 20, up, UPPER.map(i => p.bodies[i]));
+    orient(H, qmul(yq, qaxis(X, flip || lean * 0.6)), flip ? 30 : 20, up);
 
     const hspeed = Math.hypot(tv.x, tv.z), gait = Math.min(1, hspeed / 2);
     p.phase += (swim ? Math.max(hspeed, 1.5) : hspeed) * DT * 4.5;
@@ -885,6 +934,7 @@ export function createSim({ mapId, players, practice = false, roundsToWin = 3, t
       // then dashing behind the left fist thrust straight out, the right swung back (that fist is what hits, see below)
       if (p.vault > 0) { if (i === 0) { ua = add(mul(bf, -0.9), V(0, -0.35, 0)); fa = add(bf, V(0, 0.15, 0)); } else { ua = add(bf, mul(side, s * 0.2)); fa = add(add(bf, V(0, 0.35, 0)), mul(side, -s * 0.3)); } str = 0.7; } // crouched: punch cocked (elbow back, fist at the hip facing forward), guard up across the front
       if (p.dash) { ua = fa = p.dash.sylas ? add(mul(bf, -0.8), V(0, 0.1, 0)) : p.dash.dir && i === 1 ? null : add(bf, V(0, 0.05, 0)); str = 0.9; if (!ua) { ua = add(mul(bf, -0.6), V(0, -0.5, 0)); fa = add(bf, V(0, 0.35, 0)); } } // Vi: right elbow back, fist tucked at the chest // fists leading (Vi: the left only); Abscond: trailing behind
+      if (p.rivA) { ua = fa = rivPose(p.rivA.n, rk, i, bf, side); str = i ? 1 : 0.5; fs = 1; } // Riven's swings (rivPose())
       if (p.hay > 0 && i === 1) { ua = add(mul(bf, -0.8), V(0, 0.4, 0)); fa = add(bf, V(0, 0.6, 0)); str = 0.6; } // cocked back
       if (p.hay > 0 && i === 0) { ua = fa = add(bf, V(0, 0.2, 0)); str = 0.5; } // guard hand out front
       // Facebreaker: arms fling wide, then slam together in front
@@ -977,7 +1027,7 @@ export function createSim({ mapId, players, practice = false, roundsToWin = 3, t
         hit(vic, part, add(mul(norm(V(vt.x - tp.x, 0, vt.z - tp.z)), 7.5), V(0, 2.5, 0)), 24);
       }
     }
-    if (p.dash && !p.dash.sylas) { // Abscond is just a dash: it doesn't stop on champs or bump them
+    if (p.dash && !p.dash.sylas && !p.dash.riven) { // Riven's hit where they end (wings()). Abscond is just a dash: it doesn't stop on champs or bump them
       // Alistar's Headbutt also catches someone above him (launched by Pulverize), up to ~2m over his head
       const [first] = [0, ...(p.dash.ali ? [0.9, 1.8] : [])].flatMap(h => playersNearSeen(p, add(tp, add(mul(f, 0.45), V(p.dash.dir ? side.x * 0.25 : 0, h, p.dash.dir ? side.z * 0.25 : 0))), 0.6)); // Vi: at her leading left fist
       if (first) {

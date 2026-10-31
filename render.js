@@ -27,9 +27,10 @@ const PROPS = {
   thresh: [['crown', HEAD], ['mantle', CHEST], ['lantern', HIPS], ['hook', -1]], // hook: drawn on his Q, not worn
   singed: [['tank', CHEST], ['goggles', HEAD]],
   lee: [['blindfold', HEAD], ['wrap', FORE], ['wrap', FORE + 1]],
+  riven: [['hair', HEAD], ['pauldron', CHEST], ['tunic', CHEST], ['bracer', FORE + 1], ['wrap', FORE], ['greave', LEG + 1]],
   sylas: [['hair', HEAD], ['collar', CHEST], ['shackleL', FORE, 'zap'], ['shackleR', FORE + 1, 'zap'], ['chain', -1]], // zap: crackle with lightning on Abscond. chain: hung off each cuff, see apply()
 };
-const PROP_FILE = { blitz: 'blitzcrank', hec: 'hecarim', vi: 'vi', sett: 'sett', ali: 'alistar', thresh: 'thresh', singed: 'singed', lee: 'leesin', sylas: 'sylas' };
+const PROP_FILE = { blitz: 'blitzcrank', hec: 'hecarim', vi: 'vi', sett: 'sett', ali: 'alistar', thresh: 'thresh', singed: 'singed', lee: 'leesin', sylas: 'sylas', riven: 'riven' };
 const propScenes = {}; // 'blitz/core' -> parsed glTF scene
 export async function loadProps() {
   if (Object.keys(propScenes).length) return;
@@ -358,6 +359,14 @@ export function createRenderer(canvas) {
         emit(v, { color: '#7dff9a', n: 18, speed: 7, size: 0.22, life: 0.35, grav: 0, dir: dir.negate() });
         ring(v, '#7dff9a', 1.6);
         shake = Math.max(shake, 0.1);
+      } else if (kind === 'riven') { // Broken Wings: a green slash ahead of her; the 3rd, a slam round her (big)
+        if (big) { v.y -= 0.6; ring(v, '#7dffc0', 2.2, false, 0.35, true); emit(v, { color: '#8a7a66', n: 18, speed: 5, size: 0.35, life: 0.6, grav: 8, up: 4, additive: false, opacity: 0.9 }); shake = Math.max(shake, 0.25); }
+        else { ring(v, '#7dffc0', 1.5); emit(v, { color: '#b8ffe0', n: 12, speed: 6, size: 0.2, life: 0.3, grav: 0 }); shake = Math.max(shake, 0.1); }
+      } else if (kind === 'ki') { // Valor's Ki Burst: a stunning shockwave round her
+        v.y -= 0.6;
+        ring(v, '#7dffc0', 2.3, false, 0.3, true);
+        ring(v, '#ffffff', 1.8, false, 0.2, true);
+        shake = Math.max(shake, 0.18);
       } else if (kind === 'wave') { // Sonic Wave leaving Lee's palm
         emit(v, { color: '#4fe3ff', n: 10, speed: 3, size: 0.22, life: 0.3, grav: 0 });
         ring(v, '#4fe3ff', 0.7);
