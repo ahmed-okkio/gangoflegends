@@ -1,7 +1,7 @@
 // Host-authoritative game simulation: Rapier world, active ragdolls, abilities, rounds.
 // Runs on the host only (and in Node for tests); clients just render snapshots of it.
 import RAPIER from '@dimforge/rapier3d-compat';
-import { MAPS, trainsAt } from './maps.js';
+import { MAPS, trainsAt, wheelAngle } from './maps.js';
 import { CHAMPS, kit } from './champs.js';
 import { PARTS, ANCHOR, HAND, HIP_HEIGHT, CHEST, HEAD, ARM, THIGH, FORE, LEG, HIPS, WAIST } from './beast.js';
 
@@ -87,7 +87,7 @@ const othersOnly = p => (1 << 16) | (0x1fe & ~p.bit);      // hit checks
 // ragdoll toward the host's authoritative state as it arrives. Hits, KOs and rounds stay the host's call.
 // newMap: a random-stage match, the next round goes to a fresh sim on another stage (game.js): it stops at "next" for the host
 // to start that one, carrying on from carry { sc, rn }
-export function createSim({ mapId, players, practice = false, roundsToWin = 3, local = -1, gb = false, newMap = false, carry = null }) {
+export function createSim({ mapId, players, practice = false, roundsToWin = 3, timeLimit = 0, local = -1, gb = false, newMap = false, carry = null }) {
   const map = MAPS[mapId];
   const world = new RAPIER.World(V(0, -20, 0)); // Gang Beasts' gravity
   world.timestep = DT;
@@ -167,6 +167,32 @@ export function createSim({ mapId, players, practice = false, roundsToWin = 3, l
       tr.out = true;
     });
   }
+  // Wheel's ferris wheel: the frame turns about the hub's z axis; the gondolas ride round on it, kept upright. All kinematic,
+  // so whoever stands on one is carried by its motion
+  const W = map.turning;
+  const turning = W ? [{ part: W.frame }, ...W.cars.map(at => ({ part: W.car, at }))].map(({ part, at }) => {
+    const body = world.createRigidBody(RAPIER.RigidBodyDesc.kinematicPositionBased().setTranslation(...W.hub));
+    const add = (desc, p = [0, 0, 0], q) => world.createCollider(desc.setTranslation(...p).setRotation(q ? { x: q[0], y: q[1], z: q[2], w: q[3] } : QI).setFriction(0.9).setCollisionGroups(WORLD_GROUPS), body);
+    for (const b of part.boxes) add(RAPIER.ColliderDesc.cuboid(...b.h), b.p, b.q);
+    for (const c of part.caps) add(c.hh ? RAPIER.ColliderDesc.capsule(c.hh, c.r) : RAPIER.ColliderDesc.ball(c.r), c.p, c.q);
+    for (const t of part.tris) add(RAPIER.ColliderDesc.trimesh(t.v, t.i));
+    return { body, at };
+  }) : [];
+  let wheelT = 0;
+  function moveWheel(t, snap = false) {
+    if (!turning.length) return;
+    snap ||= Math.abs(t - wheelT) > 0.1; // a jump in the clock (a client re-synced to the host's): no sweep, it would fling whoever's on
+    wheelT = t;
+    const a = wheelAngle(map, t), c = Math.cos(a), s = Math.sin(a);
+    for (const { body, at } of turning) {
+      const p = at ? V(W.hub[0] + at[0] * c - at[1] * s, W.hub[1] + at[0] * s + at[1] * c, W.hub[2] + at[2]) : V(...W.hub);
+      if (snap) { body.setTranslation(p, true); if (!at) body.setRotation(qaxis(Z, a), true); continue; }
+      body.setNextKinematicTranslation(p);
+      if (!at) body.setNextKinematicRotation(qaxis(Z, a));
+    }
+  }
+  moveWheel(0, true);
+  const rides = new Set(turning.map(t => t.body.handle)); // moving stage parts a beast standing on is carried by (control())
   // a car's box sweeps 0.4m a step, so a limb could end up inside it and squeeze out the far side. Anything in or just
   // ahead of a car is carried along at its speed instead, on into the tunnel's kill box
   function trainHit(p) {
@@ -198,7 +224,7 @@ export function createSim({ mapId, players, practice = false, roundsToWin = 3, l
   const fx = (kind, t, big = 0, slot = -1, vic = -1) => events.push([kind, r2(t.x), r2(t.y), r2(t.z), big, slot, vic]);
   let by = -1; // whose move is landing hits (control(), stepHooks()), for the hit effects
   let glue = [], ownGlue = []; // Singed Q puddles { x, y, z, t, r }; a predicting client copies them from the host's snapshots
-  let hooks = [], st = practice ? 'fight' : 'count', timer = 2.5, round = carry?.rn ?? 1, mt = 0, win = -1, grace = DRAW_T;
+  let hooks = [], st = practice ? 'fight' : 'count', timer = 2.5, round = carry?.rn ?? 1, mt = 0, win = -1, grace = DRAW_T, fightT = 0; // fightT: this round's fighting time, for timeLimit (s, 0 = none)
   // spawn points are dealt out at random every round
   const shuffle = a => { for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; };
   let order = shuffle(map.spawns.map((_, i) => i));
@@ -576,7 +602,7 @@ export function createSim({ mapId, players, practice = false, roundsToWin = 3, l
     const n =Math.hypot(o.d.x, o.d.z) || 1;
     fx('fling', add(o.o.bodies[TORSO].translation(), V(0, local >= 0 ? 0.45 : 0, 0)), 0, p.slot, o.o.slot);
     if (local >= 0) return;
-    hit(o.o, TORSO, V(-o.d.x / n * 9, 10, -o.d.z / n * 9), 25);
+    hit(o.o, TORSO, V(-o.d.x / n * 7.2, 8, -o.d.z / n * 7.2), 25);
     if (o.o.ko <= 0 && o.o.safe <= 0) { o.o.stun = Math.max(o.o.stun, 0.7); cancel(o.o); }
   }
   // Alistar Q: slam the ground, launching everyone close into the air (stunned while they're up)
@@ -633,8 +659,9 @@ export function createSim({ mapId, players, practice = false, roundsToWin = 3, l
     const tp = T.translation(), tv = T.linvel(), Hb = p.bodies[HIPS];
     const ray = world.castRay(new RAPIER.Ray(tp, DOWN), STAND + 0.3, true, undefined, under(p));
     p.grounded = !!ray && ctrl > 0 && !lying;
-    // walking is relative to what's underfoot, so standing still on a conveyor rides it
-    const gv = (ray && beltOf.get(ray.collider.handle))?.v ?? [0, 0, 0];
+    // walking is relative to what's underfoot, so standing still on a conveyor or a moving part of the stage rides it
+    const floor = ray?.collider.parent(), ride = floor && rides.has(floor.handle) && floor.velocityAtPoint(add(tp, mul(DOWN, ray.timeOfImpact)));
+    const gv = (ray && beltOf.get(ray.collider.handle))?.v ?? (ride ? [ride.x, ride.y, ride.z] : [0, 0, 0]);
 
     let mx = inp.x, mz = inp.z;
     const m = Math.hypot(mx, mz);
@@ -1317,7 +1344,7 @@ export function createSim({ mapId, players, practice = false, roundsToWin = 3, l
     for (const p of ps) removeRagdoll(p);
     order = shuffle(order);
     for (const p of ps) if (!p.left) spawn(p);
-    hooks = []; trail = []; win = -1; st = 'count'; timer = 2.5;
+    hooks = []; trail = []; win = -1; st = 'count'; timer = 2.5; fightT = 0;
   }
 
   // ---------- client prediction (local >= 0) ----------
@@ -1453,7 +1480,7 @@ export function createSim({ mapId, players, practice = false, roundsToWin = 3, l
   function stepLocal() {
     mt += DT; tick++;
     for (const { r, body } of rollers) body.setNextKinematicRotation(rollerRot(r, mt));
-    moveTrains(mt);
+    moveTrains(mt); moveWheel(mt);
     glue = glue.filter(g => (g.t -= DT) > 0);
     ownGlue = st === 'count' ? [] : ownGlue.filter(g => (g.t -= DT) > 0);
     if (st === 'count' && (timer -= DT) <= 0) st = 'fight';
@@ -1473,7 +1500,7 @@ export function createSim({ mapId, players, practice = false, roundsToWin = 3, l
     if (me) return stepLocal();
     mt += DT;
     for (const { r, body } of rollers) body.setNextKinematicRotation(rollerRot(r, mt));
-    moveTrains(mt);
+    moveTrains(mt); moveWheel(mt);
     glue = glue.filter(g => (g.t -= DT) > 0);
     if (st === 'count' && (timer -= DT) <= 0) st = 'fight';
     const active = st !== 'count';
@@ -1498,9 +1525,10 @@ export function createSim({ mapId, players, practice = false, roundsToWin = 3, l
     if (st === 'fight' && teamCount > 1) {
       const alive = new Set(ps.filter(p => p.alive).map(p => p.team));
       // the last team standing only wins once it has outlived the rest by DRAW_T: going out together is a draw
-      if (alive.size > 1) grace = DRAW_T;
-      else if (!alive.size || (grace -= DT) <= 0) {
-        win = alive.size ? [...alive][0] : -1;
+      const outOfTime = timeLimit > 0 && (fightT += DT) >= timeLimit; // the host's time limit ran out first: a draw
+      if (alive.size > 1 && !outOfTime) grace = DRAW_T;
+      else if (outOfTime || !alive.size || (grace -= DT) <= 0) {
+        win = alive.size === 1 && !outOfTime ? [...alive][0] : -1;
         if (win >= 0) scores[win]++;
         st = win >= 0 && scores[win] >= roundsToWin ? 'match' : 'round';
         timer = st === 'match' ? 5 : 3;

@@ -8,7 +8,7 @@ import { ShaderPass } from 'three/addons/postprocessing/ShaderPass.js';
 import { OutputPass } from 'three/addons/postprocessing/OutputPass.js';
 import { OutlinePass } from 'three/addons/postprocessing/OutlinePass.js';
 import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
-import { MAPS, trainsAt } from './maps.js';
+import { MAPS, trainsAt, wheelAngle } from './maps.js';
 import { CHAMPS, TEAM_COLORS, FFA_COLORS } from './champs.js';
 import { PARTS, ORDER, ANCHOR, HAND, CHEST, HEAD, ARM, FORE, LEG, HIPS, HIP_HEIGHT, qmul, qinv, qrot } from './beast.js';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
@@ -194,7 +194,7 @@ export function createRenderer(canvas) {
   const rim = new THREE.DirectionalLight('#9ad8ff', 0.9); // cool back light so silhouettes pop
   scene.add(hemi, sun, sun.target, rim);
 
-  let world = null, sharks = [], avatars = [], rollers = [], cars = [], hookPool = [], gluePool = [], setup = null, animated = [];
+  let world = null, sharks = [], avatars = [], rollers = [], cars = [], wheel = null, hookPool = [], gluePool = [], setup = null, animated = [];
   const camAt = new THREE.Vector3(0, 0, 0);
   let camDist = 14, shake = 0, time = 0;
   const sunOffset = new THREE.Vector3(8, 20, 6);
@@ -394,7 +394,7 @@ export function createRenderer(canvas) {
     world = new THREE.Group();
     scene.add(world);
     animated = [];
-    cars = []; loop('train', 0); // a new map: no engine left running from the last one
+    cars = []; wheel = null; loop('train', 0); // a new map: no engine left running from the last one
     rollers = buildMap(world, MAPS[s.map], s.map);
     sharks = []; const sharksIn = MAPS[s.map].shark ? buildSharks(world, MAPS[s.map]) : null;
     for (const l of [hemi, sun, rim]) l.visible = l.intensity > 0; // an unlit light still costs every shader, and the sun a 4096² shadow pass
@@ -545,17 +545,28 @@ export function createRenderer(canvas) {
       g.add(m);
     }
     // Subway's train: one car per track (maps.js trains), hidden until it's out on the line
-    if (sc.train && view.trains !== false) {
-      const car = new THREE.Group();
-      for (const r of sc.train.renderers) {
+    // a moving part's renderers, placed relative to its own origin, as one group
+    const part = renderers => {
+      const grp = new THREE.Group();
+      for (const r of renderers) {
         const M = new THREE.Matrix4().set(...r.matrix.flat()), meta = sc.meshes[r.mesh];
         r.subs.forEach((s, i) => {
           if (!meta.subs[s] || !r.mats.length) return;
           const m = new THREE.Mesh(submesh(geos[r.mesh], meta.subs[s], M, false), material(r.mats[Math.min(i, r.mats.length - 1)], -1));
-          m.castShadow = m.receiveShadow = true; car.add(m);
+          m.castShadow = m.receiveShadow = true; grp.add(m);
         });
       }
+      return grp;
+    };
+    if (sc.train && view.trains !== false) {
+      const car = part(sc.train.renderers);
       for (const _ of MAPS[setup.map]?.trains?.tracks ?? []) { const c = car.clone(); c.visible = false; g.add(c); cars.push(c); }
+    }
+    // Wheel's ferris wheel (maps.js wheelAngle): the frame turns on the hub, the gondolas ride round upright
+    if (sc.wheel && MAPS[setup.map]?.wheel) {
+      const W = sc.wheel, frame = part(W.frame.renderers), car = part(W.car.renderers);
+      frame.position.set(...W.hub); g.add(frame);
+      wheel = { W, frame, cars: W.cars.map(() => { const c = car.clone(); g.add(c); return c; }) };
     }
     // the stage's runtime lights. The strongest directional one is the shadow-casting sun; a few spots cast shadows too
     hemi.intensity = 0; rim.intensity = 0; sun.intensity = 0; // ambient: the environment map (beasts) and lightmaps (stage)
@@ -1122,6 +1133,11 @@ export function createRenderer(canvas) {
     });
 
     for (const { r, roller } of rollers) roller.rotation.x = r.spin * b.mt;
+    if (wheel) {
+      const { W, frame, cars: gs } = wheel, ang = wheelAngle(MAPS[setup.map], a.mt + (b.mt - a.mt) * alpha), c = Math.cos(ang), s = Math.sin(ang);
+      frame.rotation.z = ang;
+      gs.forEach((g, k) => { const [x, y, z] = W.cars[k]; g.position.set(W.hub[0] + x * c - y * s, W.hub[1] + x * s + y * c, W.hub[2] + z); });
+    }
     if (cars.length) { // between the two snapshots' clocks, like the bodies
       const map = MAPS[setup.map], on = trainsAt(map, a.mt + (b.mt - a.mt) * alpha);
       cars.forEach((c, k) => {

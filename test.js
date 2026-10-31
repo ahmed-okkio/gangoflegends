@@ -770,6 +770,28 @@ if ((await prepareMap('subway')).imported) {
   assert.ok(out, 'a train carries you into the tunnel');
   console.log('subway train ok');
 }
+// 15a. a round time limit running out with two still standing: a draw, nobody scores
+{
+  const sim = createSim({ mapId: 'grind', timeLimit: 1, players: [0, 1].map(i => ({ id: i, name: 'P', champ: 'blitz', team: i })) });
+  let snap; for (let i = 0; i < 300 && snap?.st !== 'round'; i++) { sim.step(); snap = sim.snapshot(); }
+  assert.ok(snap.st === 'round' && snap.win === -1 && snap.sc.every(v => v === 0), 'time limit ends the round in a draw');
+  console.log('time limit draw ok');
+}
+// 15b. Wheel (when imported): the ferris wheel turns, and a beast standing in a gondola rides round with it
+if ((await prepareMap('wheel')).imported) {
+  const { wheelAngle, MAPS } = await import('./maps.js');
+  const sim = createSim({ mapId: 'wheel', players: [0, 1].map(i => ({ id: i, name: 'P', champ: 'blitz', team: i })) });
+  const W = MAPS.wheel.turning, at = (k, t) => { const a = wheelAngle(MAPS.wheel, t), [x, y] = W.cars[k]; return { x: W.hub[0] + x * Math.cos(a) - y * Math.sin(a), y: W.hub[1] + x * Math.sin(a) + y * Math.cos(a), z: W.hub[2] }; };
+  run(sim, 60);
+  const t1 = 61 / 60, k = W.cars.map((_, i) => i).sort((a, b) => at(a, t1).y - at(b, t1).y)[0]; // the lowest gondola
+  const g = at(k, t1), p = sim.players[0], t0 = torso(sim, 0);
+  for (const b of p.bodies) { const q = b.translation(); b.setTranslation({ x: q.x - t0.x + g.x + 0.6, y: q.y - t0.y + g.y - 1.0, z: q.z - t0.z + g.z + 0.4 }, true); b.setLinvel({ x: 0, y: 0, z: 0 }, true); } // beside the pole down its middle
+  run(sim, 240);
+  const g2 = at(k, t1 + 4), tp = torso(sim, 0);
+  console.log('gondola moved', Math.hypot(g2.x - g.x, g2.y - g.y).toFixed(2), 'beast off it by', Math.hypot(tp.x - g2.x - 0.6, tp.y - g2.y + 1.0).toFixed(2));
+  assert.ok(Math.hypot(g2.x - g.x, g2.y - g.y) > 1, 'the wheel turns');
+  assert.ok(p.alive && Math.hypot(tp.x - g2.x - 0.6, tp.y - g2.y + 1.0) < 1.2, 'a gondola carries whoever is in it');
+}
 // 16. Trawler (when imported): overboard you float and can swim a while, then tire and sink out; held under, sooner
 if ((await prepareMap('trawler')).imported) {
   const sea = MAPS.trawler.view.sea, shark = MAPS.trawler.shark;

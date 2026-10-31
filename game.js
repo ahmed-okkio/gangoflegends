@@ -213,7 +213,7 @@ $('hostBtn').onclick = async () => {
   menuError('Opening lobby…', true);
   try { conn = await net.host(); } catch (e) { return menuError(e.message); }
   menuError();
-  lobby = { code: conn.code, players: [{ id: 'host', name: me.name, champ: me.champ }], settings: { map: 'rooftop', teams: 0, rounds: 3 } };
+  lobby = { code: conn.code, players: [{ id: 'host', name: me.name, champ: me.champ }], settings: { map: 'rooftop', teams: 0, rounds: 3, limit: 0 } };
   conn.on('join', (id, name, v) => {
     const why = v !== VERSION ? `Version mismatch: the host is on v${VERSION}, you're on v${v}. Restart the game to update.` : game ? 'A match is in progress.' : lobby.players.length >= 8 ? 'Lobby is full.' : '';
     if (why) return deny(id, why);
@@ -347,8 +347,8 @@ function renderLobby() {
   $('lobbyPlayers').innerHTML = lobby.players.map((p, i) => `<li style="--pc:${lobbyColor(i)}"><b>${esc(p.name)}</b>${p.id === myId ? ' <em class="me">you</em>' : ''}${p.id === 'host' ? ' <em>host</em>' : ''}
       <span class="pick">${CHAMPS[p.champ].name}</span>${s.teams ? `<span class="team">${TEAM_NAMES[i % s.teams]}</span>` : ''}${isHost() && p.id !== 'host' ? `<button class="kick" data-kick="${esc(p.id)}" data-sfx="back" title="Kick">Kick</button>` : ''}</li>`
   ).join('') + '<li class="empty">Open</li>'.repeat(8 - lobby.players.length);
-  $('setMap').value = s.map; $('setTeams').value = s.teams; $('setRounds').value = s.rounds;
-  for (const id of ['setMap', 'setTeams', 'setRounds']) $(id).disabled = !isHost();
+  $('setMap').value = s.map; $('setTeams').value = s.teams; $('setRounds').value = s.rounds; $('setLimit').value = s.limit ?? 0;
+  for (const id of ['setMap', 'setTeams', 'setRounds', 'setLimit']) $(id).disabled = !isHost();
   $('startBtn').classList.toggle('hidden', !isHost());
   $('lobbyNote').textContent = isHost() ? 'Share the code. Start whenever everyone is in.' : 'Waiting for the host to start…';
   $('mapBlurb').textContent = MAPS[s.map]?.blurb ?? 'A different stage every round.';
@@ -356,7 +356,7 @@ function renderLobby() {
 champCards($('lobbyChamps'), id => {
   if (isHost()) { lobby.players[0].champ = id; pushLobby(); } else conn?.send({ t: 'pick', champ: id });
 });
-for (const [id, key, num] of [['setMap', 'map'], ['setTeams', 'teams', 1]])
+for (const [id, key, num] of [['setMap', 'map'], ['setTeams', 'teams', 1], ['setLimit', 'limit', 1]])
   $(id).onchange = e => { lobby.settings[key] = num ? +e.target.value : e.target.value; pushLobby(); };
 $('setRounds').onchange = e => { lobby.settings.rounds = Math.min(99, Math.max(1, Math.round(+e.target.value) || 1)); pushLobby(); }; // typed: kept to 1-99
 $('lobbyCode').onclick = () => { navigator.clipboard?.writeText(lobby.code); $('lobbyNote').textContent = 'Code copied.'; };
@@ -377,8 +377,8 @@ $('lobbyChatIn').addEventListener('keydown', e => {
 });
 $('leaveBtn').onclick = () => leave();
 $('startBtn').onclick = () => {
-  const { map, teams, rounds } = lobby.settings;
-  const setup = { map: map === 'random' ? randomStage() : map, random: map === 'random', teams, rounds, players: lobby.players.map((p, i) => ({ id: p.id, name: p.name, champ: p.champ, team: teams ? i % teams : i })) };
+  const { map, teams, rounds, limit = 0 } = lobby.settings;
+  const setup = { map: map === 'random' ? randomStage() : map, random: map === 'random', teams, rounds, limit, players: lobby.players.map((p, i) => ({ id: p.id, name: p.name, champ: p.champ, team: teams ? i % teams : i })) };
   conn.broadcast({ t: 'start', setup });
   startGame(setup);
 };
@@ -390,7 +390,7 @@ async function startGame(setup) {
   game = { setup, mySlot: setup.players.findIndex(p => p.id === myId), snaps: [], cur: null, fightAt: 0, sentEv: [], evN: 0, played: [], lastMt: -1, inq: [], offs: [], off: null, jit: 0, delay: 0.1, at: null };
   $('chatLog').replaceChildren();
   $('ping').textContent = '';
-  if (setup.practice || isHost()) game.sim = createSim({ mapId: setup.map, players: setup.players, practice: !!setup.practice, roundsToWin: setup.rounds, newMap: !!setup.random, carry: setup.carry });
+  if (setup.practice || isHost()) game.sim = createSim({ mapId: setup.map, players: setup.players, practice: !!setup.practice, roundsToWin: setup.rounds, timeLimit: setup.limit ?? 0, newMap: !!setup.random, carry: setup.carry });
   // my champ, predicted (sim.js). Practice behind a simulated connection has both: game.sim is the host
   if (!game.sim || setup.lag) game.local = createSim({ mapId: setup.map, players: setup.players, local: game.mySlot, gb: GB_MODE });
   setup.players.forEach((p, i) => p.left && game.sim?.drop(i)); // gone mid-match (Random stage carries the match on)

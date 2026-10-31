@@ -78,13 +78,17 @@ def wm(pid):
         par = parent_of[pid]
         world[pid] = mmul(wm(par), local) if par in transforms else local
     return world[pid]
-# networked roots the game switches on at runtime (Trawler's boat is saved inactive, waiting for the server to spawn it)
-WAKE = {"trawler": {"Trawler"}}
+# networked groups the game switches on at runtime (Trawler's boat is saved inactive, waiting for the server to spawn it;
+# all of Wheel's pier). Matched by name without Unity's " (n)" suffix. Wheel's "dynamic" (the turning wheel) stays off here:
+# it's exported on its own below. Both railing sets, back and front
+WAKE = {"trawler": {"Trawler"}, "wheel": {"World", "Pier_Wheel_Station", "Pier_Connection_Planks", "Pier_Main_Planks", "Pier_Main_SupportsLongA",
+                                          "Pier_Main_SupportsLongB", "Pier_Main_SupportsShortA", "Railing", "RailingForBack", "RailingForFront", "wheel text"}}
+base_name = lambda n: n.rsplit(" (", 1)[0] if n.endswith(")") else n
 def is_active(pid):
     if pid not in active:
         go = gos.get(go_of[pid])
         par = parent_of[pid]
-        on = bool(go and (go.m_IsActive or par not in transforms and go.m_Name in WAKE.get(stage, ())))
+        on = bool(go and (go.m_IsActive or base_name(go.m_Name) in WAKE.get(stage, ())))
         active[pid] = on and (is_active(par) if par in transforms else True)
     return active[pid]
 def path(pid):
@@ -232,11 +236,52 @@ if stage in MOVER:
         train["renderers"].append({"path": path(pid), "mesh": mkey, "subs": list(range(min(len(mats), len(meshes[mkey]["subs"])))), "mats": mats,
                                    "matrix": [rnd(r, 5) for r in flipz(m)], "lightmap": -1, "lmso": [1, 1, 0, 0], "cast": 1, "recv": True, "layer": go.m_Layer})
 
+# Wheel's ferris wheel: "dynamic" (saved inactive, networked) holds the turning frame and six burger gondolas. The frame's
+# parts go in "frame", placed relative to the axle's centre (the hub); one gondola goes in "car", relative to its own root
+# (the hinge it hangs from), with every gondola's hinge as an offset from the hub. maps.js turns it; the gondolas stay upright
+wheel = None
+if stage == "wheel":
+    find = lambda name, under=None: next(pid for pid in transforms if gos[go_of[pid]].m_Name == name and in_scene(transforms[pid]) and (under is None or parent_of[pid] == under))
+    dyn = find("dynamic")
+    def rigid(root, origin):
+        """renderers and solid colliders under root (its own off flag ignored), relative to the point origin"""
+        inv = [[1, 0, 0, -origin[0]], [0, 1, 0, -origin[1]], [0, 0, 1, -origin[2]], [0, 0, 0, 1]]
+        def on(pid): return pid == root or gos[go_of[pid]].m_IsActive and parent_of[pid] in transforms and on(parent_of[pid])
+        part = {"renderers": [], "boxes": [], "caps": [], "tris": []}
+        for o in env.objects:
+            if o.type.name not in ("MeshRenderer", "BoxCollider", "CapsuleCollider", "SphereCollider", "MeshCollider") or not in_scene(o): continue
+            c = o.read(); pid = tf_of_go.get(c.m_GameObject.path_id)
+            if pid is None or not on(pid) or not getattr(c, "m_Enabled", True): continue
+            m = mmul(inv, wm(pid)); go = gos[go_of[pid]]
+            if o.type.name == "MeshRenderer":
+                mf = next((comp for comp in (x.component.read() if hasattr(x, "component") else x.read() for x in go.m_Component) if comp.object_reader.type.name == "MeshFilter"), None)
+                if not mf or not mf.m_Mesh.path_id: continue
+                mkey = export_mesh(mf.m_Mesh); mats = [export_material(x) for x in c.m_Materials if x.path_id]
+                part["renderers"].append({"path": path(pid), "mesh": mkey, "subs": list(range(min(len(mats), len(meshes[mkey]["subs"])))), "mats": mats,
+                                          "matrix": [rnd(r, 5) for r in flipz(m)], "lightmap": -1, "lmso": [1, 1, 0, 0], "cast": 1, "recv": True, "layer": go.m_Layer})
+            elif c.m_IsTrigger or go.m_Layer in (11, 14, 19): continue
+            elif o.type.name == "BoxCollider":
+                pos, q, size = decompose(flipz(mmul(m, trs([c.m_Center.x, c.m_Center.y, c.m_Center.z], [0, 0, 0, 1], [c.m_Size.x, c.m_Size.y, c.m_Size.z]))))
+                part["boxes"].append({"p": rnd(pos), "q": rnd(q, 5), "h": rnd([s / 2 for s in size])})
+            elif o.type.name in ("CapsuleCollider", "SphereCollider"):
+                axis = getattr(c, "m_Direction", 1)
+                pos, q, s = decompose(flipz(mmul(m, trs([c.m_Center.x, c.m_Center.y, c.m_Center.z], [[0, 0, -0.70711, 0.70711], [0, 0, 0, 1], [0.70711, 0, 0, 0.70711]][axis], [1, 1, 1]))))
+                r = c.m_Radius * max(s[0], s[2])
+                part["caps"].append({"p": rnd(pos), "q": rnd(q, 5), "r": round(r, 4), "hh": round(max(0, getattr(c, "m_Height", 0) / 2 * s[1] - r), 4)})
+            elif c.m_Mesh.path_id:
+                part["tris"].append({"mesh": export_mesh(c.m_Mesh), "matrix": [rnd(r, 5) for r in flipz(m)]})
+        return part
+    hub = xform(wm(find("wheel_axle")), [0, 0, 0])
+    burgers = [pid for pid in transforms if parent_of[pid] == find("burgers", dyn)]
+    at = lambda pid: xform(wm(pid), [0, 0, 0])
+    wheel = {"hub": rnd([hub[0], hub[1], -hub[2]]), "frame": rigid(find("WheelFrame", dyn), hub), "car": rigid(burgers[0], at(burgers[0])),
+             "cars": [rnd([at(b)[0] - hub[0], at(b)[1] - hub[1], -(at(b)[2] - hub[2])]) for b in burgers]}
+
 # free-for-all spawn points: named "Player Spawnpoint" (Girders), or the children of the single-player group
 # ("SingleSpawns", "1-8", "StartSpawns") elsewhere. Stages that place players from code (Ring) get none; maps.js supplies those.
 def spawn_point(pid):
     parent = parent_of[pid] in transforms and gos[go_of[parent_of[pid]]].m_Name
-    return gos[go_of[pid]].m_Name == "Player Spawnpoint" or parent in ("SingleSpawns", "1-8", "StartSpawns") and not gos[go_of[pid]].m_Name.startswith("GameObject")
+    return gos[go_of[pid]].m_Name == "Player Spawnpoint" or parent in ("SingleSpawns", "1-8", "StartSpawns", "Single") and not gos[go_of[pid]].m_Name.startswith("GameObject")
 for pid in transforms:
     if spawn_point(pid) and is_active(pid):
         x, y, z = xform(wm(pid), [0, 0, 0]); spawns.append(rnd([x, y, -z]))
@@ -313,5 +358,5 @@ for o in env.objects:
                            "shadows": t["m_Shadows"]["m_Type"] > 0, "mask": t["m_CullingMask"]["m_Bits"], "name": gos[l.m_GameObject.path_id].m_Name, "jitter": jitter.get(l.m_GameObject.path_id)})
 
 json.dump({"stage": stage, "meshes": meshes, "materials": materials, "renderers": renderers, "colliders": colliders, "capsules": capsules, "trimeshes": trimeshes,
-           "spawns": spawns, "kill": kills, "train": train, "lightmaps": lightmaps, "env": env_light, "lights": lights}, open(os.path.join(out, "scene.json"), "w"), indent=0)
-print(f"{stage}: {len(renderers)} renderers, {len(meshes)} meshes, {len(materials)} materials, {len(colliders)} boxes, {len(capsules)} capsules, {len(trimeshes)} mesh colliders, {len(spawns)} spawns, {len(kills)} kill boxes, lightmaps {lightmaps}, lights {[(x["type"], x["name"], x["intensity"], x["mask"]) for x in lights]}")
+           "spawns": spawns, "kill": kills, "train": train, "wheel": wheel, "lightmaps": lightmaps, "env": env_light, "lights": lights}, open(os.path.join(out, "scene.json"), "w"), indent=0)
+print(f"{stage}: {len(renderers)} renderers, {len(meshes)} meshes, {len(materials)} materials, {len(colliders)} boxes, {len(capsules)} capsules, {len(trimeshes)} mesh colliders, {len(spawns)} spawns, {len(kills)} kill boxes, wheel {wheel and (len(wheel["frame"]["renderers"]), len(wheel["cars"]))}, lightmaps {lightmaps}, lights {[(x["type"], x["name"], x["intensity"], x["mask"]) for x in lights]}")

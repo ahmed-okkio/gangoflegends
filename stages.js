@@ -38,7 +38,8 @@ export async function prepareMap(id, { meshes = !isNode } = {}) {
   let scene;
   try { scene = await readJson(base + 'scene.json'); } catch { return map; } // not imported: keep the procedural fallback
   const bins = {}, tris = scene.trimeshes ?? [];
-  const keys = new Set([...meshes ? Object.keys(scene.meshes) : [], ...tris.map(t => t.mesh)]);
+  const W = scene.wheel, wtris = W ? [...W.frame.tris, ...W.car.tris] : [];
+  const keys = new Set([...meshes ? Object.keys(scene.meshes) : [], ...tris.map(t => t.mesh), ...wtris.map(t => t.mesh)]);
   await Promise.all([...keys].map(async k => { bins[k] = await readBin(base + k + '.bin'); }));
   // Incinerator's football-only colliders under and beside its conveyors would hold feet still between the rollers.
   // (The stair ramps for the ball stay: they help ragdolls up the steps.)
@@ -49,8 +50,10 @@ export async function prepareMap(id, { meshes = !isNode } = {}) {
     caps: (scene.capsules ?? []).filter(solid),
     tris: tris.map(t => meshTris(scene.meshes[t.mesh], bins[t.mesh], t.matrix)),
     rollers: [],
-    kill: map.gbKill === false ? map.kill :scene.kill.map(killBox),
+    kill: map.gbKill === false ? map.kill : scene.kill.filter(k => !map.gbKillSkip?.test(k.path)).map(killBox),
     train: scene.train ?? null, // Subway's car: its renderers and solid box (maps.js trains)
+    // Wheel's ferris wheel: the frame's colliders relative to the hub, one gondola's relative to its hinge (sim.js), and where the hinges sit
+    turning: W && map.wheel ? { hub: W.hub, cars: W.cars, ...Object.fromEntries(['frame', 'car'].map(k => [k, { boxes: W[k].boxes, caps: W[k].caps, tris: W[k].tris.map(t => meshTris(scene.meshes[t.mesh], bins[t.mesh], t.matrix)) }])) } : null,
     // stages that place players from code (Ring) have no markers; maps.js has those
     spawns: map.gbSpawns ?? (scene.spawns.length >= 4 ? scene.spawns : map.spawns),
     imported: { scene, bins, base },

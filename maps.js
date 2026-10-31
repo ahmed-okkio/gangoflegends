@@ -28,6 +28,15 @@ export function trainsAt(map, t) {
   }
 }
 
+// the ferris wheel's turn (radians about z) at match time t: map.wheel { speed: [start, max] deg/s, ramp: [from, to] s }
+// turns at start speed, then speeds up evenly to max between from and to (Gang Beasts' axle starts escalating 30-60s in,
+// up to its MaxSpeed 95). A pure function of t, like trainsAt
+export function wheelAngle(map, t) {
+  const { speed: [w0, w1], ramp: [a, b] } = map.wheel, k = Math.PI / 180;
+  const ramp = Math.min(Math.max(t - a, 0), b - a);
+  return k * (w0 * t + (w1 - w0) * (ramp * ramp / (2 * (b - a)) + Math.max(t - b, 0)));
+}
+
 export const MAPS = {
   // Gang Beasts stages (gb); without an import each is a stand-in: Girders its own beams, the rest a plain floor
   rooftop: {
@@ -103,6 +112,18 @@ export const MAPS = {
     // and climbing up from the track the hands find the lip instead of the chest jamming beneath it
     gbBoxes: [box(0, -0.8, 4.15, 25, 0.65, 0.15), box(0, -0.8, -4.15, 25, 0.65, 0.15)],
     spawns: [[9.5, 0, 1.5], [2.3, 0, -2.5], [5.2, 0, 2.5], [-2.5, 0, 1.5], [-2.5, 0, -1.5], [9.5, 0, -1.5], [2.3, 0, 2.5], [5.3, 0, -2.5]],
+  },
+  wheel: {
+    name: 'Wheel',
+    blurb: 'A pier with a ferris wheel that keeps speeding up. Ride it, or get thrown off it.',
+    gb: 'wheel',
+    wheel: { speed: [12, 95], ramp: [45, 120] }, // by eye: a slow lap at first, a spin every ~4s two minutes in
+    view: { sea: -3.85 }, // the top of Gang Beasts' sea KillVolume. Swim it like Trawler's: that volume is dropped, drowning does it
+    gbKillSkip: /\/KillVolume$/,
+    killY: -12, // well under the surface, like Trawler's: sinking out is the drowning's call
+    boxes: [box(0, -0.2, -6, 6, 0.2, 4, 'plate')],
+    rollers: [], kill: [],
+    spawns: [[-3, 0, -4], [3, 0, -4], [-3, 0, -8], [3, 0, -8], [0, 0, -3], [0, 0, -9], [-5, 0, -6], [5, 0, -6]],
   },
   grind: {
     name: 'Grind',
