@@ -315,7 +315,7 @@ for (const [gap, draw] of [[0.3, true], [0.7, false]]) {
   run(sim, 200, () => sim.setInput(0, { x: 0, z: 0, b: 0 }));
   lineUp(sim, 3); h.safe = 0; h.ko = 0;
   let stunned = 0;
-  run(sim, 30, i => { sim.setInput(0, { x: 0, z: 0, b: i === 0 ? BTN.A2 : 0 }); stunned = Math.max(stunned, h.stun); });
+  run(sim, 45, i => { sim.setInput(0, { x: 0, z: 0, b: i === 0 ? BTN.A2 : 0 }); stunned = Math.max(stunned, h.stun); }); // the dash is 0.5s (RIV_T)
   assert.ok(stunned > 0.5, `valor stuns (${stunned})`);
   // the window runs out after 4s: one press, then it cools
   run(sim, 400, () => sim.setInput(0, { x: 0, z: 0, b: 0 })); r.cd = [0, 0];

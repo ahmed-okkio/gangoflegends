@@ -1,5 +1,5 @@
 // App flow: menu -> lobby -> match. The host (or practice) runs the sim; clients send input and draw snapshots.
-import { initPhysics, createSim, DT, BTN } from './sim.js';
+import { initPhysics, createSim, DT, BTN, PUSH, RIV_T } from './sim.js';
 import { createRenderer, playerColor, loadProps } from './render.js';
 import { kit, CHAMPS, TEAM_NAMES, TEAM_COLORS, FFA_COLORS } from './champs.js';
 import { MAPS } from './maps.js';
@@ -299,7 +299,7 @@ function onSnap(m) {
 // one of the effects my copy played (game.played: [...event, time]) standing in for the host's e: same kind, attacker and victim.
 // Each stands in for one, so two punches that both landed don't cover a third the host saw and I didn't
 function claim(e, t) {
-  game.played = game.played.filter(p => t - p[7] < (game.ping ?? 200) + 150);
+  game.played = game.played.filter(p => t - p[7] < (game.ping ?? 200) * 1.5 + 400); // the host's copy can come a jitter spike or a lost packet late: missed, it played twice (Riven's E)
   const i = game.played.findIndex(p => (p[0] === e[0] || p[0] === 'phit' && e[0] === 'hit') && p[5] === e[5] && p[6] === e[6]); // same kind, attacker and victim: a phantom spark of mine can't eat someone else's real hit
   if (i >= 0) game.played.splice(i, 1);
   return i >= 0;
@@ -458,14 +458,17 @@ function updateHud(s, now) {
   const mine = s.p[game.mySlot];
   $('out').classList.toggle('hidden', !!mine?.[1] || !!setup.practice || s.st !== 'fight');
   const recast = s.h?.some(h => h[0] === game.mySlot && h[4] >= 0); // Thresh's caught / Lee's marked: press Q again
+  const wn = mine?.[1] ? mine[3] >> 13 & 3 : 0; // Broken Wings: Qs used in its recast window
   if (mine?.[1]) [...$('abil').children].forEach((el, i) => {
-    const re = i === 0 ? recast : !!(mine[3] & 1024), cd = re ? 0 : mine[4 + i] / 10; // E: Abscond's Abduct window
+    const ab = kit(setup.players[game.mySlot].champ, game.stole)[i], wings = ab.id === 'wings' && wn > 0;
+    const re = wings || (i === 0 ? recast : !!(mine[3] & 1024)), cd = re ? 0 : mine[4 + i] / 10; // E: Abscond's Abduct window
     el.classList.toggle('cooling', cd > 0);
     el.classList.toggle('recast', re);
-    const ab = kit(setup.players[game.mySlot].champ, game.stole)[i];
     if (ab.recastName) el.querySelector('b').textContent = re ? ab.recastName : ab.name;
+    const rx = el.querySelector('.rx') ?? el.appendChild(Object.assign(document.createElement('span'), { className: 'rx' }));
+    rx.textContent = wings ? `x${wn + 1}` : ''; // the next press: x2, then the x3 leap
     el.querySelector('.cd').textContent = cd > 0 ? Math.ceil(cd) : '';
-    el.querySelector('i').style.height = `${Math.min(100, cd / kit(setup.players[game.mySlot].champ, game.stole)[i].cd * 100)}%`;
+    el.querySelector('i').style.height = `${Math.min(100, cd / ab.cd * 100)}%`;
   });
 }
 
@@ -711,7 +714,11 @@ function frame(now) {
       local.step();
       const ev = local.takeEvents();
       if (ev.length) telEv.push([now, ev.map(e => [e[0], e[5], e[6], 'local'])]);
-      if (ev.length && !pure) { view.fx(ev); for (const e of ev) if (e[5] === game.mySlot) game.played.push([...e, now]); } // server only: the host's effects play instead
+      if (ev.length && !pure) { view.fx(ev); for (const e of ev) if (e[5] === game.mySlot) game.played.push([...e, now]); for (const e of ev) { // my Q pushes (draw loop): a new hit on them cuts the one in progress short, as the host's hit() does
+        const cut = pu => { const l = pu.at.at(-1); if (l && l.end == null) l.end = now; };
+        if (e[0] === 'rpush') { const pu = (game.push ??= {})[e[6]] ??= { base: null, at: [] }; cut(pu); pu.dir = [Math.sin(e[4]), Math.cos(e[4])]; pu.at.push({ t: now, end: null }); }
+        else if (e[0] === 'riven' && e[4] || e[0] === 'ki') for (const pu of Object.values(game.push ?? {})) cut(pu); // Q3 / E knock everyone round her
+      } } // server only: the host's effects play instead
       const mine = local.snapshot();
       game.mine = [game.mine?.[1], mine.p[game.mySlot]]; game.myHooks = mine.h;
       // and what my screen shows the others at (the playback clock): the host tests my abilities against that (sim.js seen())
@@ -750,6 +757,23 @@ function frame(now) {
     }
     const shift = carryOn(a, b, alpha, s[s.length - 1], at, dt);
     if (own) shift[game.mySlot] = null;
+    // Riven's Q push that my copy landed (sim.js 'rpush'): drawn sliding its PUSH m at once, less however far the host's has
+    // already shown them moved, so the host's push takes over without a jump. ponytail: Riven's Q only; other knockbacks still show a round trip late
+    // Back to back (Q1 then Q2 before the host's first shows) they add up: dropping the first snapped them back ~1.2m and my Q2
+    // dashed on past where the host still had them
+    for (const [k, pu] of Object.entries(game.push ?? {})) {
+      const i = +k, o = a.p[i], e = b.p[i], now = performance.now(), last = (now - pu.at.at(-1).t) / 1000;
+      const lim = 0.7 + (game.ping ?? 200) / 1000; // the host's should have shown by then: what's left fades out over 0.3s, never vanishes in a frame
+      if (!o?.[1] || !e?.[1] || last > lim + 0.3) { delete game.push[k]; continue; }
+      const x = o[6] + (e[6] - o[6]) * alpha, z = o[8] + (e[8] - o[8]) * alpha;
+      pu.base ??= [x, z];
+      const want = pu.at.reduce((s, p) => s + PUSH * Math.min(1, ((p.end ?? now) - p.t) / 1000 / RIV_T), 0);
+      // the furthest the host's has shown them pushed: knocked back the other way after (Q3's outward knock), the guess mustn't grow again
+      const moved = pu.far = Math.max(pu.far ?? 0, (x - pu.base[0]) * pu.dir[0] + (z - pu.base[1]) * pu.dir[1]), off = Math.max(0, want - moved) * Math.min(1, Math.max(0, 1 - (last - lim) / 0.3));
+      if (off < 0.02 && pu.at.every(p => p.end != null || now - p.t > RIV_T * 1000)) { delete game.push[k]; continue; } // shown in full: done
+      const sh = shift[i] ?? [0, 0, 0];
+      shift[i] = [sh[0] + pu.dir[0] * off, sh[1], sh[2] + pu.dir[1] * off];
+    }
     slideOver(!own ? 1 : limp ? 2 : 0, own, a, b, alpha, shift, dt); // 1: shared clock, 2: fresh, 0: predicted
     const fa = s.at(-2) ?? s.at(-1), fb = s.at(-1); // the newest two snapshots (my hooks from the host, below)
     // my own hook and glue: drawn from my copy (cast at once) until the host's catch / puddle shows up on screen

@@ -55,6 +55,8 @@ const PULV_R = 2.8; // Alistar Q reach
 const GLUE_T = 3; // Singed Q puddle lifetime, s
 const DRAW_T = 0.5; // the last ones out within this many seconds of each other draw the round
 const SPIN = 0.3; // Hecarim Q: seconds for its one turn
+export const RIV_T = 0.3; // every Riven dash (Q1-3, E) and her Q push take this long (s)
+export const PUSH = 1.5; // Riven Q1/Q2: how far a hit pushes them (m)
 const SKEWER_FLIP = 3; // Pyke Q: caught closer than this (m), they're flipped over him rather than pulled half way
 const KICK = 0.35; // Lee Sin E: seconds for the roundhouse's turn; it lands as the leg comes round to the front
 // water (Trawler's sea, map.view.sea): every part floats, like Gang Beasts' per-part buoyancy colliders, as long as you've
@@ -349,6 +351,7 @@ export function createSim({ mapId, players, practice = false, roundsToWin = 3, t
     // a prediction copy only learns about hits from the host, but shows my own landing on a stand-in (at its chest) right away:
     // 'phit', the light thud and the head snap; the host's 'hit' brings the confirm sound and sparks
     if (local >= 0) { if (by === local) fx('phit', add(vic.bodies[part].translation(), V(0, 0.45, 0)), daze >= 40 ? 1 : 0, by, vic.slot); return; }
+    vic.shove = null; // a Riven Q push in progress hands over its speed: the new hit adds to it (Q3 off Q2), not cut dead when the push ends
     for (const b of vic.bodies) addVel(b, dv);
     // a punch's head snap is drawn only (render.js fx 'hit'), so it plays the moment it lands instead of a round trip later
     if (!punch) addVel(vic.bodies[HEAD], mul(dv, 0.3));
@@ -378,7 +381,7 @@ export function createSim({ mapId, players, practice = false, roundsToWin = 3, t
   }
   // drop whatever the player was doing: knocked out, caught by a hook or stunned by an ability (the cooldown stays spent)
   function cancel(p) {
-    p.spin = 0; p.charge = 0; p.punch = null; p.butt = null; p.dash = null; p.vault = 0; p.hay = 0; p.leap = null; p.leapHit = null; p.kickA = 0; p.qTurn = null; p.rivA = null; p.rivNext = null;
+    p.spin = 0; p.charge = 0; p.punch = null; p.butt = null; p.dash = null; p.vault = 0; p.hay = 0; p.leap = null; p.leapHit = null; p.kickA = 0; p.qTurn = null; p.rivA = null; p.rivNext = null; p.shove = null;
     releaseGrabs(p);
   }
   function wake(p) {
@@ -492,7 +495,7 @@ export function createSim({ mapId, players, practice = false, roundsToWin = 3, t
     if (LEAPS.includes(ab.id) && p.tether != null) return leap(p); // recast while they're caught / marked: fly to them
     if (ab.id === 'abscond' && p.abduct > 0) { if (gb && local >= 0) { p.abduct = 0; return; } return abduct(p); } // the chains tie him to someone: the host's
     if (p.cd[i] > 0) return;
-    if (p.dash?.riven && (ab.id === 'wings' || ab.id === 'valor')) { p.rivNext = i; return; } // E into Q / Q into E: cast when this dash ends
+    if ((p.dash?.riven || p.rivA) && (ab.id === 'wings' || ab.id === 'valor')) { p.rivNext = i; return; } // Q into Q / E into Q / Q into E: cast once this dash and swing finish (control())
     if (ab.id === 'hijack') return hijack(p, ab);
     if (ab.id === 'wings') return brokenWings(p, i, ab);
     if (ab.id === 'sonic' && !turned && ahead(p) < -0.5) { p.qTurn = { yaw: p.yaw, t: 0.4 }; return; } // aimed over 120° round: turn first, then thrust (control())
@@ -520,7 +523,7 @@ export function createSim({ mapId, players, practice = false, roundsToWin = 3, t
     else if (ab.id === 'adhesive') adhesive(p, f, t, ab);
     else if (ab.id === 'fling') fling(p, t);
     else if (ab.id === 'headbutt') { p.dash = { t: 0.25, power: 1, ali: true }; fx('swing', t, 0, p.slot); }
-    else if (ab.id === 'valor') { p.dash = { t: 0.2, riven: 'e', dir: f, yaw: p.yaw, speed: 12.5 }; p.rivA = { n: 'e', t: 0, d: 0.3 }; fx('swing', t, 0, p.slot); } // ~2.5m, then Ki Burst (wings())
+    else if (ab.id === 'valor') { p.dash = { t: RIV_T, riven: 'e', dir: f, yaw: p.yaw, speed: 2 / RIV_T }; p.rivA = { n: 'e', t: 0, d: 0.3 }; fx('swing', t, 0, p.slot); } // 2m, then Ki Burst (wings())
     else if (ab.id === 'rage') { p.kickA = KICK; fx('swing', t, 0, p.slot); rage(p, f, t); } // checked on release, where he's aimed; the turn is just the animation
   }
 
@@ -529,41 +532,46 @@ export function createSim({ mapId, players, practice = false, roundsToWin = 3, t
   function brokenWings(p, i, ab) {
     const n = (p.wings?.n ?? 0) + 1, f = facing(p);
     p.wings = n < 3 ? { n, t: 4 } : null;
-    p.rivA = { n, t: 0, d: n < 3 ? 0.3 : 0.6 }; // the swing (rivPose())
+    p.rivA = { n, t: 0, d: n < 3 ? 0.3 : RIV_T }; // the swing (rivPose())
     if (n === 3) { p.cd[i] = ab.cd; if (local >= 0) p.castTick[i] = tick; }
-    if (n < 3) p.dash = { t: 0.18, riven: n, dir: f, yaw: p.yaw, speed: 6.5 }; // a short step in, ~1.2m
-    else { // the leap: thrown up and forward, the dash just times the landing
-      p.dash = { t: 0.55, riven: 3, dir: f, yaw: p.yaw, speed: 3.5 };
-      for (const b of p.bodies) b.setLinvel(add(mul(f, 3.5), V(0, 8, 0)), true); // high enough to front flip in
-      p.jumpT = 0.45;
+    if (n < 3) p.dash = { t: RIV_T, riven: n, dir: f, yaw: p.yaw, speed: 2 / RIV_T }; // a step in, 2m like the Q3 leap
+    else { // the leap: thrown up and forward 2m, the dash just times the landing
+      p.dash = { t: RIV_T, riven: 3, dir: f, yaw: p.yaw, speed: 2 / RIV_T };
+      for (const b of p.bodies) b.setLinvel(add(mul(f, 2 / RIV_T), V(0, 6, 0)), true); // high enough to front flip in; lands 25% sooner than a 8 m/s hop
+      p.jumpT = 0.34;
     }
     fx('swing', p.bodies[TORSO].translation(), 0, p.slot);
   }
+  function rivGo(p) { if (p.rivNext != null) { const k = p.rivNext; p.rivNext = null; useAbility(p, k); } } // a Q/E pressed mid-cast
   // Riven's swings, as in League, the sword in her right hand: Q1 a forehand cut from high on her right down across to her
   // left, Q2 the backhand back across, Q3 raised overhead on the leap and brought down in the slam; Valor drags it low
   // behind her. k: how far through the swing (a short hold cocked, then fast). The left arm out for balance
   const rivK = a => { const u = Math.min(1, Math.max(0, (a.t / a.d - 0.15) / 0.55)); return u * u * (3 - 2 * u); };
   function rivPose(n, k, i, bf, side) {
     const right = mul(side, -1), dir = (f, r, u) => add(add(mul(bf, f), mul(right, r)), V(0, u, 0));
-    if (!i) return dir(0.3, -0.8, -0.2);
-    if (n === 1) return turnTo(dir(0.2, 0.8, 0.9), dir(0.9, -0.6, -0.5), k);
-    if (n === 2) return turnTo(dir(0.3, -0.9, 0.1), dir(0.6, 0.9, 0.35), k);
+    if (!i && n !== 1 && n !== 2) return dir(0.3, -0.8, -0.2);
+    if (n === 1 || n === 2) { // Q1 a left punch, Q2 a right: the fist from cocked at the shoulder straight out; the other up on guard
+      const r = i ? 1 : -1;
+      return i === n - 1 ? turnTo(dir(-0.6, r * 0.3, -0.2), dir(1, r * 0.05, 0.15), k) : dir(0.5, r * 0.15, 0.5);
+    }
     if (n === 3) return k < 0.5 ? turnTo(dir(0.5, 0.2, 0.3), dir(-0.4, 0, 1), k * 2) : turnTo(dir(-0.4, 0, 1), dir(1, 0, -0.6), (k - 0.5) * 2);
     return dir(-0.7, 0.4, -0.6);
   }
   // where a Riven dash ends: n 1-2 the Q slash (ahead of her), 3 the Q slam, 'e' Ki Burst (round her, stuns)
   function wings(p, n) {
-    if (n !== 3) for (const b of p.bodies) { const v = b.linvel(); b.setLinvel(V(v.x * 0.15, v.y, v.z * 0.15), true); } // she plants where the dash ends: sliding on, the burst was left behind her
+    for (const b of p.bodies) { const v = b.linvel(); b.setLinvel(V(0, v.y, 0), true); } // she plants dead where the dash ends (Q3 too: no drifting on past 2m before she lands): sliding on, the burst was left behind her
     const t = p.bodies[TORSO].translation(), f = facing(p), c = n === 1 || n === 2 ? add(t, mul(f, 1)) : t, r = n === 'e' ? 2.3 : n === 3 ? 2.2 : 1.5;
-    fx(n === 'e' ? 'ki' : 'riven', c, n === 3 ? 1 : 0, p.slot);
-    if (local >= 0) return;
+    const fl = (n === 3 || n === 'e') && world.castRay(new RAPIER.Ray(t, DOWN), 6, true, undefined, under(p)); // Q3's and E's rings on the floor under her, not floating at her middle
+    fx(n === 'e' ? 'ki' : 'riven', fl ? V(t.x, t.y - fl.timeOfImpact + 0.6, t.z) : c, n === 3 ? 1 : 0, p.slot); // +0.6: render.js drops the big ring that far
     for (const o of ps) {
-      if (o === p || !o.alive) continue;
+      if (o === p || !(o.alive || o.seen)) continue;
       const d = sub(seen(p, o), c);
       if (Math.hypot(d.x, d.z) > r || Math.abs(d.y) > 1.2) continue;
-      if (n === 1 || n === 2) { hit(o, TORSO, add(mul(f, 5), V(0, 2, 0)), 15); continue; }
-      if (n === 3) hit(o, TORSO, add(mul(norm(V(d.x, 0, d.z)), 2.5), V(0, 8, 0)), 20, true);
-      else hit(o, TORSO, add(mul(norm(V(d.x, 0, d.z)), 3), V(0, 1.5, 0)), 20);
+      // my copy's Q1/Q2 landing: game.js draws them pushed at once, not a round trip later (Q3 came down "through" them)
+      if (local >= 0) { if (p === me && (n === 1 || n === 2)) fx('rpush', t, Math.atan2(f.x, f.z), p.slot, o.slot); continue; }
+      if (n === 1 || n === 2) { hit(o, TORSO, V(0, 2.2, 0), 15); o.shove = { dir: f, t: RIV_T }; continue; } // pushed PUSH m (control())
+      if (n === 3) hit(o, TORSO, add(mul(dot(V(d.x, 0, d.z), f) > -0.5 ? f : norm(V(d.x, 0, d.z)), 4), V(0, 7, 0)), 20, true); // 4m/s on the way she faces (outward for anyone well behind her), 7 up
+      else { for (const b of o.bodies) { const v = b.linvel(); b.setLinvel(V(0, v.y, 0), true); } hit(o, TORSO, add(mul(norm(V(d.x, 0, d.z)), 3), V(0, 1.5, 0)), 20, true); } // Ki Burst stops them walking on, then knocks them out // quiet: Ki Burst's own sound ('ki') is the one, not a thud per champ
       if (o.ko <= 0 && o.safe <= 0) { o.stun = Math.max(o.stun, n === 3 ? 0.8 : 0.75); o.dizzy = o.stun; cancel(o); } // stars over them while it lasts
     }
   }
@@ -813,7 +821,22 @@ export function createSim({ mapId, players, practice = false, roundsToWin = 3, t
       if (!d || len(d) < 1.2 || (p.leap.t += DT) > 1) p.leap = null;
       else { const v = add(mul(d, 14 / len(d)), V(0, 0.8, 0)); for (const b of p.bodies) b.setLinvel(v, true); p.jumpT = 0.1; }
     }
-    if (p.dash) { const d = p.dash.dir ?? f; if (p.dash.dir) p.yaw = p.dash.yaw; speed = p.dash.speed ?? (p.dash.dir ? 14.85 : 11); /* Vi's 35% faster, over the same reach (her aim strip) */ mx = d.x; mz = d.z; if ((p.dash.t -= DT) <= 0) { if (p.dash.riven) { wings(p, p.dash.riven); p.dash = null; if (p.rivNext != null) { const k = p.rivNext; p.rivNext = null; useAbility(p, k); } } else p.dash = null; } }
+    if (p.dash) { const d = p.dash.dir ?? f; if (p.dash.dir) p.yaw = p.dash.yaw; speed = p.dash.speed ?? (p.dash.dir ? 14.85 : 11); /* Vi's 35% faster, over the same reach (her aim strip) */ mx = d.x; mz = d.z;
+      // Riven's Q1/Q2 stop at whoever's in front and hit there: never through them, so spamming Q keeps driving them back
+      // Riven's dashes run at their set speed from the first tick (the walk steering ramps up, which cut Q1/Q2 to ~1.1m): exactly speed x t
+      if (p.dash.riven) for (const b of p.bodies) { const v = b.linvel(); b.setLinvel(V(d.x * p.dash.speed, v.y, d.z * p.dash.speed), true); }
+      if (p.dash.riven && p.dash.riven !== 'e' && ps.some(o => { // anyone in her path, standing or knocked flat
+        if (o === p || !(o.alive || o.seen)) return false; // seen: a prediction copy's stand-in
+        // where they really are, not lag-compensated (seen()): the host stops her at the body; my copy at the stand-in, which game.js already shows pushed
+        const r = sub(o.bodies[TORSO].translation(), p.bodies[TORSO].translation()), ahead = dot(V(r.x, 0, r.z), d);
+        return ahead > 0 && ahead < 1 && Math.hypot(r.x - d.x * ahead, r.z - d.z * ahead) < 0.6 && Math.abs(r.y) < 1.2;
+      })) { if (p.dash.riven === 3) p.dash.speed = 0; else p.dash.t = 0; } // Q3: stops going forward and comes down in front of them
+      if ((p.dash.t -= DT) <= 0) { if (p.dash.riven) { wings(p, p.dash.riven); p.dash = null; if (!p.rivA) rivGo(p); } else p.dash = null; } }
+    if (p.shove) { // Broken Wings' push: exactly PUSH m over RIV_T (her Q's time), then stopped dead, so Q3's 2m leap comes down just short of them
+      const s = p.shove, end = (s.t -= DT) <= 0;
+      for (const b of p.bodies) { const v = b.linvel(); b.setLinvel(V(end ? 0 : s.dir.x * PUSH / RIV_T, v.y, end ? 0 : s.dir.z * PUSH / RIV_T), true); }
+      if (end) p.shove = null;
+    }
     if (p.wings && (p.wings.t -= DT) <= 0) { p.wings = null; p.cd[0] = kit(p.champ, p.stole)[0].cd; } // Broken Wings' window ran out: it cools
     if (p.kick && (p.kick.t -= DT) > 0 && p.kick.vic.alive) { // Dragon's Rage: the champ he kicked bowls over whoever they hit
       const kt = p.kick.vic.bodies[TORSO].translation();
@@ -824,7 +847,7 @@ export function createSim({ mapId, players, practice = false, roundsToWin = 3, t
       if (move && inp.b & p.hayBtn && p.hay < 3) { p.hay += DT; speed = 0; }
       else { if (move) haymaker(p, f, tp, hayK(p)); p.hay = 0; } // stunned out of it (a hook, Pulverize): no throw, and the cooldown stays spent
     }
-    if (p.rivA && (p.rivA.t += DT) > p.rivA.d) p.rivA = null;
+    if (p.rivA && (p.rivA.t += DT) > p.rivA.d) { p.rivA = null; if (!p.dash) rivGo(p); } // the swing's done: the buffered Q/E goes
     if (p.phased && !p.dash) phase(p, false);
     if (p.undertow && (p.undertow.t -= DT) <= 0) { undertow(p, p.undertow.from, tp); p.undertow = null; }
     p.fb -= DT; p.pulv -= DT; p.flay -= DT; p.fling -= DT; p.palm -= DT; p.toss -= DT;
@@ -839,8 +862,9 @@ export function createSim({ mapId, players, practice = false, roundsToWin = 3, t
     // flying faster than I could walk (knocked back): the stick barely steers until it's played out, so walking against a
     // knockback no longer cancels it. Every champ and hit alike; my own dashes and charges run at their own speed, so aren't
     const flung = Math.hypot(tv.x - gv[0], tv.z - gv[2]) > speed + 1.5; // 1.5: letting go of run (4.8 to 3.6) isn't a fling
-    const k = (p.grounded ? 0.2 : swim ? 0.08 : 0.04) * move * (flung ? 0.1 : 1);
-    const dv = V((mx * speed + gv[0] - tv.x) * k, 0, (mz * speed + gv[2] - tv.z) * k);
+    const plant = ctrl && !move && p.grounded && p.sinceHit > 0.5; // stunned on their feet: they stop where they stand, not walk on the way they were going. After the hit's knockback has played out (Q3's 4m/s isn't a 'fling' and was eaten)
+    const k = (p.grounded ? 0.2 : swim ? 0.08 : 0.04) * (move || plant ? 1 : 0) * (flung ? 0.1 : 1);
+    const dv = V((mx * speed * move + gv[0] - tv.x) * k, 0, (mz * speed * move + gv[2] - tv.z) * k);
     if (p.grounded && p.jumpT <= 0) dv.y = ((STAND - ray.timeOfImpact) * 12 - tv.y) * 0.35 + HOLD * DT;
     const ledge = p.grabs.reduce((y, g, i) => g?.target.isFixed() ? Math.max(y, handPos(p, i).y) : y, -Infinity);
     // hands up on a wall: jump is the slow hoist below, not a jump (Gang Beasts)
@@ -914,13 +938,14 @@ export function createSim({ mapId, players, practice = false, roundsToWin = 3, t
     const fk = !!p.leap?.lee && !p.leap.sy; // Sonic Wave's recast: a flying kick, foot first
     // grab assist: a hand held out to grab goes for whoever a punch would track, bending down to someone on the floor
     const gt = (p.grounded || swim) && p.held.some((h, i) => h >= TAP && !p.grabs[i]) && punchTarget(p, f), gTo = gt && sub(gt.bodies[TORSO].translation(), tp);
-    const rk = p.rivA ? rivK(p.rivA) : 0, lean = p.rivA ? (p.rivA.n === 3 ? (rk < 0.5 ? -0.3 : 0.75) : p.rivA.n === 'e' ? 0.5 : 0.35) : fk ? -0.6 : p.kickA > 0 ? -0.25 : p.vault > 0 ? 0.45 : p.dash?.dir ? 0.6 : p.charge > 0 || p.dash ? 0.35 : p.butt ? 0.9 * Math.sin(Math.min(1, p.butt.t / 0.25) * Math.PI) : gTo ? Math.min(GRAB_LEAN, Math.max(0, -gTo.y - 0.05) * 4) : 0, yq = qyaw(p.yaw + p.spinA), flip = p.rivA?.n === 3 ? Math.PI * 2 * Math.min(1, Math.max(0, (p.rivA.t - 0.04) / 0.4)) ** 0.8 : 0, up = flip ? 0.6 : (sw ? 0.05 : p.pushUp ? 1 : fk ? 0.5 : p.grounded || swim ? 0.3 : 0.15) * ctrl;
+    const rk = p.rivA ? rivK(p.rivA) : 0, lean = p.rivA ? (p.rivA.n === 3 ? (rk < 0.5 ? -0.3 : 0.75) : p.rivA.n === 'e' ? 0.5 : 0.35) : fk ? -0.6 : p.kickA > 0 ? -0.25 : p.vault > 0 ? 0.45 : p.dash?.dir ? 0.6 : p.charge > 0 || p.dash ? 0.35 : p.butt ? 0.9 * Math.sin(Math.min(1, p.butt.t / 0.25) * Math.PI) : gTo ? Math.min(GRAB_LEAN, Math.max(0, -gTo.y - 0.05) * 4) : 0, yq = qyaw(p.yaw + p.spinA), flip = p.rivA?.n === 3 ? Math.PI * 2 * Math.min(1, Math.max(0, (p.rivA.t - 0.03) / 0.3)) ** 0.8 : 0, up = flip ? 0.6 : (sw ? 0.05 : p.pushUp ? 1 : fk ? 0.5 : p.grounded || swim ? 0.3 : 0.15) * ctrl;
+    const flipV = v => flip ? qrot(qaxis(qrot(yq, X), flip), v) : v; // a pose goal turned round with Riven's Q3 flip
     leak = V();
     orient(Hb, fk ? qmul(yq, qaxis(X, -0.4)) : flip ? qmul(yq, qaxis(X, flip)) : yq, flip ? 30 : 10, up); // the flying kick tips the hips back too: the leg leads; Riven's Q3 pitches every posture goal round, a front flip
     // punching turns the shoulders into it: wound back, then the punching side drives forward (that's the reach)
     const cock = p.held.findIndex(h => h > 0 && h < TAP && p.grounded);
     const backOf = i => p.punch?.arm !== i && p.armCd[i] > 0.75 - RECOIL ? Math.min(1, (p.armCd[i] - 0.75 + RECOIL) / RECOIL) : 0; // coming back from a punch: 1 down to 0
-    const tw = p.rivA ? ({ 1: -0.7 + 1.5 * rk, 2: 0.8 - 1.6 * rk, 3: 0, e: -0.4 })[p.rivA.n] : p.punch ? (p.punch.arm ? 0.7 : -0.7) : p.palm > 0 ? 0.6 : cock >= 0 ? (cock ? -0.3 : 0.3) : (backOf(1) - backOf(0)) * 0.7;
+    const tw = p.rivA ? ({ 1: -0.7, 2: 0.7, 3: 0, e: -0.4 })[p.rivA.n] : p.punch ? (p.punch.arm ? 0.7 : -0.7) : p.palm > 0 ? 0.6 : cock >= 0 ? (cock ? -0.3 : 0.3) : (backOf(1) - backOf(0)) * 0.7;
     // a punch with a target tracks it: the shoulders turn to them and the fist (below) flies from the shoulder at their head, hit or miss
     const aimTo = (p.punch?.to?.bodies && sub(skull(p.punch.to), p.bodies[ARM + p.punch.arm].translation())) || gTo, ay = aimTo ? Math.atan2(aimTo.x, aimTo.z) : p.yaw + p.spinA;
     // the upper body turns relative to where the hips point now, at most ~63° off them: aimed absolutely, a target (or
@@ -975,7 +1000,7 @@ export function createSim({ mapId, players, practice = false, roundsToWin = 3, t
       // then dashing behind the left fist thrust straight out, the right swung back (that fist is what hits, see below)
       if (p.vault > 0) { if (i === 0) { ua = add(mul(bf, -0.9), V(0, -0.35, 0)); fa = add(bf, V(0, 0.15, 0)); } else { ua = add(bf, mul(side, s * 0.2)); fa = add(add(bf, V(0, 0.35, 0)), mul(side, -s * 0.3)); } str = 0.7; } // crouched: punch cocked (elbow back, fist at the hip facing forward), guard up across the front
       if (p.dash) { ua = fa = p.dash.sylas ? add(mul(bf, -0.8), V(0, 0.1, 0)) : p.dash.dir && i === 1 ? null : add(bf, V(0, 0.05, 0)); str = 0.9; if (!ua) { ua = add(mul(bf, -0.6), V(0, -0.5, 0)); fa = add(bf, V(0, 0.35, 0)); } } // Vi: right elbow back, fist tucked at the chest // fists leading (Vi: the left only); Abscond: trailing behind
-      if (p.rivA) { ua = fa = rivPose(p.rivA.n, rk, i, bf, side); str = i ? 1 : 0.5; fs = 1; } // Riven's swings (rivPose())
+      if (p.rivA) { ua = fa = flipV(rivPose(p.rivA.n, rk, i, bf, side)); str = i || p.rivA.n === 1 ? 1 : 0.5; fs = 1; } // Riven's swings (rivPose())
       if (p.hay > 0 && i === 1) { ua = add(mul(bf, -0.8), V(0, 0.4, 0)); fa = add(bf, V(0, 0.6, 0)); str = 0.6; } // cocked back
       if (p.hay > 0 && i === 0) { ua = fa = add(bf, V(0, 0.2, 0)); str = 0.5; } // guard hand out front
       // Facebreaker: arms fling wide, then slam together in front
@@ -1021,6 +1046,11 @@ export function createSim({ mapId, players, practice = false, roundsToWin = 3, t
       // foot out at them, the left leg tucked
       const kick = i && p.kickA > 0 ? add(add(bf, mul(side, -0.3)), V(0, 0.1, 0)) : fk ? (i ? add(bf, V(0, -0.15, 0)) : add(mul(bf, 0.7), DOWN)) : null;
       const shin = fk && !i ? add(mul(bf, -0.8), DOWN) : kick;
+      if (flip) { // Q3: legs tucked and turned with the flip, not hanging straight down fighting it
+        aimPart(p, THIGH + i, flipV(add(mul(bf, 0.8), V(0, -0.4, 0))), 14, ctrl, [p.bodies[LEG + i]]);
+        aimPart(p, LEG + i, flipV(add(mul(bf, -0.2), DOWN)), 14, ctrl);
+        continue;
+      }
       aimPart(p, THIGH + i, kick || sw || add(DOWN, mul(bf, swing * 0.7 * gait)), 14, (kick ? 1 : 0.5) * ctrl, [p.bodies[LEG + i]]);
       aimPart(p, LEG + i, shin || sw || add(DOWN, mul(bf, (swing * 0.7 - Math.max(0, Math.cos(p.phase + i * Math.PI)) * 0.9) * gait)), 14, (kick ? 1 : 0.5) * ctrl);
     }
@@ -1723,7 +1753,7 @@ export function createSim({ mapId, players, practice = false, roundsToWin = 3, t
   }
   // others' stand-ins go where the screen shows them (hips position from the interpolated snapshot). ponytail: tried
   // extrapolating them to where they'll be when my input reaches the host; overshooting into me shoved me off ledges
-  function place(slot, x, y, z) { const q = ps[slot]; if (q !== me) q.bodies[0].setNextKinematicTranslation(V(x, y, z)); }
+  function place(slot, x, y, z) { const q = ps[slot]; if (q !== me) q.bodies[0].setNextKinematicTranslation(V(x, y, z)); } // game.js passes my Q's predicted push in too ('rpush')
 
   function step() {
     if (me) return stepLocal();
@@ -1777,7 +1807,8 @@ export function createSim({ mapId, players, practice = false, roundsToWin = 3, t
           | (!!p.leap || !!p.lifted || !!p.bitten) << 9 // GB mode: a move only the host plays (it ties me to someone, or a shark has me)
           | (p.abduct > 0) << 10 // Abscond's recast window: E shows Abduct ready
           | (p.wet && p.stamina < 30) << 11 // tiring in the water
-          | (p.champ === 'pyke' && !!(p.aimBtn & BTN.A1)) << 12; // holding Bone Skewer: the dagger turned blade-forward
+          | (p.champ === 'pyke' && !!(p.aimBtn & BTN.A1)) << 12 // holding Bone Skewer: the dagger turned blade-forward
+          | (p.wings?.n ?? 0) << 13; // Broken Wings: Qs used in the open recast window (0-2, bits 13-14)
         // hips position + every part's rotation; clients rebuild the other positions from the joint anchors (beast.js fk)
         const t = p === me ? add(p.bodies[HIPS].translation(), smooth) : p.bodies[HIPS].translation();
         const out = [p.slot, 1, Math.round(p.daze), flags, Math.ceil(p.cd[0] * 10), Math.ceil(p.cd[1] * 10), r2(t.x), r2(t.y), r2(t.z)];

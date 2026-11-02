@@ -344,8 +344,8 @@ export function createRenderer(canvas) {
       r.life -= dt;
       r.m.visible = r.life > 0;
       const k = 1 - r.life / r.max;
-      r.m.scale.setScalar(r.size * (r.inward ? 1 - 0.85 * k * k : 0.2 + k));
-      r.m.material.opacity = r.inward ? 1 - k * 0.6 : 1 - k;
+      r.m.scale.setScalar(r.size * (r.inward === 'static' ? 1 : r.inward ? 1 - 0.85 * k * k : 0.2 + k)); // static: an area shown at its true size
+      r.m.material.opacity = r.inward && r.inward !== 'static' ? 1 - k * 0.6 : 1 - k;
     }
   }
 
@@ -395,8 +395,7 @@ export function createRenderer(canvas) {
         else { ring(v, '#7dffc0', 1.5); emit(v, { color: '#b8ffe0', n: 12, speed: 6, size: 0.2, life: 0.3, grav: 0 }); shake = Math.max(shake, 0.1); }
       } else if (kind === 'ki') { // Valor's Ki Burst: a stunning shockwave round her
         v.y -= 0.6;
-        ring(v, '#7dffc0', 2.3, false, 0.3, true);
-        ring(v, '#ffffff', 1.8, false, 0.2, true);
+        ring(v, '#7dffc0', 2.3, 'static', 0.45, true); // the stun's reach (sim.js wings()): whoever's inside is stunned
         shake = Math.max(shake, 0.18);
       } else if (kind === 'undertow') { // Pyke's phantom rushing back along his dash (vic: its length in dm)
         const dir = tmp2.set(Math.sin(big), 0, Math.cos(big));
