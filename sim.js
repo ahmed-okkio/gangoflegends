@@ -809,7 +809,7 @@ export function createSim({ mapId, players, practice = false, roundsToWin = 3, t
     }
     if (p.leap) { // Thresh's Death Sentence recast: reeled along the chain all the way to them. Lee Sin's knocks them back
       const q = ps[p.leap.slot], d = q && live(q) && sub(q.bodies[TORSO].translation(), tp);
-      if (p.leap.lee && d) { if (len(d) < 1.2) { hit(q, TORSO, add(mul(norm(V(d.x, 0, d.z)), 6.9), V(0, 2.59, 0)), 0); p.leapHit = { o: q, t: 0.6 }; } else p.yaw = Math.atan2(d.x, d.z); }
+      if (p.leap.lee && d) { if (len(d) < 1.2) { hit(q, TORSO, add(mul(norm(V(d.x, 0, d.z)), 6.9), V(0, 2.59, 0)), 0); p.leapHit = { o: q, t: 0.6 }; for (const b of p.bodies) b.setLinvel(V(0, 0, 0), true); } // he stops at them: at 14m/s he'd overtake their 6.9m/s knockback and fly through else p.yaw = Math.atan2(d.x, d.z); }
       if (!d || len(d) < 1.2 || (p.leap.t += DT) > 1) p.leap = null;
       else { const v = add(mul(d, 14 / len(d)), V(0, 0.8, 0)); for (const b of p.bodies) b.setLinvel(v, true); p.jumpT = 0.1; }
     }
