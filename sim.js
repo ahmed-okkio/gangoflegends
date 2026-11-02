@@ -578,8 +578,13 @@ export function createSim({ mapId, players, practice = false, roundsToWin = 3, t
     p.leapHit = null;
     let o = ld && Math.hypot(ld.x, ld.z) < aim && Math.abs(ld.y) < 2 ? lh : null;
     if (o) { f = norm(V(ld.x, 0, ld.z)); p.yaw = Math.atan2(f.x, f.z); }
-    else [o] = ps.filter(o => o !== p && live(o)).map(o => ({ o, d: sub(seen(p, o), t) }))
-      .filter(({ d }) => Math.hypot(d.x, d.z) < aim && dot(d, f) > Math.cos(cone) * Math.hypot(d.x, d.z) && Math.abs(d.y) < 1).sort((a, b) => len(a.d) - len(b.d)).map(x => x.o);
+    else { // any body part in the cone counts (a leg in it is a hit), each shifted with the torso to where Lee saw them
+      const inCone = d => { const h = Math.hypot(d.x, d.z); return h < aim + 0.15 && (h < 0.3 || Math.acos(Math.min(1, dot(d, f) / h)) < cone + 0.15 / h) && Math.abs(d.y) < 1; };
+      [o] = ps.filter(o => o !== p && live(o)).map(o => {
+        const lag = sub(seen(p, o), o.bodies[TORSO].translation());
+        return { o, d: Math.min(...o.bodies.map(b => sub(add(b.translation(), lag), t)).filter(inCone).map(len)) };
+      }).filter(x => x.d < Infinity).sort((a, b) => a.d - b.d).map(x => x.o);
+    }
     if (!o) return;
     fx('rage', o.bodies[TORSO].translation(), Math.atan2(f.x, f.z), p.slot, o.slot);
     if (local >= 0) return;
