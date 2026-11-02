@@ -1175,7 +1175,8 @@ export function createSim({ mapId, players, practice = false, roundsToWin = 3, t
       h.t += DT; by = h.o.slot;
       if (!h.vic) {
         h.pos = add(h.pos, mul(h.dir, 28 * DT));
-        const [first] = playersNearSeen(h.o, h.pos, 0.4);
+        // it flies at chest height, but its indicator is on the floor: legs and feet under it count too
+        const [first] = [0, 0.45, 0.85].map(dy => playersNearSeen(h.o, add(h.pos, V(0, -dy, 0)), 0.4)).find(a => a.length) ?? [];
         if (first) {
           h.vic = first.vic;
           if (h.lee) fx('sonic', first.vic.bodies[TORSO].translation(), 0, h.o.slot, h.vic.slot); // marked: nothing else, till he recasts
