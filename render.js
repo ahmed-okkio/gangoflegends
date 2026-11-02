@@ -1032,7 +1032,8 @@ export function createRenderer(canvas) {
       // the cone between from and to metres past Sett, its point back behind him
       const sector = (from, to) => flat(new THREE.RingGeometry(back + from, back + to, 40, 1, Math.PI / 2 - cone, cone * 2).translate(0, -back, 0));
       hay = new THREE.Group();
-      hay.add(new THREE.Mesh(indCone(cone).scale(back + range, 1, back + range).translate(0, 0, -back), indMat('conicrangeindicator'))); // League's cone frame, its point back behind him
+      hay.add(new THREE.Mesh(sector(0, range), mat(0.12)));
+      hay.add(new THREE.Mesh(sector(range - 0.06, range), mat(0.7)));
       hay.add(new THREE.Mesh(flat(new THREE.PlaneGeometry(core * 2, range * 0.95).translate(0, range * 0.475, 0)), mat(0.12, '#fff3b0')));
       hay.fill = new THREE.Mesh(sector(0, range), mat(0.22, '#ff8a00'));
       hay.reach = r => { r = Math.round(r * 20) / 20; if (r !== hay.fill.r) { hay.fill.r = r; hay.fill.geometry.dispose(); hay.fill.geometry = sector(0, r); } };
