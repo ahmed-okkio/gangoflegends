@@ -39,7 +39,7 @@ const turnToward = (a, b, max) => a + Math.max(-max, Math.min(max, wrap(b - a)))
 // --- ragdoll: the Gang Beasts beast (beast.js). Part index = body index everywhere; bodies[0] is the chest. ---
 const TORSO = CHEST;
 const CORE = [HIPS, WAIST, CHEST, HEAD, THIGH, THIGH + 1, LEG, LEG + 1]; // moved as one by the locomotion; arms hang off it
-const HOST_CASTS = ['hook', 'sentence', 'skewer', 'adhesive', 'hijack']; // GB mode: a client's copy never plays these (useAbility): they tie me to someone or put something in the world
+const HOST_CASTS = ['hook', 'sentence', 'adhesive', 'hijack']; // GB mode: a client's copy never plays these (useAbility): they tie me to someone or put something in the world
 const LEAPS = ['sentence', 'sonic']; // abilities whose recast flies you to whoever they caught (Thresh Q, Lee Sin Q)
 const HOIST = [WAIST, CHEST]; // lifted by a hoist, carrying the whole core's weight; hips and legs hang off it
 const HOIST_K = CORE.reduce((m, i) => m + PARTS[i].mass, 0) / HOIST.reduce((m, i) => m + PARTS[i].mass, 0);
@@ -508,8 +508,8 @@ export function createSim({ mapId, players, practice = false, roundsToWin = 3, t
       if (!(gb && local >= 0)) hooks.push({ o: p, pos: at, dir: f, t: 0, vic: null, pull: 0, lee: true });
       fx('wave', at, 0, p.slot);
     } else if (ab.id === 'hook' || ab.id === 'sentence') hooks.push({ o: p, pos: add(add(t, mul(f, 0.7)), V(0, 0.2, 0)), dir: f, t: 0, vic: null, pull: 0, thresh: ab.id === 'sentence' });
-    else if (ab.id === 'skewer') p.toss = 0.25, hooks.push({ o: p, pos: add(add(t, mul(f, 0.7)), V(0, 0.2, 0)), dir: f, t: 0, vic: null, pull: 0, pyke: true, reach: ab.aimMin + (ab.aim - ab.aimMin) * Math.min(1, p.aimT[i] / ab.windup) }); // charged reach, like the strip
-    else if (ab.id === 'undertow') { p.dash = { t: 0.25, power: 0, sylas: true }; p.undertow = { from: t, t: 0.6 }; phase(p, true); fx('phantom', t, 0, p.slot); } // sylas: a dash that bumps nobody, arms trailing
+    else if (ab.id === 'skewer') { p.toss = 0.3; if (!(gb && local >= 0)) hooks.push({ o: p, pos: add(add(t, mul(f, 0.7)), V(0, 0.2, 0)), dir: f, t: 0, vic: null, pull: 0, pyke: true, reach: ab.aimMin + (ab.aim - ab.aimMin) * Math.min(1, p.aimT[i] / ab.windup) }); } // charged reach, like the strip. The throw pose plays on my copy too (like Sonic Wave's palm), the dagger is the host's
+    else if (ab.id === 'undertow') { p.dash = { t: 0.2, speed: 15, exact: true, dir: f, yaw: p.yaw, power: 0, sylas: true }; p.undertow = { from: t, t: 0.6 }; phase(p, true); fx('phantom', t, 0, p.slot); }  // exact: 15m/s set straight on, stopped dead at the end: his old ~3.4m (ramp + coast), quicker // sylas: a dash that bumps nobody, arms trailing
     else if (ab.id === 'fist') { p.empower = 4; p.emp = 'launch'; }
     else if (ab.id === 'rampage') { p.spin = SPIN; p.spinHit = new Set(); }
     else if (ab.id === 'abscond') { p.dash = { t: 0.2, power: 0, sylas: true }; p.empower = 4; p.emp = 'aoe'; p.abduct = ab.recast; fx('swing', t, 0, p.slot); }
@@ -824,14 +824,14 @@ export function createSim({ mapId, players, practice = false, roundsToWin = 3, t
     if (p.dash) { const d = p.dash.dir ?? f; if (p.dash.dir) p.yaw = p.dash.yaw; speed = p.dash.speed ?? (p.dash.dir ? 14.85 : 11); /* Vi's 35% faster, over the same reach (her aim strip) */ mx = d.x; mz = d.z;
       // Riven's Q1/Q2 stop at whoever's in front and hit there: never through them, so spamming Q keeps driving them back
       // Riven's dashes run at their set speed from the first tick (the walk steering ramps up, which cut Q1/Q2 to ~1.1m): exactly speed x t
-      if (p.dash.riven) for (const b of p.bodies) { const v = b.linvel(); b.setLinvel(V(d.x * p.dash.speed, v.y, d.z * p.dash.speed), true); }
+      if (p.dash.riven || p.dash.exact) for (const b of p.bodies) { const v = b.linvel(); b.setLinvel(V(d.x * p.dash.speed, v.y, d.z * p.dash.speed), true); }
       if (p.dash.riven && p.dash.riven !== 'e' && ps.some(o => { // anyone in her path, standing or knocked flat
         if (o === p || !(o.alive || o.seen)) return false; // seen: a prediction copy's stand-in
         // where they really are, not lag-compensated (seen()): the host stops her at the body; my copy at the stand-in, which game.js already shows pushed
         const r = sub(o.bodies[TORSO].translation(), p.bodies[TORSO].translation()), ahead = dot(V(r.x, 0, r.z), d);
         return ahead > 0 && ahead < 1 && Math.hypot(r.x - d.x * ahead, r.z - d.z * ahead) < 0.6 && Math.abs(r.y) < 1.2;
       })) { if (p.dash.riven === 3) p.dash.speed = 0; else p.dash.t = 0; } // Q3: stops going forward and comes down in front of them
-      if ((p.dash.t -= DT) <= 0) { if (p.dash.riven) { wings(p, p.dash.riven); p.dash = null; if (!p.rivA) rivGo(p); } else p.dash = null; } }
+      if ((p.dash.t -= DT) <= 0) { if (p.dash.exact) for (const b of p.bodies) { const v = b.linvel(); b.setLinvel(V(0, v.y, 0), true); } if (p.dash.riven) { wings(p, p.dash.riven); p.dash = null; if (!p.rivA) rivGo(p); } else p.dash = null; } }
     if (p.shove) { // Broken Wings' push: exactly PUSH m over RIV_T (her Q's time), then stopped dead, so Q3's 2m leap comes down just short of them
       const s = p.shove, end = (s.t -= DT) <= 0;
       for (const b of p.bodies) { const v = b.linvel(); b.setLinvel(V(end ? 0 : s.dir.x * PUSH / RIV_T, v.y, end ? 0 : s.dir.z * PUSH / RIV_T), true); }
@@ -1025,8 +1025,11 @@ export function createSim({ mapId, players, practice = false, roundsToWin = 3, t
       if (p.spin > 0) { ua = fa = add(mul(side, s), mul(bf, 0.1)); str = 0.5; fs = 0.4; }
       if (p.kickA > 0 || fk) { ua = fa = add(mul(side, s), V(0, fk ? 0.3 : -0.2, 0)); str = 0.5; fs = 0.4; } // out wide for balance
       if (p.champ === 'pyke' && i === 1 && (p.aimBtn & BTN.A1 || p.toss > 0)) { // Bone Skewer: held, the dagger cocked up by the ear like a spear; let go, thrown out at the aim
-        if (p.toss > 0) { ua = add(bf, V(0, 0.25, 0)); fa = add(bf, V(0, 0.1, 0)); } else { ua = add(add(mul(bf, -0.2), mul(side, s * 0.5)), V(0, 0.8, 0)); fa = add(mul(bf, -1), V(0, 0.15, 0)); } // fist back by the ear: the reverse-grip blade points forward over it
-        str = 0.9; fs = 0.9;
+        if (p.toss > 0) { // the throw: over the top from by the ear, through forward and down a little, like a spear
+          const u = Math.min(1, (0.3 - p.toss) / 0.12), a = 0.3 + 1.25 * u, b = 0.6 + 0.95 * u; // angle down from straight up: upper arm, forearm (whips over); ends straight out at shoulder height, held there
+          ua = add(mul(bf, Math.sin(a)), V(0, Math.cos(a), 0)); fa = add(mul(bf, Math.sin(b) - (1 - u) * 0.5), V(0, Math.cos(b), 0));
+          str = 1; fs = 1;
+        } else { ua = add(add(mul(bf, -0.2), mul(side, s * 0.5)), V(0, 0.8, 0)); fa = add(mul(bf, -1), V(0, 0.15, 0)); str = 0.9; fs = 0.9; } // fist back by the ear: the reverse-grip blade points forward over it
       }
       if (p.palm > 0 && i === 1) { ua = fa = add(bf, V(0, 0.05, 0)); str = 0.9; fs = 0.9; } // Sonic Wave: the palm thrust out at the aim
       if (p.held[i] > 0 && !grabbing[i] && p.punch?.arm !== i && p.armCd[i] <= 0) { ua = add(add(mul(bf, -0.5), mul(side, s * 0.7)), V(0, -0.3, 0)); fa = add(bf, V(0, 0.3, 0)); str = 0.6; fs = 0.7; } // cocked: elbow back and out
