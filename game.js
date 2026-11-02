@@ -28,7 +28,7 @@ window.__update = s => {
   if (s.done) return;
   $('updTitle').textContent = s.checking ? 'Checking for updates…' : s.installing ? 'Installing…' : `Downloading v${s.v ?? ''}`;
   $('updFill').style.width = `${s.checking ? 30 : s.p ?? 0}%`;
-  $('updTxt').textContent = s.total ? `${(s.got / 1e6).toFixed(1)} / ${(s.total / 1e6).toFixed(1)} MB` : s.installing ? 'The game restarts by itself' : 'One moment';
+  $('updTxt').textContent = s.total ? `${(s.got / 1e6).toFixed(1)} / ${(s.total / 1e6).toFixed(1)} MB` : s.installing ? 'The game restarts by itself' : s.of ? `${s.files} / ${s.of} files` : 'One moment';
 };
 if (new URLSearchParams(location.search).get('u') === '1') window.__update({ checking: true });
 

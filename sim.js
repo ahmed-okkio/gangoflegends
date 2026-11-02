@@ -1553,10 +1553,8 @@ export function createSim({ mapId, players, practice = false, roundsToWin = 3, t
   const rim = () => { const a = Math.random() * Math.PI * 2, r = 4.8 + Math.random() * 2.5; return V(r * Math.sin(a), 0.4, r * Math.cos(a)); };
   function stepTentacles() {
     if (!tentacles.length || st === 'count') return;
-    if ((octo.t -= DT) > 0) return; // the first rises 30-45s in, then another every 4-10s while fewer than two are up
-    octo.t = 4 + Math.random() * 6;
-    const down = tentacles.filter(t => t.st === 'off');
-    if (tentacles.length - down.length < 2 && down.length) {
+    const down = tentacles.filter(t => t.st === 'off'); // the first rises 30-45s in, then another every 4-10s while fewer than two are up
+    if ((octo.t -= DT) <= 0 && (octo.t = 4 + Math.random() * 6) && tentacles.length - down.length < 2 && down.length) { // gates only the rising: returning here froze the risen ones between spawns
       const t = down[Math.floor(Math.random() * down.length)];
       t.st = 'idle'; t.ph = 'idle'; t.pt = Math.max(5, 12 - 2 * octo.turn); tnPlace(t, true);
       fx('breach', t.root, 0, -1, -1);

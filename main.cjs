@@ -107,12 +107,14 @@ async function patchFiles(show) {
   if (!asset) return false;
   const m = await (await fetch(asset.browser_download_url, { signal: AbortSignal.timeout(15000) })).json();
   if (m.electron !== process.versions.electron) return false;
-  const blob = p => { try { const b = fs.readFileSync(path.join(__dirname, p)); return sha(b); } catch { return null; } };
-  const changed = Object.keys(m.files).filter(p => blob(p) !== m.files[p]);
+  // read async: hashing every file (gbcache's big assets too) with readFileSync froze the window ("Not responding")
+  const blob = p => fs.promises.readFile(path.join(__dirname, p)).then(sha, () => null);
+  const all = Object.keys(m.files), changed = [];
+  for (let i = 0; i < all.length; i += 16) (await Promise.all(all.slice(i, i + 16).map(blob))).forEach((h, j) => { if (h !== m.files[all[i + j]]) changed.push(all[i + j]); });
   if (changed.some(p => m.local.includes(p))) return false;
   const v = rel.tag_name.slice(1);
   let got = 0;
-  show({ v, p: 0 });
+  show({ v, p: 0, files: 0, of: changed.length });
   for (let i = 0; i < changed.length; i += 8) await Promise.all(changed.slice(i, i + 8).map(async p => { // 8 at a time
     const r = await fetch(`https://raw.githubusercontent.com/ahmed-okkio/gangoflegends/${rel.tag_name}/${p}`);
     if (!r.ok) throw new Error(`${p}: ${r.status}`);
@@ -121,7 +123,7 @@ async function patchFiles(show) {
     const f = path.join(__dirname, p);
     fs.mkdirSync(path.dirname(f), { recursive: true });
     fs.writeFileSync(f + '.new', b);
-    show({ v, p: ++got / changed.length * 100 });
+    show({ v, p: ++got / changed.length * 100, files: got, of: changed.length });
   }));
   for (const p of changed) fs.renameSync(path.join(__dirname, p) + '.new', path.join(__dirname, p));
   show({ p: 100, installing: true });
