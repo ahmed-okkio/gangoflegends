@@ -21,6 +21,21 @@ npm run release    # push main first: starts the Mac CI build, builds the Window
 
 Bump `version` in package.json before each release and add its entry at the top of `patchnotes.json` (the release notes, also shown in the game's Patch notes tab after the update); installed copies pick it up on next launch, and lobbies only accept players on the host's version.
 
+## Ability indicators
+
+Aiming shows League's own ground indicators: Riot's textures in `assets/indicators/`, taken from CommunityDragon
+(`https://raw.communitydragon.org/latest/game/assets/spells/textures/<name>.png`; more there, e.g. `semicirclerangeindicator`, `rectangleline`).
+`render.js` draws them additive (black is see-through), each laid flat under the champ, pointing at the cursor and scaled to the ability:
+
+| Shape | Textures | Ability fields (`champs.js`) |
+|---|---|---|
+| Line (skillshot) | `locallinemissilebase` stretched + `locallinemissiletarget` arrowhead | `aim` = length (`back: true` = both sides, no arrowhead) |
+| Cone | `conicrangeindicator`, warped to the cone's angle | `aim` = length, `cone` = radians each side |
+| Circle (spot) | `circularrangeindicator` ring + `aoe` spot | `point: true`, `aim` = max range, `radius` = spot |
+
+The hit code reads the same fields (e.g. `rage()` in `sim.js` uses Lee E's `aim` and `cone`), so the indicator is the hitbox: new
+abilities should do the same rather than hard-coding their shape. A new shape = one more texture there and one more mesh by `aimBar` in `render.js`.
+
 ## Platforms
 
 The game ships for **Windows and macOS**. Keep everything cross-platform: no Windows-only paths, APIs, shell commands or

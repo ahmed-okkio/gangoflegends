@@ -378,7 +378,7 @@ export function createSim({ mapId, players, practice = false, roundsToWin = 3, t
   }
   // drop whatever the player was doing: knocked out, caught by a hook or stunned by an ability (the cooldown stays spent)
   function cancel(p) {
-    p.spin = 0; p.charge = 0; p.punch = null; p.butt = null; p.dash = null; p.vault = 0; p.hay = 0; p.leap = null; p.kickA = 0; p.qTurn = null; p.rivA = null; p.rivNext = null;
+    p.spin = 0; p.charge = 0; p.punch = null; p.butt = null; p.dash = null; p.vault = 0; p.hay = 0; p.leap = null; p.leapHit = null; p.kickA = 0; p.qTurn = null; p.rivA = null; p.rivNext = null;
     releaseGrabs(p);
   }
   function wake(p) {
@@ -521,7 +521,7 @@ export function createSim({ mapId, players, practice = false, roundsToWin = 3, t
     else if (ab.id === 'fling') fling(p, t);
     else if (ab.id === 'headbutt') { p.dash = { t: 0.25, power: 1, ali: true }; fx('swing', t, 0, p.slot); }
     else if (ab.id === 'valor') { p.dash = { t: 0.2, riven: 'e', dir: f, yaw: p.yaw, speed: 12.5 }; p.rivA = { n: 'e', t: 0, d: 0.3 }; fx('swing', t, 0, p.slot); } // ~2.5m, then Ki Burst (wings())
-    else if (ab.id === 'rage') { p.kickA = KICK; fx('swing', t, 0, p.slot); } // the kick lands at the end of the turn (control())
+    else if (ab.id === 'rage') { p.kickA = KICK; fx('swing', t, 0, p.slot); rage(p, f, t); } // checked on release, where he's aimed; the turn is just the animation
   }
 
   // Riven Q: up to 3 presses, each within 4s of the last. 1st and 2nd: a short dash and a slash in front; 3rd: a leap that
@@ -572,13 +572,19 @@ export function createSim({ mapId, players, practice = false, roundsToWin = 3, t
   // (control()), and as it comes round to the front it kicks the champ there back. Whoever they crash into on the way
   // is knocked back too
   function rage(p, f, t) {
-    const [o] = ps.filter(o => o !== p && live(o)).map(o => ({ o, d: sub(seen(p, o), t) }))
-      .filter(({ d }) => Math.hypot(d.x, d.z) < 2.76 && dot(d, f) > 0 && Math.abs(d.y) < 1).sort((a, b) => len(a.d) - len(b.d));
+    const { aim, cone } = CHAMPS.lee.abilities[1]; // a cone `cone` radians each side, `aim` long (render.js draws it while aiming)
+    // just after Sonic Wave's recast lands he's still flying on, through or past them: E kicks them wherever they are now
+    const lh = p.leapHit?.o, ld = lh && live(lh) && sub(seen(p, lh), t);
+    p.leapHit = null;
+    let o = ld && Math.hypot(ld.x, ld.z) < aim && Math.abs(ld.y) < 2 ? lh : null;
+    if (o) { f = norm(V(ld.x, 0, ld.z)); p.yaw = Math.atan2(f.x, f.z); }
+    else [o] = ps.filter(o => o !== p && live(o)).map(o => ({ o, d: sub(seen(p, o), t) }))
+      .filter(({ d }) => Math.hypot(d.x, d.z) < aim && dot(d, f) > Math.cos(cone) * Math.hypot(d.x, d.z) && Math.abs(d.y) < 1).sort((a, b) => len(a.d) - len(b.d)).map(x => x.o);
     if (!o) return;
-    fx('rage', o.o.bodies[TORSO].translation(), Math.atan2(f.x, f.z), p.slot, o.o.slot);
+    fx('rage', o.bodies[TORSO].translation(), Math.atan2(f.x, f.z), p.slot, o.slot);
     if (local >= 0) return;
-    hit(o.o, TORSO, add(mul(f, 9.4), V(0, 5.5, 0)), 12);
-    p.kick = { vic: o.o, f, t: 0.8, hit: new Set([p, o.o]) };
+    hit(o, TORSO, add(mul(f, 9.4), V(0, 5.5, 0)), 12);
+    p.kick = { vic: o, f, t: 0.8, hit: new Set([p, o]) };
   }
 
   // Sylas Q: point and click. The champ nearest the cursor (within radius of it, and in range) has their Q stolen: his Q is
@@ -798,7 +804,7 @@ export function createSim({ mapId, players, practice = false, roundsToWin = 3, t
     }
     if (p.leap) { // Thresh's Death Sentence recast: reeled along the chain all the way to them. Lee Sin's knocks them back
       const q = ps[p.leap.slot], d = q && live(q) && sub(q.bodies[TORSO].translation(), tp);
-      if (p.leap.lee && d) { if (len(d) < 1.2) hit(q, TORSO, add(mul(norm(V(d.x, 0, d.z)), 6.9), V(0, 2.59, 0)), 0); else p.yaw = Math.atan2(d.x, d.z); }
+      if (p.leap.lee && d) { if (len(d) < 1.2) { hit(q, TORSO, add(mul(norm(V(d.x, 0, d.z)), 6.9), V(0, 2.59, 0)), 0); p.leapHit = { o: q, t: 0.6 }; } else p.yaw = Math.atan2(d.x, d.z); }
       if (!d || len(d) < 1.2 || (p.leap.t += DT) > 1) p.leap = null;
       else { const v = add(mul(d, 14 / len(d)), V(0, 0.8, 0)); for (const b of p.bodies) b.setLinvel(v, true); p.jumpT = 0.1; }
     }
@@ -818,7 +824,8 @@ export function createSim({ mapId, players, practice = false, roundsToWin = 3, t
     if (p.undertow && (p.undertow.t -= DT) <= 0) { undertow(p, p.undertow.from, tp); p.undertow = null; }
     p.fb -= DT; p.pulv -= DT; p.flay -= DT; p.fling -= DT; p.palm -= DT; p.toss -= DT;
     if (p.qTurn && ((p.qTurn.t -= DT) <= 0 || ahead(p) > 0.5)) { p.yaw = p.qTurn.yaw; p.qTurn = null; useAbility(p, 0, true); }
-    if (p.kickA > 0 && (p.kickA -= DT) <= 0) rage(p, facing(p), p.bodies[TORSO].translation());
+    if (p.kickA > 0) p.kickA -= DT;
+    if (p.leapHit && (p.leapHit.t -= DT) <= 0) p.leapHit = null;
     const stuck = glued(p, tp);
     if (stuck) speed *= 0.3;
     if (lying) speed = 1.2; // crawl

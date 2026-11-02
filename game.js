@@ -628,7 +628,7 @@ function readInput() {
 const aiming = [false, false], held = [0, 0];
 function showAim(inp, dt) {
   const abs = kit(game.setup.players[game.mySlot].champ, game.stole), mine = game.cur?.p[game.mySlot];
-  let range = 0, back = false, point = null;
+  let range = 0, back = false, point = null, cone = 0;
   const sim = game.sim ?? game.local, stuck = sim.stuck(game.mySlot), ready = sim.ready(game.mySlot);
   [BTN.A1, BTN.A2].forEach((btn, i) => {
     const ab = abs[i];
@@ -638,12 +638,12 @@ function showAim(inp, dt) {
     if (!aiming[i] || !ready) return; // knocked down or stunned mid-hold: hidden and not winding up (sim.js holds the aim through a stun)
     held[i] += dt;
     range = ab.aimMin ? ab.aimMin + (ab.aim - ab.aimMin) * Math.min(1, held[i] / ab.windup) : ab.aim ?? ab.recastAim;
-    back = !!ab.back;
+    back = !!ab.back; cone = ab.cone;
     if (ab.point) point = { max: ab.aim, r: ab.target ? 0 : ab.radius, pick: ab.target ? ab.radius : 0 }; // target: click a champ, no spot (just the range ring, and a border on who you'd get)
   });
   game.lastB = inp.b;
   $('abil').classList.toggle('stuck', stuck);
-  view.setAim(inp.a == null ? null : { slot: game.mySlot, yaw: inp.a, range, back, point, dist: inp.d });
+  view.setAim(inp.a == null ? null : { slot: game.mySlot, yaw: inp.a, range, back, cone, point, dist: inp.d });
 }
 
 // ---------- loop ----------

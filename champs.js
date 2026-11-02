@@ -53,7 +53,7 @@ export const CHAMPS = {
     name: 'Lee Sin', title: 'The Blind Monk', body: '#e0ad7e', limb: '#b8845a', eyes: '#ffd27a', glow: '#5fb8ff',
     abilities: [
       { id: 'sonic', name: 'Sonic Wave', cd: 6, aim: 12.5, release: true, desc: 'Hold to aim at your cursor, let go to send out a wave. It marks the first champ it hits for 3s: press again to fly to them and knock them back.' },
-      { id: 'rage', name: "Dragon's Rage", cd: 6, desc: 'Kick the champ in front of you back. Anyone they crash into gets knocked back too.' },
+      { id: 'rage', name: "Dragon's Rage", cd: 6, aim: 2.76, cone: 0.8, release: true, desc: 'Hold to aim at your cursor, let go to kick the champ in front of you back. Anyone they crash into gets knocked back too.' },
     ],
   },
   riven: {

@@ -1032,8 +1032,7 @@ export function createRenderer(canvas) {
       // the cone between from and to metres past Sett, its point back behind him
       const sector = (from, to) => flat(new THREE.RingGeometry(back + from, back + to, 40, 1, Math.PI / 2 - cone, cone * 2).translate(0, -back, 0));
       hay = new THREE.Group();
-      hay.add(new THREE.Mesh(sector(0, range), mat(0.12)));
-      hay.add(new THREE.Mesh(sector(range - 0.06, range), mat(0.7)));
+      hay.add(new THREE.Mesh(indCone(cone).scale(back + range, 1, back + range).translate(0, 0, -back), indMat('conicrangeindicator'))); // League's cone frame, its point back behind him
       hay.add(new THREE.Mesh(flat(new THREE.PlaneGeometry(core * 2, range * 0.95).translate(0, range * 0.475, 0)), mat(0.12, '#fff3b0')));
       hay.fill = new THREE.Mesh(sector(0, range), mat(0.22, '#ff8a00'));
       hay.reach = r => { r = Math.round(r * 20) / 20; if (r !== hay.fill.r) { hay.fill.r = r; hay.fill.geometry.dispose(); hay.fill.geometry = sector(0, r); } };
@@ -1270,23 +1269,39 @@ export function createRenderer(canvas) {
   // aiming, mine only: the cursor's point on the floor under my champ -> a world yaw, and a League-style skillshot
   // strip under my champ while an aimed ability is held (game.js; range 0 = no strip)
   const aimRay = new THREE.Raycaster(), aimPlane = new THREE.Plane(new THREE.Vector3(0, 1, 0), 0), aimHit = new THREE.Vector3();
-  const aimBar = new THREE.Mesh(new THREE.PlaneGeometry(1, 1).rotateX(-Math.PI / 2).translate(0, 0, 0.5),
-    new THREE.MeshBasicMaterial({ color: '#0ac8b9', transparent: true, opacity: 0.3, depthWrite: false, blending: THREE.AdditiveBlending }));
-  aimBar.renderOrder = 5; aimBar.visible = false; scene.add(aimBar);
-  const aimBack = new THREE.Mesh(aimBar.geometry, aimBar.material.clone()); // the other half of a two-sided strip (Flay), dimmer
-  aimBack.material.opacity = 0.15; aimBack.renderOrder = 5; aimBack.visible = false; scene.add(aimBack);
+  // League's own ground indicators (assets/indicators/, Riot's game/assets/spells/textures via CommunityDragon; see
+  // README "Ability indicators"). Drawn additive, so their black is see-through. Each is unit sized, pointing +z, and
+  // scaled to the ability's range: line = indLine base + indTip, cone = indCone(half), circle = range ring / aoe spot
+  const indMat = (name, opacity = 1) => new THREE.MeshBasicMaterial({ map: Object.assign(new THREE.TextureLoader().load(`./assets/indicators/${name}.png`), { colorSpace: THREE.SRGBColorSpace }),
+    transparent: true, opacity, blending: THREE.AdditiveBlending, depthWrite: false, side: THREE.DoubleSide });
+  const flatZ = g => g.rotateX(Math.PI / 2); // drawn in xy with the texture's top at +y; laid on the floor with its top at +z
+  // conicrangeindicator warped round to a cone `half` radians each side: its own cone (apex at px 256,518, atan(0.5)
+  // each side, 508px long) is stretched to fit, so the frame sits exactly on the hit area
+  const indCone = half => {
+    const g = new THREE.CircleGeometry(1, 32, Math.PI / 2 - half, half * 2), p = g.attributes.position, uv = g.attributes.uv;
+    for (let k = 0; k < p.count; k++) {
+      const r = Math.hypot(p.getX(k), p.getY(k)), t = Math.atan2(p.getX(k), p.getY(k)) / half * Math.atan(0.5);
+      uv.setXY(k, (256 + r * 508 * Math.sin(t)) / 512, (r * 508 * Math.cos(t) - 6) / 512);
+    }
+    return flatZ(g);
+  };
+  const aimBar = new THREE.Mesh(flatZ(new THREE.PlaneGeometry(1, 1).translate(0, 0.5, 0)), indMat('locallinemissilebase'));
+  const aimTip = new THREE.Mesh(aimBar.geometry, indMat('locallinemissiletarget')); // the arrowhead: a square at the far end
+  const aimBack = new THREE.Mesh(aimBar.geometry, indMat('locallinemissilebase', 0.5)); // the other half of a two-sided strip (Flay), dimmer
+  for (const m of [aimBar, aimTip, aimBack]) { m.renderOrder = 5; m.visible = false; scene.add(m); }
   // Flay: chevrons along the strip pointing the way it knocks everyone (away from the cursor), like League's
-  const aimArrows = new THREE.Group(), chevMat = aimBar.material.clone(); chevMat.opacity = 0.6;
+  const aimArrows = new THREE.Group(), chevMat = new THREE.MeshBasicMaterial({ color: '#0ac8b9', transparent: true, opacity: 0.6, depthWrite: false, blending: THREE.AdditiveBlending });
   for (let k = 0; k < 4; k++) for (const s of [-1, 1]) {
     const m = new THREE.Mesh(new THREE.PlaneGeometry(0.08, 0.5).rotateX(-Math.PI / 2), chevMat);
     m.rotation.y = -s * 0.8; m.position.set(s * 0.17, 0.01, 0.75 - k * 0.5); m.renderOrder = 6; aimArrows.add(m);
   }
   aimArrows.visible = false; scene.add(aimArrows);
-  // a spot-targeted ability (Singed Q): its range round my champ and the puddle where the cursor is
-  const ringMat = aimBar.material.clone(); ringMat.side = THREE.DoubleSide;
-  const aimRange = new THREE.Mesh(new THREE.RingGeometry(0.97, 1, 64).rotateX(-Math.PI / 2), ringMat);
-  const aimSpot = new THREE.Mesh(new THREE.CircleGeometry(1, 40).rotateX(-Math.PI / 2), new THREE.MeshBasicMaterial({ color: '#a6ff00', transparent: true, opacity: 0.35, depthWrite: false }));
-  for (const m of [aimRange, aimSpot]) { m.renderOrder = 5; m.visible = false; scene.add(m); }
+  // a cone-shaped hit (Lee E): the cone itself, unit long (scaled to range), rebuilt if the angle changes
+  const aimCone = new THREE.Mesh(new THREE.BufferGeometry(), indMat('conicrangeindicator'));
+  // a spot-targeted ability (Singed Q): its range round my champ and the puddle where the cursor is (unit radius)
+  const aimRange = new THREE.Mesh(flatZ(new THREE.PlaneGeometry(2, 2)), indMat('circularrangeindicator'));
+  const aimSpot = new THREE.Mesh(aimRange.geometry, indMat('aoe'));
+  for (const m of [aimCone, aimRange, aimSpot]) { m.renderOrder = 5; m.visible = false; scene.add(m); }
   let closeUp = null; // dev: { slot, yaw, d }
   let aim = null, aimD = 0; // aimD: the cursor's distance from my champ on the floor, from the last aimYaw()
   function aimYaw(cx, cy, slot) {
@@ -1319,11 +1334,19 @@ export function createRenderer(canvas) {
     }
     outline.enabled = !!spot && outline.selectedObjects.length > 0;
     const me = !spot && aim?.range && avatars[aim.slot];
-    aimBar.visible = !!me;
+    aimBar.visible = !!me && !aim.cone;
+    aimTip.visible = aimBar.visible && !aim.back;
+    aimCone.visible = !!me && !!aim.cone;
+    if (aimCone.visible) {
+      if (aimCone.cone !== aim.cone) { aimCone.cone = aim.cone; aimCone.geometry.dispose(); aimCone.geometry = indCone(aim.cone); }
+      const hp = me.parts[HIPS].position;
+      aimCone.position.set(hp.x, hp.y - HIP_HEIGHT + 0.05, hp.z); aimCone.rotation.y = aim.yaw; aimCone.scale.setScalar(aim.range);
+    }
     aimBack.visible = aimArrows.visible = !!me && !!aim.back;
     if (me) {
-      const hp = me.parts[HIPS].position;
-      for (const [bar, yaw] of [[aimBar, aim.yaw], [aimBack, aim.yaw + Math.PI]]) { bar.position.set(hp.x, hp.y - HIP_HEIGHT + 0.05, hp.z); bar.rotation.y = yaw; bar.scale.set(aim.back ? 2.6 : 0.7, 1, aim.range); } // Flay's strip is as wide as it hits (sim.js flay)
+      const hp = me.parts[HIPS].position, w = aim.back ? 2.6 : 0.7, tip = aimTip.visible ? Math.min(w, aim.range / 2) : 0; // Flay's strip is as wide as it hits (sim.js flay)
+      for (const [bar, yaw] of [[aimBar, aim.yaw], [aimBack, aim.yaw + Math.PI]]) { bar.position.set(hp.x, hp.y - HIP_HEIGHT + 0.05, hp.z); bar.rotation.y = yaw; bar.scale.set(w, 1, aim.range - tip); }
+      if (tip) { aimTip.position.set(hp.x + Math.sin(aim.yaw) * (aim.range - tip), hp.y - HIP_HEIGHT + 0.05, hp.z + Math.cos(aim.yaw) * (aim.range - tip)); aimTip.rotation.y = aim.yaw; aimTip.scale.set(w, 1, tip); }
       if (aim.back) { aimArrows.position.set(hp.x, hp.y - HIP_HEIGHT + 0.05, hp.z); aimArrows.rotation.y = aim.yaw + Math.PI; aimArrows.scale.setScalar(aim.range / 3); }
     }
     for (const fn of animated) fn({ dt, time });

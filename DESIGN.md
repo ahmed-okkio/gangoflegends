@@ -1,6 +1,6 @@
 # Gang of Legends
 
-Gang Beasts-style ragdoll brawler with League of Legends champions. Free fan game under Riot's "Legal Jibber Jabber" policy: never sold, no Riot asset rips.
+Gang Beasts-style ragdoll brawler with League of Legends champions. Free fan game under Riot's "Legal Jibber Jabber" policy: never sold, no Riot asset rips (except League's ability indicator textures, assets/indicators/, by the owner's call).
 
 ## Locked decisions
 | Area | Decision |
